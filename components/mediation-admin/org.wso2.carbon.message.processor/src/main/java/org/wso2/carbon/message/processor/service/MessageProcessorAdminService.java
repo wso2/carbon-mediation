@@ -762,7 +762,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
 
 
     /**
-<<<<<<< HEAD
      * Gets the message from the associated queue.
      *
      * @param processorName message processor name.
@@ -772,33 +771,12 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
         String msg = getMessageAsString(messageConsumer);
-=======
-     * Gets the message from the associated queue
-     *
-     * @param processorName Message Processor name
-     * @return <code>msg</code> Returns message received from the queue as a string
-     * @throws Exception
-     */
-
-    public String getMessage(String processorName) {
-        SynapseConfiguration configuration = getSynapseConfiguration();
-        MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
-        String msg;
-
-        msg = getMessageAsString(messageConsumer);
->>>>>>> 964060ea0a40e65cdecbd896ca9da2ec72deace8
         messageConsumer.cleanup();
         return msg;
     }
 
-<<<<<<< HEAD
     private String getMessageAsString(MessageConsumer messageConsumer) throws SynapseException {
         MessageContext messageContext;
-=======
-    private String getMessageAsString(MessageConsumer consumer) throws SynapseException {
-        MessageContext messageContext;
-        MessageConsumer messageConsumer = consumer;
->>>>>>> 964060ea0a40e65cdecbd896ca9da2ec72deace8
         String msg = null;
 
         if (messageConsumer.isAlive()) {
@@ -813,15 +791,9 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     }
 
     /**
-<<<<<<< HEAD
      * Pops the message from the associated queue.
      *
      * @param processorName message processor name.
-=======
-     * Pops the message from the associated queue
-     *
-     * @param processorName Message Processor Name
->>>>>>> 964060ea0a40e65cdecbd896ca9da2ec72deace8
      */
     public void popMessage(String processorName) {
         SynapseConfiguration configuration = getSynapseConfiguration();
@@ -831,13 +803,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         messageConsumer.cleanup();
     }
 
-<<<<<<< HEAD
     private  void popMessageFromQueue(MessageConsumer messageConsumer) throws SynapseException{
-=======
-    private  void popMessageFromQueue(MessageConsumer consumer) throws SynapseException{
-        MessageConsumer messageConsumer = consumer;
-
->>>>>>> 964060ea0a40e65cdecbd896ca9da2ec72deace8
         try {
             messageConsumer.receive();
             messageConsumer.ack();
@@ -847,20 +813,11 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     }
 
     /**
-<<<<<<< HEAD
      * Pops the message and enqueues it to a specified queue.
      *
      * @param processorName message processor name.
      * @param storeName name of the store to enqueue the message.
      */
-=======
-     * Pops the message and enqueues it to a specified queue
-     *
-     * @param processorName Message Processor Name
-     * @param storeName Name of the store to enqueue the message
-     */
-
->>>>>>> 964060ea0a40e65cdecbd896ca9da2ec72deace8
     public void popAndEnqueueMessage(String processorName, String storeName){
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
@@ -870,11 +827,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         messageConsumer.cleanup();
     }
 
-<<<<<<< HEAD
     private void popAndEnqueueMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer) throws SynapseException
-=======
-    private void popAndEnqueueMessageToStore(MessageProducer producer, MessageConsumer consumer) throws SynapseException
->>>>>>> 964060ea0a40e65cdecbd896ca9da2ec72deace8
     {
         MessageContext messageContext;
 
@@ -889,22 +842,12 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     }
 
     /**
-<<<<<<< HEAD
      * Gets the messageConsumer associated with the specified processor.
      *
      * @param configuration SynapseConfiguration.
      * @param processorName message processor name.
      * @return <code>messageConsumer</code> object associated with specified processor.
      */
-=======
-     * Gets the MessageConsumer associated with the specified processor
-     *
-     * @param configuration SynapseConfiguration
-     * @param processorName Message Processor Name
-     * @return <code>messageConsumer</code> object associated with specified processor
-     */
-
->>>>>>> 964060ea0a40e65cdecbd896ca9da2ec72deace8
     private MessageConsumer getMessageConsumer(SynapseConfiguration configuration, String processorName) {
         MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
         final String messageStoreName = processor.getMessageStoreName();
