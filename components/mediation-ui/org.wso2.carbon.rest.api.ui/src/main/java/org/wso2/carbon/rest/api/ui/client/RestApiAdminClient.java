@@ -172,6 +172,9 @@ public class RestApiAdminClient {
 		try {
 			stub.addApi(apiData);
 		} catch (Exception e) {
+			if (e.getMessage().contains("Error initializing API handler")) {
+				handleException(e.getMessage(), e);
+			}
 			handleException(bundle.getString("could.not.add.api"), e);
 		}
 	}
@@ -184,6 +187,9 @@ public class RestApiAdminClient {
 			}
 			stub.updateApi(apiName, apiData);
 		} catch (Exception e) {
+			if (e.getMessage().contains("Error initializing API handler")) {
+				handleException(e.getMessage(), e);
+			}
 			handleException(bundle.getString("could.not.update.api"), e);
 		}
 	}

@@ -56,8 +56,8 @@
         <input type="text" name="handler" id="handlerClasspath" value="<%=selectedHandler.getHandler()%>" style="width:300px; margin-top:2px;"/>
     </td>
 </tr>
-<%  String key;
-    String value;
+<%  String key= "";
+    String value= "";
     String[] properties = selectedHandler.getProperties();
     if (properties != null) {%>
     <table width="100%" class="styledInner">
@@ -76,10 +76,14 @@
             </tr>
         </thead>
         <%  for(int i = 0; i < properties.length; i++) {
-            String[] entry = properties[i].split(RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER);
-            key = entry[0].trim();
-            value = entry[1].trim();
+            if (properties[i] != null) {
+                String[] entry = properties[i].split(RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER);
+                key = entry[0].trim();
+                value = entry[1].trim();
+            }
         %>
+        <%
+        if (properties[0] != null) { %>
         <tr>
             <td style="border: solid 1px #cccccc;"><%=key%></td>
             <td style="border: solid 1px #cccccc;"><%=value%></td>
@@ -98,6 +102,7 @@
                 </div>
             </td>
         </tr>
+        <%}%>
         <%}%>
         </table>
          <div class="sequenceToolbar"

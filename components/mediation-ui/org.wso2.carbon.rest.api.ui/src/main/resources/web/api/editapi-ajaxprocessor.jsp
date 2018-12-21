@@ -116,14 +116,19 @@
             }
         }
         client.updateApi(apiData);
+        session.removeAttribute("apiResources");
+        session.removeAttribute("apiHandlers");
+        session.removeAttribute("resourceData");
+        session.removeAttribute("handlerData");
+        session.removeAttribute("apiData");
+        session.removeAttribute("inSeqXml");
+        session.removeAttribute("outSeqXml");
+        session.removeAttribute("faultSeqXml");
     } catch (Exception e) {
-        response.setStatus(450);
+        if (e.getMessage().contains("Error initializing API handler")) {
+            response.setStatus(456);
+        } else {
+            response.setStatus(450);
+        }
     }
-    session.removeAttribute("apiResources");
-    session.removeAttribute("apiHandlers");
-    session.removeAttribute("resourceData");
-    session.removeAttribute("apiData");
-    session.removeAttribute("inSeqXml");
-    session.removeAttribute("outSeqXml");
-    session.removeAttribute("faultSeqXml");
 %>
