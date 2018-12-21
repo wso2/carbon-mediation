@@ -788,6 +788,8 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
                             CARBON.showErrorDialog("<fmt:message key="api.update.error.453"/> : " + apiContextValue);
                         } else if(status.status == '454'){
                         	CARBON.showErrorDialog("<fmt:message key="api.update.error.454"/>");
+                        } else if(status.status == '456'){
+                            CARBON.showErrorDialog("<fmt:message key="api.update.error.456"/>");
                         }
                     }
                 });
@@ -807,6 +809,8 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
                     		CARBON.showErrorDialog("<fmt:message key="api.update.error.453"/> : " + apiContextValue);
                     	} else if(status.status == '454'){
                         	CARBON.showErrorDialog("<fmt:message key="api.update.error.454"/>");
+                        } else if(status.status == '456'){
+                            CARBON.showErrorDialog("<fmt:message key="api.update.error.456"/>");
                         }
                     }
                 });
@@ -1242,8 +1246,8 @@ function onSelectVersionType() {
                         <input type="hidden" id="handIndex" name="handIndex"/>
                         <input type="hidden" id="apiFileName" name="apiFileName"/>
                         <div id="resourceSizeVar" name="resourceSizeVar"/>
-                        <div id="handlerSizeVar" name="handlerSizeVar"/>
                     </td>
+                    <td><div id="handlerSizeVar" name="handlerSizeVar"/></td>
                 </tr>
                 <tr>
                     <td class="buttonRow">

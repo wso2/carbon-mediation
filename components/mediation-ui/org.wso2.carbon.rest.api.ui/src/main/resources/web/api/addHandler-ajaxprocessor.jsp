@@ -15,9 +15,14 @@
   --%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData"%>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 
 <%
     session.setAttribute("index", "-1");
+    List<HandlerData> handlers = (ArrayList<HandlerData>) session.getAttribute("apiHandlers");
+    session.setAttribute("apiHandlers", handlers);
 %>
 
 <fmt:bundle basename="org.wso2.carbon.rest.api.ui.i18n.Resources">
