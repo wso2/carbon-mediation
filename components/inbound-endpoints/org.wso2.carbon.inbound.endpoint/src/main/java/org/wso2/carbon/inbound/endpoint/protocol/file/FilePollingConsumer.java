@@ -187,7 +187,7 @@ public class FilePollingConsumer {
                 if (children == null || children.length == 0) {
                     // Fail record is a one that is processed but was not moved
                     // or deleted due to an error.
-                    boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, fileObject);
+                    boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, fileObject, fso);
                     if (!isFailedRecord) {
                         fileHandler();
                         if (injectHandler == null) {
@@ -533,7 +533,7 @@ public class FilePollingConsumer {
                     || child.getName().getBaseName().endsWith(".fail")) {
                 continue;
             }
-            boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
+            boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child, fso);
             boolean isReadyToRead = VFSUtils.isReadyToRead(child, waitTimeBeforeRead);
             
             // child's file name matches the file name pattern or process all
@@ -726,7 +726,7 @@ public class FilePollingConsumer {
                     String suffix = parentURI.substring(parentURI.indexOf("?"));
                     strContext += suffix;
                 }
-                FileObject sourceFile = fsManager.resolveFile(strContext);
+                FileObject sourceFile = fsManager.resolveFile(strContext, fso);
                 if (!sourceFile.exists()) {
                     return false;
                 }
@@ -837,8 +837,15 @@ public class FilePollingConsumer {
                 return;
             }
 
-            if (moveToDirectoryURI != null) {                
-                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, fso);
+            if (moveToDirectoryURI != null) {
+                // This handles when file needs to move to a different file-system
+                FileSystemOptions destinationFSO = null;
+                try {
+                    destinationFSO = VFSUtils.attachFileSystemOptions(parseSchemeFileOptions(moveToDirectoryURI),fsManager);
+                } catch (Exception e) {
+                    log.warn("Unable to set the sftp options for processed file location ", e);
+                }
+                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, destinationFSO);
                 String prefix;
                 if (vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT) != null) {
                     prefix = new SimpleDateFormat(
@@ -862,12 +869,9 @@ public class FilePollingConsumer {
                 }
                 try {
                     fileObject.moveTo(dest);
-                    if (VFSUtils.isFailRecord(fsManager, fileObject)) {
-                        VFSUtils.releaseFail(fsManager, fileObject);
-                    }
                 } catch (FileSystemException e) {
-                    if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
-                        VFSUtils.markFailRecord(fsManager, fileObject);
+                    if (!VFSUtils.isFailRecord(fsManager, fileObject, fso)) {
+                        VFSUtils.markFailRecord(fsManager, fileObject, fso);
                     }
                     log.error("Error moving file : " + VFSUtils.maskURLPassword(fileObject.toString()) + " to " +
                               VFSUtils.maskURLPassword(moveToDirectoryURI), e);
@@ -888,8 +892,8 @@ public class FilePollingConsumer {
                 }
             }
         } catch (FileSystemException e) {
-            if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
-                VFSUtils.markFailRecord(fsManager, fileObject);
+            if (!VFSUtils.isFailRecord(fsManager, fileObject, fso)) {
+                VFSUtils.markFailRecord(fsManager, fileObject, fso);
                 log.error("Error resolving directory to move after processing : "
                         + VFSUtils.maskURLPassword(moveToDirectoryURI), e);
             }
