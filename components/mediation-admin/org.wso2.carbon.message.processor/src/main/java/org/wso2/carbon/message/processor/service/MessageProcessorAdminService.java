@@ -38,10 +38,12 @@ import org.apache.synapse.message.processor.impl.forwarder.MessageForwardingProc
 import org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessorView;
+import org.opensaml.xml.signature.P;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import scala.xml.Null;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
@@ -769,12 +771,14 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     public String getMessage(String processorName) {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
-        String msg = getMessageAsString(messageConsumer);
+
+            String msg = getMessageAsString(messageConsumer);
+
         messageConsumer.cleanup();
         return msg;
     }
 
-    private String getMessageAsString(MessageConsumer messageConsumer) throws SynapseException {
+    private String getMessageAsString(MessageConsumer messageConsumer) throws SynapseException, NullPointerException {
         MessageContext messageContext;
         String msg = null;
 
@@ -784,7 +788,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 msg = messageContext.getEnvelope().toString();
             } catch (SynapseException e) {
                 log.error("Failed to get message : ", e);
+            } catch (NullPointerException e) {
+                log.error("Failed to get message. Queue Empty. ", e);
             }
+
         }
         return  msg;
     }
@@ -826,8 +833,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         messageConsumer.cleanup();
     }
 
-    private void popAndEnqueueMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer) throws SynapseException
-    {
+    private void popAndEnqueueMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer) throws SynapseException, NullPointerException {
         MessageContext messageContext;
 
         try {
@@ -836,7 +842,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             messageConsumer.ack();
         } catch (SynapseException e) {
             log.error("Failed to enqueue the message : ",e);
+        } catch (NullPointerException e) {
+            log.error("Failed to enqueue the message. Queue empty. ");
         }
+
 
     }
 
