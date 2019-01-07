@@ -85,6 +85,14 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
             handleException("Invalid DataMapper mediator. OutputSchema registry key is required");
         }
 
+        if (dataMapperMediator.getXsltStyleSheetKey() != null) {
+            ValueSerializer keySerializer = new ValueSerializer();
+            keySerializer
+                    .serializeValue(dataMapperMediator.getXsltStyleSheetKey(),
+                                    DataMapperMediatorConstants.XSLT_STYLE_SHEET,
+                                    dataMapperElement);
+        }
+
         dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUT_TYPE, nullNS,
                                                              dataMapperMediator.getInputType()));
 

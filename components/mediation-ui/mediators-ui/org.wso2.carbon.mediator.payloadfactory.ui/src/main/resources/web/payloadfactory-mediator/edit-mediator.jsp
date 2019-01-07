@@ -43,6 +43,7 @@
 
     String format = payloadFactoryMediator.getFormat();
     String mediaType = payloadFactoryMediator.getType();
+    boolean escapeXmlChar = payloadFactoryMediator.isEscapeXmlChars();
     String formatKey=(payloadFactoryMediator.getFormatKey()!=null)?payloadFactoryMediator.getFormatKey() : "";
     List<PayloadFactoryMediator.Argument> argumentList = payloadFactoryMediator.getArgumentList();
     NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
@@ -85,6 +86,20 @@
                         <option value="text" <%=(mediaType!=null && mediaType.contains("text")) ? " selected=\"true\"" : ""%>>
                                                     <fmt:message key="mediator.payloadFactory.media.text"/>
                                                 </option>
+                    </select>
+                </td>
+
+            </tr>
+            <tr>
+                <h3><td><fmt:message key="mediator.payloadFactory.escapexmlchar"/></h3></td>
+                <td>
+                    <select class="esb-edit small_textbox" name="escapexmlchar" id="escapexmlchar">
+                        <option value="true" <%= (escapeXmlChar) ? " selected=\"true\"" : ""%>>
+                            <fmt:message key="mediator.payloadFactory.true"/>
+                        </option>
+                        <option value="false" <%= (!escapeXmlChar) ? " selected=\"true\"" : ""%>>
+                            <fmt:message key="mediator.payloadFactory.false"/>
+                        </option>
                     </select>
                 </td>
 

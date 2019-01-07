@@ -52,6 +52,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
     private static final String EVAL = "evaluator";
     private static final String LITERAL = "literal";
     private static final String TYPE = "media-type";
+    private static final String ESCAPEXMLCHARS = "escapeXmlChars";
 
     private static final QName FORMAT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "format");
     private static final QName ARGS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "args");
@@ -59,6 +60,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
     protected static final QName ATT_EVAL   = new QName("evaluator");
     protected static final QName ATT_LITERAL   = new QName("literal");
     protected static final QName ATT_MEDIA   = new QName("media-type");
+    protected static final QName ATT_ESCAPE_JSON   = new QName("escapeXmlChars");
 
     private final String JSON_TYPE="json";
     private final String XML_TYPE="xml";
@@ -68,6 +70,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
     private String type = null;
     private boolean dynamic = false;
     private String formatKey = null;
+    private boolean escapeXmlChars = false;
     private List<Argument> argumentList = new ArrayList<Argument>();
 
     /// This the error private String evaluator = null;
@@ -77,6 +80,10 @@ public class PayloadFactoryMediator extends AbstractMediator {
         OMElement payloadFactoryElem = fac.createOMElement(PAYLOAD_FACTORY, synNS);
         if(type!=null){
             payloadFactoryElem.addAttribute(fac.createOMAttribute(TYPE, nullNS,type));
+        }
+        if (isEscapeXmlChars()) {
+            payloadFactoryElem.addAttribute(fac.createOMAttribute(ESCAPEXMLCHARS, nullNS,
+                    Boolean.toString(isEscapeXmlChars())));
         }
         saveTracingState(payloadFactoryElem, this);
 
@@ -150,6 +157,10 @@ public class PayloadFactoryMediator extends AbstractMediator {
         OMAttribute mediaType = elem.getAttribute(ATT_MEDIA);
         if(mediaType!=null){
             this.type=mediaType.getAttributeValue();
+        }
+        OMAttribute escapeXmlChar = elem.getAttribute(ATT_ESCAPE_JSON);
+        if (escapeXmlChar != null) {
+            this.setEscapeXmlChars(Boolean.parseBoolean(escapeXmlChar.getAttributeValue()));
         }
         OMElement formatElem = elem.getFirstChildWithName(FORMAT_Q);
 
@@ -286,6 +297,14 @@ public class PayloadFactoryMediator extends AbstractMediator {
     private void handleException(String msg, Exception ex) {
         log.error(msg, ex);
         throw new MediatorException(msg + " Caused by " + ex.getMessage());
+    }
+
+    public boolean isEscapeXmlChars() {
+        return escapeXmlChars;
+    }
+
+    public void setEscapeXmlChars(boolean escapeXmlChars) {
+        this.escapeXmlChars = escapeXmlChars;
     }
 
     public static class Argument {
