@@ -167,6 +167,7 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
                 InboundRunner inboundRunner = (InboundRunner)entry.getValue();
 
                 inboundRunner.terminate();
+                thread.interrupt();
                 try {
                     thread.join();
                 } catch (InterruptedException e) {
