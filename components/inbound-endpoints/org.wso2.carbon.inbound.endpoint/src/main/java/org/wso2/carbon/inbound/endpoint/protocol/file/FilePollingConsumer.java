@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
-import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileContent;
@@ -28,8 +27,8 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
-import org.apache.commons.vfs2.provider.UriParser;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
@@ -57,7 +56,7 @@ public class FilePollingConsumer {
     private static final Log log = LogFactory.getLog(FilePollingConsumer.class);
     private Properties vfsProperties;
     private boolean fileLock = true;
-    private FileSystemManager fsManager = null;
+    private DefaultFileSystemManager fsManager = null;
     private String name;
     private SynapseEnvironment synapseEnvironment;
     private long scanInterval;
@@ -100,7 +99,7 @@ public class FilePollingConsumer {
         }
         //Setup SFTP Options
         try {
-            fso = VFSUtils.attachFileSystemOptions(parseSchemeFileOptions(fileURI),fsManager);
+            fso = VFSUtils.attachFileSystemOptions(VFSUtils.parseSchemeFileOptions(fileURI, vfsProperties),fsManager);
         } catch (Exception e) {
             log.warn("Unable to set the sftp Options", e);
             fso = null;
@@ -238,9 +237,6 @@ public class FilePollingConsumer {
             return null;
         } finally {
             try {
-                if (fsManager != null) {
-                    fsManager.closeFileSystem(fileObject.getParent().getFileSystem());
-                }
                 fileObject.close();
             } catch (Exception e) {
                 log.error("Unable to close the file system. " + e.getMessage());
@@ -444,34 +440,6 @@ public class FilePollingConsumer {
             }
         }
     }
-
-    private Map<String, String> parseSchemeFileOptions(String fileURI) {
-        String scheme = UriParser.extractScheme(fileURI);
-        if (scheme == null) {
-            return null;
-        }
-        HashMap<String, String> schemeFileOptions = new HashMap<String, String>();
-        schemeFileOptions.put(VFSConstants.SCHEME, scheme);
-
-        try {
-            addOptions(scheme, schemeFileOptions);
-        } catch (Exception e) {
-            log.warn("Error while loading VFS parameter. " + e.getMessage());
-        }
-        return schemeFileOptions;
-    }
-
-    private void addOptions(String scheme, Map<String, String> schemeFileOptions) {
-        if (scheme.equals(VFSConstants.SCHEME_SFTP)) {
-            for (VFSConstants.SFTP_FILE_OPTION option : VFSConstants.SFTP_FILE_OPTION.values()) {
-                String strValue = vfsProperties.getProperty(VFSConstants.SFTP_PREFIX
-                        + WordUtils.capitalize(option.toString()));
-                if (strValue != null && !strValue.equals("")) {
-                    schemeFileOptions.put(option.toString(), strValue);
-                }
-            }
-        }
-    }    
     
     /**
      * 
@@ -841,9 +809,10 @@ public class FilePollingConsumer {
                 // This handles when file needs to move to a different file-system
                 FileSystemOptions destinationFSO = null;
                 try {
-                    destinationFSO = VFSUtils.attachFileSystemOptions(parseSchemeFileOptions(moveToDirectoryURI),fsManager);
+                    destinationFSO = VFSUtils.attachFileSystemOptions(
+                            VFSUtils.parseSchemeFileOptions(moveToDirectoryURI, vfsProperties), fsManager);
                 } catch (Exception e) {
-                    log.warn("Unable to set the sftp options for processed file location ", e);
+                    log.warn("Unable to set the options for processed file location ", e);
                 }
                 FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, destinationFSO);
                 String prefix;
@@ -973,5 +942,8 @@ public class FilePollingConsumer {
     protected Properties getInboundProperties() {
         return vfsProperties;
     }
-    
+
+    void destroy() {
+        fsManager.close();
+    }
 }
