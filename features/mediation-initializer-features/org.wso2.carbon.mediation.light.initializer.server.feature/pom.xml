@@ -21,11 +21,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer-features</artifactId>
-        <version>4.6.107</version>
+        <version>4.6.108-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.107</version>
+    <version>4.6.108-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.light.initializer.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Light Initializer Server Feature</name>
