@@ -20,10 +20,11 @@
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 <%@ page import="org.apache.synapse.mediators.Value"%>
-<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory"%>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.SynapseJsonPathFactory" %>
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     XPathFactory xPathFactory = XPathFactory.getInstance();
+    SynapseJsonPathFactory synapsePathFactory = SynapseJsonPathFactory.getInstance();
     if (!(mediator instanceof AggregateMediator)) {
         // todo : proper error handling
         throw new RuntimeException("Unable to edit the mediator");
@@ -87,11 +88,15 @@
 //} else {
 //    aggregateMediator.setMinMessagesToComplete(-1);
 //}
-      
-     
-       if(!aggregate_expr.equals("")){
-             aggregateMediator.setAggregationExpression(xPathFactory.createSynapseXPath("aggregate_expr", request, session));
-       }
+
+
+    if (!aggregate_expr.equals("")) {
+        if (aggregate_expr.startsWith("json-eval(")) {
+            aggregateMediator.setAggregationExpression(synapsePathFactory.createSynapseJsonPath("aggregate_expr", request));
+        } else {
+            aggregateMediator.setAggregationExpression(xPathFactory.createSynapseXPath("aggregate_expr", request, session));
+        }
+    }
        
       if(!correlate_exp.equals("")){
             aggregateMediator.setCorrelateExpression(xPathFactory.createSynapseXPath("correlate_expr", request, session));
