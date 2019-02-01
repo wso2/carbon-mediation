@@ -233,8 +233,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 artifactDir = getArtifactDirPath(axisConfig, artifactDirName);
             }
 
-            if (deployer != null && AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.
-                                            equals(artifact.getDeploymentStatus())) {
+            if (deployer != null && (
+                AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.equals(artifact.getDeploymentStatus()) ||
+                AppDeployerConstants.DEPLOYMENT_STATUS_FAILED.equals(artifact.getDeploymentStatus())
+               )) {
 
                 String fileName = artifact.getFiles().get(0).getName();
                 String artifactName = artifact.getName();
