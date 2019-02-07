@@ -124,9 +124,28 @@ public class WebsocketConnectionFactory {
 
             String scheme = uri.getScheme() == null ? WebsocketConstants.WS : uri.getScheme();
             final String host = uri.getHost() == null ? "127.0.0.1" : uri.getHost();
-            final int port = uri.getPort();
-            if (!WebsocketConstants.WS.equalsIgnoreCase(scheme) && !WebsocketConstants.WSS.equalsIgnoreCase(scheme)) {
-                return null;
+            final int port;
+
+            switch (scheme) {
+                case WebsocketConstants.WS:
+                    if (uri.getPort() < 0) {
+                        // Setting default port for WS connection if port not defined in URI
+                        port = WebsocketConstants.WEBSOCKET_DEFAULT_WS_PORT;
+                        break;
+                    }
+                    port = uri.getPort();
+                    break;
+                case WebsocketConstants.WSS:
+                    if (uri.getPort() < 0) {
+                        // Setting default port for WSS connection if port not defined in URI
+                        port = WebsocketConstants.WEBSOCKET_DEFAULT_WSS_PORT;
+                        break;
+                    }
+                    port = uri.getPort();
+                    break;
+                default:
+                    // If scheme does not belong to either ws or wss schemes, we return null
+                    return null;
             }
             final boolean ssl = WebsocketConstants.WSS.equalsIgnoreCase(scheme);
             final SslContext sslCtx;
