@@ -97,6 +97,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.soap,
+                            javax.activation.*;version="[0.0.0, 1.0.0)",
                             javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
                             org.apache.axis2.rpc.receivers; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
