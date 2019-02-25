@@ -127,6 +127,14 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             if (log.isDebugEnabled()) {
                 log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
             }
+            /* If the user have given additional attributes to be added to the end of the URI, they are derived by the
+             * header, "Append-Path" and added to the endpoint URI.
+             */
+            if (customHeaders.containsKey("Append-Path")) {
+                targetEPR = targetEPR + customHeaders.get("Append-Path");
+                // remove the header once the value is fetched.
+                customHeaders.remove("Append-Path");
+            }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
                     handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, customHeaders);
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);

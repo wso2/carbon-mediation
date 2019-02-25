@@ -118,9 +118,6 @@ public class WebsocketConnectionFactory {
                                                      String dispatchSequence,
                                                      String dispatchErrorSequence,
                                                      String contentType, Map<String, Object> headers) {
-        if (log.isDebugEnabled()) {
-            log.debug("Creating a Connection for the specified WS endpoint.");
-        }
         final WebSocketClientHandler handler;
 
         try {
@@ -174,6 +171,9 @@ public class WebsocketConnectionFactory {
                 for (Map.Entry<String, Object> header : headers.entrySet()) {
                     defaultHttpHeaders.add(header.getKey(), header.getValue());
                 }
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a Connection for the specified WS endpoint: " + uri);
             }
 
             final EventLoopGroup group = new NioEventLoopGroup();
