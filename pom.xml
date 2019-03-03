@@ -2547,6 +2547,7 @@
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v1</version.org.wso2.orbit.javax.activation>
         <wso2.commons.text.orbit.version>1.6.wso2v1</wso2.commons.text.orbit.version>
+        <osgi.framework.imp.pkg.version>[1.7.0,2.0.0)</osgi.framework.imp.pkg.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
