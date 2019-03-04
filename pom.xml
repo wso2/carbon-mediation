@@ -2107,7 +2107,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
-                <artifactId>com.jayway.jsonpath</artifactId>
+                <artifactId>json-path</artifactId>
                 <version>${jsonpath.version}</version>
             </dependency>
             <dependency>
@@ -2477,7 +2477,7 @@
         <geronimo-jpa.version>1.1</geronimo-jpa.version>
         <geronimo-jta.version>1.1.1</geronimo-jta.version>
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
-        <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
+        <jsonpath.version>2.4.0.wso2v1</jsonpath.version>
         <json.smart.version>1.2</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
         <netty.version>4.0.39.Final</netty.version>
