@@ -42,6 +42,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -97,11 +98,16 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
 
         //create default file system paths for registry
         //Default registry local registry location : <CARBON_HOME>/registry/local
-        this.localRegistry = FILE_URI_PREFIX + defaultFSRegRoot + "local" + URL_SEPARATOR;
+        this.localRegistry = getUri(defaultFSRegRoot, "local");
         //Default registry config registry location : <CARBON_HOME>/registry/config
-        this.configRegistry = FILE_URI_PREFIX + defaultFSRegRoot + "config" + URL_SEPARATOR;
+        this.configRegistry = getUri(defaultFSRegRoot, "config");
         //Default registry governance registry location : <CARBON_HOME>/registry/governance
-        this.govRegistry = FILE_URI_PREFIX + defaultFSRegRoot + "governance" + URL_SEPARATOR;
+        this.govRegistry = getUri(defaultFSRegRoot, "governance");
+    }
+
+    private String getUri(String defaultFSRegRoot, String subDirectory) {
+        return Paths.get(defaultFSRegRoot + subDirectory).toUri().normalize().toString()
+                + ESBRegistryConstants.URL_SEPARATOR;
     }
 
     @Override
