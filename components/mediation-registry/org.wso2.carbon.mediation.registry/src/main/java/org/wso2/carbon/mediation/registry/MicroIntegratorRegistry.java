@@ -42,6 +42,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -94,11 +95,16 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
 
         //create default file system paths for registry
         //Default registry local registry location : <CARBON_HOME>/registry/local
-        this.localRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "local" + File.separator;
+        this.localRegistry = getUri(defaultFSRegRoot, "local");
         //Default registry config registry location : <CARBON_HOME>/registry/config
-        this.configRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "config" + File.separator;
+        this.configRegistry = getUri(defaultFSRegRoot, "config");
         //Default registry governance registry location : <CARBON_HOME>/registry/governance
-        this.govRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "governance" + File.separator;
+        this.govRegistry = getUri(defaultFSRegRoot, "governance");
+    }
+
+    private String getUri(String defaultFSRegRoot, String subDirectory) {
+        return Paths.get(defaultFSRegRoot + subDirectory).toUri().normalize().toString()
+                + ESBRegistryConstants.URL_SEPARATOR;
     }
 
     @Override
@@ -780,10 +786,6 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
 
             if (resourcePath.startsWith(ESBRegistryConstants.URL_SEPARATOR)) {
                 resourcePath = resourcePath.substring(1);
-            }
-
-            if (ESBRegistryConstants.URL_SEPARATOR_CHAR != File.separatorChar && registryRoot.startsWith(ESBRegistryConstants.PROTOCOL_FILE)) {
-                resourcePath = resourcePath.replace(ESBRegistryConstants.URL_SEPARATOR_CHAR, File.separatorChar);
             }
 
             resolvedPath = registryRoot + resourcePath;
