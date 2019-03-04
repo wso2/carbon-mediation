@@ -65,7 +65,7 @@
        </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
-            <artifactId>com.jayway.jsonpath</artifactId>
+            <artifactId>json-path</artifactId>
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
@@ -125,7 +125,7 @@
                                 <bundleDef>com.google.code.gson:gson:${gson.version}</bundleDef>
                                 <bundleDef>org.wso2.caching:wso2caching-core</bundleDef>
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
                                 <!-- Json schema validator dependencies -->
                                 <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:libphonenumber</bundleDef>
