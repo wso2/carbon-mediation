@@ -50,7 +50,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import static org.wso2.carbon.mediation.registry.ESBRegistryConstants.FILE_URI_PREFIX;
 import static org.wso2.carbon.mediation.registry.ESBRegistryConstants.URL_SEPARATOR;
 
 public class MicroIntegratorRegistry extends AbstractRegistry {
@@ -299,18 +298,18 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         boolean isDirectory = new File(new URL(originalURL).getFile()).isDirectory();
         if (!isDirectory) {
             // if the url is a file, the property file is expected to be present as a sibling
-            if (originalURL.endsWith(FILE_URI_PREFIX)) {
+            if (originalURL.endsWith(URL_SEPARATOR)) {
                 originalURL = originalURL.substring(0, originalURL.length() - 1);
             }
             return originalURL + ESBRegistryConstants.PROPERTY_EXTENTION;
         }
         // if the url is a folder, the property file is expected to be present as a child
-        String[] pathSegments = originalURL.split(FILE_URI_PREFIX);
+        String[] pathSegments = originalURL.split(URL_SEPARATOR);
         String folderName = pathSegments[pathSegments.length - 1];
-        if (originalURL.endsWith(FILE_URI_PREFIX)) {
+        if (originalURL.endsWith(URL_SEPARATOR)) {
             return originalURL + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
         }
-        return originalURL + FILE_URI_PREFIX + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
+        return originalURL + URL_SEPARATOR + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
     }
 
     @Override
