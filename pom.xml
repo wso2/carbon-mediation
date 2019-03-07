@@ -2487,7 +2487,7 @@
         <org.milyn.wso2.version>1.5.1.wso2v1</org.milyn.wso2.version>
         <javax.persistence.version>1.0</javax.persistence.version>
         <org.slf4j.verison>1.7.21</org.slf4j.verison>
-        <addressing.version>1.6.1-wso2v11</addressing.version>
+        <addressing.version>1.6.1-wso2v30-SNAPSHOT</addressing.version>
         <version.jettison>1.3.4</version.jettison>
         <carbon.p2.plugin.version>1.5.3</carbon.p2.plugin.version>
         <openjpa.version.wso2>2.2.2.wso2v1</openjpa.version.wso2>
