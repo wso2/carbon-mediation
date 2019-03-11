@@ -93,7 +93,8 @@ public class JMSInjectHandler {
         Message msg = (Message) object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
-            msgCtx.setProperty("inbound.endpoint.name", name);
+            msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, name);
+            msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
             CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
             String contentType = null;
@@ -140,7 +141,6 @@ public class JMSInjectHandler {
             // Handle dual channel
             Destination replyTo = msg.getJMSReplyTo();
             if (replyTo != null) {
-                msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
                 // Create the cachedJMSConnectionFactory with the existing
                 // connection
                 CachedJMSConnectionFactory cachedJMSConnectionFactory =
@@ -156,7 +156,6 @@ public class JMSInjectHandler {
                 msgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                                    jmsReplySender);
             } else if (replyDestination != null) {
-                msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
                 // Create the cachedJMSConnectionFactory with the existing
                 // connection
                 CachedJMSConnectionFactory cachedJMSConnectionFactory =

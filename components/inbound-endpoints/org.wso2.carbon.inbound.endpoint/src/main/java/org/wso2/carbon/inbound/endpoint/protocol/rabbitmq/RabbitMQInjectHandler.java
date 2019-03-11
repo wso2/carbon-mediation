@@ -137,6 +137,7 @@ public class RabbitMQInjectHandler {
                 seq.init(synapseEnvironment);
             }
             seq.setErrorHandler(onErrorSeq);
+            msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, inboundName);
             synapseEnvironment.injectInbound(msgCtx, seq, sequential);
         } else {

@@ -247,7 +247,7 @@ public class InboundHttpServerWorker extends ServerWorker {
         if (log.isDebugEnabled()) {
             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
         }
-        synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
+        synCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, endpoint.getName());
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 
