@@ -15,13 +15,16 @@
  **/
 package org.wso2.carbon.mediator.aggregate;
 
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.drop.DropMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.synapse.mediators.Value;
-import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.config.xml.SynapsePath;
+import org.apache.synapse.config.xml.SynapsePathFactory;
+import org.apache.synapse.config.xml.SynapsePathSerializer;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
 import org.apache.synapse.config.xml.ValueFactory;
@@ -62,7 +65,7 @@ public class AggregateMediator extends AbstractListMediator {
     private Value maxMessagesToComplete;
 
     private SynapseXPath correlateExpression = null;
-    private SynapseXPath aggregationExpression = null;
+    private SynapsePath aggregationExpression = null;
 
     private String onCompleteSequenceRef = null;
     private String id;
@@ -109,11 +112,11 @@ public class AggregateMediator extends AbstractListMediator {
         this.correlateExpression = correlateExpression;
     }
 
-    public SynapseXPath getAggregationExpression() {
+    public SynapsePath getAggregationExpression() {
         return aggregationExpression;
     }
 
-    public void setAggregationExpression(SynapseXPath aggregationExpression) {
+    public void setAggregationExpression(SynapsePath aggregationExpression) {
         this.aggregationExpression = aggregationExpression;
     }
 
@@ -168,8 +171,7 @@ public class AggregateMediator extends AbstractListMediator {
 
         OMElement onCompleteElem = fac.createOMElement("onComplete", synNS);
         if (aggregationExpression != null) {
-            SynapseXPathSerializer.serializeXPath(
-                aggregationExpression, onCompleteElem, "expression");
+            SynapsePathSerializer.serializePath(aggregationExpression, onCompleteElem, "expression");
         }
         if (onCompleteSequenceRef != null) {
             onCompleteElem.addAttribute("sequence", onCompleteSequenceRef, nullNS);
@@ -255,8 +257,7 @@ public class AggregateMediator extends AbstractListMediator {
             OMAttribute aggregateExpr = onComplete.getAttribute(EXPRESSION_Q);
             if (aggregateExpr != null) {
                 try {
-                    aggregationExpression =
-                        SynapseXPathFactory.getSynapseXPath(onComplete, EXPRESSION_Q);
+                    aggregationExpression = SynapsePathFactory.getSynapsePath(onComplete, EXPRESSION_Q);
                 } catch (JaxenException e) {
                     throw new MediatorException("Unable to load the aggregating XPATH");
                 }

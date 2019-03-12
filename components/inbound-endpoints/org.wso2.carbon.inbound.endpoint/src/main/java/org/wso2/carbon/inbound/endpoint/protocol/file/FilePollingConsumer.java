@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
-import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileContent;
@@ -28,8 +27,8 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
-import org.apache.commons.vfs2.provider.UriParser;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
@@ -57,7 +56,7 @@ public class FilePollingConsumer {
     private static final Log log = LogFactory.getLog(FilePollingConsumer.class);
     private Properties vfsProperties;
     private boolean fileLock = true;
-    private FileSystemManager fsManager = null;
+    private DefaultFileSystemManager fsManager = null;
     private String name;
     private SynapseEnvironment synapseEnvironment;
     private long scanInterval;
@@ -100,7 +99,7 @@ public class FilePollingConsumer {
         }
         //Setup SFTP Options
         try {
-            fso = VFSUtils.attachFileSystemOptions(parseSchemeFileOptions(fileURI),fsManager);
+            fso = VFSUtils.attachFileSystemOptions(VFSUtils.parseSchemeFileOptions(fileURI, vfsProperties),fsManager);
         } catch (Exception e) {
             log.warn("Unable to set the sftp Options", e);
             fso = null;
@@ -187,7 +186,7 @@ public class FilePollingConsumer {
                 if (children == null || children.length == 0) {
                     // Fail record is a one that is processed but was not moved
                     // or deleted due to an error.
-                    boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, fileObject);
+                    boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, fileObject, fso);
                     if (!isFailedRecord) {
                         fileHandler();
                         if (injectHandler == null) {
@@ -238,9 +237,6 @@ public class FilePollingConsumer {
             return null;
         } finally {
             try {
-                if (fsManager != null) {
-                    fsManager.closeFileSystem(fileObject.getParent().getFileSystem());
-                }
                 fileObject.close();
             } catch (Exception e) {
                 log.error("Unable to close the file system. " + e.getMessage());
@@ -444,34 +440,6 @@ public class FilePollingConsumer {
             }
         }
     }
-
-    private Map<String, String> parseSchemeFileOptions(String fileURI) {
-        String scheme = UriParser.extractScheme(fileURI);
-        if (scheme == null) {
-            return null;
-        }
-        HashMap<String, String> schemeFileOptions = new HashMap<String, String>();
-        schemeFileOptions.put(VFSConstants.SCHEME, scheme);
-
-        try {
-            addOptions(scheme, schemeFileOptions);
-        } catch (Exception e) {
-            log.warn("Error while loading VFS parameter. " + e.getMessage());
-        }
-        return schemeFileOptions;
-    }
-
-    private void addOptions(String scheme, Map<String, String> schemeFileOptions) {
-        if (scheme.equals(VFSConstants.SCHEME_SFTP)) {
-            for (VFSConstants.SFTP_FILE_OPTION option : VFSConstants.SFTP_FILE_OPTION.values()) {
-                String strValue = vfsProperties.getProperty(VFSConstants.SFTP_PREFIX
-                        + WordUtils.capitalize(option.toString()));
-                if (strValue != null && !strValue.equals("")) {
-                    schemeFileOptions.put(option.toString(), strValue);
-                }
-            }
-        }
-    }    
     
     /**
      * 
@@ -533,7 +501,7 @@ public class FilePollingConsumer {
                     || child.getName().getBaseName().endsWith(".fail")) {
                 continue;
             }
-            boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
+            boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child, fso);
             boolean isReadyToRead = VFSUtils.isReadyToRead(child, waitTimeBeforeRead);
             
             // child's file name matches the file name pattern or process all
@@ -726,7 +694,7 @@ public class FilePollingConsumer {
                     String suffix = parentURI.substring(parentURI.indexOf("?"));
                     strContext += suffix;
                 }
-                FileObject sourceFile = fsManager.resolveFile(strContext);
+                FileObject sourceFile = fsManager.resolveFile(strContext, fso);
                 if (!sourceFile.exists()) {
                     return false;
                 }
@@ -837,8 +805,16 @@ public class FilePollingConsumer {
                 return;
             }
 
-            if (moveToDirectoryURI != null) {                
-                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, fso);
+            if (moveToDirectoryURI != null) {
+                // This handles when file needs to move to a different file-system
+                FileSystemOptions destinationFSO = null;
+                try {
+                    destinationFSO = VFSUtils.attachFileSystemOptions(
+                            VFSUtils.parseSchemeFileOptions(moveToDirectoryURI, vfsProperties), fsManager);
+                } catch (Exception e) {
+                    log.warn("Unable to set the options for processed file location ", e);
+                }
+                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, destinationFSO);
                 String prefix;
                 if (vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT) != null) {
                     prefix = new SimpleDateFormat(
@@ -862,12 +838,9 @@ public class FilePollingConsumer {
                 }
                 try {
                     fileObject.moveTo(dest);
-                    if (VFSUtils.isFailRecord(fsManager, fileObject)) {
-                        VFSUtils.releaseFail(fsManager, fileObject);
-                    }
                 } catch (FileSystemException e) {
-                    if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
-                        VFSUtils.markFailRecord(fsManager, fileObject);
+                    if (!VFSUtils.isFailRecord(fsManager, fileObject, fso)) {
+                        VFSUtils.markFailRecord(fsManager, fileObject, fso);
                     }
                     log.error("Error moving file : " + VFSUtils.maskURLPassword(fileObject.toString()) + " to " +
                               VFSUtils.maskURLPassword(moveToDirectoryURI), e);
@@ -888,8 +861,8 @@ public class FilePollingConsumer {
                 }
             }
         } catch (FileSystemException e) {
-            if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
-                VFSUtils.markFailRecord(fsManager, fileObject);
+            if (!VFSUtils.isFailRecord(fsManager, fileObject, fso)) {
+                VFSUtils.markFailRecord(fsManager, fileObject, fso);
                 log.error("Error resolving directory to move after processing : "
                         + VFSUtils.maskURLPassword(moveToDirectoryURI), e);
             }
@@ -969,5 +942,8 @@ public class FilePollingConsumer {
     protected Properties getInboundProperties() {
         return vfsProperties;
     }
-    
+
+    void destroy() {
+        fsManager.close();
+    }
 }

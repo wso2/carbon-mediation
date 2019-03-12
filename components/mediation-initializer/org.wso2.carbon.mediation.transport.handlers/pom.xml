@@ -17,14 +17,14 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer</artifactId>
-        <version>4.6.107-SNAPSHOT</version>
+        <version>4.6.115-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.transport.handlers</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon Mediation - Transport Handlers</name>
-    <version>4.6.107-SNAPSHOT</version>
+    <version>4.6.115-SNAPSHOT</version>
 
     <build>
 
@@ -85,6 +85,10 @@
         <dependency>
             <groupId>org.wso2.orbit.org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
         </dependency>
     </dependencies>
 </project>
