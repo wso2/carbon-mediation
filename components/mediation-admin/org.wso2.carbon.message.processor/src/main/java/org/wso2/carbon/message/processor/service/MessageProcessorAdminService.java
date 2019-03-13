@@ -767,7 +767,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
      * @param processorName message processor name.
      * @return <code>message</code> returns message received from the queue as a string.
      */
-    public String getMessage(String processorName) throws AxisFault {
+    public String browseMessage(String processorName) throws AxisFault {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
         String message = null;
@@ -776,9 +776,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             message = getMessageAsString(messageConsumer);
         } catch (AxisFault e) {
             handleException(log, "Failed to get message from the queue :", e);
+        } finally {
+            messageConsumer.cleanup();
         }
 
-        messageConsumer.cleanup();
         return message;
     }
 
@@ -810,9 +811,9 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             popMessageFromQueue(messageConsumer);
         } catch (SynapseException e) {
             handleException(log, "Failed to pop message from the queue: ", e);
+        } finally {
+            messageConsumer.cleanup();
         }
-
-        messageConsumer.cleanup();
     }
 
     private  void popMessageFromQueue(MessageConsumer messageConsumer) throws AxisFault {
@@ -839,9 +840,9 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             popAndRedirectMessageToStore(messageProducer, messageConsumer);
         } catch (AxisFault e) {
             handleException(log, "Failed to redirect message to " + storeName + " :", e);
+        } finally {
+            messageConsumer.cleanup();
         }
-
-        messageConsumer.cleanup();
     }
 
     private void popAndRedirectMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer)

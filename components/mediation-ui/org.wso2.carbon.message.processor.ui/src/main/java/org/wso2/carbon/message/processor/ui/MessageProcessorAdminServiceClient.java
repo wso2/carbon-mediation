@@ -436,11 +436,11 @@ public class MessageProcessorAdminServiceClient {
      * @return <code>message</code> Returns message from the queue as a string
      * @throws Exception
      */
-    public String getMessage(String processorName) throws Exception {
+    public String browseMessage(String processorName) throws Exception {
         String message = null;
         try {
             if (processorName != null) {
-                message = stub.getMessage(processorName);
+                message = stub.browseMessage(processorName);
             }
         } catch (Exception e) {
             handleException(e);
@@ -471,7 +471,6 @@ public class MessageProcessorAdminServiceClient {
      * @param storeName Name of store to redirect the message
      * @throws Exception
      */
-
     public void popAndRedirectMessage(String processorName, String storeName) throws Exception {
         try {
             if (processorName != null) {

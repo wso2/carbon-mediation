@@ -120,9 +120,9 @@
         
         if( processorName != null ) {
             try {
-                msg = client.getMessage(processorName);
+                msg = client.browseMessage(processorName);
             } catch (Throwable e) {
-                msg = "ERROR : " + e.getMessage();
+                msg = "ERROR : " + e.browseMessage();
                 CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request);
             }
         }
