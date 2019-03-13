@@ -23,11 +23,10 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 
 import org.apache.axis2.AxisFault;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
-
-import sun.misc.BASE64Encoder;
 
 public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 
@@ -57,8 +56,7 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
                                 null);
             }
 			byte[] encryptedPassword = cipher.doFinal(plainTextPassByte);
-			BASE64Encoder encoder = new BASE64Encoder();
-            return encoder.encode(encryptedPassword);
+            return new String(Base64.encodeBase64(encryptedPassword));
 		} catch (IllegalBlockSizeException | BadPaddingException e) {
 			handleException(log, "Error encrypting password ", e);
 		}
