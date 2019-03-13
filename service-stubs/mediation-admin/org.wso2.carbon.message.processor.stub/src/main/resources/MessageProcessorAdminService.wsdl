@@ -1,190 +1,17 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://org.apache.synapse/xsd" xmlns:ax2295="http://service.processor.message.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://service.processor.message.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.processor.message.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://org.apache.synapse/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://service.processor.message.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax2262="http://service.processor.message.carbon.wso2.org/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://service.processor.message.carbon.wso2.org">
     <wsdl:documentation>MessageProcessorAdminService</wsdl:documentation>
     <wsdl:types>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.processor.message.carbon.wso2.org/xsd">
             <xs:complexType name="MessageProcessorMetaData">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="isEdited" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
-        <xs:schema xmlns:ax2296="http://service.processor.message.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
+        <xs:schema xmlns:ax2263="http://service.processor.message.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
             <xs:import namespace="http://service.processor.message.carbon.wso2.org/xsd"/>
-            <xs:element name="deleteMessageProcessor">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="resend">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEnvelope">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEnvelopeResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDefinedEndpoints">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDefinedEndpointsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteFirstMessages">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteAllMessages">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="resendFirstMessage">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="addMessageProcessor">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageProcessor">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageProcessorResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteMessage">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="modifyMessageProcessor">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageProcessorNames">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageProcessorNamesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="resendAll">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageProcessorDataList">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageProcessorDataListResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2295:MessageProcessorMetaData"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageIds">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getMessageIdsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deactivate">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="isActive">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="isActiveResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="activate">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="getSize">
                 <xs:complexType>
                     <xs:sequence>
@@ -213,33 +40,244 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="deactivate">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="activate">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addMessageProcessor">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEnvelope">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEnvelopeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isActive">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isActiveResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDefinedEndpoints">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDefinedEndpointsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageProcessor">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageProcessorResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteMessageProcessor">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="modifyMessageProcessor">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageProcessorNames">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageProcessorNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageIds">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageIdsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageProcessorDataList">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageProcessorDataListResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2262:MessageProcessorMetaData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteFirstMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteAllMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resend">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resendFirstMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resendAll">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="validateAxis2ClientRepo">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="in" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="input" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="validateAxis2ClientRepoResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="out" type="xs:boolean"></xs:element>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="browseMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="browseMessageResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="popMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="popAndRedirectMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="getSizeRequest">
-        <wsdl:part name="parameters" element="ns:getSize"/>
+    <wsdl:message name="getMessageProcessorRequest">
+        <wsdl:part name="parameters" element="ns:getMessageProcessor"/>
     </wsdl:message>
-    <wsdl:message name="getSizeResponse">
-        <wsdl:part name="parameters" element="ns:getSizeResponse"/>
+    <wsdl:message name="getMessageProcessorResponse">
+        <wsdl:part name="parameters" element="ns:getMessageProcessorResponse"/>
     </wsdl:message>
-    <wsdl:message name="resendFirstMessageRequest">
-        <wsdl:part name="parameters" element="ns:resendFirstMessage"/>
+    <wsdl:message name="popMessageRequest">
+        <wsdl:part name="parameters" element="ns:popMessage"/>
+    </wsdl:message>
+    <wsdl:message name="popAndRedirectMessageRequest">
+        <wsdl:part name="parameters" element="ns:popAndRedirectMessage"/>
     </wsdl:message>
     <wsdl:message name="deleteAllMessagesRequest">
         <wsdl:part name="parameters" element="ns:deleteAllMessages"/>
+    </wsdl:message>
+    <wsdl:message name="validateAxis2ClientRepoRequest">
+        <wsdl:part name="parameters" element="ns:validateAxis2ClientRepo"/>
+    </wsdl:message>
+    <wsdl:message name="validateAxis2ClientRepoResponse">
+        <wsdl:part name="parameters" element="ns:validateAxis2ClientRepoResponse"/>
     </wsdl:message>
     <wsdl:message name="isActiveRequest">
         <wsdl:part name="parameters" element="ns:isActive"/>
@@ -247,26 +285,17 @@
     <wsdl:message name="isActiveResponse">
         <wsdl:part name="parameters" element="ns:isActiveResponse"/>
     </wsdl:message>
+    <wsdl:message name="deactivateRequest">
+        <wsdl:part name="parameters" element="ns:deactivate"/>
+    </wsdl:message>
+    <wsdl:message name="browseMessageRequest">
+        <wsdl:part name="parameters" element="ns:browseMessage"/>
+    </wsdl:message>
+    <wsdl:message name="browseMessageResponse">
+        <wsdl:part name="parameters" element="ns:browseMessageResponse"/>
+    </wsdl:message>
     <wsdl:message name="modifyMessageProcessorRequest">
         <wsdl:part name="parameters" element="ns:modifyMessageProcessor"/>
-    </wsdl:message>
-    <wsdl:message name="getMessageProcessorRequest">
-        <wsdl:part name="parameters" element="ns:getMessageProcessor"/>
-    </wsdl:message>
-    <wsdl:message name="getMessageProcessorResponse">
-        <wsdl:part name="parameters" element="ns:getMessageProcessorResponse"/>
-    </wsdl:message>
-    <wsdl:message name="getMessageProcessorNamesRequest">
-        <wsdl:part name="parameters" element="ns:getMessageProcessorNames"/>
-    </wsdl:message>
-    <wsdl:message name="getMessageProcessorNamesResponse">
-        <wsdl:part name="parameters" element="ns:getMessageProcessorNamesResponse"/>
-    </wsdl:message>
-    <wsdl:message name="getEnvelopeRequest">
-        <wsdl:part name="parameters" element="ns:getEnvelope"/>
-    </wsdl:message>
-    <wsdl:message name="getEnvelopeResponse">
-        <wsdl:part name="parameters" element="ns:getEnvelopeResponse"/>
     </wsdl:message>
     <wsdl:message name="getMessageIdsRequest">
         <wsdl:part name="parameters" element="ns:getMessageIds"/>
@@ -274,38 +303,11 @@
     <wsdl:message name="getMessageIdsResponse">
         <wsdl:part name="parameters" element="ns:getMessageIdsResponse"/>
     </wsdl:message>
-    <wsdl:message name="activateRequest">
-        <wsdl:part name="parameters" element="ns:activate"/>
-    </wsdl:message>
     <wsdl:message name="addMessageProcessorRequest">
         <wsdl:part name="parameters" element="ns:addMessageProcessor"/>
     </wsdl:message>
-    <wsdl:message name="deleteMessageProcessorRequest">
-        <wsdl:part name="parameters" element="ns:deleteMessageProcessor"/>
-    </wsdl:message>
-    <wsdl:message name="getClassNameRequest">
-        <wsdl:part name="parameters" element="ns:getClassName"/>
-    </wsdl:message>
-    <wsdl:message name="getClassNameResponse">
-        <wsdl:part name="parameters" element="ns:getClassNameResponse"/>
-    </wsdl:message>
-    <wsdl:message name="deactivateRequest">
-        <wsdl:part name="parameters" element="ns:deactivate"/>
-    </wsdl:message>
-    <wsdl:message name="resendRequest">
-        <wsdl:part name="parameters" element="ns:resend"/>
-    </wsdl:message>
-    <wsdl:message name="deleteMessageRequest">
-        <wsdl:part name="parameters" element="ns:deleteMessage"/>
-    </wsdl:message>
-    <wsdl:message name="deleteFirstMessagesRequest">
-        <wsdl:part name="parameters" element="ns:deleteFirstMessages"/>
-    </wsdl:message>
-    <wsdl:message name="getMessageProcessorDataListRequest">
-        <wsdl:part name="parameters" element="ns:getMessageProcessorDataList"/>
-    </wsdl:message>
-    <wsdl:message name="getMessageProcessorDataListResponse">
-        <wsdl:part name="parameters" element="ns:getMessageProcessorDataListResponse"/>
+    <wsdl:message name="resendFirstMessageRequest">
+        <wsdl:part name="parameters" element="ns:resendFirstMessage"/>
     </wsdl:message>
     <wsdl:message name="getDefinedEndpointsRequest">
         <wsdl:part name="parameters" element="ns:getDefinedEndpoints"/>
@@ -313,128 +315,141 @@
     <wsdl:message name="getDefinedEndpointsResponse">
         <wsdl:part name="parameters" element="ns:getDefinedEndpointsResponse"/>
     </wsdl:message>
+    <wsdl:message name="deleteFirstMessagesRequest">
+        <wsdl:part name="parameters" element="ns:deleteFirstMessages"/>
+    </wsdl:message>
+    <wsdl:message name="deleteMessageRequest">
+        <wsdl:part name="parameters" element="ns:deleteMessage"/>
+    </wsdl:message>
+    <wsdl:message name="getMessageProcessorNamesRequest">
+        <wsdl:part name="parameters" element="ns:getMessageProcessorNames"/>
+    </wsdl:message>
+    <wsdl:message name="getMessageProcessorNamesResponse">
+        <wsdl:part name="parameters" element="ns:getMessageProcessorNamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getSizeRequest">
+        <wsdl:part name="parameters" element="ns:getSize"/>
+    </wsdl:message>
+    <wsdl:message name="getSizeResponse">
+        <wsdl:part name="parameters" element="ns:getSizeResponse"/>
+    </wsdl:message>
     <wsdl:message name="resendAllRequest">
         <wsdl:part name="parameters" element="ns:resendAll"/>
     </wsdl:message>
-    <wsdl:message name="validateAxis2ClientRepoRequest">
-        <wsdl:part name="parameters" element="ns:validateAxis2ClientRepo"></wsdl:part>
+    <wsdl:message name="deleteMessageProcessorRequest">
+        <wsdl:part name="parameters" element="ns:deleteMessageProcessor"/>
     </wsdl:message>
-    <wsdl:message name="validateAxis2ClientRepoResponse">
-        <wsdl:part name="parameters" element="ns:validateAxis2ClientRepoResponse"></wsdl:part>
+    <wsdl:message name="resendRequest">
+        <wsdl:part name="parameters" element="ns:resend"/>
+    </wsdl:message>
+    <wsdl:message name="activateRequest">
+        <wsdl:part name="parameters" element="ns:activate"/>
+    </wsdl:message>
+    <wsdl:message name="getEnvelopeRequest">
+        <wsdl:part name="parameters" element="ns:getEnvelope"/>
+    </wsdl:message>
+    <wsdl:message name="getEnvelopeResponse">
+        <wsdl:part name="parameters" element="ns:getEnvelopeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getClassNameRequest">
+        <wsdl:part name="parameters" element="ns:getClassName"/>
+    </wsdl:message>
+    <wsdl:message name="getClassNameResponse">
+        <wsdl:part name="parameters" element="ns:getClassNameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getMessageProcessorDataListRequest">
+        <wsdl:part name="parameters" element="ns:getMessageProcessorDataList"/>
+    </wsdl:message>
+    <wsdl:message name="getMessageProcessorDataListResponse">
+        <wsdl:part name="parameters" element="ns:getMessageProcessorDataListResponse"/>
     </wsdl:message>
     <wsdl:portType name="MessageProcessorAdminServicePortType">
-        <wsdl:operation name="getSize">
-            <wsdl:input message="tns:getSizeRequest" wsaw:Action="urn:getSize"/>
-            <wsdl:output message="tns:getSizeResponse" wsaw:Action="urn:getSizeResponse"/>
+        <wsdl:operation name="getMessageProcessor">
+            <wsdl:input message="tns:getMessageProcessorRequest" wsaw:Action="urn:getMessageProcessor"/>
+            <wsdl:output message="tns:getMessageProcessorResponse" wsaw:Action="urn:getMessageProcessorResponse"/>
         </wsdl:operation>
-        <wsdl:operation name="resendFirstMessage">
-            <wsdl:input message="tns:resendFirstMessageRequest" wsaw:Action="urn:resendFirstMessage"/>
+        <wsdl:operation name="popMessage">
+            <wsdl:input message="tns:popMessageRequest" wsaw:Action="urn:popMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="popAndRedirectMessage">
+            <wsdl:input message="tns:popAndRedirectMessageRequest" wsaw:Action="urn:popAndRedirectMessage"/>
         </wsdl:operation>
         <wsdl:operation name="deleteAllMessages">
             <wsdl:input message="tns:deleteAllMessagesRequest" wsaw:Action="urn:deleteAllMessages"/>
+        </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <wsdl:input message="tns:validateAxis2ClientRepoRequest" wsaw:Action="urn:validateAxis2ClientRepo"/>
+            <wsdl:output message="tns:validateAxis2ClientRepoResponse" wsaw:Action="urn:validateAxis2ClientRepoResponse"/>
         </wsdl:operation>
         <wsdl:operation name="isActive">
             <wsdl:input message="tns:isActiveRequest" wsaw:Action="urn:isActive"/>
             <wsdl:output message="tns:isActiveResponse" wsaw:Action="urn:isActiveResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="deactivate">
+            <wsdl:input message="tns:deactivateRequest" wsaw:Action="urn:deactivate"/>
+        </wsdl:operation>
+        <wsdl:operation name="browseMessage">
+            <wsdl:input message="tns:browseMessageRequest" wsaw:Action="urn:browseMessage"/>
+            <wsdl:output message="tns:browseMessageResponse" wsaw:Action="urn:browseMessageResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="modifyMessageProcessor">
             <wsdl:input message="tns:modifyMessageProcessorRequest" wsaw:Action="urn:modifyMessageProcessor"/>
-        </wsdl:operation>
-        <wsdl:operation name="getMessageProcessor">
-            <wsdl:input message="tns:getMessageProcessorRequest" wsaw:Action="urn:getMessageProcessor"/>
-            <wsdl:output message="tns:getMessageProcessorResponse" wsaw:Action="urn:getMessageProcessorResponse"/>
-        </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorNames">
-            <wsdl:input message="tns:getMessageProcessorNamesRequest" wsaw:Action="urn:getMessageProcessorNames"/>
-            <wsdl:output message="tns:getMessageProcessorNamesResponse" wsaw:Action="urn:getMessageProcessorNamesResponse"/>
-        </wsdl:operation>
-        <wsdl:operation name="getEnvelope">
-            <wsdl:input message="tns:getEnvelopeRequest" wsaw:Action="urn:getEnvelope"/>
-            <wsdl:output message="tns:getEnvelopeResponse" wsaw:Action="urn:getEnvelopeResponse"/>
         </wsdl:operation>
         <wsdl:operation name="getMessageIds">
             <wsdl:input message="tns:getMessageIdsRequest" wsaw:Action="urn:getMessageIds"/>
             <wsdl:output message="tns:getMessageIdsResponse" wsaw:Action="urn:getMessageIdsResponse"/>
         </wsdl:operation>
-        <wsdl:operation name="activate">
-            <wsdl:input message="tns:activateRequest" wsaw:Action="urn:activate"/>
-        </wsdl:operation>
         <wsdl:operation name="addMessageProcessor">
             <wsdl:input message="tns:addMessageProcessorRequest" wsaw:Action="urn:addMessageProcessor"/>
         </wsdl:operation>
-        <wsdl:operation name="deleteMessageProcessor">
-            <wsdl:input message="tns:deleteMessageProcessorRequest" wsaw:Action="urn:deleteMessageProcessor"/>
-        </wsdl:operation>
-        <wsdl:operation name="getClassName">
-            <wsdl:input message="tns:getClassNameRequest" wsaw:Action="urn:getClassName"/>
-            <wsdl:output message="tns:getClassNameResponse" wsaw:Action="urn:getClassNameResponse"/>
-        </wsdl:operation>
-        <wsdl:operation name="deactivate">
-            <wsdl:input message="tns:deactivateRequest" wsaw:Action="urn:deactivate"/>
-        </wsdl:operation>
-        <wsdl:operation name="resend">
-            <wsdl:input message="tns:resendRequest" wsaw:Action="urn:resend"/>
-        </wsdl:operation>
-        <wsdl:operation name="deleteMessage">
-            <wsdl:input message="tns:deleteMessageRequest" wsaw:Action="urn:deleteMessage"/>
-        </wsdl:operation>
-        <wsdl:operation name="deleteFirstMessages">
-            <wsdl:input message="tns:deleteFirstMessagesRequest" wsaw:Action="urn:deleteFirstMessages"/>
-        </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorDataList">
-            <wsdl:input message="tns:getMessageProcessorDataListRequest" wsaw:Action="urn:getMessageProcessorDataList"/>
-            <wsdl:output message="tns:getMessageProcessorDataListResponse" wsaw:Action="urn:getMessageProcessorDataListResponse"/>
+        <wsdl:operation name="resendFirstMessage">
+            <wsdl:input message="tns:resendFirstMessageRequest" wsaw:Action="urn:resendFirstMessage"/>
         </wsdl:operation>
         <wsdl:operation name="getDefinedEndpoints">
             <wsdl:input message="tns:getDefinedEndpointsRequest" wsaw:Action="urn:getDefinedEndpoints"/>
             <wsdl:output message="tns:getDefinedEndpointsResponse" wsaw:Action="urn:getDefinedEndpointsResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="deleteFirstMessages">
+            <wsdl:input message="tns:deleteFirstMessagesRequest" wsaw:Action="urn:deleteFirstMessages"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessage">
+            <wsdl:input message="tns:deleteMessageRequest" wsaw:Action="urn:deleteMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageProcessorNames">
+            <wsdl:input message="tns:getMessageProcessorNamesRequest" wsaw:Action="urn:getMessageProcessorNames"/>
+            <wsdl:output message="tns:getMessageProcessorNamesResponse" wsaw:Action="urn:getMessageProcessorNamesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getSize">
+            <wsdl:input message="tns:getSizeRequest" wsaw:Action="urn:getSize"/>
+            <wsdl:output message="tns:getSizeResponse" wsaw:Action="urn:getSizeResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="resendAll">
             <wsdl:input message="tns:resendAllRequest" wsaw:Action="urn:resendAll"/>
         </wsdl:operation>
-        <wsdl:operation name="validateAxis2ClientRepo">
-            <wsdl:input message="tns:validateAxis2ClientRepoRequest" wsaw:Action="urn:validateAxis2ClientRepo" />
-            <wsdl:output message="tns:validateAxis2ClientRepoResponse" wsaw:Action="urn:validateAxis2ClientRepoResponse" />
+        <wsdl:operation name="deleteMessageProcessor">
+            <wsdl:input message="tns:deleteMessageProcessorRequest" wsaw:Action="urn:deleteMessageProcessor"/>
+        </wsdl:operation>
+        <wsdl:operation name="resend">
+            <wsdl:input message="tns:resendRequest" wsaw:Action="urn:resend"/>
+        </wsdl:operation>
+        <wsdl:operation name="activate">
+            <wsdl:input message="tns:activateRequest" wsaw:Action="urn:activate"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <wsdl:input message="tns:getEnvelopeRequest" wsaw:Action="urn:getEnvelope"/>
+            <wsdl:output message="tns:getEnvelopeResponse" wsaw:Action="urn:getEnvelopeResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <wsdl:input message="tns:getClassNameRequest" wsaw:Action="urn:getClassName"/>
+            <wsdl:output message="tns:getClassNameResponse" wsaw:Action="urn:getClassNameResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageProcessorDataList">
+            <wsdl:input message="tns:getMessageProcessorDataListRequest" wsaw:Action="urn:getMessageProcessorDataList"/>
+            <wsdl:output message="tns:getMessageProcessorDataListResponse" wsaw:Action="urn:getMessageProcessorDataListResponse"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="MessageProcessorAdminServiceSoap11Binding" type="tns:MessageProcessorAdminServicePortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="resendFirstMessage">
-            <soap:operation soapAction="urn:resendFirstMessage" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="getSize">
-            <soap:operation soapAction="urn:getSize" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="deleteAllMessages">
-            <soap:operation soapAction="urn:deleteAllMessages" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="isActive">
-            <soap:operation soapAction="urn:isActive" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="modifyMessageProcessor">
-            <soap:operation soapAction="urn:modifyMessageProcessor" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
         <wsdl:operation name="getMessageProcessor">
             <soap:operation soapAction="urn:getMessageProcessor" style="document"/>
             <wsdl:input>
@@ -444,8 +459,26 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorNames">
-            <soap:operation soapAction="urn:getMessageProcessorNames" style="document"/>
+        <wsdl:operation name="popMessage">
+            <soap:operation soapAction="urn:popMessage" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="popAndRedirectMessage">
+            <soap:operation soapAction="urn:popAndRedirectMessage" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteAllMessages">
+            <soap:operation soapAction="urn:deleteAllMessages" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <soap:operation soapAction="urn:validateAxis2ClientRepo" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -453,44 +486,8 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getEnvelope">
-            <soap:operation soapAction="urn:getEnvelope" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getMessageIds">
-            <soap:operation soapAction="urn:getMessageIds" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="addMessageProcessor">
-            <soap:operation soapAction="urn:addMessageProcessor" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="activate">
-            <soap:operation soapAction="urn:activate" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="deleteMessageProcessor">
-            <soap:operation soapAction="urn:deleteMessageProcessor" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="getClassName">
-            <soap:operation soapAction="urn:getClassName" style="document"/>
+        <wsdl:operation name="isActive">
+            <soap:operation soapAction="urn:isActive" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -504,11 +501,50 @@
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="resend">
-            <soap:operation soapAction="urn:resend" style="document"/>
+        <wsdl:operation name="browseMessage">
+            <soap:operation soapAction="urn:browseMessage" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyMessageProcessor">
+            <soap:operation soapAction="urn:modifyMessageProcessor" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageIds">
+            <soap:operation soapAction="urn:getMessageIds" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resendFirstMessage">
+            <soap:operation soapAction="urn:resendFirstMessage" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addMessageProcessor">
+            <soap:operation soapAction="urn:addMessageProcessor" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getDefinedEndpoints">
+            <soap:operation soapAction="urn:getDefinedEndpoints" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteFirstMessages">
             <soap:operation soapAction="urn:deleteFirstMessages" style="document"/>
@@ -522,8 +558,8 @@
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorDataList">
-            <soap:operation soapAction="urn:getMessageProcessorDataList" style="document"/>
+        <wsdl:operation name="getMessageProcessorNames">
+            <soap:operation soapAction="urn:getMessageProcessorNames" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -531,8 +567,8 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getDefinedEndpoints">
-            <soap:operation soapAction="urn:getDefinedEndpoints" style="document"/>
+        <wsdl:operation name="getSize">
+            <soap:operation soapAction="urn:getSize" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -546,55 +582,54 @@
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="validateAxis2ClientRepo">
-            <soap:operation
-                    soapAction="http://service.processor.message.carbon.wso2.org/validateAxis2ClientRepo" />
+        <wsdl:operation name="deleteMessageProcessor">
+            <soap:operation soapAction="urn:deleteMessageProcessor" style="document"/>
             <wsdl:input>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="resend">
+            <soap:operation soapAction="urn:resend" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="activate">
+            <soap:operation soapAction="urn:activate" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <soap:operation soapAction="urn:getEnvelope" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap:body use="literal" />
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <soap:operation soapAction="urn:getClassName" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageProcessorDataList">
+            <soap:operation soapAction="urn:getMessageProcessorDataList" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="MessageProcessorAdminServiceSoap12Binding" type="tns:MessageProcessorAdminServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="resendFirstMessage">
-            <soap12:operation soapAction="urn:resendFirstMessage" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="getSize">
-            <soap12:operation soapAction="urn:getSize" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="deleteAllMessages">
-            <soap12:operation soapAction="urn:deleteAllMessages" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="isActive">
-            <soap12:operation soapAction="urn:isActive" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="modifyMessageProcessor">
-            <soap12:operation soapAction="urn:modifyMessageProcessor" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
         <wsdl:operation name="getMessageProcessor">
             <soap12:operation soapAction="urn:getMessageProcessor" style="document"/>
             <wsdl:input>
@@ -604,8 +639,26 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorNames">
-            <soap12:operation soapAction="urn:getMessageProcessorNames" style="document"/>
+        <wsdl:operation name="popMessage">
+            <soap12:operation soapAction="urn:popMessage" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="popAndRedirectMessage">
+            <soap12:operation soapAction="urn:popAndRedirectMessage" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteAllMessages">
+            <soap12:operation soapAction="urn:deleteAllMessages" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <soap12:operation soapAction="urn:validateAxis2ClientRepo" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -613,44 +666,8 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getEnvelope">
-            <soap12:operation soapAction="urn:getEnvelope" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getMessageIds">
-            <soap12:operation soapAction="urn:getMessageIds" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="addMessageProcessor">
-            <soap12:operation soapAction="urn:addMessageProcessor" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="activate">
-            <soap12:operation soapAction="urn:activate" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="deleteMessageProcessor">
-            <soap12:operation soapAction="urn:deleteMessageProcessor" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="getClassName">
-            <soap12:operation soapAction="urn:getClassName" style="document"/>
+        <wsdl:operation name="isActive">
+            <soap12:operation soapAction="urn:isActive" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -664,11 +681,50 @@
                 <soap12:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="resend">
-            <soap12:operation soapAction="urn:resend" style="document"/>
+        <wsdl:operation name="browseMessage">
+            <soap12:operation soapAction="urn:browseMessage" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyMessageProcessor">
+            <soap12:operation soapAction="urn:modifyMessageProcessor" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageIds">
+            <soap12:operation soapAction="urn:getMessageIds" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resendFirstMessage">
+            <soap12:operation soapAction="urn:resendFirstMessage" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addMessageProcessor">
+            <soap12:operation soapAction="urn:addMessageProcessor" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getDefinedEndpoints">
+            <soap12:operation soapAction="urn:getDefinedEndpoints" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteFirstMessages">
             <soap12:operation soapAction="urn:deleteFirstMessages" style="document"/>
@@ -682,8 +738,8 @@
                 <soap12:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorDataList">
-            <soap12:operation soapAction="urn:getMessageProcessorDataList" style="document"/>
+        <wsdl:operation name="getMessageProcessorNames">
+            <soap12:operation soapAction="urn:getMessageProcessorNames" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -691,8 +747,8 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getDefinedEndpoints">
-            <soap12:operation soapAction="urn:getDefinedEndpoints" style="document"/>
+        <wsdl:operation name="getSize">
+            <soap12:operation soapAction="urn:getSize" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -706,49 +762,54 @@
                 <soap12:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="validateAxis2ClientRepo">
-            <wsdl:input></wsdl:input>
-            <wsdl:output></wsdl:output>
+        <wsdl:operation name="deleteMessageProcessor">
+            <soap12:operation soapAction="urn:deleteMessageProcessor" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="resend">
+            <soap12:operation soapAction="urn:resend" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="activate">
+            <soap12:operation soapAction="urn:activate" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <soap12:operation soapAction="urn:getEnvelope" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <soap12:operation soapAction="urn:getClassName" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageProcessorDataList">
+            <soap12:operation soapAction="urn:getMessageProcessorDataList" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="MessageProcessorAdminServiceHttpBinding" type="tns:MessageProcessorAdminServicePortType">
         <http:binding verb="POST"/>
-        <wsdl:operation name="resendFirstMessage">
-            <http:operation location="resendFirstMessage"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="getSize">
-            <http:operation location="getSize"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="deleteAllMessages">
-            <http:operation location="deleteAllMessages"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="isActive">
-            <http:operation location="isActive"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="modifyMessageProcessor">
-            <http:operation location="modifyMessageProcessor"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
         <wsdl:operation name="getMessageProcessor">
             <http:operation location="getMessageProcessor"/>
             <wsdl:input>
@@ -758,8 +819,26 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorNames">
-            <http:operation location="getMessageProcessorNames"/>
+        <wsdl:operation name="popMessage">
+            <http:operation location="popMessage"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="popAndRedirectMessage">
+            <http:operation location="popAndRedirectMessage"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteAllMessages">
+            <http:operation location="deleteAllMessages"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <http:operation location="validateAxis2ClientRepo"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -767,44 +846,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getEnvelope">
-            <http:operation location="getEnvelope"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getMessageIds">
-            <http:operation location="getMessageIds"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="addMessageProcessor">
-            <http:operation location="addMessageProcessor"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="activate">
-            <http:operation location="activate"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="deleteMessageProcessor">
-            <http:operation location="deleteMessageProcessor"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="getClassName">
-            <http:operation location="getClassName"/>
+        <wsdl:operation name="isActive">
+            <http:operation location="isActive"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -818,11 +861,50 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="resend">
-            <http:operation location="resend"/>
+        <wsdl:operation name="browseMessage">
+            <http:operation location="browseMessage"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyMessageProcessor">
+            <http:operation location="modifyMessageProcessor"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageIds">
+            <http:operation location="getMessageIds"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resendFirstMessage">
+            <http:operation location="resendFirstMessage"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addMessageProcessor">
+            <http:operation location="addMessageProcessor"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getDefinedEndpoints">
+            <http:operation location="getDefinedEndpoints"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteFirstMessages">
             <http:operation location="deleteFirstMessages"/>
@@ -836,8 +918,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="getMessageProcessorDataList">
-            <http:operation location="getMessageProcessorDataList"/>
+        <wsdl:operation name="getMessageProcessorNames">
+            <http:operation location="getMessageProcessorNames"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -845,8 +927,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getDefinedEndpoints">
-            <http:operation location="getDefinedEndpoints"/>
+        <wsdl:operation name="getSize">
+            <http:operation location="getSize"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -860,25 +942,61 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
         </wsdl:operation>
-        <wsdl:operation name="validateAxis2ClientRepo">
-            <http:operation location="/validateAxis2ClientRepo" />
+        <wsdl:operation name="deleteMessageProcessor">
+            <http:operation location="deleteMessageProcessor"/>
             <wsdl:input>
-                <mime:content type="application/x-www-form-urlencoded" />
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="resend">
+            <http:operation location="resend"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="activate">
+            <http:operation location="activate"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <http:operation location="getEnvelope"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
             <wsdl:output>
-                <mime:content type="text/xml" />
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <http:operation location="getClassName"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageProcessorDataList">
+            <http:operation location="getMessageProcessorDataList"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="MessageProcessorAdminService">
         <wsdl:port name="MessageProcessorAdminServiceHttpsSoap11Endpoint" binding="tns:MessageProcessorAdminServiceSoap11Binding">
-            <soap:address location="https://localhost:8243/services/MessageProcessorAdminService.MessageProcessorAdminServiceHttpsSoap11Endpoint"/>
+            <soap:address location="https://Mohameds-MacBook-Pro.local:8243/services/MessageProcessorAdminService.MessageProcessorAdminServiceHttpsSoap11Endpoint"/>
         </wsdl:port>
         <wsdl:port name="MessageProcessorAdminServiceHttpsSoap12Endpoint" binding="tns:MessageProcessorAdminServiceSoap12Binding">
-            <soap12:address location="https://localhost:8243/services/MessageProcessorAdminService.MessageProcessorAdminServiceHttpsSoap12Endpoint"/>
+            <soap12:address location="https://Mohameds-MacBook-Pro.local:8243/services/MessageProcessorAdminService.MessageProcessorAdminServiceHttpsSoap12Endpoint"/>
         </wsdl:port>
         <wsdl:port name="MessageProcessorAdminServiceHttpsEndpoint" binding="tns:MessageProcessorAdminServiceHttpBinding">
-            <http:address location="https://localhost:8243/services/MessageProcessorAdminService.MessageProcessorAdminServiceHttpsEndpoint"/>
+            <http:address location="https://Mohameds-MacBook-Pro.local:8243/services/MessageProcessorAdminService.MessageProcessorAdminServiceHttpsEndpoint"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
