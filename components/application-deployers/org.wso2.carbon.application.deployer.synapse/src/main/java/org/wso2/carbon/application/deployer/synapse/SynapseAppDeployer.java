@@ -249,25 +249,12 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
                 File artifactInRepo = new File(artifactDir + File.separator + fileName);
 
-                // In case of an API, there may have a version strategy and the name of the API will have
-                // that version in his name in the synapse config (ex: MyAPI:v1 instead of MyAPI)
-                if (SynapseAppDeployerConstants.API_TYPE.equals(artifact.getType())){
-                    String fullFilePath = Paths.get(artifact.getExtractedPath(), fileName).toString();
-                    try {
-                        // To create the API, we must first read it's configuration fron the artifact file
-                        InputStream in = new FileInputStream(fullFilePath);
-                        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);
-                        OMElement artifactConfig = builder.getDocumentElement();
-                        in.close();
-                        // Create the API to get the real name
-                        API api = APIFactory.createAPI(artifactConfig, new Properties());
-                        artifactName = api.getName();
-                    } catch (Exception e) {
-                        log.warn("Could not find the complete API name (with version), artifact file doesn't exist : " + fullFilePath, e);
-                    }
-                }
-
                 try {
+                    // In case of an API, there may have a version strategy and the name of the API will have that
+                    // version in its name in the synapse config (ex: MyAPI:v1 instead of MyAPI)
+                    if (SynapseAppDeployerConstants.API_TYPE.equals(artifact.getType())) {
+                        artifactName = extractApiNameFromArtifact(artifact, fileName);
+                    }
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
 
                         if (deployer instanceof AbstractSynapseArtifactDeployer) {
@@ -306,6 +293,27 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     log.error("Error occured while trying to un deploy : "+ artifactName);
                 }
             }
+        }
+    }
+
+    /**
+     * Extracts the real name of the API including the version if a versioning strategy is used for it by reading the
+     * file containing the artifact configuration and building an API.
+     *
+     * @param artifact the artifact to be built
+     * @param fileName the name of the file containing the API
+     * @return the actual name of the API
+     * @throws IOException if an error occurs while reading the configuration file
+     */
+    private String extractApiNameFromArtifact(Artifact artifact, String fileName) throws IOException {
+        String fullFilePath = Paths.get(artifact.getExtractedPath(), fileName).toString();
+        try (InputStream in = new FileInputStream(fullFilePath)) {
+            // To create the API, we must first read it's configuration from the artifact file
+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);
+            OMElement artifactConfig = builder.getDocumentElement();
+            // Create the API to get the real name
+            API api = APIFactory.createAPI(artifactConfig, new Properties());
+            return api.getName();
         }
     }
 
