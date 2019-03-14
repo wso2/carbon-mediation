@@ -388,6 +388,34 @@
 %>
     </tbody>
 </table>
+
+<%
+    }
+
+    String[] templates = synapseMetadata.getTemplates();
+    if (templates != null && templates.length > 0) {
+%>
+<p>&nbsp;&nbsp;</p>
+<table class="styledLeft" id="TemplatesTable" width="40%">
+    <thead>
+    <tr>
+        <th><img src="../templates/images/sequences.gif" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.templates"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        for (String templateName : templates) {
+    %>
+    <tr>
+        <td>
+             <%= templateName%>
+        </td>
+    </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
 <%
     }
 
