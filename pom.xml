@@ -584,6 +584,12 @@
                 <artifactId>org.wso2.carbon.core.services</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.base</artifactId>
+                <version>${carbon.kernel.version}</version>
+                <scope>compile</scope>
+            </dependency>
             <!--5 Carbon-Registry -->
             <dependency>
                 <groupId>org.wso2.carbon.registry</groupId>
@@ -1968,6 +1974,11 @@
                 <version>${javax.ws.rs.version}</version>
             </dependency>
             <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>${javax.jsr311.api.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.orbit.com.jcraft</groupId>
                 <artifactId>jsch</artifactId>
                 <version>${jsch.wso2.version}</version>
@@ -2511,6 +2522,7 @@
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
         <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
+        <javax.jsr311.api.version>1.1.1</javax.jsr311.api.version>
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
