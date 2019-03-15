@@ -285,11 +285,6 @@
                 <artifactId>synapse-fix-transport</artifactId>
                 <version>${synapse.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-commons</artifactId>
-                <version>${synapse.version}</version>
-            </dependency>
             <!--2 wso2-axis2 -->
             <dependency>
                 <groupId>org.apache.axis2.wso2</groupId>
