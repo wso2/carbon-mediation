@@ -79,7 +79,7 @@
                         </Private-Package>
                         <Import-Package>
                             org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
-                            org.osgi.framework,
+                            org.osgi.framework;version="${osgi.framework.imp.pkg.version}",
                             *;resolution:=optional,
                         </Import-Package>
                         <Export-Package>
