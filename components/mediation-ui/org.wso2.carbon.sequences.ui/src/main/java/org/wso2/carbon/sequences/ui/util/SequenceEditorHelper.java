@@ -469,15 +469,10 @@ public class SequenceEditorHelper {
 
     private static EditorUIClientFactory getFactoryFrom(HttpSession session, String editor) {
 
-        EditorUIClientFactory factory = null;
-
         if (editor != null && editor.equals("template")) {
-            factory = (EditorUIClientFactory) session.getAttribute("editorClientFactory");
+            return (EditorUIClientFactory) session.getAttribute("editorClientFactory");
         }
-        if (factory == null) {
-            factory = new SequenceEditorClientFactory();
-        }
-        return factory;
+        return new SequenceEditorClientFactory();
     }
 
     public static String getForwardToFrom(HttpSession session, String editor) {

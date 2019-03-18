@@ -83,7 +83,8 @@
     }
 
     EditorUIClient sequenceAdminClient
-            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session) ; //new SequenceAdminClient(this.getServletConfig(), session);
+            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session, editor) ;
+            //new SequenceAdminClient(this.getServletConfig(), session);
     if (SequenceEditorHelper.getEditingSequence(session) != null) {
         if (onErrorKey != null && !"".equals(onErrorKey)) {
             SequenceEditorHelper.getEditingSequence(session).setErrorHandler(onErrorKey);

@@ -26,10 +26,11 @@
         return;
     }
     String sequenceName = request.getParameter("sequenceName");
-    String action = request.getParameter("action");    
+    String action = request.getParameter("action");
+    String editor = request.getParameter("seqEditor");
 
     if (sequenceName != null && action != null) {
-        EditorUIClient client = SequenceEditorHelper.getClientForEditor(getServletConfig(), session);//new SequenceAdminClient(getServletConfig(), session);
+        EditorUIClient client = SequenceEditorHelper.getClientForEditor(getServletConfig(), session, editor);//new SequenceAdminClient(getServletConfig(), session);
         if ("enableStat".equals(action)) {
             client.enableStatistics(sequenceName);
         } else if ("disableStat".equals(action)) {

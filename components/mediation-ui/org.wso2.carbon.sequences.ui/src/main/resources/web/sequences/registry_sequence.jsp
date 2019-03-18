@@ -29,15 +29,15 @@
 <%
     ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.sequences.ui.i18n.Resources",
             request.getLocale());
-
+    
+    String editor = request.getParameter("seqEditor");
     EditorUIClient sequenceAdminClient
-            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session);//new SequenceAdminClient(getServletConfig(), session);
+            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session, editor);//new SequenceAdminClient(getServletConfig(), session);
     SequenceMediator seq = null;
     String action = request.getParameter("action");
     String header = "";
     String seqXML = (String)session.getAttribute("seqXML");
     String key = request.getParameter("key");
-    String editor = request.getParameter("seqEditor");
 
     String forwardTo = "";
     if (request.getParameter("cancelled") != null && "true".equals(request.getParameter("cancelled"))) {

@@ -49,7 +49,7 @@
 
     String epType = "";
     
-    //createClient factory for editor
+    // set session attribute to create Client factory for editor
     session.setAttribute("editorClientFactory",new TemplateEditorClientFactory());
     
     try {
@@ -395,7 +395,6 @@
 
 <%
     }
-
     String[] templates = synapseMetadata.getTemplates();
     if (templates != null && templates.length > 0) {
 %>
