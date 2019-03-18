@@ -41,8 +41,9 @@
     } else {
 
         ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.sequences.ui.i18n.Resources", request.getLocale());
-
-        String forwardTo = /*"list_sequences.jsp"*/ SequenceEditorHelper.getForwardToFrom(session)+"?tab=0&";
+    
+        String editor = request.getParameter("seqEditor");
+        String forwardTo = /*"list_sequences.jsp"*/ SequenceEditorHelper.getForwardToFrom(session,editor)+"?tab=0&";
         String errorPage = "design_sequence.jsp?ordinal=1";
         try {
             String sequenceSource = request.getParameter("sequenceXML");
@@ -54,7 +55,7 @@
                         SequenceEditorHelper.getEditingSequenceAction(session))) {
                     OMElement elem = SequenceEditorHelper.parseStringToElement(sequenceSource.trim());
                     // changes the inSequence or outSequence or faultSequence to just sequence
-                    if ("sequence".equals(SequenceEditorHelper.getEditorMode(session))) {
+                    if ("sequence".equals(SequenceEditorHelper.getEditorMode(session, editor))) {
                         elem.setLocalName("sequence");
                     }
                     OMAttribute name = elem.getAttribute(new QName("name"));

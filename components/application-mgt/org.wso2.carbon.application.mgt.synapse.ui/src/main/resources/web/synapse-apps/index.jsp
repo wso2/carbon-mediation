@@ -26,6 +26,7 @@
 <%@ page import="org.wso2.carbon.application.mgt.synapse.ui.SynapseAppAdminClient" %>
 <%@ page import="org.wso2.carbon.application.mgt.synapse.stub.types.carbon.TaskMetadata" %>
 <%@ page import="org.wso2.carbon.application.mgt.synapse.stub.types.carbon.EndpointMetadata" %>
+<%@ page import="org.wso2.carbon.mediation.templates.ui.factory.TemplateEditorClientFactory" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -47,7 +48,10 @@
     SynapseApplicationMetadata synapseMetadata = null;
 
     String epType = "";
-
+    
+    //createClient factory for editor
+    session.setAttribute("editorClientFactory",new TemplateEditorClientFactory());
+    
     try {
         SynapseAppAdminClient client = new SynapseAppAdminClient(cookie,
                 backendServerURL, configContext, request.getLocale());
@@ -408,7 +412,10 @@
     %>
     <tr>
         <td>
-             <%= templateName%>
+            <a href="#"
+               onclick="editCAppArtifact('../sequences/design_sequence.jsp?sequenceAction=edit&seqEditor=template&sequenceName=<%= Encode.forJavaScriptAttribute(templateName) %>')"><%= templateName%>
+    
+            </a>
         </td>
     </tr>
     <%

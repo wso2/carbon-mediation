@@ -152,8 +152,9 @@
         %>
             window.location.href='<%=annonOriginator%>' + '?cancelled=true';
         <%} else {
+            String editor = request.getParameter("seqEditor");
         %>
-            window.location.href = "<%=SequenceEditorHelper.getForwardToFrom(session)%>";
+        window.location.href = "<%=SequenceEditorHelper.getForwardToFrom(session,editor)%>";
         <%}
         %>
     }
