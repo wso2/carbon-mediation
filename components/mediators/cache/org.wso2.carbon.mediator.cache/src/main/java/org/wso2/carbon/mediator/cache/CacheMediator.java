@@ -76,6 +76,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      * The value of json content type as it appears in HTTP Content-Type header.
      */
     private final String jsonContentType = "application/json";
+
     /**
      * Cache configuration ID.
      */
@@ -163,6 +164,26 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      * The cache manager to be used.
      */
     private CacheManager cacheManager;
+
+    /**
+     * The hash generator used in previous cache implementation
+     */
+    private String hashGenerator = null;
+
+    /**
+     * The cache scope used in previous cache implementation
+     */
+    private String scope = null;
+
+    /**
+     * The implementation used in previous cache implementation
+     */
+    private String implementationType = null;
+
+    /**
+     * To differentiate between the new and previous cache implementations, which will be used for EI Tooling
+     */
+    private boolean isPreviousCacheImplementation = false;
 
     public CacheMediator(CacheManager cacheManager) {
         this.id = UUID.randomUUID().toString();
@@ -858,4 +879,93 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         this.addAgeHeaderEnabled = addAgeHeaderEnabled;
     }
 
+    /**
+     * This method sets the id of the cache configuration.
+     *
+     * @param id id of the cache configuration
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * This method returns the id of the cache configuration.
+     *
+     * @return id of the cache configuration
+     */
+    public String getId() {
+        return this.id;
+    }
+
+    /**
+     * This method sets the hash generator class.
+     *
+     * @param hashGenerator hash generator used to evaluate the hash value
+     */
+    public void setHashGenerator(String hashGenerator) {
+        this.hashGenerator = hashGenerator;
+    }
+
+    /**
+     * This returns the hash generator used to evaluate the hash value.
+     *
+     * @return hash generator used to evaluate the hash value
+     */
+    public String getHashGenerator() {
+        return this.hashGenerator;
+    }
+
+    /**
+     * This method sets the scope of the cache.
+     *
+     * @param scope scope of the cache
+     */
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * This method returns the scope of the cache.
+     *
+     * @return the scope of the cache
+     */
+    public String getScope() {
+        return this.scope;
+    }
+
+    /**
+     * This method sets the cache implementation type.
+     *
+     * @param implementationType cache implementation type
+     */
+    public void setImplementationType(String implementationType) {
+        this.implementationType = implementationType;
+    }
+
+    /**
+     * This method returns the cache implementation type.
+     *
+     * @return cache implementation type
+     */
+    public String getImplementationType() {
+        return this.implementationType;
+    }
+
+    /**
+     * This method returns whether this represents the previous cache implementation or not.
+     *
+     * @return whether this represents the previous cache implementation or not
+     */
+    public boolean isPreviousCacheImplementation() {
+        return isPreviousCacheImplementation;
+    }
+
+    /**
+     * This method sets whether this represents the previous cache implementation or not.
+     *
+     * @param previousCacheImplementation whether this represents the previous cache implementation or not
+     */
+    public void setPreviousCacheImplementation(boolean previousCacheImplementation) {
+        isPreviousCacheImplementation = previousCacheImplementation;
+    }
 }

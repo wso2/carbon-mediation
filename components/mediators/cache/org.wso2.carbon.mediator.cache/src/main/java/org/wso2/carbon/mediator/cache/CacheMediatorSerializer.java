@@ -45,8 +45,15 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
         OMElement cacheElem = fac.createOMElement(CachingConstants.CACHE_LOCAL_NAME, synNS);
         saveTracingState(cacheElem, mediator);
 
+        boolean isPreviousCacheImplementation = cacheMediator.isPreviousCacheImplementation();
         if (cacheMediator.isCollector()) {
             cacheElem.addAttribute(fac.createOMAttribute(CachingConstants.COLLECTOR_STRING, nullNS, "true"));
+
+            if (isPreviousCacheImplementation) {
+                cacheElem.addAttribute(
+                        fac.createOMAttribute(CachingConstants.SCOPE_STRING, nullNS, cacheMediator.getScope()));
+            }
+
         } else {
             cacheElem.addAttribute(fac.createOMAttribute(CachingConstants.COLLECTOR_STRING, nullNS, "false"));
 
@@ -62,6 +69,17 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
                                               Integer.toString(cacheMediator.getMaxMessageSize())));
             }
 
+            if (isPreviousCacheImplementation) {
+                if (!cacheMediator.getId().trim().isEmpty()) {
+                    cacheElem.addAttribute(
+                            fac.createOMAttribute(CachingConstants.ID_STRING, nullNS, cacheMediator.getId()));
+                }
+                cacheElem.addAttribute(fac.createOMAttribute(CachingConstants.HASH_GENERATOR_STRING, nullNS,
+                        cacheMediator.getHashGenerator()));
+                cacheElem.addAttribute(
+                        fac.createOMAttribute(CachingConstants.SCOPE_STRING, nullNS, cacheMediator.getScope()));
+            }
+
             OMElement onCacheHit;
             if (cacheMediator.getOnCacheHitRef() != null) {
                 onCacheHit = fac.createOMElement(CachingConstants.ON_CACHE_HIT_STRING, synNS);
@@ -75,70 +93,75 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
                 cacheElem.addChild(onCacheHit);
             }
 
-            OMElement protocolElem = fac.createOMElement(CachingConstants.PROTOCOL_STRING, synNS);
-            protocolElem.addAttribute(
-                    fac.createOMAttribute(CachingConstants.TYPE_STRING, nullNS, cacheMediator.getProtocolType()));
-            if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(cacheMediator.getProtocolType())) {
+            if (!isPreviousCacheImplementation) {
+                OMElement protocolElem = fac.createOMElement(CachingConstants.PROTOCOL_STRING, synNS);
+                protocolElem.addAttribute(fac.createOMAttribute(CachingConstants.TYPE_STRING, nullNS, cacheMediator.getProtocolType()));
+                if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(cacheMediator.getProtocolType())) {
 
-                String[] methods = cacheMediator.getHTTPMethodsToCache();
-                if (!(methods.length == 0 && methods[0].isEmpty())) {
-                    StringBuilder method = new StringBuilder();
-                    for (int i = 0; i < methods.length; i++) {
-                        if (i != methods.length - 1) {
-                            method.append(methods[i]).append(", ");
-                        } else {
-                            method.append(methods[i]);
+                    String[] methods = cacheMediator.getHTTPMethodsToCache();
+                    if (!(methods.length == 0 && methods[0].isEmpty())) {
+                        StringBuilder method = new StringBuilder();
+                        for (int i = 0; i < methods.length; i++) {
+                            if (i != methods.length - 1) {
+                                method.append(methods[i]).append(", ");
+                            } else {
+                                method.append(methods[i]);
+                            }
                         }
+                        OMElement methodElem = fac.createOMElement(CachingConstants.METHODS_STRING, synNS);
+                        methodElem.setText(method.toString());
+                        protocolElem.addChild(methodElem);
                     }
-                    OMElement methodElem = fac.createOMElement(CachingConstants.METHODS_STRING, synNS);
-                    methodElem.setText(method.toString());
-                    protocolElem.addChild(methodElem);
+
+                    String[] headers = cacheMediator.getHeadersToExcludeInHash();
+                    if (!(headers.length == 0 && headers[0].isEmpty())) {
+                        StringBuilder header = new StringBuilder();
+                        for (int i = 0; i < headers.length; i++) {
+                            if (i != headers.length - 1) {
+                                header.append(headers[i]).append(", ");
+                            } else {
+                                header.append(headers[i]);
+                            }
+                        }
+                        OMElement headerElem = fac.createOMElement(CachingConstants.HEADERS_TO_EXCLUDE_STRING, synNS);
+                        headerElem.setText(header.toString());
+                        protocolElem.addChild(headerElem);
+                    }
+
+                    String responseCodes = cacheMediator.getResponseCodes();
+                    OMElement responseCodesElem = fac.createOMElement(CachingConstants.RESPONSE_CODES_STRING, synNS);
+                    responseCodesElem.setText(responseCodes);
+                    protocolElem.addChild(responseCodesElem);
+
+                    boolean cacheControlEnabled = cacheMediator.isCacheControlEnabled();
+                    OMElement enableCacheControlElem = fac
+                            .createOMElement(CachingConstants.ENABLE_CACHE_CONTROL_STRING, synNS);
+                    enableCacheControlElem.setText(String.valueOf(cacheControlEnabled));
+                    protocolElem.addChild(enableCacheControlElem);
+
+                    boolean addAgeHeaderEnabled = cacheMediator.isAddAgeHeaderEnabled();
+                    OMElement addAgeHeaderEnabledElem = fac
+                            .createOMElement(CachingConstants.INCLUDE_AGE_HEADER_STRING, synNS);
+                    addAgeHeaderEnabledElem.setText(String.valueOf(addAgeHeaderEnabled));
+                    protocolElem.addChild(addAgeHeaderEnabledElem);
+
                 }
 
-                String[] headers = cacheMediator.getHeadersToExcludeInHash();
-                if (!(headers.length == 0 && headers[0].isEmpty())) {
-                    StringBuilder header = new StringBuilder();
-                    for (int i = 0; i < headers.length; i++) {
-                        if (i != headers.length - 1) {
-                            header.append(headers[i]).append(", ");
-                        } else {
-                            header.append(headers[i]);
-                        }
-                    }
-                    OMElement headerElem = fac.createOMElement(CachingConstants.HEADERS_TO_EXCLUDE_STRING, synNS);
-                    headerElem.setText(header.toString());
-                    protocolElem.addChild(headerElem);
-                }
+                OMElement hashGeneratorElem = fac.createOMElement(CachingConstants.HASH_GENERATOR_STRING, synNS);
+                hashGeneratorElem.setText(cacheMediator.getDigestGenerator().getClass().getName());
+                protocolElem.addChild(hashGeneratorElem);
 
-                String responseCodes = cacheMediator.getResponseCodes();
-                OMElement responseCodesElem = fac.createOMElement(CachingConstants.RESPONSE_CODES_STRING, synNS);
-                responseCodesElem.setText(responseCodes);
-                protocolElem.addChild(responseCodesElem);
-
-                boolean cacheControlEnabled = cacheMediator.isCacheControlEnabled();
-                OMElement enableCacheControlElem = fac.createOMElement(CachingConstants.ENABLE_CACHE_CONTROL_STRING,
-                        synNS);
-                enableCacheControlElem.setText(String.valueOf(cacheControlEnabled));
-                protocolElem.addChild(enableCacheControlElem);
-
-                boolean addAgeHeaderEnabled = cacheMediator.isAddAgeHeaderEnabled();
-                OMElement addAgeHeaderEnabledElem = fac.createOMElement(CachingConstants.INCLUDE_AGE_HEADER_STRING,
-                        synNS);
-                addAgeHeaderEnabledElem.setText(String.valueOf(addAgeHeaderEnabled));
-                protocolElem.addChild(addAgeHeaderEnabledElem);
-
+                cacheElem.addChild(protocolElem);
             }
-
-            OMElement hashGeneratorElem = fac.createOMElement(CachingConstants.HASH_GENERATOR_STRING, synNS);
-            hashGeneratorElem.setText(cacheMediator.getDigestGenerator().getClass().getName());
-            protocolElem.addChild(hashGeneratorElem);
-
-            cacheElem.addChild(protocolElem);
 
             if (cacheMediator.getInMemoryCacheSize() > -1) {
                 OMElement implElem = fac.createOMElement(CachingConstants.IMPLEMENTATION_STRING, synNS);
                 implElem.addAttribute(fac.createOMAttribute(CachingConstants.MAX_SIZE_STRING, nullNS,
                                                             Integer.toString(cacheMediator.getInMemoryCacheSize())));
+                if (isPreviousCacheImplementation) {
+                    implElem.addAttribute(fac.createOMAttribute(CachingConstants.TYPE_STRING, nullNS,
+                            cacheMediator.getImplementationType()));
+                }
                 cacheElem.addChild(implElem);
             }
         }
