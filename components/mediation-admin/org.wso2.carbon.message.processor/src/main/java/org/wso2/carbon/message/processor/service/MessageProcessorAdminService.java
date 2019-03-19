@@ -790,7 +790,9 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         if (messageConsumer.isAlive()) {
             try {
                 messageContext = messageConsumer.receive();
-                message = messageContext.getEnvelope().toString();
+                if (messageContext != null) {
+                    message = messageContext.getEnvelope().toString();
+                }
             } catch (SynapseException e) {
                 handleException(log, "MessageConsumer failed to receive message from queue :", e);
             }
@@ -833,9 +835,8 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
      */
     public void popAndRedirectMessage(String processorName, String storeName) throws AxisFault {
         SynapseConfiguration configuration = getSynapseConfiguration();
-        MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
+        MessageConsumer messageConsumer = getMessageConsumer(configuration, processorName);
         MessageProducer messageProducer = configuration.getMessageStore(storeName).getProducer();
-
         try {
             popAndRedirectMessageToStore(messageProducer, messageConsumer);
         } catch (AxisFault e) {
@@ -847,11 +848,12 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
 
     private void popAndRedirectMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer)
         throws AxisFault {
-
         try {
             MessageContext messageContext = messageConsumer.receive();
-            messageProducer.storeMessage(messageContext);
-            messageConsumer.ack();
+            if (messageContext != null) {
+                messageProducer.storeMessage(messageContext);
+                messageConsumer.ack();
+            }
         } catch (SynapseException e) {
             handleException(log, "Failed to redirect message. ", e);
         }
