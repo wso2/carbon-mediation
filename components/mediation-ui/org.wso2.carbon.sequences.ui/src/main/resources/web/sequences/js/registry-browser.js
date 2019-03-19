@@ -22,6 +22,11 @@ function showMediationResourceTree(id, path) {
                                                     '</td></tr></tbody></table>';
         showLocalRegBrowser(id);
         $('local-registry-placeholder').style.display = "";
+        document.onkeydown = function(evt) {
+            if (evt.key === "Escape") {
+                jQuery('#dialog').dialog("destroy").remove();
+            }
+        };
     } else {
         setTimeout("showMediationResourceTree('" + id + "','" + path + "')", 100);
     }
