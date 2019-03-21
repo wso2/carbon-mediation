@@ -55,6 +55,8 @@ public class EventMediatorFactory extends AbstractMediatorFactory {
             }
         }
 
+        addAllCommentChildrenToList(element, event.getCommentsList());
+
         return event;
     }
 
