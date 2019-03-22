@@ -27,7 +27,7 @@
     <description>Dependency management of Synapse and the required mediation fragments of the ESB</description>
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.osgi</groupId>
+            <groupId>org.wso2.eclipse.osgi</groupId>
             <artifactId>org.eclipse.osgi</artifactId>
         </dependency>
         <dependency>
