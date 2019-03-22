@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.message.processor.service;
 
-import javafx.scene.chart.Axis;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
