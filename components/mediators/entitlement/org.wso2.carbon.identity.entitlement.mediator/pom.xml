@@ -53,7 +53,7 @@
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
         <dependency>
@@ -97,7 +97,7 @@
 			    !org.pache.axis2.databinding.utils.writer,
                             !org.wso2.carbon.identity.entitlement.mediator.*,
 			    org.wso2.carbon.identity.entitlement.proxy.*,
-                            org.wso2.carbon.identity.entitlement.stub.*;version="${carbon.identity.imp.pkg.version}",
+                            org.wso2.carbon.identity.entitlement.stub.*;version="${carbon.commons.imp.pkg.version}",
                             org.wso2.carbon.authenticator.stub.*;version="${carbon.kernel.imp.pkg.version}",
                             *; resolution:=optional
                         </Import-Package>
