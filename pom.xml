@@ -2348,6 +2348,16 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>accessors-smart</artifactId>
+                <version>${net.minidev.accessors-smart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>${org.ow2.asm.asm.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.integrator.core</artifactId>
                 <version>${carbon.mediation.version}</version>
@@ -2490,7 +2500,7 @@
         <geronimo-jta.version>1.1.1</geronimo-jta.version>
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <jsonpath.version>2.4.0.wso2v2</jsonpath.version>
-        <json.smart.version>2.2</json.smart.version>
+        <json.smart.version>2.3</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
         <netty.version>4.0.39.Final</netty.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
@@ -2531,6 +2541,8 @@
         <jacoco.agent.version>0.7.5.201505241946</jacoco.agent.version>
         <activemq.version>5.2.0</activemq.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
+        <net.minidev.accessors-smart.version>1.2</net.minidev.accessors-smart.version>
+        <org.ow2.asm.asm.version>5.2</org.ow2.asm.asm.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
