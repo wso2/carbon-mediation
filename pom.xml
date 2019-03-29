@@ -2480,7 +2480,7 @@
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xmlsec.version>1.5.5</xmlsec.version>
         <xml.resolver.version>1.2</xml.resolver.version>
-        <stax2.version>3.1.4</stax2.version>
+        <stax2.version>4.2</stax2.version>
         <woodstox.core.version>4.2.0</woodstox.core.version>
         <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
         <jaxb.impl.version>2.1.13</jaxb.impl.version>
