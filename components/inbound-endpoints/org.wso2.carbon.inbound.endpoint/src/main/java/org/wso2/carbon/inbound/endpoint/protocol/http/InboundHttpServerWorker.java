@@ -68,6 +68,7 @@ public class InboundHttpServerWorker extends ServerWorker {
     private RESTRequestHandler restHandler;
     private Pattern dispatchPattern;
     private Matcher patternMatcher;
+    private boolean isInternalInboundEndpoint;
 
     public InboundHttpServerWorker(int port, String tenantDomain,
                                    SourceRequest sourceRequest,
@@ -78,6 +79,8 @@ public class InboundHttpServerWorker extends ServerWorker {
         this.port = port;
         this.tenantDomain = tenantDomain;
         restHandler = new RESTRequestHandler();
+
+        isInternalInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundPort() == port);
     }
 
     public void run() {
@@ -133,6 +136,11 @@ public class InboundHttpServerWorker extends ServerWorker {
                 }
 
                 dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
+
+                if (isInternalInboundEndpoint) {
+                    HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
+                    return;
+                }
 
                 boolean continueDispatch = true;
                 if (dispatchPattern != null) {

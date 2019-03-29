@@ -31,6 +31,8 @@ import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpSourceHandler;
 import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPIDispatcher;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -57,8 +59,13 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>> dispatchPatternMap =
             new ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>>();
 
+    private int internalInboundPort = -1;
+
+    private InternalAPIDispatcher internalAPIDispatcher;
+
     private HTTPEndpointManager() {
         super();
+        internalAPIDispatcher = new InternalAPIDispatcher(ConfigurationLoader.loadInternalAPIs());
     }
 
     public static HTTPEndpointManager getInstance() {
@@ -408,4 +415,15 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         }
     }
 
+    public InternalAPIDispatcher getInternalAPIDispatcher() {
+        return internalAPIDispatcher;
+    }
+
+    public int getInternalInboundPort() {
+        return internalInboundPort;
+    }
+
+    public void setInternalInboundPort(int internalInboundPort) {
+        this.internalInboundPort = internalInboundPort;
+    }
 }
