@@ -59,13 +59,16 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>> dispatchPatternMap =
             new ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>>();
 
-    private int internalInboundPort = -1;
+    private int internalInboundPort;
 
     private InternalAPIDispatcher internalAPIDispatcher;
 
     private HTTPEndpointManager() {
         super();
-        internalAPIDispatcher = new InternalAPIDispatcher(ConfigurationLoader.loadInternalAPIs());
+        internalInboundPort = ConfigurationLoader.getInternalInboundPort();
+        if (internalInboundPort != -1) {
+            internalAPIDispatcher = new InternalAPIDispatcher(ConfigurationLoader.loadInternalAPIs());
+        }
     }
 
     public static HTTPEndpointManager getInstance() {
@@ -421,9 +424,5 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     public int getInternalInboundPort() {
         return internalInboundPort;
-    }
-
-    public void setInternalInboundPort(int internalInboundPort) {
-        this.internalInboundPort = internalInboundPort;
     }
 }

@@ -67,6 +67,6 @@ public class InboundHttpConstants {
     /** Parameter name for preferred ciphers in inbound endpoint configs **/
     public static final String PREFERRED_CIPHERS = "PreferredCiphers";
 
-    public static final String INTERNAL_INBOUND_ENDPOINT_NAME = "INTERNAL_INBOUND_ENDPOINT_NAME";
+    public static final String INTERNAL_INBOUND_ENDPOINT_NAME = "EI_INTERNAL_INBOUND_ENDPOINT";
 
 }

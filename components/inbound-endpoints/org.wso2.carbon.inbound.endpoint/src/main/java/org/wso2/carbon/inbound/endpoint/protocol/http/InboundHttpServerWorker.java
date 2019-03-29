@@ -79,7 +79,6 @@ public class InboundHttpServerWorker extends ServerWorker {
         this.port = port;
         this.tenantDomain = tenantDomain;
         restHandler = new RESTRequestHandler();
-
         isInternalInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundPort() == port);
     }
 
@@ -100,6 +99,11 @@ public class InboundHttpServerWorker extends ServerWorker {
                 String method = request.getRequest() != null ? request.getRequest().
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
+
+                if (isInternalInboundEndpoint) {
+                    HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
+                    return;
+                }
 
                 String endpointName =
                         HTTPEndpointManager.getInstance().getEndpointName(port, tenantDomain);
@@ -136,11 +140,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                 }
 
                 dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
-
-                if (isInternalInboundEndpoint) {
-                    HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
-                    return;
-                }
 
                 boolean continueDispatch = true;
                 if (dispatchPattern != null) {

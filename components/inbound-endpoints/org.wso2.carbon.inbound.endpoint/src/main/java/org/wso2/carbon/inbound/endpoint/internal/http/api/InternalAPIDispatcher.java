@@ -54,13 +54,14 @@ public class InternalAPIDispatcher {
     public void dispatch(MessageContext synCtx) {
         InternalAPI internalApi = findAPI(synCtx);
         if (internalApi == null) {
-            log.warn("No Internal InternalAPI found to dispatch the message");
+            log.warn("No Internal API found to dispatch the message");
             return;
         }
 
         APIResource resource = findResource(synCtx, internalApi);
         if (resource == null) {
-            log.warn("No matching Resource found in " + internalApi.getName() + " InternalAPI to dispatch the message");
+            log.warn("No matching Resource found in " + internalApi.getName() +
+                    " InternalAPI to dispatch the message");
             return;
         }
 

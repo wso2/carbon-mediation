@@ -96,9 +96,8 @@ public class EndpointListenerLoader {
             }
         }
 
-        int internalInboundPort = ConfigurationLoader.getInternalInboundPort();
+        int internalInboundPort = HTTPEndpointManager.getInstance().getInternalInboundPort();
         if (internalInboundPort != -1) {
-            HTTPEndpointManager.getInstance().setInternalInboundPort(internalInboundPort);
             HTTPEndpointManager.getInstance().startListener(
                     internalInboundPort, InboundHttpConstants.INTERNAL_INBOUND_ENDPOINT_NAME, null);
 
