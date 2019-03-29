@@ -327,6 +327,11 @@ public class CGPollingTransportTaskManager {
                                 // ignore the interrupted exception and make this thread sleep in next iteration
                             }
                         }
+                    } catch (NotAuthorizedException | AxisFault e) {
+                        // just logged the error and re-try in the next attempt
+                        if (log.isDebugEnabled()) {
+                            log.debug(e);
+                        }
                     } catch (TException e) {
                         log.error("Polling Task Manager encountered an error..", e);
                         // should be a connection error with the remote server
@@ -334,16 +339,6 @@ public class CGPollingTransportTaskManager {
                         registerObserver(hostName, serviceName, port);
                         scheduleHeartBeatTaskIfRequired(hostName, port);
                         return;
-                    } catch (NotAuthorizedException e) {
-                        // just logged the error and re-try in the next attempt
-                        if (log.isDebugEnabled()) {
-                            log.debug(e);
-                        }
-                    } catch (AxisFault e) {
-                        // just log and re-try in the next attempt
-                        if (log.isDebugEnabled()) {
-                            log.debug(e);
-                        }
                     }
                 }
             } finally {
@@ -453,7 +448,7 @@ public class CGPollingTransportTaskManager {
 
                         msgContext.setAxisService(null); // fix the service dispatching
                         msgContext.setProperty(HTTPConstants.HTTP_METHOD, message.getHttpMethod());
-                        msgContext.setIncomingTransportName(message.getIncommingTransport());
+                        msgContext.setIncomingTransportName(message.getIncomingTransport());
                         RESTUtil.processXMLRequest(
                                 msgContext,
                                 new ByteArrayInputStream(message.getMessage()),
@@ -487,7 +482,7 @@ public class CGPollingTransportTaskManager {
                                         gzipInputStream,
                                         contentType));
                         isSOAP11 = msgContext.isSOAP11();
-                        msgContext.setIncomingTransportName(message.getIncommingTransport());
+                        msgContext.setIncomingTransportName(message.getIncomingTransport());
                         AxisEngine.receive(msgContext);
                     }
                 } catch (XMLStreamException e) {
