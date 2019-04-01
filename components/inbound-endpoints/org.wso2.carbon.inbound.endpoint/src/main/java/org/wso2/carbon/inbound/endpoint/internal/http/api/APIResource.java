@@ -18,8 +18,11 @@
 package org.wso2.carbon.inbound.endpoint.internal.http.api;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
 import org.apache.synapse.rest.dispatch.URITemplateHelper;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 
 import java.util.Set;
 
@@ -40,14 +43,14 @@ public abstract class APIResource {
      *
      * @return the supported HTTP methods
      */
-    abstract public Set<String> getMethods();
+    public abstract Set<String> getMethods();
 
     /**
      * Invokes the API Resource.
      *
      * @param synCtx the Synapse Message Context
      */
-    abstract public void invoke(MessageContext synCtx);
+    public abstract void invoke(MessageContext synCtx);
 
     /**
      * Constructor for creating an API Resource.
@@ -63,8 +66,21 @@ public abstract class APIResource {
      *
      * @return the DispatcherHelper
      */
-    final DispatcherHelper getDispatcherHelper() {
+    public final DispatcherHelper getDispatcherHelper() {
         return dispatcherHelper;
+    }
+
+    /**
+     * Builds the message by consuming the input stream.
+     *
+     * @param synCtx the Synapse Message Context
+     */
+    public final void buildMessage(MessageContext synCtx) {
+        try {
+            RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(), false);
+        } catch (Exception e) {
+            throw new SynapseException("Error while building the message. " + e.getMessage(), e);
+        }
     }
 
 }
