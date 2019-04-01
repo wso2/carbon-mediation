@@ -2426,7 +2426,7 @@
         <commons.vfs.version>2.2-wso2v5</commons.vfs.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
         <httpcore.version>4.3.3</httpcore.version>
-        <httpclient.version>4.3.2</httpclient.version>
+        <httpclient.version>4.5.8</httpclient.version>
         <httpasyncclient.version>4.0-beta3</httpasyncclient.version>
         <!--Misc-->
         <org.wso2.uri.template.version>1.6.4</org.wso2.uri.template.version>
