@@ -26,6 +26,7 @@ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
@@ -67,7 +68,8 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         super();
         internalInboundPort = ConfigurationLoader.getInternalInboundPort();
         if (internalInboundPort != -1) {
-            internalAPIDispatcher = new InternalAPIDispatcher(ConfigurationLoader.loadInternalAPIs());
+            internalAPIDispatcher =
+                    new InternalAPIDispatcher(ConfigurationLoader.loadInternalAPIs(Constants.INTERNAL_APIS_FILE));
         }
     }
 

@@ -49,8 +49,9 @@ public abstract class APIResource {
      * Invokes the API Resource.
      *
      * @param synCtx the Synapse Message Context
+     * @return whether to continue post invocation tasks
      */
-    public abstract void invoke(MessageContext synCtx);
+    public abstract boolean invoke(MessageContext synCtx);
 
     /**
      * Constructor for creating an API Resource.

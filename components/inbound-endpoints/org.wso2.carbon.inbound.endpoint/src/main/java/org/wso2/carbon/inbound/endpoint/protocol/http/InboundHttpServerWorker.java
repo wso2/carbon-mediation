@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -32,6 +33,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.core.axis2.ResponseState;
 import org.apache.synapse.core.axis2.SynapseMessageReceiver;
@@ -102,7 +104,11 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 if (isInternalInboundEndpoint) {
                     doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
-                    HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
+                    boolean executePostDispatchActions =
+                            HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
+                    if (executePostDispatchActions) {
+                        respond(synCtx);
+                    }
                     return;
                 }
 
@@ -416,5 +422,20 @@ public class InboundHttpServerWorker extends ServerWorker {
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setOperationContext(opCtx);
 
         return synCtx;
+    }
+
+    /**
+     * Sends the respond back to the client.
+     *
+     * @param synCtx the MessageContext
+     */
+    private void respond(org.apache.synapse.MessageContext synCtx) {
+        synCtx.setTo(null);
+        synCtx.setResponse(true);
+        Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+        org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+        axis2MessageCtx.getOperationContext()
+                .setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
+        Axis2Sender.sendBack(synCtx);
     }
 }

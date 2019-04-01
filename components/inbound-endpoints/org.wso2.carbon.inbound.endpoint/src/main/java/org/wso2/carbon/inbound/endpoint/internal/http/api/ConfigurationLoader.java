@@ -49,10 +49,10 @@ public class ConfigurationLoader {
     private static final QName CLASS_Q = new QName("class");
     private static final QName NAME_ATT = new QName("name");
 
-    public static List<InternalAPI> loadInternalAPIs() {
+    public static List<InternalAPI> loadInternalAPIs(String apiFilePath) {
 
         List<InternalAPI> internalApis = new ArrayList<>();
-        OMElement apiConfig = MiscellaneousUtil.loadXMLConfig(Constants.INTERNAL_APIS_FILE);
+        OMElement apiConfig = MiscellaneousUtil.loadXMLConfig(apiFilePath);
         if (apiConfig != null) {
 
             if (!ROOT_Q.equals(apiConfig.getQName())) {

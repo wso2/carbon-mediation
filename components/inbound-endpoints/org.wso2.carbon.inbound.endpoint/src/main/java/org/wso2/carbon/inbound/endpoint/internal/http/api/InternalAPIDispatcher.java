@@ -49,24 +49,23 @@ public class InternalAPIDispatcher {
     /**
      * Dispatches the message into relevant internal API.
      *
-     * @param synCtx the Synapse Message Context.
+     * @param synCtx the Synapse Message Context
+     * @return whether to continue with post dispatching actions
      */
-    public void dispatch(MessageContext synCtx) {
+    public boolean dispatch(MessageContext synCtx) {
         InternalAPI internalApi = findAPI(synCtx);
         if (internalApi == null) {
             log.warn("No Internal API found to dispatch the message");
-            return;
+            return false;
         }
 
         APIResource resource = findResource(synCtx, internalApi);
         if (resource == null) {
             log.warn("No matching Resource found in " + internalApi.getName() +
                     " InternalAPI to dispatch the message");
-            return;
+            return false;
         }
-
-        resource.invoke(synCtx);
-        respond(synCtx);
+        return resource.invoke(synCtx);
     }
 
     /* Finds the API that the message should be dispatched to */
@@ -109,16 +108,5 @@ public class InternalAPIDispatcher {
             }
         }
         return null;
-    }
-
-    /* Sends the respond back to the client */
-    private void respond(MessageContext synCtx) {
-        synCtx.setTo(null);
-        synCtx.setResponse(true);
-        Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
-        org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
-        axis2MessageCtx.getOperationContext()
-                .setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
-        Axis2Sender.sendBack(synCtx);
     }
 }
