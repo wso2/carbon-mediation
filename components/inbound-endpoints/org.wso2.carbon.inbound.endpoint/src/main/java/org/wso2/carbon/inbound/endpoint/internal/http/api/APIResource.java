@@ -40,14 +40,14 @@ public abstract class APIResource {
      *
      * @return the supported HTTP methods
      */
-    abstract Set<String> getMethods();
+    abstract public Set<String> getMethods();
 
     /**
      * Invokes the API Resource.
      *
      * @param synCtx the Synapse Message Context
      */
-    abstract void invoke(MessageContext synCtx);
+    abstract public void invoke(MessageContext synCtx);
 
     /**
      * Constructor for creating an API Resource.

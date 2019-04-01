@@ -101,6 +101,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                 processHttpRequestUri(axis2MsgContext, method);
 
                 if (isInternalInboundEndpoint) {
+                    doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
                     HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
                     return;
                 }
@@ -123,21 +124,7 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
-                if (!isRESTRequest(axis2MsgContext, method)) {
-                    if (request.isEntityEnclosing()) {
-                        processEntityEnclosingRequest(axis2MsgContext, false);
-                    } else {
-                        processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
-                    }
-                } else {
-                    AxisOperation axisOperation = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisOperation();
-                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(null);
-                    String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-                    SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
-                    processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgContext, false);
-                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(axisOperation);
-
-                }
+                doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
 
                 dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
 
@@ -211,6 +198,25 @@ public class InboundHttpServerWorker extends ServerWorker {
             }
         } else {
             log.error("InboundSourceRequest cannot be null");
+        }
+    }
+
+    private void doPreInjectTasks(MessageContext axis2MsgContext, Axis2MessageContext synCtx, String method) {
+
+        if (!isRESTRequest(axis2MsgContext, method)) {
+            if (request.isEntityEnclosing()) {
+                processEntityEnclosingRequest(axis2MsgContext, false);
+            } else {
+                processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
+            }
+        } else {
+            AxisOperation axisOperation = synCtx.getAxis2MessageContext().getAxisOperation();
+            synCtx.getAxis2MessageContext().setAxisOperation(null);
+            String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+            SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
+            processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgContext, false);
+            synCtx.getAxis2MessageContext().setAxisOperation(axisOperation);
+
         }
     }
 

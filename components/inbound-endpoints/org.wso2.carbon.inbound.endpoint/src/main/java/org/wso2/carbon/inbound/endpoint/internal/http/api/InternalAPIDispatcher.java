@@ -84,17 +84,23 @@ public class InternalAPIDispatcher {
     /* Finds the Resource that the message should be dispatched to */
     private APIResource findResource(MessageContext synCtx, InternalAPI internalApi) {
 
-        String method = (String) synCtx.getProperty(Constants.Configuration.HTTP_METHOD);
+        org.apache.axis2.context.MessageContext axis2Ctx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        String method = (String) axis2Ctx.getProperty(Constants.Configuration.HTTP_METHOD);
+
+        String path = (String) synCtx.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
+        String subPath = path.substring(internalApi.getContext().length());
+        if ("".equals(subPath)) {
+            subPath = "/";
+        }
 
         for (APIResource resource : internalApi.getResources()) {
             if (!resource.getMethods().contains(method)) {
                 continue;
             }
-            String url = RESTUtils.getSubRequestPath(synCtx);
             DispatcherHelper helper = resource.getDispatcherHelper();
             URITemplateHelper templateHelper = (URITemplateHelper) helper;
             Map<String, String> variables = new HashMap<>();
-            if (templateHelper.getUriTemplate().matches(url, variables)) {
+            if (templateHelper.getUriTemplate().matches(subPath, variables)) {
                 for (Map.Entry<String, String> entry : variables.entrySet()) {
                     synCtx.setProperty(RESTConstants.REST_URI_VARIABLE_PREFIX + entry.getKey(),
                             entry.getValue());
