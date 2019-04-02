@@ -2272,7 +2272,7 @@
             <dependency>
                 <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${fasterxml.jackson.databind.version}</version>
+                <version>${fasterxml.jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
@@ -2376,7 +2376,7 @@
         <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.6.58</carbon.commons.version>
+        <carbon.commons.version>4.6.60</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5.0, 5.0.0)</carbon.commons.imp.pkg.version>
         <!-- Carbon Deployment version-->
         <carbon.deployment.version>4.7.22</carbon.deployment.version>
@@ -2394,7 +2394,7 @@
         <carbon.rule.version>4.4.9</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v93</synapse.version>
+        <synapse.version>2.1.7-wso2v94</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.1.5</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.0.103</carbon.identity.oauth.version>
@@ -2523,8 +2523,7 @@
         <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
         <libthrift.version>${libthrift.wso2.version}</libthrift.version>
         <opencsv.version>2.3</opencsv.version>
-        <fasterxml.jackson.version>2.6.1.wso2v1</fasterxml.jackson.version>
-        <fasterxml.jackson.databind.version>2.6.1.wso2v3</fasterxml.jackson.databind.version>
+        <fasterxml.jackson.version>2.9.8.wso2v1</fasterxml.jackson.version>
         <json.simple.version>1.1.1</json.simple.version>
         <esotericsoftware.kryo.version>3.0.3</esotericsoftware.kryo.version>
         <org.objenesis.version>2.1</org.objenesis.version>
