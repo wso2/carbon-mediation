@@ -112,15 +112,21 @@ public class ConfigurationLoader {
 
         File synapseProperties = Paths.get(CarbonUtils.getCarbonConfigDirPath(), "synapse.properties").toFile();
         Properties properties = new Properties();
-        InputStream inputStream;
+        InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(synapseProperties);
             properties.load(inputStream);
-            inputStream.close();
         } catch (FileNotFoundException e) {
             handleException("synapse.properties file not found", e);
         } catch (IOException e) {
             handleException("Error while reading synapse.properties file", e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
         int internalInboundPort = Constants.DEFAULT_INTERNAL_HTTP_API_PORT;
 
