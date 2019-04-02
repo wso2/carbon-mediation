@@ -72,7 +72,7 @@ public class ConfigurationLoader {
 
                 if (handlerElem.getAttribute(CLASS_Q) != null) {
                     String className = handlerElem.getAttributeValue(CLASS_Q);
-                    if (!"".equals(className)) {
+                    if (!className.isEmpty()) {
                         InternalAPI internalApi = createAPI(className);
                         if (internalApi != null) {
                             internalApis.add(internalApi);
