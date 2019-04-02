@@ -47,6 +47,8 @@ public class EventMediatorSerializer extends AbstractMediatorSerializer {
                     eventElement, "expression");
         }
 
+        serializeComments(eventElement, ((EventMediator)mediator).getCommentsList());
+
         return eventElement;
     }
 
