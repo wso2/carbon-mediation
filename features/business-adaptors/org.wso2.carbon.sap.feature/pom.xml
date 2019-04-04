@@ -33,11 +33,22 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.transports.sap</artifactId>
         </dependency>
-    </dependencies>	
-   
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <properties>
+                <org.wso2.carbon.transports.sap.import.version>${carbon.mediation.version}
+                </org.wso2.carbon.transports.sap.import.version>
+            </properties>
+        </profile>
+    </profiles>
+
+
     <build>
         <plugins>
             <plugin>
@@ -51,18 +62,19 @@
                         <goals>
                             <goal>p2-feature-gen</goal>
                         </goals>
-			
+
                         <configuration>
-			    <bundles>
-                            	<bundleDef>org.wso2.carbon:org.wso2.carbon.transports.sap</bundleDef>
-                            </bundles>	
+                            <bundles>
+                                <bundleDef>
+                                    org.wso2.carbon.mediation:org.wso2.carbon.transports.sap:${org.wso2.carbon.transports.sap.import.version}
+                                </bundleDef>
+                            </bundles>
                             <id>org.wso2.carbon.transports.sap</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
-		        </configuration>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
