@@ -9,7 +9,7 @@
     <artifactId>org.wso2.carbon.transports.sap</artifactId>
     <version>4.6.131-SNAPSHOT</version>
     <packaging>${packaging.type}</packaging>
-    <name>SAP transport</name>
+    <name>WSO2 Carbon - SAP transport</name>
     <description>WSO2 Carbon - SAP Adapter</description>
 
     <profiles>

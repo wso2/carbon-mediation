@@ -26,11 +26,11 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.Iterator;
 
-/** This will contains the required methods that can be use to parser a
+/** This will contain the required methods that can be use to parser a
  * meta data description of a BAPI/RFC call.
  * So the BNF grammer for the meta data would looks like :
  *  bapirfc   -> import | tables | both
- *  import    -> structure | field | both
+ *  import    -> structure | field | tables | all
  *  structure -> 1 or more fields
  *  tables    -> 1 or more table
  *  table     -> row
@@ -55,6 +55,9 @@ public class RFCMetaDataParser {
         while(itr.hasNext()){
             OMElement childElement = (OMElement)itr.next();
             processElement(childElement, function);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Processed metadata document");
         }
     }
 
@@ -187,7 +190,7 @@ public class RFCMetaDataParser {
             }
         }
     }
-    
+
     private static void processTablesParameter(OMElement element, JCoFunction function) throws AxisFault{
         Iterator itr = element.getChildElements();
         while (itr.hasNext()){
@@ -223,7 +226,7 @@ public class RFCMetaDataParser {
 
         }
     }
-    
+
     private static void processTableParameter(OMElement element, JCoFunction function, String tableName)
             throws AxisFault{
         JCoTable inputTable = function.getImportParameterList().getTable(tableName);
