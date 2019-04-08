@@ -17,6 +17,7 @@
 package org.wso2.carbon.mediator.cache;
 
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 import org.wso2.carbon.mediator.cache.digest.DigestGenerator;
 import org.wso2.carbon.mediator.cache.digest.HttpRequestHashGenerator;
 
@@ -93,6 +94,12 @@ public class CachingConstants {
     public static final boolean DEFAULT_ADD_AGE_HEADER = false;
 
     /**
+     * Headers which need to be permanently excluded in hashing due to its dynamic nature.
+     */
+    public static final String[] PERMANENTLY_EXCLUDED_HEADERS
+            = {PassThroughConfiguration.getInstance().getCorrelationHeaderName()};
+
+    /**
      * Following names represent the local names used in QNames in MediatorFactory, Serializer and the UI
      * CacheMediator.
      */
@@ -118,5 +125,5 @@ public class CachingConstants {
     public static final String NO_STORE_STRING = "no-store";
     public static final String ID_STRING = "id";
     public static final String SCOPE_STRING = "scope";
-
+    public static final String PERMANENTLY_EXCLUDED_HEADERS_STRING = "permanently-excluded-headers";
 }
