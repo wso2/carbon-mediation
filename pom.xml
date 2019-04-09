@@ -2353,11 +2353,6 @@
                 <version>${net.minidev.accessors-smart.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>${org.ow2.asm.asm.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.integrator.core</artifactId>
                 <version>${carbon.mediation.version}</version>
@@ -2540,7 +2535,7 @@
         <activemq.version>5.2.0</activemq.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <net.minidev.accessors-smart.version>1.2</net.minidev.accessors-smart.version>
-        <org.ow2.asm.asm.version>5.2</org.ow2.asm.asm.version>
+        <org.ow2.asm.asm-all.version>5.2</org.ow2.asm.asm-all.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
