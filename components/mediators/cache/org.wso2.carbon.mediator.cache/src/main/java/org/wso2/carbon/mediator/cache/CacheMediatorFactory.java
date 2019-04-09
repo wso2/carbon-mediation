@@ -307,6 +307,9 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                 } else {
                     cache.setDigestGenerator(CachingConstants.DEFAULT_HASH_GENERATOR);
                 }
+
+                props.put(CachingConstants.PERMANENTLY_EXCLUDED_HEADERS_STRING,
+                        CachingConstants.PERMANENTLY_EXCLUDED_HEADERS);
                 cache.getDigestGenerator().init(props);
 
                 OMElement onCacheHitElem = elem.getFirstChildWithName(ON_CACHE_HIT_Q);
