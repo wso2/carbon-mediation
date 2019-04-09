@@ -19,7 +19,7 @@
 
    <parent>
        <artifactId>synapse-features</artifactId>
-       <version>4.6.124-SNAPSHOT</version>
+       <version>4.6.124</version>
        <groupId>org.wso2.carbon.mediation</groupId>
     </parent>
 
