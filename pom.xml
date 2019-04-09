@@ -2414,7 +2414,7 @@
         <!-- Apache Versions -->
         <rampart.version>1.6.1-wso2v28</rampart.version>
         <rampart.mar.version>${rampart.version}</rampart.mar.version>
-        <neethi.version>3.0.2</neethi.version>
+        <neethi.version>3.1.1</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
         <wss4j.version>1.5.11.wso2v17</wss4j.version>
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
