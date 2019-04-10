@@ -126,7 +126,9 @@ public class IntegratorStatefulHandler extends AbstractDispatcher {
                         }
                     }
                 }
-                msgctx.setProperty(Constants.Configuration.MESSAGE_TYPE, type);
+                if (type != null) {
+                    msgctx.setProperty(Constants.Configuration.MESSAGE_TYPE, type);
+                }
             } catch (IOException e) {
                 throw new AxisFault("I/O  Exception occured while building the data service request", e);
             } catch (XMLStreamException e) {
