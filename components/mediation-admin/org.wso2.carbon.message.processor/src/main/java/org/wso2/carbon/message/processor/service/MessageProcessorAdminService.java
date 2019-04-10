@@ -803,26 +803,29 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
      * Pops the message from the associated queue.
      *
      * @param processorName message processor name.
+     * @return <code>true</code> if ++ is successful, else <code>false</code>
      */
-    public void popMessage(String processorName) throws AxisFault {
+    public boolean popMessage(String processorName) throws AxisFault {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
 
         try {
-            popMessageFromQueue(messageConsumer);
+            return popMessageFromQueue(messageConsumer);
         } catch (SynapseException e) {
             handleException(log, "Failed to pop message from the queue: ", e);
+            return false;
         } finally {
             messageConsumer.cleanup();
         }
     }
 
-    private  void popMessageFromQueue(MessageConsumer messageConsumer) throws AxisFault {
+    private  boolean popMessageFromQueue(MessageConsumer messageConsumer) throws AxisFault {
         try {
             messageConsumer.receive();
-            messageConsumer.ack();
+            return messageConsumer.ack();
         } catch (SynapseException e) {
            handleException(log, "MessageConsumer failed to receive or acknowledge the message :" , e);
+           return false;
         }
     }
 
@@ -831,30 +834,34 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
      *
      * @param processorName message processor name.
      * @param storeName name of the store to redirect the message.
+     * @return <code>true</code> if ++ is successful, else <code>false</code>
      */
-    public void popAndRedirectMessage(String processorName, String storeName) throws AxisFault {
+    public boolean popAndRedirectMessage(String processorName, String storeName) throws AxisFault {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration, processorName);
         MessageProducer messageProducer = configuration.getMessageStore(storeName).getProducer();
         try {
-            popAndRedirectMessageToStore(messageProducer, messageConsumer);
+            return popAndRedirectMessageToStore(messageProducer, messageConsumer);
         } catch (AxisFault e) {
             handleException(log, "Failed to redirect message to " + storeName + " :", e);
+            return false;
         } finally {
             messageConsumer.cleanup();
         }
     }
 
-    private void popAndRedirectMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer)
+    private boolean popAndRedirectMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer)
         throws AxisFault {
         try {
             MessageContext messageContext = messageConsumer.receive();
             if (messageContext != null) {
                 messageProducer.storeMessage(messageContext);
-                messageConsumer.ack();
+                return messageConsumer.ack();
             }
+            return false;
         } catch (SynapseException e) {
             handleException(log, "Failed to redirect message. ", e);
+            return false;
         }
     }
 

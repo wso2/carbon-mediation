@@ -452,15 +452,18 @@ public class MessageProcessorAdminServiceClient {
      * Pop the message from the associated queue
      *
      * @param processorName The MessageProcessor name
+     * @return <code>true</code> if popMessage is successful, else <code>false</code>
      * @throws Exception
      */
-    public void popMessage(String processorName) throws Exception {
+    public boolean popMessage(String processorName) throws Exception {
         try {
             if (processorName != null) {
-                stub.popMessage(processorName);
+               return stub.popMessage(processorName);
             }
+            return false;
         } catch (Exception e) {
             handleException(e);
+            return false;
         }
     }
 
@@ -469,15 +472,18 @@ public class MessageProcessorAdminServiceClient {
      *
      * @param processorName MessageProcessor name
      * @param storeName Name of store to redirect the message
+     * @return <code>true</code> if popAndRedirectMessage is successful, else <code>false</code>
      * @throws Exception
      */
-    public void popAndRedirectMessage(String processorName, String storeName) throws Exception {
+    public boolean popAndRedirectMessage(String processorName, String storeName) throws Exception {
         try {
             if (processorName != null) {
-                stub.popAndRedirectMessage(processorName, storeName);
+                return stub.popAndRedirectMessage(processorName, storeName);
             }
+            return false;
         } catch (Exception e) {
             handleException(e);
+            return false;
         }
 
     }
