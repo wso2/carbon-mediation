@@ -72,6 +72,11 @@ public class SAPTransportSender extends AbstractTransportSender {
     public static final int SAP_TRANSPORT_ERROR = 8000;
 
     /**
+     * String constant for the header name wait.
+     */
+    public static final String SAP_WAIT = "sap.wait";
+
+    /**
      * String constant for the header name of sap transaciton id.
      */
     public static final String SAP_TRANSACTION_ID = "SAP-Transaction-Id";
@@ -191,6 +196,12 @@ public class SAPTransportSender extends AbstractTransportSender {
                         responseXML = evaluateRFCfunction(function, destination, escapeErrorHandling);
                         //commit the transaction
                         JCoFunction commitFunction = getRFCfunction(destination, SAPConstants.BAPI_TRANSACTION_COMMIT);
+                        Object headers = messageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+                        Map headersMap = (Map) headers;
+                        String waitValue = (String) headersMap.get(SAP_WAIT);
+                        if (waitValue != null && !waitValue.isEmpty()) {
+                            RFCMetaDataParser.processFieldValue("WAIT", waitValue, commitFunction);
+                        }
                         evaluateRFCfunction(commitFunction, destination, escapeErrorHandling);
                         if (log.isDebugEnabled()){
                             log.debug("Commit transaction.");
