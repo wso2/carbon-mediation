@@ -2513,7 +2513,7 @@
         <fge.json.schema.validator.version>2.2.6.wso2v4</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
         <joda-time.version>2.9.4.wso2v1</joda-time.version>
-        <google.guava.version>19.0</google.guava.version>
+        <google.guava.version>27.0-jre</google.guava.version>
         <!-- publishEvent mediator versions -->
         <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
         <org.apache.axiom.om.version>0.0.0</org.apache.axiom.om.version>
