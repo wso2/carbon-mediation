@@ -122,7 +122,7 @@
             try {
                 msg = client.browseMessage(processorName);
             } catch (Throwable e) {
-                msg = "ERROR : " + e.browseMessage();
+                msg = "ERROR : " + e.getMessage();
                 CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request);
             }
         }
