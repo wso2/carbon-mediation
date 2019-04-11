@@ -25,6 +25,8 @@
 
 <%
 
+    final String LIST_EXECUTORS = "list_executors.jsp";
+    final String PRIORITY_SOURCE = "priority_source.jsp";
     PriorityAdminClient client = new PriorityAdminClient(getServletConfig(), session);
 //    String executorName = request.getParameter("name");
     String action = request.getParameter("action");
@@ -108,7 +110,9 @@
 <script type="text/javascript">
     <% if (forwardTo == null) { %>
         document.location.href = 'list_executors.jsp?action=<%=Encode.forHtml(action)%>&mode=<%=Encode.forHtml(mode)%>';
-    <% } else { %>
+    <% } else if (LIST_EXECUTORS.equals(forwardTo) || PRIORITY_SOURCE.equals(forwardTo)) { %>
         document.location.href = '<%=Encode.forHtml(forwardTo)%>' + '?action=<%=Encode.forHtml(action)%>&mode=<%=Encode.forHtml(mode)%>';
+    <% } else { %>
+        CARBON.showErrorDialog("Invalid Redirect URL");
     <% } %>
 </script>
