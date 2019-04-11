@@ -739,7 +739,8 @@
 
                             <div class="toggle_container">
                                 <textarea name="seqeunceDescription" id="seqeunceDescription" title="Sequence Description"
-                                          cols="100" rows="3"><%= sequence.getDescription() != null ? sequence.getDescription() : ""%></textarea>
+                                          cols="100" rows="3"><%= sequence.getDescription() != null ?
+                                        Encode.forHtml(sequence.getDescription()) : ""%></textarea>
                             </div>
 
 
