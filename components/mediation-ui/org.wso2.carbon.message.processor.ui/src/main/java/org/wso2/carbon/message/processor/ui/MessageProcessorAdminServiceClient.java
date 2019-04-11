@@ -457,10 +457,7 @@ public class MessageProcessorAdminServiceClient {
      */
     public boolean popMessage(String processorName) throws Exception {
         try {
-            if (processorName != null) {
-               return stub.popMessage(processorName);
-            }
-            return false;
+            return stub.popMessage(processorName);
         } catch (Exception e) {
             handleException(e);
             return false;
@@ -477,10 +474,7 @@ public class MessageProcessorAdminServiceClient {
      */
     public boolean popAndRedirectMessage(String processorName, String storeName) throws Exception {
         try {
-            if (processorName != null) {
-                return stub.popAndRedirectMessage(processorName, storeName);
-            }
-            return false;
+            return stub.popAndRedirectMessage(processorName, storeName);
         } catch (Exception e) {
             handleException(e);
             return false;
