@@ -40,6 +40,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="activate">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="deactivate">
                 <xs:complexType>
                     <xs:sequence>
@@ -47,10 +54,17 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="activate">
+            <xs:element name="isActive">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isActiveResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -69,17 +83,15 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="isActive">
+            <xs:element name="getDefinedEndpoints">
                 <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
+                    <xs:sequence/>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="isActiveResponse">
+            <xs:element name="getDefinedEndpointsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -90,15 +102,10 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getDefinedEndpoints">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDefinedEndpointsResponse">
+            <xs:element name="modifyMessageProcessor">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -120,13 +127,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="modifyMessageProcessor">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>

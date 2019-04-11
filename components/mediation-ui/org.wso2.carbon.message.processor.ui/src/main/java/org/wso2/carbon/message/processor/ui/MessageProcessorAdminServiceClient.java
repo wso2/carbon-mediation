@@ -429,6 +429,11 @@ public class MessageProcessorAdminServiceClient {
         throw new Exception(message);
     }
 
+    private Exception createException(String message, Exception e) throws Exception {
+        message = message + "::" + e.getMessage();
+        return new Exception(message);
+    }
+
     /**
      * Get the message from the associated queue
      *
@@ -459,8 +464,7 @@ public class MessageProcessorAdminServiceClient {
         try {
             return stub.popMessage(processorName);
         } catch (Exception e) {
-            handleException(e);
-            return false;
+            throw createException("Failed to pop the message from the queue", e);
         }
     }
 
@@ -476,8 +480,7 @@ public class MessageProcessorAdminServiceClient {
         try {
             return stub.popAndRedirectMessage(processorName, storeName);
         } catch (Exception e) {
-            handleException(e);
-            return false;
+            throw createException("Failed to redirect message to " + storeName, e);
         }
 
     }

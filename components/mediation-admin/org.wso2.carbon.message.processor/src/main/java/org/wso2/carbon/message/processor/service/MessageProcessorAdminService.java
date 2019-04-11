@@ -55,11 +55,10 @@ import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
-    private static Log log = LogFactory.getLog(MessageProcessorAdminService.class);
-
     public static final int MSGS_PER_PAGE = 10;
-    private static String CONF_LOCATION = "conf.location";
     public final static String DEFAULT_AXIS2_XML;
+    private static Log log = LogFactory.getLog(MessageProcessorAdminService.class);
+    private static String CONF_LOCATION = "conf.location";
 
     static {
         String confPath = System.getProperty(CONF_LOCATION);
@@ -812,8 +811,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         try {
             return popMessageFromQueue(messageConsumer);
         } catch (SynapseException e) {
-            handleException(log, "Failed to pop message from the queue: ", e);
-            return false;
+            throw createAxisFaultException(log, "Failed to pop the message from the queue", e);
         } finally {
             messageConsumer.cleanup();
         }
@@ -821,12 +819,13 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
 
     private  boolean popMessageFromQueue(MessageConsumer messageConsumer) throws AxisFault {
         try {
-            messageConsumer.receive();
-            return messageConsumer.ack();
+            if (messageConsumer.receive() != null) {
+                return messageConsumer.ack();
+            }
         } catch (SynapseException e) {
            handleException(log, "MessageConsumer failed to receive or acknowledge the message :" , e);
-           return false;
         }
+        return false;
     }
 
     /**
@@ -843,8 +842,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         try {
             return popAndRedirectMessageToStore(messageProducer, messageConsumer);
         } catch (AxisFault e) {
-            handleException(log, "Failed to redirect message to " + storeName + " :", e);
-            return false;
+            throw createAxisFaultException(log, "Failed to redirect message to " + storeName, e);
         } finally {
             messageConsumer.cleanup();
         }
@@ -858,11 +856,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 messageProducer.storeMessage(messageContext);
                 return messageConsumer.ack();
             }
-            return false;
         } catch (SynapseException e) {
             handleException(log, "Failed to redirect message. ", e);
-            return false;
         }
+        return false;
     }
 
     /**
@@ -876,5 +873,11 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
         String messageStoreName = processor.getMessageStoreName();
         return configuration.getMessageStore(messageStoreName).getConsumer();
+    }
+
+    private AxisFault createAxisFaultException(Log log, String message, Exception e) throws AxisFault {
+        message = message + "::" + e.getMessage();
+        log.error(message, e);
+        return new AxisFault(message, e);
     }
 }
