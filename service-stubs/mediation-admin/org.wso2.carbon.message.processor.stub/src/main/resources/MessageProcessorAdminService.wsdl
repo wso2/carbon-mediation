@@ -102,6 +102,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="modifyMessageProcessor">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getMessageProcessor">
                 <xs:complexType>
                     <xs:sequence>
@@ -120,13 +127,6 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="modifyMessageProcessor">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -248,11 +248,25 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="popMessageResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="popAndRedirectMessage">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="popAndRedirectMessageResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -267,8 +281,14 @@
     <wsdl:message name="popMessageRequest">
         <wsdl:part name="parameters" element="ns:popMessage"/>
     </wsdl:message>
+    <wsdl:message name="popMessageResponse">
+        <wsdl:part name="parameters" element="ns:popMessageResponse"/>
+    </wsdl:message>
     <wsdl:message name="popAndRedirectMessageRequest">
         <wsdl:part name="parameters" element="ns:popAndRedirectMessage"/>
+    </wsdl:message>
+    <wsdl:message name="popAndRedirectMessageResponse">
+        <wsdl:part name="parameters" element="ns:popAndRedirectMessageResponse"/>
     </wsdl:message>
     <wsdl:message name="deleteAllMessagesRequest">
         <wsdl:part name="parameters" element="ns:deleteAllMessages"/>
@@ -370,9 +390,11 @@
         </wsdl:operation>
         <wsdl:operation name="popMessage">
             <wsdl:input message="tns:popMessageRequest" wsaw:Action="urn:popMessage"/>
+            <wsdl:output message="tns:popMessageResponse" wsaw:Action="urn:popMessageResponse"/>
         </wsdl:operation>
         <wsdl:operation name="popAndRedirectMessage">
             <wsdl:input message="tns:popAndRedirectMessageRequest" wsaw:Action="urn:popAndRedirectMessage"/>
+            <wsdl:output message="tns:popAndRedirectMessageResponse" wsaw:Action="urn:popAndRedirectMessageResponse"/>
         </wsdl:operation>
         <wsdl:operation name="deleteAllMessages">
             <wsdl:input message="tns:deleteAllMessagesRequest" wsaw:Action="urn:deleteAllMessages"/>
@@ -464,12 +486,18 @@
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="popAndRedirectMessage">
             <soap:operation soapAction="urn:popAndRedirectMessage" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteAllMessages">
             <soap:operation soapAction="urn:deleteAllMessages" style="document"/>
@@ -644,12 +672,18 @@
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="popAndRedirectMessage">
             <soap12:operation soapAction="urn:popAndRedirectMessage" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteAllMessages">
             <soap12:operation soapAction="urn:deleteAllMessages" style="document"/>
@@ -824,12 +858,18 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="popAndRedirectMessage">
             <http:operation location="popAndRedirectMessage"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteAllMessages">
             <http:operation location="deleteAllMessages"/>

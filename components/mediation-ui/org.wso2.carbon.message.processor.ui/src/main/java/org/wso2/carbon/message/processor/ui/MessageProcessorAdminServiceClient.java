@@ -429,6 +429,11 @@ public class MessageProcessorAdminServiceClient {
         throw new Exception(message);
     }
 
+    private Exception createException(String message, Exception e) throws Exception {
+        message = message + "::" + e.getMessage();
+        return new Exception(message);
+    }
+
     /**
      * Get the message from the associated queue
      *
@@ -452,15 +457,14 @@ public class MessageProcessorAdminServiceClient {
      * Pop the message from the associated queue
      *
      * @param processorName The MessageProcessor name
+     * @return <code>true</code> if popMessage is successful, else <code>false</code>
      * @throws Exception
      */
-    public void popMessage(String processorName) throws Exception {
+    public boolean popMessage(String processorName) throws Exception {
         try {
-            if (processorName != null) {
-                stub.popMessage(processorName);
-            }
+            return stub.popMessage(processorName);
         } catch (Exception e) {
-            handleException(e);
+            throw createException("Failed to pop the message from the queue", e);
         }
     }
 
@@ -469,15 +473,14 @@ public class MessageProcessorAdminServiceClient {
      *
      * @param processorName MessageProcessor name
      * @param storeName Name of store to redirect the message
+     * @return <code>true</code> if popAndRedirectMessage is successful, else <code>false</code>
      * @throws Exception
      */
-    public void popAndRedirectMessage(String processorName, String storeName) throws Exception {
+    public boolean popAndRedirectMessage(String processorName, String storeName) throws Exception {
         try {
-            if (processorName != null) {
-                stub.popAndRedirectMessage(processorName, storeName);
-            }
+            return stub.popAndRedirectMessage(processorName, storeName);
         } catch (Exception e) {
-            handleException(e);
+            throw createException("Failed to redirect message to " + storeName, e);
         }
 
     }
