@@ -2394,7 +2394,7 @@
         <carbon.rule.version>4.4.9</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v96</synapse.version>
+        <synapse.version>2.1.7-wso2v98</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.1.5</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.0.103</carbon.identity.oauth.version>
