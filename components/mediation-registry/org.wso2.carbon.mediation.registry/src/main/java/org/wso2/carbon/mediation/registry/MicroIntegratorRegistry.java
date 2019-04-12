@@ -120,7 +120,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 addConfigProperty(name, value);
             }
         }
-        log.info("EI lightweight registry is initialized.");
+        log.debug("EI lightweight registry is initialized.");
 
     }
 
