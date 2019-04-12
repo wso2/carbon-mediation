@@ -246,7 +246,7 @@ public class ServiceBusInitializer {
 
             // Start Inbound Endpoint Listeners
             //tOdO need to fix inbound endpoints
-            EndpointListenerLoader.loadListeners();
+//            EndpointListenerLoader.loadListeners();
 
             registerInboundDeployer(configCtxSvc.getServerConfigContext()
                             .getAxisConfiguration(),
