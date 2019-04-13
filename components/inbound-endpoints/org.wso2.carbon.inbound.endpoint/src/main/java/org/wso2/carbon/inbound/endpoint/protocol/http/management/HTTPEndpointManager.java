@@ -26,11 +26,14 @@ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpSourceHandler;
 import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPIDispatcher;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -57,8 +60,17 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>> dispatchPatternMap =
             new ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>>();
 
+    private int internalInboundPort;
+
+    private InternalAPIDispatcher internalAPIDispatcher;
+
     private HTTPEndpointManager() {
         super();
+        internalInboundPort = ConfigurationLoader.getInternalInboundPort();
+        if (internalInboundPort != -1) {
+            internalAPIDispatcher =
+                    new InternalAPIDispatcher(ConfigurationLoader.loadInternalAPIs(Constants.INTERNAL_APIS_FILE));
+        }
     }
 
     public static HTTPEndpointManager getInstance() {
@@ -408,4 +420,11 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         }
     }
 
+    public InternalAPIDispatcher getInternalAPIDispatcher() {
+        return internalAPIDispatcher;
+    }
+
+    public int getInternalInboundPort() {
+        return internalInboundPort;
+    }
 }

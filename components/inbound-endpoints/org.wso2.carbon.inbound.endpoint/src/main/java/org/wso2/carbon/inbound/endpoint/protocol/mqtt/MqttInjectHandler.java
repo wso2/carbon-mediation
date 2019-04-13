@@ -27,6 +27,7 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -79,6 +80,7 @@ public class MqttInjectHandler {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
 
             msgCtx.setProperty(MqttConstants.MQTT_TOPIC_NAME, topicName);
+            msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
 
             if (name != null) {
                 InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);

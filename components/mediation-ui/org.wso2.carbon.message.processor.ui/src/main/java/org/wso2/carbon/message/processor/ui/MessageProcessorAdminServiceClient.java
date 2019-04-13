@@ -428,4 +428,58 @@ public class MessageProcessorAdminServiceClient {
         log.error(message);
         throw new Exception(message);
     }
+
+    /**
+     * Get the message from the associated queue
+     *
+     * @param processorName The MessageProcessor name
+     * @return <code>message</code> Returns message from the queue as a string
+     * @throws Exception
+     */
+    public String browseMessage(String processorName) throws Exception {
+        String message = null;
+        try {
+            if (processorName != null) {
+                message = stub.browseMessage(processorName);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return message;
+    }
+
+    /**
+     * Pop the message from the associated queue
+     *
+     * @param processorName The MessageProcessor name
+     * @throws Exception
+     */
+    public void popMessage(String processorName) throws Exception {
+        try {
+            if (processorName != null) {
+                stub.popMessage(processorName);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+    }
+
+    /**
+     * Pop the message from the associated queue and redirect to specified queue
+     *
+     * @param processorName MessageProcessor name
+     * @param storeName Name of store to redirect the message
+     * @throws Exception
+     */
+    public void popAndRedirectMessage(String processorName, String storeName) throws Exception {
+        try {
+            if (processorName != null) {
+                stub.popAndRedirectMessage(processorName, storeName);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+
+    }
+
 }

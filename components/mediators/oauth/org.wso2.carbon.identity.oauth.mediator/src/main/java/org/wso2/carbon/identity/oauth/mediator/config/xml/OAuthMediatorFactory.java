@@ -75,6 +75,9 @@ public class OAuthMediatorFactory extends AbstractMediatorFactory {
         } else {
             throw new MediatorException("The 'password' attribute is required for the OAuth mediator");
         }
+
+        addAllCommentChildrenToList(element, mediator.getCommentsList());
+
         return mediator;
     }
 

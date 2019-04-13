@@ -292,7 +292,7 @@ function validateEmptySV(fld, fldName) {
 function validateForInputSV(fld, fldName) {
   	var error = "";
   	// This regex includes patterns for characters which should not include in the vault key
-	var illegalChars = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]/;
+	var illegalChars = /[&<>'"]/;
 	if (illegalChars.test(fld.value)) {
 		error = "The " + fldName + " has illegal characters";
 	}

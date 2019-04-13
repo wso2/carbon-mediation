@@ -89,14 +89,14 @@ public class HL7Processor implements InboundResponseSender {
         }
 
         mllpContext.setMessageId(synCtx.getMessageID());
-        synCtx.setProperty("inbound.endpoint.name", params.getName());
+        synCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, params.getName());
+        synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
         InboundEndpoint inboundEndpoint = synCtx.getConfiguration().getInboundEndpoint(params.getName());
         CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         synCtx.setProperty(MLLPConstants.HL7_INBOUND_MSG_ID, synCtx.getMessageID());
 
         // If not AUTO ACK, we need response invocation through this processor
         if (!autoAck) {
-            synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
             synCtx.setProperty(MLLPConstants.MLLP_CONTEXT, mllpContext);
         }
@@ -145,14 +145,14 @@ public class HL7Processor implements InboundResponseSender {
         }
 
         mllpContext.setMessageId(synCtx.getMessageID());
-        synCtx.setProperty("inbound.endpoint.name", params.getName());
+        synCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, params.getName());
+        synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
         InboundEndpoint inboundEndpoint = synCtx.getConfiguration().getInboundEndpoint(params.getName());
         CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         synCtx.setProperty(MLLPConstants.HL7_INBOUND_MSG_ID, synCtx.getMessageID());
 
         // If not AUTO ACK, we need response invocation through this processor
         if (!autoAck) {
-            synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
             synCtx.setProperty(MLLPConstants.MLLP_CONTEXT, mllpContext);
         }

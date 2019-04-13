@@ -19,6 +19,8 @@ package org.wso2.carbon.application.deployer.synapse;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.deployment.Deployer;
@@ -39,11 +41,13 @@ import org.apache.synapse.config.xml.EntryFactory;
 import org.apache.synapse.config.xml.SynapseImportFactory;
 import org.apache.synapse.config.xml.SynapseImportSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.deployers.LibraryArtifactDeployer;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
+import org.apache.synapse.rest.API;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
@@ -63,14 +67,18 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -242,6 +250,11 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 File artifactInRepo = new File(artifactDir + File.separator + fileName);
 
                 try {
+                    // In case of an API, there may have a version strategy and the name of the API will have that
+                    // version in its name in the synapse config (ex: MyAPI:v1 instead of MyAPI)
+                    if (SynapseAppDeployerConstants.API_TYPE.equals(artifact.getType())) {
+                        artifactName = extractApiNameFromArtifact(artifact, fileName);
+                    }
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
 
                         if (deployer instanceof AbstractSynapseArtifactDeployer) {
@@ -280,6 +293,27 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     log.error("Error occured while trying to un deploy : "+ artifactName);
                 }
             }
+        }
+    }
+
+    /**
+     * Extracts the real name of the API including the version if a versioning strategy is used for it by reading the
+     * file containing the artifact configuration and building an API.
+     *
+     * @param artifact the artifact to be built
+     * @param fileName the name of the file containing the API
+     * @return the actual name of the API
+     * @throws IOException if an error occurs while reading the configuration file
+     */
+    private String extractApiNameFromArtifact(Artifact artifact, String fileName) throws IOException {
+        String fullFilePath = Paths.get(artifact.getExtractedPath(), fileName).toString();
+        try (InputStream in = new FileInputStream(fullFilePath)) {
+            // To create the API, we must first read it's configuration from the artifact file
+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);
+            OMElement artifactConfig = builder.getDocumentElement();
+            // Create the API to get the real name
+            API api = APIFactory.createAPI(artifactConfig, new Properties());
+            return api.getName();
         }
     }
 

@@ -57,6 +57,8 @@ public class BuilderMediatorSerializer extends AbstractMediatorSerializer {
 
         }
 
+        serializeComments(builder, builderMediator.getCommentsList());
+
         return builder;
     }
 

@@ -35,8 +35,8 @@
     } else {
 
         ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.sequences.ui.i18n.Resources", request.getLocale());
-
-        String forwardTo = /*"list_sequences.jsp"*/ SequenceEditorHelper.getForwardToFrom(session) + "?tab=1&";
+        String editor = request.getParameter("seqEditor");
+        String forwardTo = /*"list_sequences.jsp"*/ SequenceEditorHelper.getForwardToFrom(session, editor) + "?tab=1&";
         String errorPage = "design_sequence.jsp?ordinal=1";
         try {
             String sequenceSource = request.getParameter("sequenceXML");
@@ -86,7 +86,7 @@
             }   
 
     EditorUIClient sequenceAdminClient
-            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session) ;//new SequenceAdminClient(this.getServletConfig(), session);
+            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session,editor) ;//new SequenceAdminClient(this.getServletConfig(), session);
     if (onErrorKey != null && !"".equals(onErrorKey)) {
         SequenceEditorHelper.getEditingSequence(session).setErrorHandler(onErrorKey);
     }

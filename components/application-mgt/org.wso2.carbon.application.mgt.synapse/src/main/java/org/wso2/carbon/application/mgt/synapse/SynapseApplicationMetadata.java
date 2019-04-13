@@ -34,6 +34,7 @@ public class SynapseApplicationMetadata {
     private String[] inboundEPs;
     private String[] messageProcessors;
     private String[] messageStores;
+    private String[] templates;
 
     public String getAppName() {
         return appName;
@@ -125,5 +126,13 @@ public class SynapseApplicationMetadata {
 
     public void setMessageStores(String[] messageStores) {
         this.messageStores = messageStores;
+    }
+
+    public String[] getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(String[] templates) {
+        this.templates = templates;
     }
 }

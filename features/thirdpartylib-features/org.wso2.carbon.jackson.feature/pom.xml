@@ -18,12 +18,12 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>thirdpartylib-features</artifactId>
-        <version>4.6.108-SNAPSHOT</version>
+        <version>4.6.125-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.jackson.feature</artifactId>
-    <version>4.6.108-SNAPSHOT</version>
+    <version>4.6.125-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Jackson Feature</name>
     <url>http://wso2.org</url>
@@ -66,7 +66,7 @@
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.databind.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-annotations:${fasterxml.jackson.version}</bundleDef>
                             </bundles>
                         </configuration>

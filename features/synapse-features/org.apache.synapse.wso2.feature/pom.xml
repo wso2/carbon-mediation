@@ -20,7 +20,7 @@
     <parent>
        <artifactId>synapse-features</artifactId>
        <groupId>org.wso2.carbon.mediation</groupId>
-       <version>4.6.108-SNAPSHOT</version>
+       <version>4.6.125-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -92,6 +92,18 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>accessors-smart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.orbit.commons-text</groupId>
             <artifactId>commons-text</artifactId>
         </dependency>
@@ -131,6 +143,8 @@
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
+                                <bundleDef>net.minidev:accessors-smart:${net.minidev.accessors-smart.version}</bundleDef>
+                                <bundleDef>org.ow2.asm:asm:${org.ow2.asm.asm.version}</bundleDef>
                                 <!-- Json schema validator dependencies -->
                                 <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:libphonenumber</bundleDef>
                                 <!--<bundleDef>org.wso2.orbit.joda-time:joda-time:${joda-time.version}</bundleDef>-->

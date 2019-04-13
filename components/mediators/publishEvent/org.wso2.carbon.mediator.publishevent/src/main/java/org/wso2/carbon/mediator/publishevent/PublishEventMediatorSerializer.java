@@ -100,6 +100,8 @@ public class PublishEventMediatorSerializer extends AbstractMediatorSerializer {
 
 		mediatorElement.addChild(streamAttributesElement);
 
+		serializeComments(mediatorElement, publishEventMediator.getCommentsList());
+
 		return mediatorElement;
 	}
 
