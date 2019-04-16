@@ -29,7 +29,7 @@
     <url>http://wso2.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <libthrift.version>0.12.0.wso2v1</libthrift.version>
+        <libthrift.version>0.8.0.wso2v1</libthrift.version>
     </properties>
     <profiles>
         <profile>
