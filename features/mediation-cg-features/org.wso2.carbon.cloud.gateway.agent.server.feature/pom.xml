@@ -75,7 +75,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <libthrift.version>0.8.0.wso2v1</libthrift.version>
     </properties>
 
 </project>
