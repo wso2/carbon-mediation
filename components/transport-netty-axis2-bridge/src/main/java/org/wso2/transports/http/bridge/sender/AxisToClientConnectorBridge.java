@@ -21,12 +21,14 @@ package org.wso2.transports.http.bridge.sender;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
@@ -46,6 +48,7 @@ import org.wso2.transport.http.netty.message.HttpMessageDataStreamer;
 import org.wso2.transport.http.netty.message.PooledDataStreamerFactory;
 import org.wso2.transports.http.bridge.BridgeConstants;
 import org.wso2.transports.http.bridge.listener.RequestUtils;
+import org.wso2.transports.http.bridge.util.MessageUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -140,8 +143,19 @@ public class AxisToClientConnectorBridge extends AbstractHandler implements Tran
                 final HttpMessageDataStreamer httpMessageDataStreamer =
                         getHttpMessageDataStreamer(httpCarbonMessage);
                 OutputStream outputStream = httpMessageDataStreamer.getOutputStream();
-                OMElement omElement = msgCtx.getEnvelope().getBody().getFirstElement();
-                writeToStream(outputStream, omElement.toString());
+                OMOutputFormat format = MessageUtils.getOMOutputFormat(msgCtx);
+                try {
+                    MessageFormatter messageFormatter = MessageUtils.getMessageFormatter(msgCtx);
+                    messageFormatter.writeTo(msgCtx, format, outputStream, false);
+                } catch (AxisFault axisFault) {
+                    LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + axisFault.getMessage());
+                } finally {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + e.getMessage());
+                    }
+                }
             }
         } catch (ServerConnectorException e) {
             LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + "Error occurred while submitting the response " +
@@ -163,24 +177,21 @@ public class AxisToClientConnectorBridge extends AbstractHandler implements Tran
         if (Boolean.TRUE.equals(msgCtx.getProperty(BridgeConstants.MESSAGE_BUILDER_INVOKED))) {
             final HttpMessageDataStreamer outboundMsgDataStreamer = getHttpMessageDataStreamer(httpCarbonMessage);
             final OutputStream outputStream = outboundMsgDataStreamer.getOutputStream();
-            OMElement omElement = msgCtx.getEnvelope().getBody().getFirstElement();
-            writeToStream(outputStream, omElement.toString());
-        }
-
-    }
-
-    private void writeToStream(OutputStream outputStream, String omElementString) {
-        try {
-            outputStream.write(omElementString.getBytes(Charset.defaultCharset()));
-        } catch (IOException e) {
-            LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + e.getMessage());
-        } finally {
+            OMOutputFormat format = MessageUtils.getOMOutputFormat(msgCtx);
             try {
-                outputStream.close();
-            } catch (IOException e) {
-                LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + e.getMessage());
+                MessageFormatter messageFormatter = MessageUtils.getMessageFormatter(msgCtx);
+                messageFormatter.writeTo(msgCtx, format, outputStream, false);
+            } catch (AxisFault axisFault) {
+                LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + axisFault.getMessage());
+            } finally {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + e.getMessage());
+                }
             }
         }
+
     }
 
     @Override

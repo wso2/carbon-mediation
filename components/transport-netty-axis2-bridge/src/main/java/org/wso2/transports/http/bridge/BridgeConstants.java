@@ -68,4 +68,6 @@ public class BridgeConstants {
     public static final String RAW_PAYLOAD = "RAW_PAYLOAD";
 
     public static final String POOLED_BYTE_BUFFER_FACTORY = "POOLED_BYTE_BUFFER_FACTORY";
+
+    public static final String MESSAGE_OUTPUT_FORMAT = "MESSAGE_OUTPUT_FORMAT";
 }
