@@ -16,7 +16,6 @@
  * under the License.
  *
  */
-
 package org.wso2.transports.http.bridge.util;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -42,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 
-
 /**
  * Class MessageUtils contains helper methods that are used to build the payload.
  */
@@ -53,6 +51,8 @@ public class MessageUtils {
     private static boolean noAddressingHandler = false;
 
     private static volatile Handler addressingInHandler = null;
+
+    private MessageUtils() {}
 
     public static void buildMessage(MessageContext msgCtx) {
 
@@ -87,7 +87,7 @@ public class MessageUtils {
             if (element != null) {
                 msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(element));
                 msgCtx.setProperty(DeferredMessageBuilder.RELAY_FORMATTERS_MAP,
-                        messageBuilder.getFormatters());
+                                   messageBuilder.getFormatters());
                 msgCtx.setProperty(BridgeConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
 
                 // TODO: implement XML/JSON force validation
@@ -133,10 +133,10 @@ public class MessageUtils {
     }
 
     /**
-     * This selects the formatter for a given message format based on the the content type of the received message.
-     * content-type to builder mapping can be specified through the Axis2.xml.
+     * Returns the formatter for a given message format based on the the content type of the received message.
+     * The content-type to builder mapping can be specified through the axis2.xml.
      *
-     * @param msgContext axis2 MessageContext
+     * @param msgContext axis2 message context
      * @return the formatter registered against the given content-type
      */
     public static MessageFormatter getMessageFormatter(MessageContext msgContext) {
@@ -147,10 +147,8 @@ public class MessageUtils {
         if (messageFormatString != null) {
             messageFormatter = msgContext.getConfigurationContext()
                     .getAxisConfiguration().getMessageFormatter(messageFormatString);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Message format is: " + messageFormatString
-                             + "; message formatter returned by AxisConfiguration: " + messageFormatter);
-            }
+            LOGGER.debug("Message format: {}; message formatter returned by AxisConfiguration: {}",
+                         messageFormatString, messageFormatter);
         }
         if (messageFormatter == null) {
             messageFormatter = (MessageFormatter) msgContext.getProperty(Constants.Configuration.MESSAGE_FORMATTER);
@@ -169,7 +167,7 @@ public class MessageUtils {
                 }
                 return new ApplicationXMLFormatter();
             } else {
-                // Lets default to SOAP formatter
+                // default to SOAP formatter
                 messageFormatter = new SOAPMessageFormatter();
             }
         }
@@ -177,6 +175,7 @@ public class MessageUtils {
     }
 
     private static String getMessageFormatterProperty(MessageContext msgContext) {
+
         String messageFormatterProperty = null;
         Object property = msgContext
                 .getProperty(Constants.Configuration.MESSAGE_TYPE);
@@ -194,6 +193,7 @@ public class MessageUtils {
     }
 
     private static String getContentTypeForFormatterSelection(String type, MessageContext msgContext) {
+
         /*
          * Handle special case where content-type : text/xml and SOAPAction = null consider as
          * POX (REST) message not SOAP 1.1.
@@ -223,8 +223,8 @@ public class MessageUtils {
         msgContext.setDoingREST(TransportUtils.isDoingREST(msgContext));
 
         /*
-         *  PassThroughConstants.INVOKED_REST set to true here if isDoingREST is true -
-         *  this enables us to check whether the original request to the endpoint was a
+         * PassThroughConstants.INVOKED_REST set to true here if isDoingREST is true -
+         * this enables us to check whether the original request to the endpoint was a
          * REST request inside DefferedMessageBuilder (which we need to convert
          * text/xml content type into application/xml if the request was not a SOAP
          * request.
