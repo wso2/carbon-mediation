@@ -163,87 +163,92 @@ public class XMLInputReader implements InputReader {
         String nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName,
                 omElement, jsonSchemaMap);
 
-        elementType = getElementType(jsonSchemaMap, nameSpaceLocalName);
-        if (NULL_ELEMENT_TYPE.equals(elementType)) {
-            /* Check whether the input payload has empty tags. */
-            log.warn("Element name not found : " + nameSpaceLocalName);
-        }
 
-        nextJSONSchemaMap = buildNextSchema(jsonSchemaMap, elementType, nameSpaceLocalName);
-        if (nextJSONSchemaMap == null) {
-            throw new ReaderException(
-                    "Input type is incorrect or Invalid element found in the message payload : " + nameSpaceLocalName);
-        }
         /* if this is new object preceding an array, close the array before writing the new element */
         if (prevElementName != null && !nameSpaceLocalName.equals(prevElementName)) {
             writeArrayEndElement();
             prevElementName = null;
         }
 
-        if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
-            if (prevElementName == null) {
-                writeArrayStartElement(nameSpaceLocalName);
+        /* Get element type and schema map (if the element is found in the schema).
+           If the element is not found in the map, ignore it */
+        elementType = getElementType(jsonSchemaMap, nameSpaceLocalName);
+        if (NULL_ELEMENT_TYPE.equals(elementType)) {
+            /* Check whether the input payload has empty tags. */
+            log.debug("Element name not found : " + nameSpaceLocalName);
+        } else {
+            nextJSONSchemaMap = buildNextSchema(jsonSchemaMap, elementType, nameSpaceLocalName);
+            if (nextJSONSchemaMap == null) {
+                throw new ReaderException(
+                        "Input type is incorrect or Invalid element found in the message payload : " + nameSpaceLocalName);
             }
-            elementType = getArraySubElementType(jsonSchemaMap, nameSpaceLocalName);
-            isArrayElement = true;
-        }
 
-        if (nameSpaceLocalName.equals(getInputSchema().getName())) {
-            writeAnonymousObjectStartElement();
-        } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
-            isObject = true;
-            if (isArrayElement) {
-                writeAnonymousObjectStartElement();
-                elementType = getArrayObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
-            } else {
-                writeObjectStartElement(nameSpaceLocalName);
-                elementType = getObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
+            if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
+                if (prevElementName == null) {
+                    writeArrayStartElement(nameSpaceLocalName);
+                }
+                elementType = getArraySubElementType(jsonSchemaMap, nameSpaceLocalName);
+                isArrayElement = true;
             }
-        }
-        /* If an object/element(String/boolean/integer/number) property contains xis:nil=true
-           need  to avoid writing those fields */
-        if (!isXsiNil(omElement)) {
-            /* If there is text in the OMElement */
-            if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(elementType)
-                || DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE.equals(elementType)
-                || DataMapperEngineConstants.INTEGER_ELEMENT_TYPE.equals(elementType)
-                || DataMapperEngineConstants.NUMBER_ELEMENT_TYPE.equals(elementType)) {
-                if (isObject) { // if it is a normal object or an array element object
-                    writeFieldElement(SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD, omElement.getText(), elementType);
-                } else if (!isArrayElement) { // if it is a normal XML element (not a object or part of an array)
-                    writeFieldElement(nameSpaceLocalName, omElement.getText(), elementType);
-                } else { // primitive array elements
-                    writePrimitiveElement(omElement.getText(), elementType);
+
+            if (nameSpaceLocalName.equals(getInputSchema().getName())) {
+                writeAnonymousObjectStartElement();
+            } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
+                isObject = true;
+                if (isArrayElement) {
+                    writeAnonymousObjectStartElement();
+                    elementType = getArrayObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
+                } else {
+                    writeObjectStartElement(nameSpaceLocalName);
+                    elementType = getObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
+                }
+            }
+            /* If an object/element(String/boolean/integer/number) property contains xis:nil=true
+               need  to avoid writing those fields */
+            if (!isXsiNil(omElement)) {
+                /* If there is text in the OMElement */
+                if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(elementType)
+                    || DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE.equals(elementType)
+                    || DataMapperEngineConstants.INTEGER_ELEMENT_TYPE.equals(elementType)
+                    || DataMapperEngineConstants.NUMBER_ELEMENT_TYPE.equals(elementType)) {
+                    if (isObject) { // if it is a normal object or an array element object
+                        writeFieldElement(SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD, omElement.getText(), elementType);
+                    } else if (!isArrayElement) { // if it is a normal XML element (not a object or part of an array)
+                        writeFieldElement(nameSpaceLocalName, omElement.getText(), elementType);
+                    } else { // primitive array elements
+                        writePrimitiveElement(omElement.getText(), elementType);
+                    }
+                }
+
+                /* writing attributes to the JSON message */
+                it_attr = omElement.getAllAttributes();
+                if (it_attr.hasNext()) {
+                    writeAttributes(nextJSONSchemaMap);
+                }
+
+                it = omElement.getChildElements();
+
+                /* Recursively call all the children */
+                while (it.hasNext()) {
+                    prevElementNameSpaceLocalName = xmlTraverse(it.next(), prevElementNameSpaceLocalName,
+                                                                nextJSONSchemaMap);
                 }
             }
 
-            /* writing attributes to the JSON message */
-            it_attr = omElement.getAllAttributes();
-            if (it_attr.hasNext()) {
-                writeAttributes(nextJSONSchemaMap);
+            /* Closing the opened JSON objects and arrays */
+            if (prevElementNameSpaceLocalName != null) {
+                writeArrayEndElement();
             }
 
-            it = omElement.getChildElements();
+            if (isObject) {
+                writeObjectEndElement();
+            }
 
-            /* Recursively call all the children */
-            while (it.hasNext()) {
-                prevElementNameSpaceLocalName = xmlTraverse(it.next(), prevElementNameSpaceLocalName,
-                                                            nextJSONSchemaMap);
+            if (isArrayElement) {
+                return nameSpaceLocalName;
             }
         }
 
-        /* Closing the opened JSON objects and arrays */
-        if (prevElementNameSpaceLocalName != null) {
-            writeArrayEndElement();
-        }
-
-        if (isObject) {
-            writeObjectEndElement();
-        }
-
-        if (isArrayElement) {
-            return nameSpaceLocalName;
-        }
         return null;
     }
 
