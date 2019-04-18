@@ -31,6 +31,10 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
+import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.rest.api.APIData;
 import org.wso2.carbon.rest.api.APIDataSorter;
 import org.wso2.carbon.rest.api.APIException;
@@ -43,6 +47,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -928,5 +933,101 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		} else {
 			return CarbonConfigurationContextFactory.getConfigurationContext();
 		}
-	}
+    }
+
+    /**
+     * Replace the swagger document in the registry with the given swagger json string
+     *
+     * @param swaggerJsonString
+     * @param resourcePath
+     * @param tenantId
+     * @throws APIException
+     */
+    public void addSwaggerDocument(String swaggerJsonString, String resourcePath, int tenantId) throws APIException {
+
+        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
+        try {
+            Registry registry = registryService.getConfigSystemRegistry(tenantId);
+
+            org.wso2.carbon.registry.core.Resource resource;
+
+            if (swaggerJsonString != null) {
+                resource = registry.newResource();
+                resource.setContent(swaggerJsonString);
+                resource.setMediaType("application/json");
+                registry.put(resourcePath, resource);
+
+            }
+
+        } catch (RegistryException e) {
+            handleException(log, "Could not add swagger document", e);
+        }
+
+    }
+
+    /**
+     * Create a registry resource for the swagger document and update the registry resource with the default swagger
+     *
+     * @param swaggerJsonString
+     * @param resourcePath
+     * @param tenantId
+     * @throws APIException
+     */
+    public void updateSwaggerDocument(String swaggerJsonString, String resourcePath, int tenantId) throws APIException {
+
+        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
+        try {
+            Registry registry = registryService.getConfigSystemRegistry(tenantId);
+
+            org.wso2.carbon.registry.core.Resource resource;
+            if (!registry.resourceExists(resourcePath)) {
+                resource = registry.newResource();
+                resource.setContent(swaggerJsonString);
+                resource.setMediaType("application/json");
+
+                registry.put(resourcePath, resource);
+            } else {
+                org.wso2.carbon.registry.core.Resource apiDocResource = registry.get(resourcePath);
+                String apiDocContent = new String((byte[]) apiDocResource.getContent(), Charset.defaultCharset());
+                if (apiDocContent == null || apiDocContent.isEmpty()) {
+                    apiDocContent = swaggerJsonString;
+                    resource = registry.newResource();
+                    resource.setContent(apiDocContent);
+                    resource.setMediaType("application/json");
+                    registry.put(resourcePath, resource);
+
+                }
+            }
+        } catch (RegistryException e) {
+            handleException(log, "Could not update swagger document", e);
+        }
+    }
+
+    /** Return the registry resource for the provided location
+     * @param resourcePath
+     * @param tenantId
+     * @return
+     * @throws APIException
+     */
+    public String getSwaggerDocument(String resourcePath, int tenantId) throws APIException {
+
+        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
+        String swaggerJsonString = null;
+        try {
+            Registry registry = registryService.getConfigSystemRegistry(tenantId);
+
+            org.wso2.carbon.registry.core.Resource resource;
+            if (registry.resourceExists(resourcePath)) {
+                resource = registry.get(resourcePath);
+                swaggerJsonString = new String((byte[]) resource.getContent(), Charset.defaultCharset());
+            } else {
+                log.error("No resource found in the path " + resourcePath);
+            }
+        } catch (RegistryException e) {
+            handleException(log, "Could not get swagger document", e);
+
+        }
+        return swaggerJsonString;
+    }
+
 }

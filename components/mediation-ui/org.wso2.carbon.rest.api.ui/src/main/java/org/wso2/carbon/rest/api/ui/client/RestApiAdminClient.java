@@ -338,4 +338,35 @@ public class RestApiAdminClient {
 		}
 		return null;
 	}
+
+	public String updateSwaggerDocument(String swaggerJsonString, String resourcePath, int tenantId) throws AxisFault {
+
+		try {
+			stub.updateSwaggerDocument(swaggerJsonString, resourcePath, tenantId);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.update.swagger.document"), e);
+		}
+		return null;
+	}
+
+	public String addSwaggerDocument(String swaggerJsonString, String resourcePath, int tenantId) throws AxisFault {
+
+		try {
+			stub.addSwaggerDocument(swaggerJsonString, resourcePath, tenantId);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.add.swagger.document"), e);
+		}
+		return null;
+	}
+
+	public String getSwaggerDocument(String resourcePath, int tenantId) throws AxisFault {
+
+		String swaggerJsonString = null;
+		try {
+			swaggerJsonString = stub.getSwaggerDocument(resourcePath, tenantId);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.get.swagger.document"), e);
+		}
+		return swaggerJsonString;
+	}
 }
