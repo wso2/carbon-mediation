@@ -29,6 +29,7 @@
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="org.wso2.carbon.context.PrivilegedCarbonContext" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
 <!-- This page is included to display messages which are set to request scope or session scope -->
@@ -510,7 +511,7 @@
             <th><fmt:message key="api.select"/></th>
         	<th><fmt:message key="api.name"/></th>
         	<th><fmt:message key="api.invocation.url"/></th>
-        	<th colspan="4"><fmt:message key="apis.table.action.header"/></th>
+        	<th colspan="5"><fmt:message key="apis.table.action.header"/></th>
         </tr>
         </thead>
         <tbody>
@@ -631,7 +632,7 @@
                     <% } %>
                 </div>
             </td>
-            <td width="20px" style="text-align:left;border-left:none;width:100px;">
+            <td width="20px" style="text-align:left;border-left:none;border-right:none;width:100px;">
                 <div class="inlineDiv">
                     <% if (apiData.getArtifactContainerName() != null) { %>
                         <a style="color:gray;background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
@@ -639,6 +640,25 @@
                     <% } else {%>
                         <a style="background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
                            onclick="deleteApi('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')">Delete</a>
+                    <% } %>
+                </div>
+            </td>
+            <td width="20px" style="text-align:left;border-left:none;width:100px;">
+                <div class="inlineDiv">
+                    <% if (apiData.getArtifactContainerName() != null) { %>
+                    <a style="color:gray;background-image:url(images/favicon-16x16.png);" class="icon-link" href="#"
+                       onclick="#">swagger</a>
+                    <% } else {
+                        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                        String url=null;
+                        if (tenantDomain != "carbon.super") {
+                            url = serverContext + "/t/" + tenantDomain + "/" + apiData.getName();
+                        } else {
+                            url = serverContext + "/" + apiData.getName();
+                        }
+                    %>
+                    <a style="background-image:url(images/favicon-16x16.png);" class="icon-link" href="<%=url + "?swagger.json"%>"
+                       onclick="#" %>swagger</a>
                     <% } %>
                 </div>
             </td>

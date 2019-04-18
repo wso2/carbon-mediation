@@ -128,6 +128,39 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
+         <xs:element name="updateSwaggerDocument">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="swaggerJsonString" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="tenantId" nillable="true" type="xs:int"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="addSwaggerDocument">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="swaggerJsonString" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="tenantId" nillable="true" type="xs:int"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getSwaggerDocument">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="tenantId" type="xs:int"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getSwaggerDocumentResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
          <xs:element name="deleteAllApi">
             <xs:complexType>
                <xs:sequence/>
@@ -391,6 +424,18 @@
    <wsdl:message name="deleteSelectedApiRequest">
       <wsdl:part name="parameters" element="ns1:deleteSelectedApi"/>
    </wsdl:message>
+   <wsdl:message name="updateSwaggerDocumentRequest">
+      <wsdl:part name="parameters" element="ns1:updateSwaggerDocument"/>
+   </wsdl:message>
+   <wsdl:message name="addSwaggerDocumentRequest">
+      <wsdl:part name="parameters" element="ns1:addSwaggerDocument"/>
+   </wsdl:message>
+   <wsdl:message name="getSwaggerDocumentRequest">
+      <wsdl:part name="parameters" element="ns1:getSwaggerDocument"/>
+   </wsdl:message>
+   <wsdl:message name="getSwaggerDocumentResponse">
+      <wsdl:part name="parameters" element="ns1:getSwaggerDocumentResponse"/>
+   </wsdl:message>
    <wsdl:message name="addApiRequest">
       <wsdl:part name="parameters" element="ns1:addApi"/>
    </wsdl:message>
@@ -517,6 +562,19 @@
       <wsdl:operation name="deleteSelectedApi">
          <wsdl:input message="tns:deleteSelectedApiRequest" wsaw:Action="urn:deleteSelectedApi"/>
          <wsdl:fault message="tns:RestApiAdminAPIException" name="RestApiAdminAPIException" wsaw:Action="urn:deleteSelectedApiRestApiAdminAPIException"/>
+      </wsdl:operation>
+      <wsdl:operation name="updateSwaggerDocument">
+         <wsdl:input message="tns:updateSwaggerDocumentRequest" wsaw:Action="urn:updateSwaggerDocument"/>
+         <wsdl:fault message="tns:RestApiAdminAPIException" name="RestApiAdminAPIException" wsaw:Action="urn:updateSwaggerDocumentAdminAPIException"/>
+      </wsdl:operation>
+      <wsdl:operation name="addSwaggerDocument">
+         <wsdl:input message="tns:addSwaggerDocumentRequest" wsaw:Action="urn:addSwaggerDocument"/>
+         <wsdl:fault message="tns:RestApiAdminAPIException" name="RestApiAdminAPIException" wsaw:Action="urn:addSwaggerDocumentAdminAPIException"/>
+      </wsdl:operation>
+      <wsdl:operation name="getSwaggerDocument">
+         <wsdl:input message="tns:getSwaggerDocumentRequest" wsaw:Action="urn:getSwaggerDocument"/>
+         <wsdl:output message="tns:getSwaggerDocumentResponse" wsaw:Action="urn:getSwaggerDocumentResponse"/>
+         <wsdl:fault message="tns:RestApiAdminAPIException" name="RestApiAdminAPIException" wsaw:Action="urn:getSwaggerDocumentRestApiAdminAPIException"/>
       </wsdl:operation>
       <wsdl:operation name="addApi">
          <wsdl:input message="tns:addApiRequest" wsaw:Action="urn:addApi"/>
@@ -659,6 +717,36 @@
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="updateSwaggerDocument">
+         <soap:operation soapAction="urn:updateSwaggerDocument" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="addSwaggerDocument">
+         <soap:operation soapAction="urn:addSwaggerDocument" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getSwaggerDocument">
+         <soap:operation soapAction="urn:getSwaggerDocument" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RestApiAdminAPIException">
             <soap:fault use="literal" name="RestApiAdminAPIException"/>
          </wsdl:fault>
@@ -915,6 +1003,36 @@
             <soap12:fault use="literal" name="RestApiAdminAPIException"/>
          </wsdl:fault>
       </wsdl:operation>
+      <wsdl:operation name="updateSwaggerDocument">
+         <soap12:operation soapAction="urn:updateSwaggerDocument" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap12:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="addSwaggerDocument">
+         <soap12:operation soapAction="urn:addSwaggerDocument" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap12:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getSwaggerDocument">
+         <soap12:operation soapAction="urn:getSwaggerDocument" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap12:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
       <wsdl:operation name="addApi">
          <soap12:operation soapAction="urn:addApi" style="document"/>
          <wsdl:input>
@@ -1154,6 +1272,27 @@
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="updateSwaggerDocument">
+         <http:operation location="updateSwaggerDocument"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="addSwaggerDocument">
+         <http:operation location="addSwaggerDocument"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getSwaggerDocument">
+         <http:operation location="getSwaggerDocument"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
       </wsdl:operation>
       <wsdl:operation name="addApi">
          <http:operation location="addApi"/>
