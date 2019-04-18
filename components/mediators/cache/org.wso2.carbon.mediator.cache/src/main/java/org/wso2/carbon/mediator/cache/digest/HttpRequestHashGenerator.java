@@ -26,6 +26,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
+import org.wso2.carbon.mediator.cache.CachingConstants;
 import org.wso2.carbon.mediator.cache.CachingException;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
@@ -64,6 +66,8 @@ public class HttpRequestHashGenerator implements DigestGenerator {
 
     String[] headers = {""};
 
+    String[] permanentlyExcludedHeaders = {};
+
     /**
      * {@inheritDoc}
      */
@@ -75,11 +79,23 @@ public class HttpRequestHashGenerator implements DigestGenerator {
                 PassThroughConstants.HTTP_HEAD.equals(method));
         //If some or all headers need to be included in the hash
         if (!excludeAllHeaders) {
+            //cloning transport headers from message context and making them case insensitive
             Map<String, String> transportHeaders =
-                    (Map<String, String>) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+                    new TreeMap<String, String>(new Comparator<String>() {
+                        public int compare(String o1, String o2) {
+                            return o1.compareToIgnoreCase(o2);
+                        }
+                    });
+            transportHeaders.putAll((Map<String, String>)msgContext.getProperty(MessageContext.TRANSPORT_HEADERS));
             for (String header : headers) {
                 transportHeaders.remove(header);
             }
+
+            //remove permanently excluded headers from hashing methods
+            for (String header : permanentlyExcludedHeaders) {
+                transportHeaders.remove(header);
+            }
+
             //If the HTTP method is GET do not hash the payload. Hash only url and headers.
             if (isGet) {
                 if (msgContext.getTo() == null) {
@@ -534,5 +550,6 @@ public class HttpRequestHashGenerator implements DigestGenerator {
     @Override
     public void init(Map<String, Object> properties) {
         headers = (String[]) properties.get("headers-to-exclude");
+        permanentlyExcludedHeaders = (String[]) properties.get(CachingConstants.PERMANENTLY_EXCLUDED_HEADERS_STRING);
     }
 }

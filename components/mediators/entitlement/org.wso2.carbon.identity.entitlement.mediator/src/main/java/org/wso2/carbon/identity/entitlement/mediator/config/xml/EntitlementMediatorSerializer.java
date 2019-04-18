@@ -173,6 +173,8 @@ public class EntitlementMediatorSerializer extends AbstractMediatorSerializer {
             }
         }
 
+        serializeComments(entitlementElem, entitlement.getCommentsList());
+
         return entitlementElem;
     }
 

@@ -29,8 +29,9 @@
                 request="<%=request%>" />
     <%
         String resourceConsumer = request.getParameter("resourceConsumer");
+        String editor = request.getParameter("seqEditor");
         EditorUIClient sequenceAdminClient
-                = SequenceEditorHelper.getClientForEditor(getServletConfig(), session);//new SequenceAdminClient(this.getServletConfig(), session);
+                = SequenceEditorHelper.getClientForEditor(getServletConfig(), session, editor);//new SequenceAdminClient(this.getServletConfig(), session);
         String result = "error";
         try {
             result = sequenceAdminClient.getEntryNamesString();

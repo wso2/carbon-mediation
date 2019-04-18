@@ -30,6 +30,7 @@
 <%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="carbon"
 	uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"%>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%
 	PropertiesServiceClient client_ = new PropertiesServiceClient(config, session);

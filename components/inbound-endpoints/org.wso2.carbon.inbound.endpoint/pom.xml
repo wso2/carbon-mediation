@@ -18,12 +18,12 @@
     <parent>
         <artifactId>inbound-endpoints</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.108-SNAPSHOT</version>
+        <version>4.6.125-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
-    <version>4.6.108-SNAPSHOT</version>
+    <version>4.6.125-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>javax.jms</groupId>
@@ -122,6 +122,7 @@
                             org.wso2.carbon.inbound.endpoint.protocol.http.multitenancy,
                             org.wso2.carbon.inbound.endpoint.protocol.generic,
                             org.wso2.carbon.inbound.endpoint.protocol.hl7,
+                            org.wso2.carbon.inbound.endpoint.internal.http.api,
                             org.wso2.carbon.inbound.endpoint
                         </Export-Package>
                         <Import-Package>

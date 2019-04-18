@@ -26,6 +26,7 @@ import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersi
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -94,7 +95,13 @@ public class EndpointListenerLoader {
                 }
             }
         }
-        
+
+        int internalInboundPort = HTTPEndpointManager.getInstance().getInternalInboundPort();
+        if (internalInboundPort != -1) {
+            HTTPEndpointManager.getInstance().startListener(
+                    internalInboundPort, InboundHttpConstants.INTERNAL_INBOUND_ENDPOINT_NAME, null);
+
+        }
         //Load tenats required for polling inbound protocols
         Map<String, Set<String>> mPollingEndpoints =
 		                                  InboundEndpointsDataStore.getInstance().getAllPollingingEndpointData();

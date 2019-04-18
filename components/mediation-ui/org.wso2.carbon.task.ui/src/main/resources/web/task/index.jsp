@@ -74,18 +74,19 @@
                             return a.getName().compareTo(b.getName());
                         }
                     });
-                    for (TaskData taskData : data) {
-                        if (taskData != null) {
-                            String name = taskData.getName();
-                            String group = taskData.getGroup();
+                    if (data != null) {
+                        for (TaskData taskData : data) {
+                            if (taskData != null) {
+                                String name = taskData.getName();
+                                String group = taskData.getGroup();
                 %>
                 <tr id="tr_<%=name%>">
 
                     <td>
-                        <% if(taskData.getArtifactContainerName() != null) { %>
+                        <% if (taskData.getArtifactContainerName() != null) { %>
                         <img src="images/applications.gif">
                         <%=Encode.forHtmlContent(name)%>
-                        <% if(taskData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                        <% if (taskData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                         <% } else { %>
                         <%=Encode.forHtmlContent(name)%>
                         <% } %>
@@ -110,6 +111,7 @@
 
                 </tr>
                 <%
+                            }
                         }
                     }
                 %>

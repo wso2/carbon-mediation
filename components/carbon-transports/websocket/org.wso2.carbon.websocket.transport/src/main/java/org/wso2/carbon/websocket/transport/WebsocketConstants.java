@@ -23,6 +23,8 @@ public class WebsocketConstants {
     public static final String WS = "ws";
     public static final String WSS = "wss";
 
+    public static final int WEBSOCKET_DEFAULT_WS_PORT = 80;
+    public static final int WEBSOCKET_DEFAULT_WSS_PORT = 433;
 
     public static final String UNIVERSAL_SOURCE_IDENTIFIER = "universal.source.identifier";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
