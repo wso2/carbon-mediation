@@ -778,7 +778,12 @@ function onSelectVersionType() {
     }
 }
 
+function swaggerView() {
+    var apiNameValue = document.getElementById('api.name').value;
+    document.location.href = "swaggereditor.jsp?" +"&apiName=" + apiNameValue;
+}
 </script>
+
 
 <div id="middle">
     <h2>
@@ -807,11 +812,17 @@ function onSelectVersionType() {
                                 key="switch.to.source"/>
                         </a>
                     </th>
+                    <th border="0">
+                        <a style="background-image:url(images/favicon-16x16.png);" class="icon-link"
+                           onclick="swaggerView()"><fmt:message
+                                key="switch.to.swagger.editor"/>
+                        </a>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>
+                <tr >
+                    <td colspan="2">
                         <table class="normal" width="100%">
                             <!-- API Name -->
                             <tr>
@@ -949,7 +960,7 @@ function onSelectVersionType() {
                     </td>
                 </tr>
                 <tr>
-                    <td class="buttonRow">
+                    <td class="buttonRow" colspan="2">
                         <input type="button" value="<fmt:message key="save"/>"
                                class="button"
                                name="save"

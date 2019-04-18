@@ -197,4 +197,9 @@ public class SwaggerConstants {
      * Path separator character
      */
     static final String PATH_SEPARATOR = "/";
+
+    /**
+     * Path to save the swagger document
+     */
+    public static String Registry_path = "integrator/applicationdata/";
 }
