@@ -2544,7 +2544,7 @@
 
         <!--SAP import version. This should be changed immediately after each release of carbon-mediation to the
         latest released version of mediation.-->
-        <org.wso2.carbon.transports.sap.import.version>4.6.123-SNAPSHOT</org.wso2.carbon.transports.sap.import.version>
+        <org.wso2.carbon.transports.sap.import.version>4.6.129-SNAPSHOT</org.wso2.carbon.transports.sap.import.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>

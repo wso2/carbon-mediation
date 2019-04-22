@@ -62,28 +62,24 @@ public class RFCMetaDataParser {
     }
 
     /**
-     * Returns the BAPI/RFC function name
+     * Returns the BAPI/RFC function name.
+     *
      * @param rootElement root document element
      * @return the BAPI/RFC function name
      * @throws AxisFault throws in case of an error
      */
-    public static String getBAPIRFCFucntionName(OMElement rootElement) throws AxisFault {
-        String qname = rootElement.getQName().toString();
-        if (qname != null) {
-            if (qname.equals(RFCConstants.BAPIRFC)) {
-                String rfcFunctionName = rootElement.getAttributeValue(RFCConstants.NAME_Q);
-                if (rfcFunctionName != null) {
-                    return rfcFunctionName;
-                } else {
-                    throw new AxisFault("BAPI/RFC function name is mandatory in meta data" +
-                            " configuration");
-                }
+    public static String getBAPIRFCFunctionName(OMElement rootElement) throws AxisFault {
+        if (rootElement != null) {
+            String rfcFunctionName = rootElement.getAttributeValue(RFCConstants.NAME_Q);
+            if (rfcFunctionName != null) {
+                return rfcFunctionName;
             } else {
-                throw new AxisFault("Invalid meta data root element.Found: " + qname + "" +
-                        ". Required:" + RFCConstants.BAPIRFC);
+                throw new AxisFault("BAPI/RFC function name is mandatory in meta data configuration");
             }
+        } else {
+            throw new AxisFault("Invalid meta data root element.Found: " + rootElement + "" +
+                                ". Required:" + RFCConstants.BAPIRFC);
         }
-        return null;
     }
 
     private static void processElement(OMElement element, JCoFunction function) throws AxisFault{

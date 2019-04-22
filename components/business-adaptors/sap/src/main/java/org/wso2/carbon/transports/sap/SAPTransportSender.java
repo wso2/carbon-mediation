@@ -181,7 +181,7 @@ public class SAPTransportSender extends AbstractTransportSender {
                     body = messageContext.getEnvelope().getBody();
                     payLoad = body.getFirstChildWithName(new QName(RFCConstants.BAPIRFC));
                     log.info("Received RFC/Meta DATA: " + payLoad);
-                    String rfcFunctionName = RFCMetaDataParser.getBAPIRFCFucntionName(payLoad);
+                    String rfcFunctionName = RFCMetaDataParser.getBAPIRFCFunctionName(payLoad);
                     log.info("RFC name: " + rfcFunctionName);
                     if (isTransaction(messageContext) || isLogon) {
                         if (log.isDebugEnabled()) {
