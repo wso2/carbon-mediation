@@ -2417,7 +2417,7 @@
         <neethi.version>3.0.2</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
         <wss4j.version>1.5.11-wso2v18</wss4j.version>
-        <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
+        <orbit.version.xmlschema>1.4.7-wso2v5</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>${rampart.version}</rampart.wso2.version>
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
