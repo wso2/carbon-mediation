@@ -26,7 +26,7 @@
     </parent>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>carbon-mediation</artifactId>
-    <version>4.6.131-SNAPSHOT</version>
+    <version>4.6.132-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -651,12 +651,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.user.mgt</artifactId>
-                <version>${carbon.identity.version}</version>
+                <version>${carbon.identity.framework.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
-                <version>${carbon.identity.version}</version>
+                <version>${carbon.identity.framework.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
@@ -2367,7 +2367,7 @@
     <properties>
         <!-- Carbon mediation version -->
         <carbon.mediation.import.feature.version>${carbon.mediation.version}</carbon.mediation.import.feature.version>
-        <carbon.mediation.version>4.6.131-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.6.132-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
@@ -2387,14 +2387,14 @@
         <!-- Analytic Commons version-->
         <carbon.analytics.common.version>5.1.57</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.1.0, 6.0.0)</carbon.analytics.common.imp.pkg.version>
-        <!-- Carbon Identity version-->
-        <carbon.identity.version>5.12.356</carbon.identity.version>
+        <!-- carbon.identity.framework.version-->
+        <carbon.identity.framework.version>5.12.364</carbon.identity.framework.version>
         <carbon.identity.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.imp.pkg.version>
         <!-- Carbon Rule version -->
         <carbon.rule.version>4.4.9</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v101</synapse.version>
+        <synapse.version>2.1.7-wso2v102</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.1.5</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.0.141</carbon.identity.oauth.version>
@@ -2412,11 +2412,11 @@
         <axiom.wso2.version>${axiom.version}</axiom.wso2.version>
         <axiom.osgi.version.range>[1.2.11, 1.3.0)</axiom.osgi.version.range>
         <!-- Apache Versions -->
-        <rampart.version>1.6.1-wso2v28</rampart.version>
+        <rampart.version>1.6.1-wso2v34</rampart.version>
         <rampart.mar.version>${rampart.version}</rampart.mar.version>
         <neethi.version>3.0.2</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
-        <wss4j.version>1.5.11.wso2v17</wss4j.version>
+        <wss4j.version>1.5.11-wso2v18</wss4j.version>
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>${rampart.version}</rampart.wso2.version>
