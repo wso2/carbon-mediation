@@ -163,7 +163,7 @@ public class SAPTransportSender extends AbstractTransportSender {
                 JCoIDoc.send(iDocList, getIDocVersion(uri), destination, tid);
                 destination.confirmTID(tid);
                 if (log.isDebugEnabled()) {
-                    log.debug("Successfully sent Idoc");
+                    log.debug("Successfully sent Idoc. Destination:" + destination.getDestinationID());
                 }
             } else if (uri.getScheme().equals(SAPConstants.SAP_BAPI_PROTOCOL_NAME)) {
                 if (log.isDebugEnabled()) {
@@ -176,25 +176,31 @@ public class SAPTransportSender extends AbstractTransportSender {
                             .getProperty(SAPConstants.TRANSACTION_COMMIT_PARAM));
                     log.debug("Logon property :" + messageContext.getProperty(SAPConstants.TRANSACTION_SAP_LOGON));
                 }
+                String rfcFunctionName = null;
                 try {
                     OMElement payLoad,body;
                     body = messageContext.getEnvelope().getBody();
                     payLoad = body.getFirstChildWithName(new QName(RFCConstants.BAPIRFC));
-                    log.info("Received RFC/Meta DATA: " + payLoad);
-                    String rfcFunctionName = RFCMetaDataParser.getBAPIRFCFunctionName(payLoad);
-                    log.info("RFC name: " + rfcFunctionName);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Received RFC/Meta DATA: " + payLoad);
+                    }
+                    rfcFunctionName = RFCMetaDataParser.getBAPIRFCFunctionName(payLoad);
                     if (isTransaction(messageContext) || isLogon) {
                         if (log.isDebugEnabled()) {
-                            log.debug("Beginning Transaction");
+                            log.debug("Beginning Transaction for function: " + rfcFunctionName);
                         }
                         JCoContext.begin(destination);
-                        log.info("Transaction begun successfully");
+                        if (log.isDebugEnabled()){
+                            log.debug("Transaction begun. Function: " + rfcFunctionName);
+                        }
                     }
                     if (isLogon) {
                         logon(messageContext, destination, escapeErrorHandling);
                     }
-                    log.info("Looking up the BAPI/RFC function: " + rfcFunctionName + ". In the " +
-                             "meta data repository");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Looking up the BAPI/RFC function: " + rfcFunctionName
+                                  + ". In the meta data repository");
+                    }
                     String responseXML;
                     if (isTransaction(messageContext)) {
                         //call BAPI function
@@ -210,7 +216,9 @@ public class SAPTransportSender extends AbstractTransportSender {
                             RFCMetaDataParser.processFieldValue("WAIT", waitValue, commitFunction);
                         }
                         evaluateRFCfunction(commitFunction, destination, escapeErrorHandling);
-                        log.info("Committed transaction.");
+                        if (log.isDebugEnabled()){
+                            log.debug("Committed transaction. Function: " + rfcFunctionName);
+                        }
                     } else {
                         //this is not transaction just calling the BAPI function and get the result
                         JCoFunction function = getRFCfunction(destination, rfcFunctionName);
@@ -225,14 +233,16 @@ public class SAPTransportSender extends AbstractTransportSender {
                         JCoFunction rollbackFunction = getRFCfunction(destination,
                                 SAPConstants.BAPI_TRANSACTION_ROLLBACK);
                         evaluateRFCfunction(rollbackFunction, destination, escapeErrorHandling);
-                        log.warn("Rolled-back transaction.");
+                        log.warn("Rolled-back transaction. Function: " + rfcFunctionName);
                     }
                     sendFault(messageContext, e , SAP_TRANSPORT_ERROR);
                 } finally {
                     if (isTransaction(messageContext) || isLogon) {
                         //end transaction
                         JCoContext.end(destination);
-                        log.info("Ended transaction.");
+                        if (log.isDebugEnabled()){
+                            log.debug("Ended transaction. Function: " + rfcFunctionName);
+                        }
                     }
                 }
 
@@ -296,7 +306,6 @@ public class SAPTransportSender extends AbstractTransportSender {
         if (log.isDebugEnabled()) {
             log.debug("BAPI XMI Logon response: " + logonResponse);
         }
-        log.info("logged in");
     }
 
     /**
