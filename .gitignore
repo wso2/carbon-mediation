@@ -7,3 +7,4 @@ target
 *.iws
 *.ipr
 .idea
+components/business-adaptors/sap/lib

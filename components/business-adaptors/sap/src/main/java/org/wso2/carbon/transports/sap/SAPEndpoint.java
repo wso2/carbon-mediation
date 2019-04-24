@@ -34,6 +34,8 @@ import com.sap.conn.jco.server.JCoServerTIDHandler;
 import com.sap.conn.jco.server.JCoServer;
 import com.sap.conn.jco.server.JCoServerState;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * <code>SAPEndpoint </code> describes a SAP addresible endpoint, the properties decscribe by the
  * endpoint are SAP server specifi. The full list of properties can be found at 
@@ -182,18 +184,23 @@ public abstract class SAPEndpoint extends ProtocolEndpoint {
 
     /**
      * Block until server state is stopped or maximum timeout reached.
-     * @param server
-     * @return true | false if server state is JCoServerState.STOPPED in case timeout is exceeded
+     *
+     * @param server jco server for which we wait to be stopped.
+     * @return true if the server is stopped before the timeout is exceeded
      */
     protected boolean waitForServerStop(JCoServer server) {
         long timeStamp = System.currentTimeMillis();
-        do {
-            // This is to ensure a startEndpoint called right after a stopEndpoint (proxy redeploy) would not
-            // cause the server.start() to be called until the server state is STOPPED.
+        while (server.getState() != JCoServerState.STOPPED
+               && timeStamp + serverStopTimeout > System.currentTimeMillis()) {
             if (log.isDebugEnabled()) {
                 log.debug("Waiting for server to stop...");
             }
-        } while (server.getState() != JCoServerState.STOPPED && timeStamp + serverStopTimeout > System.currentTimeMillis());
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                //do nothing, just continue the loop
+            }
+        }
 
         if (server.getState() == JCoServerState.STOPPED) {
             return true;

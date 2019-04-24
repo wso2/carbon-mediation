@@ -26,11 +26,11 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.Iterator;
 
-/** This will contains the required methods that can be use to parser a
+/** This will contain the required methods that can be use to parser a
  * meta data description of a BAPI/RFC call.
  * So the BNF grammer for the meta data would looks like :
  *  bapirfc   -> import | tables | both
- *  import    -> structure | field | both
+ *  import    -> structure | field | tables | all
  *  structure -> 1 or more fields
  *  tables    -> 1 or more table
  *  table     -> row
@@ -56,31 +56,30 @@ public class RFCMetaDataParser {
             OMElement childElement = (OMElement)itr.next();
             processElement(childElement, function);
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Processed metadata document");
+        }
     }
 
     /**
-     * Returns the BAPI/RFC function name
+     * Returns the BAPI/RFC function name.
+     *
      * @param rootElement root document element
      * @return the BAPI/RFC function name
      * @throws AxisFault throws in case of an error
      */
-    public static String getBAPIRFCFucntionName(OMElement rootElement) throws AxisFault {
-        String qname = rootElement.getQName().toString();
-        if (qname != null) {
-            if (qname.equals(RFCConstants.BAPIRFC)) {
-                String rfcFunctionName = rootElement.getAttributeValue(RFCConstants.NAME_Q);
-                if (rfcFunctionName != null) {
-                    return rfcFunctionName;
-                } else {
-                    throw new AxisFault("BAPI/RFC function name is mandatory in meta data" +
-                            " configuration");
-                }
+    public static String getBAPIRFCFunctionName(OMElement rootElement) throws AxisFault {
+        if (rootElement != null) {
+            String rfcFunctionName = rootElement.getAttributeValue(RFCConstants.NAME_Q);
+            if (rfcFunctionName != null) {
+                return rfcFunctionName;
             } else {
-                throw new AxisFault("Invalid meta data root element.Found: " + qname + "" +
-                        ". Required:" + RFCConstants.BAPIRFC);
+                throw new AxisFault("BAPI/RFC function name is mandatory in meta data configuration");
             }
+        } else {
+            throw new AxisFault("Invalid meta data root element.Found: " + rootElement + "" +
+                                ". Required:" + RFCConstants.BAPIRFC);
         }
-        return null;
     }
 
     private static void processElement(OMElement element, JCoFunction function) throws AxisFault{
@@ -187,7 +186,7 @@ public class RFCMetaDataParser {
             }
         }
     }
-    
+
     private static void processTablesParameter(OMElement element, JCoFunction function) throws AxisFault{
         Iterator itr = element.getChildElements();
         while (itr.hasNext()){
@@ -223,7 +222,7 @@ public class RFCMetaDataParser {
 
         }
     }
-    
+
     private static void processTableParameter(OMElement element, JCoFunction function, String tableName)
             throws AxisFault{
         JCoTable inputTable = function.getImportParameterList().getTable(tableName);
