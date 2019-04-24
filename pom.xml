@@ -241,6 +241,11 @@
                         <argLine>${argLine}</argLine>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${maven.codehaus.build.helper.plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -2433,7 +2438,6 @@
         <org.wso2.caching.version>4.0.3</org.wso2.caching.version>
         <org.wso2.carbon.caching.core.version>4.2.0</org.wso2.carbon.caching.core.version>
         <carbon.datastore.version>4.2.0</carbon.datastore.version>
-        <wso2.sap.version>1.0</wso2.sap.version>
         <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>
         <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
         <org.wso2.securevault.version>1.0.0-wso2v2</org.wso2.securevault.version>
@@ -2536,15 +2540,12 @@
         <owasp.encoder.wso2.imp.pkg.version>[1.2.0,1.3.0)</owasp.encoder.wso2.imp.pkg.version>
         <maven.surefire.plugin.version>2.12.4</maven.surefire.plugin.version>
         <maven.jacoco.plugin.version>0.7.5.201505241946</maven.jacoco.plugin.version>
+        <maven.codehaus.build.helper.plugin.version>3.0.0</maven.codehaus.build.helper.plugin.version>
         <jacoco.agent.version>0.7.5.201505241946</jacoco.agent.version>
         <activemq.version>5.2.0</activemq.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <net.minidev.accessors-smart.version>1.2</net.minidev.accessors-smart.version>
         <org.ow2.asm.asm.version>5.2</org.ow2.asm.asm.version>
-
-        <!--SAP import version. This should be changed immediately after each release of carbon-mediation to the
-        latest released version of mediation.-->
-        <org.wso2.carbon.transports.sap.import.version>4.6.129-SNAPSHOT</org.wso2.carbon.transports.sap.import.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
