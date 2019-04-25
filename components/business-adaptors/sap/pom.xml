@@ -17,6 +17,7 @@
             <id>jenkins</id>
             <properties>
                 <packaging.type>bundle</packaging.type>
+                <sap.lib.dir>${basedir}/lib</sap.lib.dir>
             </properties>
 
             <build>
@@ -41,7 +42,7 @@
                                         <property name="runtime-classpath" refid="maven.runtime.classpath" />
 
                                         <path id="lib.path.ref">
-                                            <fileset dir="${basedir}/lib" includes="*.jar" />
+                                            <fileset dir="${sap.lib.dir}" includes="*.jar" />
                                         </path>
 
                                         <echo message="Maven CLASS PATH : ${runtime-classpath}" />
