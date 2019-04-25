@@ -37,6 +37,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>components/business-adaptors</module>
                 <module>components/carbon-transports</module>
                 <module>components/carbon-mediation-startup</module>
                 <module>service-stubs/mediation-admin</module>
@@ -46,7 +47,6 @@
                 <module>components/mediation-initializer</module>
                 <module>components/mediation-monitor</module>
                 <module>components/mediation-config-admin</module>
-                <module>components/business-adaptors</module>
                 <module>components/mediation-admin</module>
                 <module>components/mediation-connector</module>
                 <module>components/mediators</module>
