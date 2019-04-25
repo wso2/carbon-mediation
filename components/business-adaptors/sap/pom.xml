@@ -17,7 +17,6 @@
             <id>jenkins</id>
             <properties>
                 <packaging.type>bundle</packaging.type>
-                <sap.lib.dir>${basedir}/lib</sap.lib.dir>
             </properties>
 
             <build>
