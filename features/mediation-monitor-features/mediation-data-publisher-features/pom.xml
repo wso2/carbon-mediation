@@ -33,6 +33,7 @@
 
     <modules>
         <module>messageflow</module>
+        <module>prometheus-publisher-feature</module>
     </modules>
 
 </project>
