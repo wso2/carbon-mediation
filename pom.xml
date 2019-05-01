@@ -2441,7 +2441,7 @@
         <httpclient.wso2.version>4.3.6.wso2v2</httpclient.wso2.version>
         <commons.vfs.version>2.2-wso2v6</commons.vfs.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
-        <httpcore.version>4.3.3</httpcore.version>
+        <httpcore.version>4.4.11</httpcore.version>
         <httpclient.version>4.3.2</httpclient.version>
         <httpasyncclient.version>4.0-beta3</httpasyncclient.version>
         <!--Misc-->
