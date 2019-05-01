@@ -2516,7 +2516,7 @@
         <jsonpath.version>2.4.0.wso2v2</jsonpath.version>
         <json.smart.version>2.3</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
-        <netty.version>4.0.39.Final</netty.version>
+        <netty.version>4.1.36.Final</netty.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
