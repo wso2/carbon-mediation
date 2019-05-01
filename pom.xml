@@ -114,7 +114,7 @@
             <plugin>
                 <groupId>org.jvnet.maven.incrementalbuild</groupId>
                 <artifactId>incremental-build-plugin</artifactId>
-                <version>1.3.1</version>
+                <version>${incremental.build.plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -2558,6 +2558,7 @@
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <net.minidev.accessors-smart.version>1.2</net.minidev.accessors-smart.version>
         <org.ow2.asm.asm.version>5.2</org.ow2.asm.asm.version>
+        <incremental.build.plugin.version>1.3.1</incremental.build.plugin.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>

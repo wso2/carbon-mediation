@@ -99,7 +99,7 @@
             <plugin>
                 <groupId>org.jvnet.maven.incrementalbuild</groupId>
                 <artifactId>incremental-build-plugin</artifactId>
-                <version>1.3</version>
+                <version>${incremental.build.plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
