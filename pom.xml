@@ -2378,6 +2378,11 @@
                 <artifactId>org.wso2.carbon.integrator.core</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.commons</groupId>
+                <artifactId>org.wso2.carbon.tenant.common</artifactId>
+                <version>${carbon.commons.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
