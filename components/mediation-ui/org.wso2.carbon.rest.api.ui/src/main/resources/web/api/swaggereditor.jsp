@@ -1,5 +1,5 @@
 <%--
-  ~  Copyright (c) 2008, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <%@ page import="org.apache.synapse.rest.API" %>
 <%@ page import="org.apache.synapse.config.SynapseConfigUtils" %>
 <%@ page import="org.wso2.carbon.context.PrivilegedCarbonContext" %>
-<%@page import="org.wso2.carbon.rest.api.ui.client.RestApiAdminClient" %>
+<%@ page import="org.wso2.carbon.rest.api.ui.client.RestApiAdminClient" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
@@ -88,8 +88,7 @@
         load_swagger_ui();
 
     });
-
-
+    
     function saveChanges() {
 
         var swagYaml = window.localStorage.getItem("swagger-editor-content");
