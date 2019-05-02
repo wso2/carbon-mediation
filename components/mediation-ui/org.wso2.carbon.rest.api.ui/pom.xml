@@ -96,8 +96,6 @@
         <dependency>
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.tenant.common</artifactId>
-            <version>4.6.43</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
