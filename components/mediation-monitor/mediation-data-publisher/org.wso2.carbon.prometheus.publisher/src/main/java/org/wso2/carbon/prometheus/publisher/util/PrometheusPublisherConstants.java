@@ -24,11 +24,6 @@ public class PrometheusPublisherConstants {
 
     }
 
-    public static final String PROMETHEUS_CONFIG_FILE = "prometheus-conf.xml";
-
-    public static final String STAT_CONFIG_ELEMENT = "PrometheusPublishingConfig";
-    public static final String PROMETHEUS_PUBLISHING_ENABLED = "Enabled";
-
     public static final String PROMETHEUS_HELP_TAG = "# HELP ";
     public static final String PROMETHEUS_TYPE_TAG = "# TYPE ";
 }

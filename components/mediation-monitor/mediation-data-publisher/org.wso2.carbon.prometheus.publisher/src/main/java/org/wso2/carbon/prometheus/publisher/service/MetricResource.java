@@ -22,18 +22,14 @@ import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.APIResource;
 import org.wso2.carbon.integrator.core.handler.BasicAuthConstants;
 import org.wso2.carbon.prometheus.publisher.publisher.MetricPublisher;
-import org.wso2.carbon.prometheus.publisher.util.PrometheusPublisherConstants;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.xml.namespace.QName;
 
 /**
  * Resource class for endpoint exposing metric data
@@ -42,6 +38,10 @@ public class MetricResource extends APIResource {
 
     private static Log log = LogFactory.getLog(MetricResource.class);
     private MetricPublisher metricPublisher;
+
+    private static final String PROMETHEUS_SYSTEM_PROPERTY = "enablePrometheusApi";
+    private static final boolean isPrometheusPublishingEnabled = Boolean
+            .parseBoolean(System.getProperty(PROMETHEUS_SYSTEM_PROPERTY));
 
     public MetricResource(String urlTemplate) {
 
@@ -66,7 +66,7 @@ public class MetricResource extends APIResource {
         OMElement textRootElem =
                 OMAbstractFactory.getOMFactory().createOMElement(BaseConstants.DEFAULT_TEXT_WRAPPER);
 
-        if (isPublishingEnabled()) {
+        if (isPrometheusPublishingEnabled) {
 
             if (log.isDebugEnabled()) {
                 log.debug("Retrieving metric data to be published to Prometheus");
@@ -98,26 +98,4 @@ public class MetricResource extends APIResource {
         return true;
     }
 
-    /**
-     * Reads config data from prometheus-conf.xml
-     */
-    private boolean isPublishingEnabled() {
-
-        OMElement apiConfig = MiscellaneousUtil.loadXMLConfig(PrometheusPublisherConstants.PROMETHEUS_CONFIG_FILE);
-        QName root = new QName(PrometheusPublisherConstants.STAT_CONFIG_ELEMENT);
-        QName enableElement = new QName(PrometheusPublisherConstants.PROMETHEUS_PUBLISHING_ENABLED);
-
-        if (apiConfig != null) {
-            if (!root.toString().equals(apiConfig.getLocalName())) {
-                log.error("Invalid Prometheus configuration file");
-                return false;
-            }
-            Iterator iterator = apiConfig.getChildrenWithName(enableElement);
-            if (iterator.hasNext()) {
-                OMElement enabled = (OMElement) iterator.next();
-                return Boolean.parseBoolean(enabled.getText());
-            }
-        }
-        return false;
-    }
 }
