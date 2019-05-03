@@ -38,13 +38,15 @@ public class MetricResource extends APIResource {
 
     private static Log log = LogFactory.getLog(MetricResource.class);
     private MetricPublisher metricPublisher;
-    private boolean isPrometheusPublishingEnabled;
+
+    private static final String PROMETHEUS_SYSTEM_PROPERTY = "enablePrometheusApi";
+    private static final boolean isPrometheusPublishingEnabled = Boolean
+            .parseBoolean(System.getProperty(PROMETHEUS_SYSTEM_PROPERTY));
 
     public MetricResource(String urlTemplate) {
 
         super(urlTemplate);
         metricPublisher = new MetricPublisher();
-        isPrometheusPublishingEnabled = Boolean.parseBoolean(System.getProperty("enablePrometheusBE"));
     }
 
     @Override
