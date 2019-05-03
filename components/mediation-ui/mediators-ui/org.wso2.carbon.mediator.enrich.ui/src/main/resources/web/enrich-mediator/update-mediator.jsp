@@ -20,6 +20,8 @@
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.SynapseJsonPathFactory" %>
+
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
@@ -35,12 +37,23 @@
     if (request.getParameter("mediator.enrich.source.val_ex") != null && !request.getParameter("mediator.enrich.source.val_ex").trim().equals("")) {
 
         if (request.getParameter("mediator.enrich.source.type2").equals("custom")) {
-            XPathFactory xPathFactory = XPathFactory.getInstance();
-            enrichMediator.setSourceExpression(xPathFactory.createSynapseXPath("mediator.enrich.source.val_ex",
-                    request.getParameter("mediator.enrich.source.val_ex"), session));
+            String expression = request.getParameter("mediator.enrich.source.val_ex");
+            if (expression.startsWith("json-eval(")) {
+                int expLength = expression.length();
+                String extractedExp = expression.substring(10, expLength - 1);
+                SynapseJsonPathFactory synapseJsonPathFactory = SynapseJsonPathFactory.getInstance();
+                enrichMediator.setSourceExpression(synapseJsonPathFactory.createSynapseJsonPath(
+                        "mediator.enrich.target.val_ex", extractedExp));
+            } else {
+                XPathFactory xPathFactory = XPathFactory.getInstance();
+                enrichMediator.setSourceExpression(xPathFactory.createSynapseXPath("mediator.enrich.source.val_ex",
+                        expression, session));
+            }
+            enrichMediator.setTargetProperty(null);
         } else if (request.getParameter("mediator.enrich.source.type2").equals("property")) {
             enrichMediator.setSourceType(request.getParameter("mediator.enrich.source.type2"));
             enrichMediator.setSourceProperty(request.getParameter("mediator.enrich.source.val_ex"));
+            enrichMediator.setSourceExpression(null);
         }
     }
 
@@ -67,11 +80,22 @@
 
     if (request.getParameter("mediator.enrich.target.val_ex") != null && !request.getParameter("mediator.enrich.target.val_ex").trim().equals("")) {
         if (request.getParameter("mediator.enrich.target.type").equals("custom")) {
-            XPathFactory xPathFactory2 = XPathFactory.getInstance();
-            enrichMediator.setTargetExpression(xPathFactory2.createSynapseXPath("mediator.enrich.target.val_ex",
-                    request.getParameter("mediator.enrich.target.val_ex"),session));
+            String expression = request.getParameter("mediator.enrich.target.val_ex");
+            if (expression.startsWith("json-eval(")) {
+                int expLength = expression.length();
+                String extractedExp = expression.substring(10, expLength - 1);
+                SynapseJsonPathFactory synapseJsonPathFactory = SynapseJsonPathFactory.getInstance();
+                enrichMediator.setTargetExpression(synapseJsonPathFactory.createSynapseJsonPath(
+                        "mediator.enrich.target.val_ex", extractedExp));
+            } else {
+                XPathFactory xPathFactory2 = XPathFactory.getInstance();
+                enrichMediator.setTargetExpression(xPathFactory2.createSynapseXPath("mediator.enrich.target.val_ex",
+                        expression, session));
+            }
+            enrichMediator.setTargetProperty(null);
         } else if (request.getParameter("mediator.enrich.target.type").equals("property")) {
             enrichMediator.setTargetProperty(request.getParameter("mediator.enrich.target.val_ex"));
+            enrichMediator.setTargetExpression(null);
         }       
     }
 

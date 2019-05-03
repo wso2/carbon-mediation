@@ -21,6 +21,7 @@
 <%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -60,11 +61,13 @@
     } else if (enrichMediator.getSourceType().equals("custom")) {
         sourceType = CUSTOM;
         if (enrichMediator.getSourceExpression() != null) {
-            SynapseXPath sourceXPath = enrichMediator.getSourceExpression();
-            NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
-            if (sourceXPath != null) {
-                nameSpacesRegistrar.registerNameSpaces(sourceXPath, "mediator.enrich.source.val_ex", session);
-                sourceValue = sourceXPath.toString();
+            SynapsePath sourcePath = enrichMediator.getSourceExpression();
+            if (sourcePath != null) {
+                if (sourcePath instanceof SynapseXPath) {
+                    NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
+                    nameSpacesRegistrar.registerNameSpaces(sourcePath, "mediator.enrich.source.val_ex", session);
+                }
+                sourceValue = sourcePath.toString();
             }
         }
     } else if (enrichMediator.getSourceType().equals("inline")) {
@@ -89,11 +92,13 @@
     } else if (enrichMediator.getTargetType().equals("custom")) {
         targetType = CUSTOM;
         if (enrichMediator.getTargetExpression() != null) {
-            SynapseXPath targetXPath = enrichMediator.getTargetExpression();
-            NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
-            if (targetXPath != null) {
-                nameSpacesRegistrar.registerNameSpaces(targetXPath, "mediator.enrich.target.val_ex", session);
-                targetValue = targetXPath.toString();
+            SynapsePath synapsePath = enrichMediator.getTargetExpression();
+            if (synapsePath != null) {
+                if (synapsePath instanceof SynapseXPath) {
+                    NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
+                    nameSpacesRegistrar.registerNameSpaces(synapsePath, "mediator.enrich.target.val_ex", session);
+                }
+                targetValue = synapsePath.toString();
             }
         }
     }
