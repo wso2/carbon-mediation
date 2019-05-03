@@ -23,7 +23,7 @@ package org.wso2.carbon.inbound.endpoint.internal.http.api;
 public class Constants {
 
     static final String INTERNAL_HTTP_API_PORT = "internal.http.api.port";
-    static final int DEFAULT_INTERNAL_HTTP_API_PORT = 9091;
+    static final int DEFAULT_INTERNAL_HTTP_API_PORT = 9191;
     static final String INTERNAL_HTTP_API_ENABLED = "internal.http.api.enabled";
     public static final String INTERNAL_APIS_FILE = "internal-apis.xml";
 
