@@ -245,6 +245,16 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     }
 
     /**
+     * Set a pre-built mapping resource
+     * This method is used by data-mapper test feature in EI-Tooling
+     *
+     * @param mappingResource prebuilt mapping resource
+     */
+    public void setMappingResource(MappingResource mappingResource) {
+        this.mappingResource = mappingResource;
+    }
+
+    /**
      * Get the values from the message context to do the data mapping
      *
      * @param synCtx current message for the mediation
