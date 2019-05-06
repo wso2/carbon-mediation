@@ -105,9 +105,8 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 if (isInternalInboundEndpoint) {
                     doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
-                    boolean executePostDispatchActions =
-                            HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
-                    respond(synCtx, executePostDispatchActions);
+                    boolean result = HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
+                    respond(synCtx, result);
                     return;
                 }
 
