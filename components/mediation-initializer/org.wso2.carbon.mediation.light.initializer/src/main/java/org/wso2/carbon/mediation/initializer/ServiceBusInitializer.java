@@ -424,7 +424,7 @@ public class ServiceBusInitializer {
                     new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
 
             if (isRunningDebugMode()) {
-                log.info("Micro Integrator started in Debug mode for super tenant");
+                log.debug("Micro Integrator started in Debug mode for super tenant");
                 createSynapseDebugEnvironment(contextInfo);
             }
 
@@ -489,7 +489,7 @@ public class ServiceBusInitializer {
             contextInfo.setSynapseDebugInterface(debugInterface);
             SynapseDebugManager debugManager = SynapseDebugManager.getInstance();
             contextInfo.setSynapseDebugManager(debugManager);
-            log.info("Synapse debug Environment created successfully");
+            log.debug("Synapse debug Environment created successfully");
         } catch (IOException ex) {
             log.error("Error while creating Synapse debug environment ", ex);
         } catch (InterruptedException ex) {
