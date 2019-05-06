@@ -20,6 +20,7 @@ package internal.http.api;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPI;
 
 import java.net.URL;
@@ -32,6 +33,7 @@ public class ConfigurationLoaderTestCase {
      */
     @Test
     public void testLoadInternalAPIs() {
+        System.setProperty(Constants.PREFIX_TO_ENABLE_INTERNAL_APIS + "SampleAPI", "true");
         URL url = getClass().getResource("internal-apis.xml");
         Assert.assertNotNull("Configuration file not found", url);
 

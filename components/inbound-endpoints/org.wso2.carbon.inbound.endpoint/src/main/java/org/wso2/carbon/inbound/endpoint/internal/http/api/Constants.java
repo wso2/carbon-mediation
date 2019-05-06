@@ -26,5 +26,6 @@ public class Constants {
     static final int DEFAULT_INTERNAL_HTTP_API_PORT = 9191;
     static final String INTERNAL_HTTP_API_ENABLED = "internal.http.api.enabled";
     public static final String INTERNAL_APIS_FILE = "internal-apis.xml";
+    public static final String PREFIX_TO_ENABLE_INTERNAL_APIS = "enable";
 
 }
