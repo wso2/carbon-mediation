@@ -272,8 +272,12 @@
     }
 
     function directToViewSource() {
-        document.location.href = "source_sequence.jsp?ordinal=1&sequenceName=" + document.getElementById("sequence.name").value + "&onErrorKey="
-                + document.getElementById("sequence.onerror.key").value + "&seqDescription=" + document.getElementById("seqeunceDescription").value;
+        document.location.href = "source_sequence.jsp?ordinal=1&sequenceName=" +
+            document.getElementById("sequence.name").value + "&onErrorKey=" +
+            document.getElementById("sequence.onerror.key").value +
+            "&seqDescription=" + document.getElementById("seqeunceDescription").value +
+            "&seqEditor=" + "<%=editor%>";
+
     }
 
     function cancelSequence() {
@@ -340,12 +344,12 @@
             var seqDescription = document.getElementById("seqeunceDescription").value;
             if (onErrorKey != '') {
                 document.location.href = "save_sequence.jsp?sequence=<%=seq%>&onErrorKey="
-                        + onErrorKey;
+                        + onErrorKey + "&seqEditor=<%=editor%>";
             } else if (seqDescription != ''){
                  document.location.href = "save_sequence.jsp?sequence=<%=seq%>"
-                        +"&seqDescription=" + seqDescription;
+                        +"&seqDescription=" + seqDescription + "&seqEditor=<%=editor%>";
             } else {
-                document.location.href = "save_sequence.jsp?sequence=<%=seq%>";
+                document.location.href = "save_sequence.jsp?sequence=<%=seq%>" + "&seqEditor=<%=editor%>";
             }
         } else {
             var seqName = document.getElementById("sequence.name").value;
@@ -356,7 +360,7 @@
                 return;
             }
             document.location.href = "save_sequence.jsp?sequenceName=" + seqName
-                    + "&onErrorKey=" + onErrorKey + "&seqDescription=" + seqDescription;
+                    + "&onErrorKey=" + onErrorKey + "&seqDescription=" + seqDescription + "&seqEditor=<%=editor%>";
         }
     }
 
@@ -389,7 +393,7 @@
         var onErrorKey = document.getElementById("sequence.onerror.key").value;
         var seqDescription = document.getElementById("seqeunceDescription").value;
         document.location.href = "save_sequence_as.jsp?registry=" + registry + "&regKey=" + key + "&onErrorKey="
-                + onErrorKey + "&seqDescription=" + seqDescription;
+                + onErrorKey + "&seqDescription=" + seqDescription + "&seqEditor=<%=editor%>";
     }
 
     function applySequence() {
@@ -432,7 +436,7 @@
     function onUpdateSucess() {
         var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
         if ('<%=Encode.forJavaScriptBlock(SequenceEditorHelper.getEditingSequenceAction(session))%>' == 'anonify') {
-            document.location.href = "save_sequence.jsp?sequence=<%=seq%>&forwardTo=design_sequence.jsp";
+            document.location.href = "save_sequence.jsp?sequence=<%=seq%>&seqEditor=<%=editor%>&forwardTo=design_sequence.jsp";
         } else {
             var seqName = document.getElementById("sequence.name").value;
             var onErrorKey = document.getElementById("sequence.onerror.key").value;
@@ -441,8 +445,9 @@
                 CARBON.showWarningDialog('<fmt:message key="sequence.name.required"/>');
                 return;
             }
-            document.location.href = "save_sequence.jsp?sequenceName=" + seqName
-                    + "&onErrorKey=" + onErrorKey + "&forwardTo=design_sequence.jsp" + "&seqDescription=" + seqDescription;
+            document.location.href = "save_sequence.jsp?sequenceName=" + seqName +
+                "&onErrorKey=" + onErrorKey + "&forwardTo=design_sequence.jsp" +
+                "&seqDescription=" + seqDescription + "&seqEditor=<%=editor%>";
         }
     }
 

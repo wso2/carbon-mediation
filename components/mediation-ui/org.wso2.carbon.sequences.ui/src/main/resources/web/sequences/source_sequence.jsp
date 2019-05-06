@@ -31,6 +31,7 @@
     ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.sequences.ui.i18n.Resources", request.getLocale());
     String sequenceName = request.getParameter("sequenceName");
     String onErrorKey = request.getParameter("onErrorKey");
+    String editor = request.getParameter("seqEditor");
     String sequenceXML = "";
     SequenceMediator sequence = SequenceEditorHelper.getEditingSequence(session);
     if (sequence == null) {
@@ -152,7 +153,6 @@
         %>
             window.location.href='<%=annonOriginator%>' + '?cancelled=true';
         <%} else {
-            String editor = request.getParameter("seqEditor");
         %>
         window.location.href = "<%=SequenceEditorHelper.getForwardToFrom(session,editor)%>";
         <%}
@@ -161,7 +161,7 @@
 
     function saveSequence() {
         document.getElementById("sequence_source").value = editAreaLoader.getValue("sequence_source");
-        document.seqSrcForm.action = "save_sequence.jsp";
+        document.seqSrcForm.action = "save_sequence.jsp" + "?seqEditor=<%=editor%>" ;
         document.seqSrcForm.submit();
     }
 
@@ -179,7 +179,8 @@
             registry = 'gov';
         }
 
-        document.seqSrcForm.action = "save_sequence_as.jsp?regKey=" + key+ "&registry=" + registry;
+        document.seqSrcForm.action = "save_sequence_as.jsp?regKey=" + key+ "&registry=" + registry +
+            "&seqEditor=<%=editor%>";
         document.seqSrcForm.submit();
     }
 
@@ -193,7 +194,7 @@
 		CARBON.showErrorDialog("<fmt:message key="invalid.value.error.parsing.xml"/><br />"+ error);
 		return false;
 	}
-        source_form.action = "design_sequence.jsp?ordinal=1";
+        source_form.action = "design_sequence.jsp?ordinal=1&seqEditor=" + "<%=editor%>";
         source_form.submit();
     }
 
