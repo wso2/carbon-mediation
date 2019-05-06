@@ -31,7 +31,7 @@ public class DataBridgePublisher {
 
                 publisher = new DataPublisher(null,receiverUrl, authUrl, username, password);
                 if (log.isDebugEnabled()) {
-                    log.error("Connected to analytics sever with the following details, " +
+                    log.debug("Connected to analytics sever with the following details, " +
                             " ReceiverURL:" + receiverUrl + ", AuthURL:" + authUrl + ", Username:" + username);
                 }
             } catch (DataEndpointAgentConfigurationException e) {
