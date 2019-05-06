@@ -41,6 +41,8 @@ public class DispatcherTestCase {
      */
     @Test
     public void testDispatching() throws Exception {
+        System.setProperty(org.wso2.carbon.inbound.endpoint.internal.http.api.Constants.PREFIX_TO_ENABLE_INTERNAL_APIS
+                + "SampleAPI", "true");
         List<InternalAPI> apis = ConfigurationLoader.loadInternalAPIs("internal/http/api/internal-apis.xml");
         Assert.assertEquals("Expected API not loaded", 1, apis.size());
 
