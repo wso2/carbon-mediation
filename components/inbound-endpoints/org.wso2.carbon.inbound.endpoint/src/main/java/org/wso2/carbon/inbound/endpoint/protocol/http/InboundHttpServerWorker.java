@@ -43,6 +43,7 @@ import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.RESTRequestHandler;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
+import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -104,11 +105,8 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 if (isInternalInboundEndpoint) {
                     doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
-                    boolean executePostDispatchActions =
-                            HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
-                    if (executePostDispatchActions) {
-                        respond(synCtx);
-                    }
+                    boolean result = HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
+                    respond(synCtx, result);
                     return;
                 }
 
@@ -425,17 +423,20 @@ public class InboundHttpServerWorker extends ServerWorker {
     }
 
     /**
-     * Sends the respond back to the client.
-     *
+     *Sends the respond back to the client.
      * @param synCtx the MessageContext
+     * @param result the result of API Call
      */
-    private void respond(org.apache.synapse.MessageContext synCtx) {
+    private void respond(org.apache.synapse.MessageContext synCtx, boolean result) {
         synCtx.setTo(null);
         synCtx.setResponse(true);
         Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
         org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
         axis2MessageCtx.getOperationContext()
                 .setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
+        if (!result) {
+            axis2MessageCtx.setProperty(PassThroughConstants.HTTP_SC, "404");
+        }
         Axis2Sender.sendBack(synCtx);
     }
 }
