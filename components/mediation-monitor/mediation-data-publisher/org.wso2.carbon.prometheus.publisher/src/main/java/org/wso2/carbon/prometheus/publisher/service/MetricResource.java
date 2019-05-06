@@ -39,10 +39,6 @@ public class MetricResource extends APIResource {
     private static Log log = LogFactory.getLog(MetricResource.class);
     private MetricPublisher metricPublisher;
 
-    private static final String PROMETHEUS_SYSTEM_PROPERTY = "enablePrometheusApi";
-    private static final boolean isPrometheusPublishingEnabled = Boolean
-            .parseBoolean(System.getProperty(PROMETHEUS_SYSTEM_PROPERTY));
-
     public MetricResource(String urlTemplate) {
 
         super(urlTemplate);
@@ -66,25 +62,16 @@ public class MetricResource extends APIResource {
         OMElement textRootElem =
                 OMAbstractFactory.getOMFactory().createOMElement(BaseConstants.DEFAULT_TEXT_WRAPPER);
 
-        if (isPrometheusPublishingEnabled) {
+        log.debug("Retrieving metric data to be published to Prometheus");
 
-            if (log.isDebugEnabled()) {
-                log.debug("Retrieving metric data to be published to Prometheus");
-            }
+        List<String> metrics = metricPublisher.getMetrics();
 
-            List<String> metrics = metricPublisher.getMetrics();
-
-            if (metrics != null && !metrics.isEmpty()) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Retrieving metric data successful");
-                }
-                textRootElem.setText(String.join("", metrics));
-            } else {
-                textRootElem.setText("");
-                log.info("No metrics retrieved to be published to Prometheus");
-            }
+        if (metrics != null && !metrics.isEmpty()) {
+            log.debug("Retrieving metric data successful");
+            textRootElem.setText(String.join("", metrics));
         } else {
             textRootElem.setText("");
+            log.info("No metrics retrieved to be published to Prometheus");
         }
 
         synCtx.getEnvelope().getBody().addChild(textRootElem);
