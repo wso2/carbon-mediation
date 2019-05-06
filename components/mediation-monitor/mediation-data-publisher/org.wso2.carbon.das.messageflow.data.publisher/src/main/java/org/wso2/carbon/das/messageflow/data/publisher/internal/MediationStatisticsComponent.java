@@ -60,10 +60,6 @@ import java.util.Set;
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
  * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
  * unbind="unsetSynapseRegistrationsService"
- * @scr.reference name="eventStreamManager.service"
- * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
- * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
- * unbind="unsetEventStreamService"
  */
 public class MediationStatisticsComponent {
 
@@ -290,14 +286,6 @@ public class MediationStatisticsComponent {
 
     protected void unsetRegistryService(RegistryService registryService) {
         MessageFlowDataPublisherDataHolder.getInstance().setRegistryService(null);
-    }
-
-    protected void setEventStreamService(EventStreamService publisherService) {
-        MessageFlowDataPublisherDataHolder.getInstance().setPublisherService(publisherService);
-    }
-
-    protected void unsetEventStreamService(EventStreamService publisherService) {
-        MessageFlowDataPublisherDataHolder.getInstance().setPublisherService(null);
     }
 
     protected void setSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {

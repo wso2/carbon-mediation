@@ -39,7 +39,7 @@
                             org.apache.thrift.*,
                             org.osgi.framework.*,
                             com.esotericsoftware.kryo.*;version=${esotericsoftware.kryo.version},
-                            org.wso2.carbon.databridge.commons; version="${carbon.analytics.common.imp.pkg.version}",
+                            org.wso2.carbon.databridge.*; version="${carbon.analytics.common.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
