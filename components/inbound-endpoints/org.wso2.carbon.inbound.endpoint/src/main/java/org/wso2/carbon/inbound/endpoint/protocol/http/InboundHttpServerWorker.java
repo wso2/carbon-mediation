@@ -424,12 +424,6 @@ public class InboundHttpServerWorker extends ServerWorker {
     }
 
     /**
-     * Sends the respond back to the client.
-     *
-     * @param synCtx the MessageContext
-     */
-
-    /**
      *Sends the respond back to the client.
      * @param synCtx the MessageContext
      * @param result the result of API Call

@@ -66,6 +66,9 @@ public class ConfigurationLoader {
                 String name = null;
                 if (handlerElem.getAttribute(NAME_ATT) != null) {
                     name = handlerElem.getAttributeValue(NAME_ATT);
+                    if (name == null || name.isEmpty()) {
+                        handleException("Name not specified in one or more handlers");
+                    }
                     if (!Boolean.parseBoolean(System.getProperty(Constants.PREFIX_TO_ENABLE_INTERNAL_APIS + name))) {
                         continue;
                     }
