@@ -324,7 +324,7 @@ public class PersistenceUtils {
     }
 
     /**
-     * Used to get the port offset value of server
+     * Used to get the port offset value of server.
      *
      * @return port offset of server
      */
