@@ -25,7 +25,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
-import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
+import org.wso2.carbon.das.messageflow.data.publisher.observer.AnalyticsMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.JMXMediationFlowObserver;
@@ -36,7 +36,6 @@ import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServic
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.event.stream.core.EventStreamService;
 
 import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowObserverStore;
 
@@ -170,7 +169,7 @@ public class MediationStatisticsComponent {
         String disableAnalyticStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_ANALYTICS_PUBLISHING);
         boolean enableAnalyticsPublishing = !Boolean.parseBoolean(disableAnalyticStr);
         if (enableAnalyticsPublishing) {
-            DASMediationFlowObserver dasObserver = new DASMediationFlowObserver();
+            AnalyticsMediationFlowObserver dasObserver = new AnalyticsMediationFlowObserver();
             observerStore.registerObserver(dasObserver);
             dasObserver.setTenantId(tenantId);
             log.info("DAS mediation statistic publishing enabled for tenant: " + tenantId);

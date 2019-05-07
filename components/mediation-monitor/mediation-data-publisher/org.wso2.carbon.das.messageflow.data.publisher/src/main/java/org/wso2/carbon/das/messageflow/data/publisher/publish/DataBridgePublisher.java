@@ -1,9 +1,27 @@
+/*
+ *  Copyright (c) 2019 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+
 package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
-import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -23,31 +41,21 @@ public class DataBridgePublisher {
     private static String username;
     private static String password;
 
-
-    private synchronized static DataPublisher initDataPublisher(){
-        if (publisher == null){
+    private synchronized static void initDataPublisher() {
+        if (publisher == null) {
             try {
                 loadConfigs();
 
-                publisher = new DataPublisher(null,receiverUrl, authUrl, username, password);
+                publisher = new DataPublisher(null, receiverUrl, authUrl, username, password);
                 if (log.isDebugEnabled()) {
                     log.debug("Connected to analytics sever with the following details, " +
                             " ReceiverURL:" + receiverUrl + ", AuthURL:" + authUrl + ", Username:" + username);
                 }
-            } catch (DataEndpointAgentConfigurationException e) {
-                log.error("Error while creating databridge publisher", e);
-            } catch (DataEndpointException e) {
-                log.error("Error while creating databridge publisher", e);
-            } catch (DataEndpointConfigurationException e) {
-                log.error("Error while creating databridge publisher", e);
-            } catch (DataEndpointAuthenticationException e) {
-                log.error("Error while creating databridge publisher", e);
-            } catch (TransportException e) {
+            } catch (DataEndpointAgentConfigurationException | DataEndpointConfigurationException |
+                    DataEndpointException | DataEndpointAuthenticationException | TransportException e) {
                 log.error("Error while creating databridge publisher", e);
             }
         }
-
-        return publisher;
     }
 
     public static DataPublisher getDataPublisher() {
@@ -55,12 +63,6 @@ public class DataBridgePublisher {
             initDataPublisher();
         }
         return  publisher;
-    }
-
-    public static void publish(Event event) {
-        if (publisher != null) {
-            publisher.publish(event);
-        }
     }
 
     private static void loadConfigs() {

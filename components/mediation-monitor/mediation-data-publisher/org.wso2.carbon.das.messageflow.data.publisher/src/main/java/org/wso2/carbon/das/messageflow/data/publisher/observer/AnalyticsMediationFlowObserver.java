@@ -25,13 +25,13 @@ import org.wso2.carbon.das.messageflow.data.publisher.publish.StatisticsPublishe
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 
-public class DASMediationFlowObserver implements MessageFlowObserver,
+public class AnalyticsMediationFlowObserver implements MessageFlowObserver,
                                                  TenantInformation {
 
-    private static final Log log = LogFactory.getLog(DASMediationFlowObserver.class);
+    private static final Log log = LogFactory.getLog(AnalyticsMediationFlowObserver.class);
     private int tenantId = -1234;
 
-    public DASMediationFlowObserver() {
+    public AnalyticsMediationFlowObserver() {
     }
 
     @Override
