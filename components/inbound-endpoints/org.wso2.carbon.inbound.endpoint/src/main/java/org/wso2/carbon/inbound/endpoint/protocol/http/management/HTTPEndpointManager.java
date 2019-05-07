@@ -73,7 +73,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         if (internalInboundPort != -1) {
             List<InternalAPI> internalAPIList = ConfigurationLoader.loadInternalAPIs(Constants.INTERNAL_APIS_FILE);
             internalAPIDispatcher = new InternalAPIDispatcher(internalAPIList);
-            internalApiEnabled = internalAPIList != null && internalAPIList.isEmpty();
+            internalApiEnabled = !internalAPIList.isEmpty();
         }
     }
 
