@@ -27,6 +27,7 @@ import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPI;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
@@ -64,12 +65,15 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     private InternalAPIDispatcher internalAPIDispatcher;
 
+    private boolean internalApiEnabled;
+
     private HTTPEndpointManager() {
         super();
         internalInboundPort = ConfigurationLoader.getInternalInboundPort();
         if (internalInboundPort != -1) {
-            internalAPIDispatcher =
-                    new InternalAPIDispatcher(ConfigurationLoader.loadInternalAPIs(Constants.INTERNAL_APIS_FILE));
+            List<InternalAPI> internalAPIList = ConfigurationLoader.loadInternalAPIs(Constants.INTERNAL_APIS_FILE);
+            internalAPIDispatcher = new InternalAPIDispatcher(internalAPIList);
+            internalApiEnabled = internalAPIList != null && internalAPIList.isEmpty();
         }
     }
 
@@ -426,5 +430,14 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     public int getInternalInboundPort() {
         return internalInboundPort;
+    }
+
+    /**
+     * Checks whether at least one internal API is enabled.
+     *
+     * @return - whether any internal API is enabled.
+     */
+    public boolean isAnyInternalApiEnabled() {
+        return internalApiEnabled;
     }
 }
