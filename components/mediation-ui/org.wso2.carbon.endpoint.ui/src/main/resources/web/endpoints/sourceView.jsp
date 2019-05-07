@@ -62,6 +62,8 @@
     OMElement epElement = AXIOMUtil.stringToOM(configuration);
     EndpointService epService;
 
+    String endpointName = epElement.getAttributeValue(new QName("name"));
+
     String templateAdd = (String) session.getAttribute("templateAdd");
     boolean isFromTemplateEditor = session.getAttribute("endpointTemplate") != null ? true : false;
     boolean isTemplateAdd = templateAdd != null && "true".equals(templateAdd) ? true : false;
@@ -209,6 +211,13 @@
         var formElem = document.getElementById('saveAsForm');
         if (show) {
             formElem.style.display = "";
+            var keyField = document.getElementById('synRegKey');
+            if (keyField.value == '') {
+                var endpointName = "<%=endpointName%>";
+                if (endpointName) {
+                    keyField.value = endpointName;
+                }
+            }
         } else {
             formElem.style.display = "none";
         }
