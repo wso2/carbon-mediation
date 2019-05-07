@@ -21,7 +21,7 @@ package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
+import org.wso2.carbon.das.data.publisher.util.AnalyticsDataPublisherConstants;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -29,7 +29,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.utils.CarbonUtils;
 
 public class DataBridgePublisher {
@@ -66,13 +65,13 @@ public class DataBridgePublisher {
     }
 
     private static void loadConfigs() {
-        String agentConfPath = CarbonUtils.getCarbonConfigDirPath() + DASDataPublisherConstants.DATA_AGENT_CONFIG_PATH;
+        String agentConfPath = CarbonUtils.getCarbonConfigDirPath() + AnalyticsDataPublisherConstants.DATA_AGENT_CONFIG_PATH;
         AgentHolder.setConfigPath(agentConfPath);
 
-        receiverUrl = ServerConfiguration.getInstance().getFirstProperty(DASDataPublisherConstants.ANALYTICS_RECEIVER_URL);
-        authUrl = ServerConfiguration.getInstance().getFirstProperty(DASDataPublisherConstants.ANALYTICS_AUTH_URL);
-        username = ServerConfiguration.getInstance().getFirstProperty(DASDataPublisherConstants.ANALYTICS_USERNAME);
-        password = ServerConfiguration.getInstance().getFirstProperty(DASDataPublisherConstants.ANALYTICS_PASSWORD);
+        receiverUrl = ServerConfiguration.getInstance().getFirstProperty(AnalyticsDataPublisherConstants.ANALYTICS_RECEIVER_URL);
+        authUrl = ServerConfiguration.getInstance().getFirstProperty(AnalyticsDataPublisherConstants.ANALYTICS_AUTH_URL);
+        username = ServerConfiguration.getInstance().getFirstProperty(AnalyticsDataPublisherConstants.ANALYTICS_USERNAME);
+        password = ServerConfiguration.getInstance().getFirstProperty(AnalyticsDataPublisherConstants.ANALYTICS_PASSWORD);
 
     }
 }

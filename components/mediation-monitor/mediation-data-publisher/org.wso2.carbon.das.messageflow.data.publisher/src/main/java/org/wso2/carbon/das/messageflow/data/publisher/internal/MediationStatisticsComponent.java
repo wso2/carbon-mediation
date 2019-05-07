@@ -24,7 +24,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
+import org.wso2.carbon.das.data.publisher.util.AnalyticsDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.AnalyticsMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation;
@@ -123,31 +123,31 @@ public class MediationStatisticsComponent {
         ServerConfiguration serverConf = ServerConfiguration.getInstance();
 
         // Set a custom interval value if required
-        String interval = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL);
-        long delay = DASDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL_DEFAULT;
+        String interval = serverConf.getFirstProperty(AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL);
+        long delay = AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL_DEFAULT;
         if (interval != null) {
             try {
                 delay = Long.parseLong(interval);
             } catch (NumberFormatException ignored) {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid delay time for mediation-flow-tracer thread. It will use default value - "
-                              + DASDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL_DEFAULT);
+                              + AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL_DEFAULT);
                 }
-                delay = DASDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL_DEFAULT;
+                delay = AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_IDLE_INTERVAL_DEFAULT;
             }
         }
 
-        String workerCountString = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT);
-        int workerCount = DASDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT_DEFAULT;
+        String workerCountString = serverConf.getFirstProperty(AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT);
+        int workerCount = AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT_DEFAULT;
         if (workerCountString != null) {
             try {
                 workerCount = Integer.parseInt(workerCountString);
             } catch (NumberFormatException ignored) {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid StatisticWorkerCount. It will use default value - "
-                              + DASDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT_DEFAULT);
+                              + AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT_DEFAULT);
                 }
-                workerCount = DASDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT_DEFAULT;
+                workerCount = AnalyticsDataPublisherConstants.FLOW_STATISTIC_WORKER_COUNT_DEFAULT;
             }
         }
         for (int i = 0; i < workerCount; i++) {
@@ -159,14 +159,14 @@ public class MediationStatisticsComponent {
         }
 
 
-        String disableJmxStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
+        String disableJmxStr = serverConf.getFirstProperty(AnalyticsDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
         boolean enableJmxPublishing = !Boolean.parseBoolean(disableJmxStr);
         if (enableJmxPublishing) {
             JMXMediationFlowObserver jmxObserver = new JMXMediationFlowObserver(tenantId);
             observerStore.registerObserver(jmxObserver);
             log.info("JMX mediation statistic publishing enabled for tenant: " + tenantId);
         }
-        String disableAnalyticStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_ANALYTICS_PUBLISHING);
+        String disableAnalyticStr = serverConf.getFirstProperty(AnalyticsDataPublisherConstants.FLOW_STATISTIC_ANALYTICS_PUBLISHING);
         boolean enableAnalyticsPublishing = !Boolean.parseBoolean(disableAnalyticStr);
         if (enableAnalyticsPublishing) {
             AnalyticsMediationFlowObserver dasObserver = new AnalyticsMediationFlowObserver();
@@ -175,7 +175,7 @@ public class MediationStatisticsComponent {
             log.info("DAS mediation statistic publishing enabled for tenant: " + tenantId);
         }
         // Engage custom observer implementations (user written extensions)
-        String observers = serverConf.getFirstProperty(DASDataPublisherConstants.STAT_OBSERVERS);
+        String observers = serverConf.getFirstProperty(AnalyticsDataPublisherConstants.STAT_OBSERVERS);
         if (observers != null && !"".equals(observers)) {
             String[] classNames = observers.split(",");
             for (String className : classNames) {

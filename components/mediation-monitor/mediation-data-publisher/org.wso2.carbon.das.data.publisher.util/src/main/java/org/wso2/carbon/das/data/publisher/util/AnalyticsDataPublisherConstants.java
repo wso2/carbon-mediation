@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.das.data.publisher.util;
 
-public class DASDataPublisherConstants {
+public class AnalyticsDataPublisherConstants {
 
     // Carbon XML properties
     public static final String STAT_CONFIG_ELEMENT = "MediationFlowStatisticConfig";
