@@ -29,6 +29,7 @@ import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPI;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
+import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpSourceHandler;
@@ -71,6 +72,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         super();
         internalInboundPort = ConfigurationLoader.getInternalInboundPort();
         if (internalInboundPort != -1) {
+            internalInboundPort += PersistenceUtils.getPortOffset();
             List<InternalAPI> internalAPIList = ConfigurationLoader.loadInternalAPIs(Constants.INTERNAL_APIS_FILE);
             internalAPIDispatcher = new InternalAPIDispatcher(internalAPIList);
             internalApiEnabled = !internalAPIList.isEmpty();
