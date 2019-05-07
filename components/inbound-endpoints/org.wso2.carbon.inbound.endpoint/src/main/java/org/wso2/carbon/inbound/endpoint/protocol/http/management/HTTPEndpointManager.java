@@ -431,6 +431,11 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         return internalInboundPort;
     }
 
+    /**
+     * Checks whether at least one internal API is enabled.
+     *
+     * @return - whether any internal API is enabled.
+     */
     public boolean isAnyInternalApiEnabled() {
         return internalAPIList != null && internalAPIList.size() > 0;
     }
