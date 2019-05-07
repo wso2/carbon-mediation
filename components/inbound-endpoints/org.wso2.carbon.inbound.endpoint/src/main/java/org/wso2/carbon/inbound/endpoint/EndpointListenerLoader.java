@@ -95,11 +95,8 @@ public class EndpointListenerLoader {
             }
         }
 
-        int internalInboundPort = HTTPEndpointManager.getInstance().getInternalInboundPort();
-        if (internalInboundPort != -1 && HTTPEndpointManager.getInstance().isAnyInternalApiEnabled()) {
-            HTTPEndpointManager.getInstance().startListener(internalInboundPort + PersistenceUtils.getPortOffset(),
-                    InboundHttpConstants.INTERNAL_INBOUND_ENDPOINT_NAME, null);
-        }
+        loadInternalInboundApis();
+
         //Load tenats required for polling inbound protocols
         Map<String, Set<String>> mPollingEndpoints =
 		                                  InboundEndpointsDataStore.getInstance().getAllPollingingEndpointData();
@@ -108,6 +105,14 @@ public class EndpointListenerLoader {
         ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
         for (String tenantDomain : mPollingEndpoints.keySet()) {
             TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+        }
+    }
+
+    private static void loadInternalInboundApis() {
+        int internalInboundPort = HTTPEndpointManager.getInstance().getInternalInboundPort();
+        if (internalInboundPort != -1 && HTTPEndpointManager.getInstance().isAnyInternalApiEnabled()) {
+            HTTPEndpointManager.getInstance().startListener(internalInboundPort + PersistenceUtils.getPortOffset(),
+                                                            InboundHttpConstants.INTERNAL_INBOUND_ENDPOINT_NAME, null);
         }
     }
 }
