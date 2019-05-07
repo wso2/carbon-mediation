@@ -20,8 +20,12 @@
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.SynapseJsonPathFactory" %>
+<%@ page import="org.wso2.carbon.mediator.enrich.ui.EnrichUIConstants" %>
+
 
 <%
+
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     if (!(mediator instanceof EnrichMediator)) {
         throw new RuntimeException("Unable to edit the mediator");
@@ -29,53 +33,75 @@
     EnrichMediator enrichMediator = (org.wso2.carbon.mediator.enrich.ui.EnrichMediator) mediator;
 
     // Source
-    enrichMediator.setSourceClone(request.getParameter("mediator.enrich.source.clone"));
-    enrichMediator.setSourceType(request.getParameter("mediator.enrich.source.type2"));
+    enrichMediator.setSourceClone(request.getParameter(EnrichUIConstants.SOURCE_CLONE));
+    enrichMediator.setSourceType(request.getParameter(EnrichUIConstants.SOURCE_TYPE));
 
-    if (request.getParameter("mediator.enrich.source.val_ex") != null && !request.getParameter("mediator.enrich.source.val_ex").trim().equals("")) {
+    if (request.getParameter(EnrichUIConstants.SOURCE_EXPRESSION_ID) != null &&
+            !request.getParameter(EnrichUIConstants.SOURCE_EXPRESSION_ID).trim().equals("")) {
 
-        if (request.getParameter("mediator.enrich.source.type2").equals("custom")) {
-            XPathFactory xPathFactory = XPathFactory.getInstance();
-            enrichMediator.setSourceExpression(xPathFactory.createSynapseXPath("mediator.enrich.source.val_ex",
-                    request.getParameter("mediator.enrich.source.val_ex"), session));
-        } else if (request.getParameter("mediator.enrich.source.type2").equals("property")) {
-            enrichMediator.setSourceType(request.getParameter("mediator.enrich.source.type2"));
-            enrichMediator.setSourceProperty(request.getParameter("mediator.enrich.source.val_ex"));
+        if (request.getParameter(EnrichUIConstants.SOURCE_TYPE).equals("custom")) {
+            String expression = request.getParameter(EnrichUIConstants.SOURCE_EXPRESSION_ID);
+            if (expression.startsWith(EnrichUIConstants.JSON_PATH)) {
+                int expLength = expression.length();
+                String extractedExp = expression.substring(EnrichUIConstants.JSON_PATH.length(), expLength - 1);
+                SynapseJsonPathFactory synapseJsonPathFactory = SynapseJsonPathFactory.getInstance();
+                enrichMediator.setSourceExpression(synapseJsonPathFactory.createSynapseJsonPath(
+                        EnrichUIConstants.TARGET_EXPRESSION_ID, extractedExp));
+            } else {
+                XPathFactory xPathFactory = XPathFactory.getInstance();
+                enrichMediator.setSourceExpression(xPathFactory.createSynapseXPath(EnrichUIConstants.SOURCE_EXPRESSION_ID,
+                        expression, session));
+            }
+            enrichMediator.setSourceProperty(null);
+        } else if (request.getParameter(EnrichUIConstants.SOURCE_TYPE).equals("property")) {
+            enrichMediator.setSourceType(request.getParameter(EnrichUIConstants.SOURCE_TYPE));
+            enrichMediator.setSourceProperty(request.getParameter(EnrichUIConstants.SOURCE_EXPRESSION_ID));
+            enrichMediator.setSourceExpression(null);
         }
     }
 
     String keyGroup = request.getParameter("keygroup");
     String keyVal = "";
-    if (request.getParameter("mediator.enrich.source.type2").equals("inline")) {
+    if (request.getParameter(EnrichUIConstants.SOURCE_TYPE).equals("inline")) {
         if (keyGroup != null && !keyGroup.equals("")) {
             if (keyGroup.equals("InlineXML")) {
                 keyVal = request.getParameter("inlineEnrichText");
-                enrichMediator.setSourceInlineXML(keyVal);
+                enrichMediator.setSourceInlineElement(keyVal);
                 enrichMediator.setInlineSourceRegKey("");
             } else if (keyGroup.equals("InlineRegKey")) {
                 keyVal = request.getParameter("mediator.enrich.reg.key");
                 enrichMediator.setInlineSourceRegKey(keyVal);
-                enrichMediator.setSourceInlineXML("");
+                enrichMediator.setSourceInlineElement("");
             }
         }
+        enrichMediator.setSourceExpression(null);
+        enrichMediator.setSourceProperty(null);
     }
             
     // Target
-    enrichMediator.setTargetAction(request.getParameter("mediator.enrich.target.action"));
-    enrichMediator.setTargetType(request.getParameter("mediator.enrich.target.type"));
+    enrichMediator.setTargetAction(request.getParameter(EnrichUIConstants.TARGET_ACTION));
+    enrichMediator.setTargetType(request.getParameter(EnrichUIConstants.TARGET_TYPE));
 
 
-    if (request.getParameter("mediator.enrich.target.val_ex") != null && !request.getParameter("mediator.enrich.target.val_ex").trim().equals("")) {
-        if (request.getParameter("mediator.enrich.target.type").equals("custom")) {
-            XPathFactory xPathFactory2 = XPathFactory.getInstance();
-            enrichMediator.setTargetExpression(xPathFactory2.createSynapseXPath("mediator.enrich.target.val_ex",
-                    request.getParameter("mediator.enrich.target.val_ex"),session));
-        } else if (request.getParameter("mediator.enrich.target.type").equals("property")) {
-            enrichMediator.setTargetProperty(request.getParameter("mediator.enrich.target.val_ex"));
-        }       
+    if (request.getParameter(EnrichUIConstants.TARGET_EXPRESSION_ID) != null &&
+            !request.getParameter(EnrichUIConstants.TARGET_EXPRESSION_ID).trim().equals("")) {
+        if (request.getParameter(EnrichUIConstants.TARGET_TYPE).equals("custom")) {
+            String expression = request.getParameter(EnrichUIConstants.TARGET_EXPRESSION_ID);
+            if (expression.startsWith(EnrichUIConstants.JSON_PATH)) {
+                int expLength = expression.length();
+                String extractedExp = expression.substring(EnrichUIConstants.JSON_PATH.length(), expLength - 1);
+                SynapseJsonPathFactory synapseJsonPathFactory = SynapseJsonPathFactory.getInstance();
+                enrichMediator.setTargetExpression(synapseJsonPathFactory.createSynapseJsonPath(
+                        EnrichUIConstants.TARGET_EXPRESSION_ID, extractedExp));
+            } else {
+                XPathFactory xPathFactory2 = XPathFactory.getInstance();
+                enrichMediator.setTargetExpression(xPathFactory2.createSynapseXPath(EnrichUIConstants.TARGET_EXPRESSION_ID,
+                        expression, session));
+            }
+            enrichMediator.setTargetProperty(null);
+        } else if (request.getParameter(EnrichUIConstants.TARGET_TYPE).equals("property")) {
+            enrichMediator.setTargetProperty(request.getParameter(EnrichUIConstants.TARGET_EXPRESSION_ID));
+            enrichMediator.setTargetExpression(null);
+        }
     }
-
-
-
 %>
-

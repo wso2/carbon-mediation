@@ -44,30 +44,36 @@ function enrichMediatorValidate() {
     //XML Validation
     var typeSelect = document.getElementById('mediator.enrich.source.type');
     if(typeSelect.options[typeSelect.selectedIndex].value=="inline" && jQuery('#inlineEnrichText').is(":visible") ){
-        var sourceInlineXML = document.getElementById("inlineEnrichText").value;
-
-        if (window.ActiveXObject) {
-            try {
-                var doc = new ActiveXObject("Microsoft.XMLDOM");
-                doc.async = "false";
-                var hasParse = doc.loadXML(sourceInlineXML);
-                if (!hasParse) {
-                    CARBON.showErrorDialog(enrichMediatorJsi18n["invalid.inline.xml"]);
+        var sourceInline = document.getElementById("inlineEnrichText").value;
+        // check the inline value is JSON
+        try {
+            JSON.parse(sourceInline);
+            return true;
+        } catch (e) {
+            // check for XML
+            if (window.ActiveXObject) {
+                try {
+                    var doc = new ActiveXObject("Microsoft.XMLDOM");
+                    doc.async = "false";
+                    var hasParse = doc.loadXML(sourceInline);
+                    if (!hasParse) {
+                        CARBON.showErrorDialog(enrichMediatorJsi18n["invalid.inline.xml.json"]);
+                        form.Value.focus();
+                        return false;
+                    }
+                } catch (e) {
+                    CARBON.showErrorDialog(enrichMediatorJsi18n["invalid.inline.xml.json"]);
                     form.Value.focus();
                     return false;
                 }
-            } catch (e) {
-                CARBON.showErrorDialog(enrichMediatorJsi18n["invalid.inline.xml"]);
-                form.Value.focus();
-                return false;
-            }
-        } else {
-            var parser = new DOMParser();
-            var dom = parser.parseFromString(sourceInlineXML, "text/xml");
-            if (dom.documentElement.nodeName == "parsererror" || dom.getElementsByTagName("parsererror").length > 0 ) {
-                CARBON.showErrorDialog(enrichMediatorJsi18n["invalid.inline.xml"]);
-                form.Value.focus();
-                return false;
+            } else {
+                var parser = new DOMParser();
+                var dom = parser.parseFromString(sourceInline, "text/xml");
+                if (dom.documentElement.nodeName == "parsererror" || dom.getElementsByTagName("parsererror").length > 0) {
+                    CARBON.showErrorDialog(enrichMediatorJsi18n["invalid.inline.xml.json"]);
+                    form.Value.focus();
+                    return false;
+                }
             }
         }
     }

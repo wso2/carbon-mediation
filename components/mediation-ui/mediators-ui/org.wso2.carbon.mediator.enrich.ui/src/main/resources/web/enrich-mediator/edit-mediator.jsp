@@ -18,17 +18,16 @@
 
 <%@ page import="org.wso2.carbon.mediator.enrich.ui.EnrichMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
-<%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
-<%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
+<%@ page import="org.wso2.carbon.mediator.enrich.ui.EnrichMediatorUtil" %>
+<%@ page import="org.wso2.carbon.mediator.enrich.ui.EnrichUIConstants" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
 
-    String sourceProperty = "";
-    String targetProperty = "";
     String sourceValue = "";
     String targetValue = "";
     String inlineXMLStr = "";
@@ -60,17 +59,13 @@
     } else if (enrichMediator.getSourceType().equals("custom")) {
         sourceType = CUSTOM;
         if (enrichMediator.getSourceExpression() != null) {
-            SynapseXPath sourceXPath = enrichMediator.getSourceExpression();
-            NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
-            if (sourceXPath != null) {
-                nameSpacesRegistrar.registerNameSpaces(sourceXPath, "mediator.enrich.source.val_ex", session);
-                sourceValue = sourceXPath.toString();
-            }
+            SynapsePath sourcePath = enrichMediator.getSourceExpression();
+            sourceValue = EnrichMediatorUtil.getSynapsePathString(session, sourcePath, EnrichUIConstants.SOURCE_EXPRESSION_ID);
         }
     } else if (enrichMediator.getSourceType().equals("inline")) {
         sourceType = INLINE;
-        if (enrichMediator.getSourceInlineXML() != null && !enrichMediator.getSourceInlineXML().equals("")) {
-            inlineXMLStr = enrichMediator.getSourceInlineXML();
+        if (enrichMediator.getSourceInlineElement() != null && !enrichMediator.getSourceInlineElement().equals("")) {
+            inlineXMLStr = enrichMediator.getSourceInlineElement();
         } else if (enrichMediator.getInlineSourceRegKey() != null
                 && !enrichMediator.getInlineSourceRegKey().equals("")) {
             isInlineRegResource = true;
@@ -89,12 +84,8 @@
     } else if (enrichMediator.getTargetType().equals("custom")) {
         targetType = CUSTOM;
         if (enrichMediator.getTargetExpression() != null) {
-            SynapseXPath targetXPath = enrichMediator.getTargetExpression();
-            NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
-            if (targetXPath != null) {
-                nameSpacesRegistrar.registerNameSpaces(targetXPath, "mediator.enrich.target.val_ex", session);
-                targetValue = targetXPath.toString();
-            }
+            SynapsePath synapsePath = enrichMediator.getTargetExpression();
+            targetValue = EnrichMediatorUtil.getSynapsePathString(session, synapsePath, EnrichUIConstants.TARGET_EXPRESSION_ID);
         }
     }
 
