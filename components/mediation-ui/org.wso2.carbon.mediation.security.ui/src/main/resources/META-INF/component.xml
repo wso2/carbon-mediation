@@ -16,6 +16,14 @@
  ~ under the License.
  -->
 <component xmlns="http://products.wso2.org/carbon">
+
+    <ManagementPermissions>
+        <ManagementPermission>
+            <DisplayName>Secure Vault</DisplayName>
+            <ResourceId>/permission/admin/manage/securevault</ResourceId>
+        </ManagementPermission>
+    </ManagementPermissions>
+
 	<menus>
 	    <menu>
             <id>secure_vault_main_menu</id>
@@ -27,7 +35,7 @@
             <order>9</order>
             <style-class>manage</style-class>
             <icon>../mediation_secure_vault/images/secure-vault.png</icon>
-            <require-permission>/permission/admin/manage</require-permission>
+            <require-permission>/permission/admin/manage/securevault</require-permission>
         </menu>
         
 		<menu>
@@ -40,7 +48,7 @@
 			<order>1</order>
 			<style-class>manage</style-class>
             <icon>../mediation_secure_vault/images/list.gif</icon>
-            <require-permission>/permission/admin/manage</require-permission>
+            <require-permission>/permission/admin/manage/securevault</require-permission>
         </menu>
        
 		
