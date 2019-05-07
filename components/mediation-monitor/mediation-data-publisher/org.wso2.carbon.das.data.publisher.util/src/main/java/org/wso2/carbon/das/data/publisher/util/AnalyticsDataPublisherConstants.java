@@ -18,7 +18,7 @@
  */
 package org.wso2.carbon.das.data.publisher.util;
 
-public class DASDataPublisherConstants {
+public class AnalyticsDataPublisherConstants {
 
     // Carbon XML properties
     public static final String STAT_CONFIG_ELEMENT = "MediationFlowStatisticConfig";
@@ -30,4 +30,14 @@ public class DASDataPublisherConstants {
     public static final String FLOW_STATISTIC_ANALYTICS_PUBLISHING = STAT_CONFIG_ELEMENT + ".AnalyticPublishingDisable";
     public static final String STAT_OBSERVERS = STAT_CONFIG_ELEMENT + ".Observers";
     public static final String FLOW_STATISTIC_NODE_HOST_NAME = STAT_CONFIG_ELEMENT + ".NodeHostName";
+
+    // Carbon xml analytics server configs.
+    public static final String ANALYTICS_ELEMENT = "Analytics";
+    public static final String ANALYTICS_RECEIVER_URL = ANALYTICS_ELEMENT + ".ServerURL";
+    public static final String ANALYTICS_AUTH_URL = ANALYTICS_ELEMENT + ".AuthServerURL";
+    public static final String ANALYTICS_USERNAME = ANALYTICS_ELEMENT + ".Username";
+    public static final String ANALYTICS_PASSWORD = ANALYTICS_ELEMENT + ".Password";
+
+    public static final String DATA_AGENT_CONFIG_PATH = "/data-bridge/data-agent-config.xml";
+
 }

@@ -23,7 +23,6 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class MessageFlowDataPublisherDataHolder {
 
-    private EventStreamService publisherService;
     private RegistryService registryService;
     private ConfigurationContextService contextService;
     private boolean isGlobalStatisticsEnabled;
@@ -36,14 +35,6 @@ public class MessageFlowDataPublisherDataHolder {
 
     public static MessageFlowDataPublisherDataHolder getInstance() {
         return serviceHolder;
-    }
-
-    public EventStreamService getPublisherService() {
-        return publisherService;
-    }
-
-    public void setPublisherService(EventStreamService publisherService) {
-        this.publisherService = publisherService;
     }
 
     public RegistryService getRegistryService() {

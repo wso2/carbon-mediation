@@ -21,18 +21,17 @@ package org.wso2.carbon.das.messageflow.data.publisher.observer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
-import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 import org.wso2.carbon.das.messageflow.data.publisher.publish.StatisticsPublisher;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 
-public class DASMediationFlowObserver implements MessageFlowObserver,
+public class AnalyticsMediationFlowObserver implements MessageFlowObserver,
                                                  TenantInformation {
 
-    private static final Log log = LogFactory.getLog(DASMediationFlowObserver.class);
+    private static final Log log = LogFactory.getLog(AnalyticsMediationFlowObserver.class);
     private int tenantId = -1234;
 
-    public DASMediationFlowObserver() {
+    public AnalyticsMediationFlowObserver() {
     }
 
     @Override
@@ -49,11 +48,7 @@ public class DASMediationFlowObserver implements MessageFlowObserver,
 
             // Using super tenant for all the publishing, data-bridge looks for thread-local tenantId
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(-1234, true);
-
-            // No need to publish if there's no stream
-            if (MessageFlowDataPublisherDataHolder.getInstance().getPublisherService().getStreamIds().size() > 0) {
-                StatisticsPublisher.process(flow, tenantId);
-            }
+            StatisticsPublisher.process(flow, tenantId);
         } catch (Exception e) {
             log.error("failed to update statics from DAS publisher", e);
         } finally {
