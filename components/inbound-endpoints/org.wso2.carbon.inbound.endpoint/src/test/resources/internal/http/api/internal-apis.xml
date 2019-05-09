@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -16,6 +16,34 @@
   ~ under the License.
   -->
 
-<apis>
-  <api name="SampleAPI" class="internal.http.api.SampleInternalAPI"/>
-</apis>
+<internalApis>
+    <apis>
+        <api name="SampleAPI" protocol="http https" class="internal.http.api.SampleInternalAPI"/>
+    </apis>
+    <sslConfig>
+        <parameter name="keystore">
+            <KeyStore>
+                <Location>repository/resources/security/wso2carbon.jks</Location>
+                <Type>JKS</Type>
+                <Password>wso2carbon</Password>
+                <KeyPassword>wso2carbon</KeyPassword>
+            </KeyStore>
+        </parameter>
+        <parameter name="truststore">
+            <TrustStore>
+                <Location>repository/resources/security/client-truststore.jks</Location>
+                <Type>JKS</Type>
+                <Password>wso2carbon</Password>
+            </TrustStore>
+        </parameter>
+        <parameter name="sslVerifyClient">false</parameter>
+        <parameter name="httpsProtocols">TLSv1,TLSv1.1,TLSv1.2</parameter>
+        <parameter name="sslProtocol">SSLV3</parameter>
+        <parameter name="certificateRevocationVerifier">
+            <CertificateRevocationVerifier enable="false">
+                <CacheSize>10</CacheSize>
+                <CacheDelay>2</CacheDelay>
+            </CertificateRevocationVerifier>
+        </parameter>
+    </sslConfig>
+</internalApis>

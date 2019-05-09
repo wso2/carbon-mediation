@@ -18,6 +18,7 @@
 package internal.http.api;
 
 import junit.framework.Assert;
+import org.junit.After;
 import org.junit.Test;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
@@ -37,10 +38,16 @@ public class ConfigurationLoaderTestCase {
         URL url = getClass().getResource("internal-apis.xml");
         Assert.assertNotNull("Configuration file not found", url);
 
-        List<InternalAPI> apis = ConfigurationLoader.loadInternalAPIs("internal/http/api/internal-apis.xml");
+        ConfigurationLoader.loadInternalApis("internal/http/api/internal-apis.xml");
+        List<InternalAPI> apis = ConfigurationLoader.getHttpInternalApis();
         Assert.assertEquals("Expected number of APIs not found", 1, apis.size());
         Assert.assertEquals("Loaded API name is not correct", "SampleAPI" , apis.get(0).getName());
         Assert.assertEquals("Loaded API context is not correct", "/foo" , apis.get(0).getContext());
+    }
+
+    @After
+    public void cleanup(){
+        ConfigurationLoader.destroy();
     }
 
 }
