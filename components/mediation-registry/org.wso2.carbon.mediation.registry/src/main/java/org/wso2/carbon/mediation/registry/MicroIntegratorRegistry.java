@@ -967,7 +967,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      */
     private Map<String, String> createFileExtensionsMap() {
 
-        Map<String, String> extensionContentTypeMap = new HashMap();
+        Map<String, String> extensionContentTypeMap = new HashMap<>();
 
         extensionContentTypeMap.put(".xml", "application/xml");
         extensionContentTypeMap.put(".js", "application/javascript");
