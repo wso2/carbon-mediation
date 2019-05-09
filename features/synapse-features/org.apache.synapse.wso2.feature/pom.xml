@@ -92,10 +92,6 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>accessors-smart</artifactId>
         </dependency>
@@ -146,7 +142,6 @@
                                 <!--<bundleDef>org.wso2.orbit.joda-time:joda-time:${joda-time.version}</bundleDef>-->
                                 <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.github.fge:json-schema-validator-all</bundleDef>
-                                <bundleDef>org.apache.commons:commons-text:${commons-text.version}</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
