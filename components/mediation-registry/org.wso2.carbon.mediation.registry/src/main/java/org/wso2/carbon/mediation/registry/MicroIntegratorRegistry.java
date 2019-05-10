@@ -822,7 +822,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 return null;
             }
 
-            if (mediaType == "" || mediaType == "text/plain") {
+            if (ESBRegistryConstants.DEFAULT_MEDIA_TYPE.equals(mediaType)) {
                 StringBuilder strBuilder = new StringBuilder();
                 try (BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line;
@@ -967,7 +967,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      */
     private Map<String, String> createFileExtensionsMap() {
 
-        Map<String, String> extensionContentTypeMap = new HashMap();
+        Map<String, String> extensionContentTypeMap = new HashMap<>();
 
         extensionContentTypeMap.put(".xml", "application/xml");
         extensionContentTypeMap.put(".js", "application/javascript");
@@ -992,13 +992,13 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      */
     private String lookUpFileMediaType(String fileUrl) {
         String extension = "";
-        int i = fileUrl.lastIndexOf('.');
-        if (i > 0) {
-            extension = fileUrl.substring(i);
+        int indexOfExtensionDot = fileUrl.lastIndexOf('.');
+        if (indexOfExtensionDot > 0) {
+            extension = fileUrl.substring(indexOfExtensionDot);
         }
 
-        String mediaType = "";
-        if (fileExtensionMediaTypeMap != null && fileExtensionMediaTypeMap.containsKey(extension)) {
+        String mediaType = ESBRegistryConstants.DEFAULT_MEDIA_TYPE;
+        if (fileExtensionMediaTypeMap.containsKey(extension)) {
             mediaType = fileExtensionMediaTypeMap.get(extension);
         }
         return mediaType;
