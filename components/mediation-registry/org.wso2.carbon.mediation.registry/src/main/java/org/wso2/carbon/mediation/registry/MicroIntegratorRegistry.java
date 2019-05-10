@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.registry.AbstractRegistry;
 import org.apache.synapse.registry.RegistryEntry;
+import org.apache.synapse.util.SynapseBinaryDataSource;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -44,8 +45,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import javax.activation.DataHandler;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -73,6 +77,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     private String configRegistry = null;
 
     private String govRegistry = null;
+
+    private Map<String, String> fileExtensionMediaTypeMap = null;
 
     /**
      * Specifies whether the registry is in the local host or a remote registry.
@@ -120,6 +126,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 addConfigProperty(name, value);
             }
         }
+        this.fileExtensionMediaTypeMap =  createFileExtensionsMap();
         log.debug("EI lightweight registry is initialized.");
 
     }
@@ -805,7 +812,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * @throws IOException
      */
     private OMNode readNonXML (URL url) throws IOException {
-
+        String mediaType = lookUpFileMediaType(url.getPath());
         URLConnection urlConnection = url.openConnection();
         urlConnection.connect();
 
@@ -815,14 +822,19 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 return null;
             }
 
-            StringBuilder strBuilder = new StringBuilder();
-            try (BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = bReader.readLine()) != null) {
-                    strBuilder.append(line);
+            if (mediaType == "" || mediaType == "text/plain") {
+                StringBuilder strBuilder = new StringBuilder();
+                try (BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    String line;
+                    while ((line = bReader.readLine()) != null) {
+                        strBuilder.append(line);
+                    }
                 }
+                return OMAbstractFactory.getOMFactory().createOMText(strBuilder.toString());
+            } else {
+                return OMAbstractFactory.getOMFactory().createOMText(
+                        new DataHandler(new SynapseBinaryDataSource(inputStream, mediaType)), true);
             }
-            return OMAbstractFactory.getOMFactory().createOMText(strBuilder.toString());
         }
     }
 
@@ -946,5 +958,49 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             return properties;
         }
         return null;
+    }
+
+    /**
+     * Populate file extension to media type mapping
+     *
+     * @return Map which contains file extension to media type mapping
+     */
+    private Map<String, String> createFileExtensionsMap() {
+
+        Map<String, String> extensionContentTypeMap = new HashMap<>();
+
+        extensionContentTypeMap.put(".xml", "application/xml");
+        extensionContentTypeMap.put(".js", "application/javascript");
+        extensionContentTypeMap.put(".css", "text/css");
+        extensionContentTypeMap.put(".html", "text/html");
+        extensionContentTypeMap.put(".sql", "text/plain");
+        extensionContentTypeMap.put(".xsd", "Schema");
+        extensionContentTypeMap.put(".xsl", "application/xsl+xml");
+        extensionContentTypeMap.put(".xslt", "application/xslt+xml");
+        extensionContentTypeMap.put(".dmc", "application/datamapper");
+        extensionContentTypeMap.put(".zip", "application/zip");
+        extensionContentTypeMap.put(".wsdl", "WSDL");
+
+        return extensionContentTypeMap;
+    }
+
+    /**
+     * Loopkup media-type for the relevant file from the mappings
+     *
+     * @param fileUrl File URL of the registry resource
+     * @return Media-type of the file
+     */
+    private String lookUpFileMediaType(String fileUrl) {
+        String extension = "";
+        int i = fileUrl.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileUrl.substring(i);
+        }
+
+        String mediaType = "";
+        if (fileExtensionMediaTypeMap != null && fileExtensionMediaTypeMap.containsKey(extension)) {
+            mediaType = fileExtensionMediaTypeMap.get(extension);
+        }
+        return mediaType;
     }
 }
