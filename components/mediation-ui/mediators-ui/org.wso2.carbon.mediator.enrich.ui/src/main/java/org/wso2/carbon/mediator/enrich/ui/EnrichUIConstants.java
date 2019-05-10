@@ -14,4 +14,5 @@ public class EnrichUIConstants {
         public static String SOURCE_CLONE = "mediator.enrich.source.clone";
         public static String TARGET_ACTION = "mediator.enrich.target.action";
 
+        public enum CONFIG_ELEMENT_TYPE  {SOURCE, TARGET}
 }
