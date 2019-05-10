@@ -26,16 +26,15 @@ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPI;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPIDispatcher;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
-import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpSourceHandler;
 import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
-import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
-import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPIDispatcher;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -62,20 +61,25 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
     private ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>> dispatchPatternMap =
             new ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>>();
 
-    private int internalInboundPort;
-
-    private InternalAPIDispatcher internalAPIDispatcher;
-
-    private boolean internalApiEnabled;
+    private int internalInboundHttpPort;
+    private int internalInboundHttpsPort;
+    private InternalAPIDispatcher internalHttpApiDispatcher;
+    private InternalAPIDispatcher internalHttpsApiDispatcher;
+    private boolean internalHttpApiEnabled;
+    private boolean internalHttpsApiEnabled;
 
     private HTTPEndpointManager() {
         super();
-        internalInboundPort = ConfigurationLoader.getInternalInboundPort();
-        if (internalInboundPort != -1) {
-            internalInboundPort += PersistenceUtils.getPortOffset();
-            List<InternalAPI> internalAPIList = ConfigurationLoader.loadInternalAPIs(Constants.INTERNAL_APIS_FILE);
-            internalAPIDispatcher = new InternalAPIDispatcher(internalAPIList);
-            internalApiEnabled = !internalAPIList.isEmpty();
+        if (ConfigurationLoader.isInternalApiEnabled()) {
+            internalInboundHttpPort = ConfigurationLoader.getInternalInboundHttpPort();
+            internalInboundHttpsPort = ConfigurationLoader.getInternalInboundHttpsPort();
+            ConfigurationLoader.loadInternalApis(Constants.INTERNAL_APIS_FILE);
+            List<InternalAPI> httpInternalAPIList = ConfigurationLoader.getHttpInternalApis();
+            internalHttpApiDispatcher = new InternalAPIDispatcher(httpInternalAPIList);
+            internalHttpApiEnabled = !httpInternalAPIList.isEmpty();
+            List<InternalAPI> httpsInternalAPIList = ConfigurationLoader.getHttpsInternalApis();
+            internalHttpsApiDispatcher = new InternalAPIDispatcher(httpsInternalAPIList);
+            internalHttpsApiEnabled = !httpsInternalAPIList.isEmpty();
         }
     }
 
@@ -426,20 +430,37 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         }
     }
 
-    public InternalAPIDispatcher getInternalAPIDispatcher() {
-        return internalAPIDispatcher;
+    public InternalAPIDispatcher getInternalHttpApiDispatcher() {
+        return internalHttpApiDispatcher;
     }
 
-    public int getInternalInboundPort() {
-        return internalInboundPort;
+    public InternalAPIDispatcher getInternalHttpsApiDispatcher() {
+        return internalHttpsApiDispatcher;
+    }
+
+    public int getInternalInboundHttpPort() {
+        return internalInboundHttpPort;
+    }
+
+    public int getInternalInboundHttpsPort() {
+        return internalInboundHttpsPort;
     }
 
     /**
-     * Checks whether at least one internal API is enabled.
+     * Checks whether at least one internal http api is enabled.
      *
-     * @return - whether any internal API is enabled.
+     * @return - whether any internal http api enabled.
      */
-    public boolean isAnyInternalApiEnabled() {
-        return internalApiEnabled;
+    public boolean isAnyInternalHttpApiEnabled() {
+        return internalHttpApiEnabled;
+    }
+
+    /**
+     * Checks whether at least one internal https api is enabled.
+     *
+     * @return - whether any internal https api is enabled.
+     */
+    public boolean isAnyInternalHttpsApiEnabled() {
+        return internalHttpsApiEnabled;
     }
 }
