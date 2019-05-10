@@ -180,9 +180,6 @@ function hideEpOps() {
 
 function disableEnableEndPointOnSequencRef(selectOp){
     var theObj = document.getElementById(selectOp);
-    document.getElementById('epOpNone').checked=false;
-    document.getElementById('epOpAnon').checked=false;
-    document.getElementById('epOpReg').checked=false;
          
     if(theObj != null && theObj.checked){
       document.getElementById('epOpNone').disabled="true";
