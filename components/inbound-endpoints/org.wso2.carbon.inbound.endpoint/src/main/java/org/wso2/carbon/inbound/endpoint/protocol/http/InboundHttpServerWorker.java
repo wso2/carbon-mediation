@@ -71,7 +71,8 @@ public class InboundHttpServerWorker extends ServerWorker {
     private RESTRequestHandler restHandler;
     private Pattern dispatchPattern;
     private Matcher patternMatcher;
-    private boolean isInternalInboundEndpoint;
+    private boolean isInternalHttpInboundEndpoint;
+    private boolean isInternalHttpsInboundEndpoint;
 
     public InboundHttpServerWorker(int port, String tenantDomain,
                                    SourceRequest sourceRequest,
@@ -82,7 +83,8 @@ public class InboundHttpServerWorker extends ServerWorker {
         this.port = port;
         this.tenantDomain = tenantDomain;
         restHandler = new RESTRequestHandler();
-        isInternalInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundPort() == port);
+        isInternalHttpInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundHttpPort() == port);
+        isInternalHttpsInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundHttpsPort() == port);
     }
 
     public void run() {
@@ -103,9 +105,16 @@ public class InboundHttpServerWorker extends ServerWorker {
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
 
-                if (isInternalInboundEndpoint) {
+                if (isInternalHttpInboundEndpoint) {
                     doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
-                    boolean result = HTTPEndpointManager.getInstance().getInternalAPIDispatcher().dispatch(synCtx);
+                    boolean result = HTTPEndpointManager.getInstance().getInternalHttpApiDispatcher().dispatch(synCtx);
+                    respond(synCtx, result);
+                    return;
+                }
+
+                if (isInternalHttpsInboundEndpoint) {
+                    doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
+                    boolean result = HTTPEndpointManager.getInstance().getInternalHttpsApiDispatcher().dispatch(synCtx);
                     respond(synCtx, result);
                     return;
                 }

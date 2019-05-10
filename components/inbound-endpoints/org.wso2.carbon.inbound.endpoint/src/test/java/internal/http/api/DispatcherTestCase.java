@@ -27,6 +27,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.junit.After;
 import org.junit.Test;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPI;
@@ -43,8 +44,10 @@ public class DispatcherTestCase {
     public void testDispatching() throws Exception {
         System.setProperty(org.wso2.carbon.inbound.endpoint.internal.http.api.Constants.PREFIX_TO_ENABLE_INTERNAL_APIS
                 + "SampleAPI", "true");
-        List<InternalAPI> apis = ConfigurationLoader.loadInternalAPIs("internal/http/api/internal-apis.xml");
-        Assert.assertEquals("Expected API not loaded", 1, apis.size());
+
+        ConfigurationLoader.loadInternalApis("internal/http/api/internal-apis.xml");
+        List<InternalAPI> apis = ConfigurationLoader.getHttpInternalApis();
+                Assert.assertEquals("Expected API not loaded", 1, apis.size());
 
         InternalAPIDispatcher internalAPIDispatcher = new InternalAPIDispatcher(apis);
         MessageContext synCtx = createMessageContext();
@@ -73,5 +76,10 @@ public class DispatcherTestCase {
         org.apache.axis2.context.MessageContext axis2Ctx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         axis2Ctx.setProperty(Constants.Configuration.TRANSPORT_IN_URL, path);
         axis2Ctx.setProperty(Constants.Configuration.HTTP_METHOD, method);
+    }
+
+    @After
+    public void cleanup(){
+        ConfigurationLoader.destroy();
     }
 }
