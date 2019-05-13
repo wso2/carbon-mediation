@@ -41,17 +41,16 @@
     String name = request.getParameter("sequenceName");
     String sequenceXML = request.getParameter("sequenceXML");
     String action = request.getParameter("sequenceAction");
-    String editor = request.getParameter("seqEditor");
     SequenceMediator sequence;
     if (action != null) {
         if (name != null) {
-            org.wso2.carbon.sequences.ui.client.EditorUIClient sequenceClient = SequenceEditorHelper
-                    .getClientForEditor(getServletConfig(), session, editor);
+            org.wso2.carbon.sequences.ui.client.EditorUIClient sequenceClient
+                    = SequenceEditorHelper.getClientForEditor(getServletConfig(), session);//new SequenceAdminClient(getServletConfig(), session);
             sequence = sequenceClient.getSequenceMediator(name);
         } else {
             //remove attribute if it is already set in edit dynamic sequence page
             session.removeAttribute("registrySequenceName");
-            sequence = SequenceEditorHelper.getSequenceForEditor(session, editor);//new SequenceMediator();
+            sequence = SequenceEditorHelper.getSequenceForEditor(session);//new SequenceMediator();
         }
         session.setAttribute("editingSequenceAction", action);
     } else if (sequenceXML != null && !"".equals(sequenceXML)) {
@@ -59,7 +58,7 @@
                 SequenceEditorHelper.getEditingSequenceAction(session))) {
             OMElement elem = SequenceEditorHelper.parseStringToElement(sequenceXML);
             // changes the inSequence or outSequence or faultSequence to just sequence
-            if ("sequence".equals(SequenceEditorHelper.getEditorMode(session, editor))) {
+            if ("sequence".equals(SequenceEditorHelper.getEditorMode(session))) {
                 elem.setLocalName("sequence");
             }
             OMAttribute nameAttr = elem.getAttribute(new QName("name"));
@@ -286,7 +285,7 @@
            if (annonOriginator != null && !annonOriginator.equals("../sequences/design_sequence.jsp")) {%>
                 window.location.href='<%=session.getAttribute("sequenceAnonOriginator")%>' + '?cancelled=true';
             <%} else {%>
-        window.location.href = "<%=SequenceEditorHelper.getForwardToFrom(session,editor)%>";
+                window.location.href = "<%=SequenceEditorHelper.getForwardToFrom(session)%>";
             <%}
         %>
     }
@@ -591,9 +590,7 @@
 </script>
 
     <carbon:breadcrumb
-		label="<%= "edit".equals(SequenceEditorHelper.getEditingSequenceAction(session)) ?
-		SequenceEditorHelper.getUIMetadataForEditor("sequence.edit.text",session,editor) :
-		SequenceEditorHelper.getUIMetadataForEditor("sequence.design.text",session,editor) %>"
+		label="<%= "edit".equals(SequenceEditorHelper.getEditingSequenceAction(session)) ? SequenceEditorHelper.getUIMetadataForEditor("sequence.edit.text",session) : SequenceEditorHelper.getUIMetadataForEditor("sequence.design.text",session) %>"
 		resourceBundle="org.wso2.carbon.sequences.ui.i18n.Resources"
 		topPage="false"
 		request="<%=request%>" />
@@ -613,8 +610,7 @@
                     } else if ("fault".equals(seq)) {
                         %><fmt:message key="sequence.fault.edit.header"/><%
                     } else {
-                        %><fmt:message
-                key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.edit.header",session,editor)%>"/><%
+                        %><fmt:message key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.edit.header",session)%>"/><%
                     }
                 }else{
                     if("in".equals(seq)) {
@@ -624,8 +620,7 @@
                     } else if ("fault".equals(seq)) {
                         %><fmt:message key="sequence.fault.design.header"/><%
                     } else {
-                        %><fmt:message
-                key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.design.header",session,editor)%>"/><%
+                        %><fmt:message key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.design.header",session)%>"/><%
                     }
                 }
             %>
@@ -635,11 +630,7 @@
                 <thead>
                     <tr>
                         <th>
-                            <span style="float:left; position:relative; margin-top:2px;"><fmt:message
-                                    key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.design.view.text",session,editor)%>"/></span><a
-                                href="#" onclick="sourceView()" class="icon-link"
-                                style="background-image:url(images/source-view.gif);"><fmt:message
-                                key="sequence.switchto.source.text"/></a>
+                            <span style="float:left; position:relative; margin-top:2px;"><fmt:message key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.design.view.text",session)%>"/></span><a href="#" onclick="sourceView()" class="icon-link" style="background-image:url(images/source-view.gif);"><fmt:message key="sequence.switchto.source.text"/></a>
                         </th>
                     </tr>
                 </thead>
@@ -649,9 +640,7 @@
 		<table class="normal" width="100%">
                     <tr id="sequenceNameSection">
                         <td width="5%" style="white-space:nowrap;">
-                            <fmt:message
-                                    key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.name",session,editor)%>"/><span
-                                class="required">*</span>
+                            <fmt:message key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.name",session)%>"/><span class="required">*</span>
                         </td>
                         <td align="left" colspan="2">
                             <input type="text" id="sequence.name" value="<%= sequence.getName() != null ? sequence.getName() : (session.getAttribute("registrySequenceName") != null ? session.getAttribute("sequenceRegistryKey") : "") %>" <%= "edit".equals(SequenceEditorHelper.getEditingSequenceAction(session)) || session.getAttribute("registrySequenceName") != null ? "disabled=\"disabled\"" : "" %> onkeypress="return validateText(event);"/>
@@ -680,8 +669,7 @@
                                             <li>
                                                 <div class="minus-icon" onclick="treeColapse(this)" id="treeColapser"></div>
                                                 <div class="mediators" id="mediator-00">
-                                                    <a class="root-mediator"><fmt:message
-                                                            key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.root.text",session,editor)%>"/></a>
+                                                    <a class="root-mediator"><fmt:message key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.root.text",session)%>"/></a>
                                                     <div class="sequenceToolbar" style="width:100px;">
                                                         <div>
                                                             <a class="addChildStyle"><fmt:message key="sequence.add.child.action"/></a>
@@ -839,15 +827,11 @@
 
                     <tr>
                         <td class="buttonRow">
-                            <input type="button" class="button"
-                                   value="<fmt:message key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.button.save.text",session,editor)%>"/>"
-                                   id="saveButton" onclick="javascript: saveSequence(); return false;"/>
+                            <input type="button" class="button" value="<fmt:message key="<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.button.save.text",session)%>"/>" id="saveButton" onclick="javascript: saveSequence(); return false;"/>
                             <%
                                 if (SequenceEditorHelper.getEditingSequenceAction(session) != "anonify") {
                             %>
-                            <input type="button" class="button"
-                                   value="<fmt:message key='<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.button.saveas.text",session,editor)%>'/>"
-                                   id="saveAsButton" onclick="javascript: showSaveAsForm(true); return false;">
+                                <input type="button" class="button" value="<fmt:message key='<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.button.saveas.text",session)%>'/>" id="saveAsButton" onclick="javascript: showSaveAsForm(true); return false;">
                             <%
                                 }
                             %>

@@ -62,7 +62,6 @@
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="proxyServices" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="sequences" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="tasks" nillable="true" type="ax23:TaskMetadata"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="templates" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="EndpointMetadata">
