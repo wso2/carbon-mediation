@@ -29,10 +29,9 @@
 <%
     ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.sequences.ui.i18n.Resources",
             request.getLocale());
-    
-    String editor = request.getParameter("seqEditor");
+
     EditorUIClient sequenceAdminClient
-            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session, editor);//new SequenceAdminClient(getServletConfig(), session);
+            = SequenceEditorHelper.getClientForEditor(getServletConfig(), session);//new SequenceAdminClient(getServletConfig(), session);
     SequenceMediator seq = null;
     String action = request.getParameter("action");
     String header = "";
@@ -41,14 +40,14 @@
 
     String forwardTo = "";
     if (request.getParameter("cancelled") != null && "true".equals(request.getParameter("cancelled"))) {
-        forwardTo = SequenceEditorHelper.getForwardToFrom(session, editor);//"list_sequences.jsp";
+        forwardTo = SequenceEditorHelper.getForwardToFrom(session);//"list_sequences.jsp";
         // removes common attributes
         removeCommonSessionAttributes(session);
     } else {
         if (seqXML != null && !"".equals(seqXML)) {            
             // return path from save_sequence.jsp
             header = (String)session.getAttribute("header");
-            forwardTo = SequenceEditorHelper.getForwardToFrom(session, editor);//"list_sequences.jsp";
+            forwardTo = SequenceEditorHelper.getForwardToFrom(session);//"list_sequences.jsp";
             seqXML = seqXML.replaceAll("&gt", ">");
             seqXML = seqXML.replaceAll("&lt", "<");
 
@@ -59,7 +58,7 @@
                 if (name != null) {
                     elem.addAttribute("name", name, null);
                 }
-                seq = SequenceEditorHelper.getSequenceForEditor(session, editor);
+                seq = SequenceEditorHelper.getSequenceForEditor(session);
                 seq.build(elem);
                 key = (String) session.getAttribute("sequenceRegistryKey");
                 if (key != null) {
@@ -89,12 +88,12 @@
             try {
                 OMElement elem = sequenceAdminClient.getDynamicSequence(key);
                 OMFactory fac = elem.getOMFactory();
-                seq = SequenceEditorHelper.getSequenceForEditor(session, editor);
+                seq = SequenceEditorHelper.getSequenceForEditor(session);
                 seq.build(elem.getFirstElement());
                 session.setAttribute("registrySequenceName", seq.getName());
             } catch (Exception e) {
                 session.setAttribute("dynamic_edit","fail");
-                forwardTo = "./" + SequenceEditorHelper.getForwardToFrom(session, editor);//"list_sequences.jsp";
+                forwardTo = "./" + SequenceEditorHelper.getForwardToFrom(session);//"list_sequences.jsp";
             }
             session.setAttribute("editingSequence", seq);
             session.setAttribute("editingSequenceAction", "anonify");

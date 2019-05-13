@@ -19,6 +19,7 @@ package org.wso2.carbon.sequences.ui.util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.xerces.impl.Constants;
+import org.apache.xerces.util.*;
 import org.apache.xerces.util.SecurityManager;
 import org.wso2.carbon.mediator.service.MediatorService;
 import org.wso2.carbon.mediator.service.MediatorStore;
@@ -35,12 +36,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -49,6 +44,12 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  *
@@ -448,18 +449,18 @@ public class SequenceEditorHelper {
         session.removeAttribute("mediator.position");
     }
 
-    public static EditorUIClient getClientForEditor(ServletConfig config, HttpSession session, String editor) {
-        EditorUIClientFactory factory = getFactoryFrom(session, editor);
+    public static EditorUIClient getClientForEditor(ServletConfig config, HttpSession session) {
+        EditorUIClientFactory factory = getFactoryFrom(session);
         return factory.createClient(config, session);
     }
 
-    public static SequenceMediator getSequenceForEditor(HttpSession session, String editor) {
-        EditorUIClientFactory factory = getFactoryFrom(session, editor);
+    public static SequenceMediator getSequenceForEditor(HttpSession session) {
+        EditorUIClientFactory factory = getFactoryFrom(session);
         return (SequenceMediator) factory.createEditingMediator();
     }
 
-    public static String getUIMetadataForEditor(String key, HttpSession session, String editor) {
-        EditorUIClientFactory factory = getFactoryFrom(session, editor);
+    public static String getUIMetadataForEditor(String key, HttpSession session) {
+        EditorUIClientFactory factory = getFactoryFrom(session);
         String tag = factory.getUIMetaInfo().get(key);
         if (tag != null && !"".equals(tag)) {
             return tag;
@@ -467,16 +468,15 @@ public class SequenceEditorHelper {
         return key;
     }
 
-    private static EditorUIClientFactory getFactoryFrom(HttpSession session, String editor) {
-
-        if (editor != null && editor.equals("template")) {
-            return (EditorUIClientFactory) session.getAttribute("editorClientFactory");
+    private static EditorUIClientFactory getFactoryFrom(HttpSession session) {
+        EditorUIClientFactory factory = (EditorUIClientFactory) session.getAttribute("editorClientFactory");
+        if (factory == null) {
+            factory = new SequenceEditorClientFactory();
         }
-        return new SequenceEditorClientFactory();
+        return factory;
     }
-
-    public static String getForwardToFrom(HttpSession session, String editor) {
-        EditorUIClientFactory factory = getFactoryFrom(session, editor);
+    public static String  getForwardToFrom(HttpSession session) {
+        EditorUIClientFactory factory = getFactoryFrom(session);
         String mode = getEditorMode(factory);
 
         if (mode == null || ( mode != null && "sequence".equals(mode))) {
@@ -489,8 +489,8 @@ public class SequenceEditorHelper {
         return factory.getUIMetaInfo().get("editorMode");
     }
 
-    public static String getEditorMode(HttpSession session, String editor) {
-        return getEditorMode(getFactoryFrom(session, editor));
+    public static String getEditorMode(HttpSession session) {
+        return getEditorMode(getFactoryFrom(session));
     }
 
     /**

@@ -26,7 +26,6 @@
 <%@ page import="org.wso2.carbon.application.mgt.synapse.ui.SynapseAppAdminClient" %>
 <%@ page import="org.wso2.carbon.application.mgt.synapse.stub.types.carbon.TaskMetadata" %>
 <%@ page import="org.wso2.carbon.application.mgt.synapse.stub.types.carbon.EndpointMetadata" %>
-<%@ page import="org.wso2.carbon.mediation.templates.ui.factory.TemplateEditorClientFactory" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -48,10 +47,7 @@
     SynapseApplicationMetadata synapseMetadata = null;
 
     String epType = "";
-    
-    // set session attribute to create Client factory for editor
-    session.setAttribute("editorClientFactory",new TemplateEditorClientFactory());
-    
+
     try {
         SynapseAppAdminClient client = new SynapseAppAdminClient(cookie,
                 backendServerURL, configContext, request.getLocale());
@@ -390,36 +386,6 @@
     <%
     }
 %>
-    </tbody>
-</table>
-
-<%
-    }
-    String[] templates = synapseMetadata.getTemplates();
-    if (templates != null && templates.length > 0) {
-%>
-<p>&nbsp;&nbsp;</p>
-<table class="styledLeft" id="TemplatesTable" width="40%">
-    <thead>
-    <tr>
-        <th><img src="../templates/images/sequences.gif" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.templates"/></th>
-    </tr>
-    </thead>
-    <tbody>
-    <%
-        for (String templateName : templates) {
-    %>
-    <tr>
-        <td>
-            <a href="#"
-               onclick="editCAppArtifact('../sequences/design_sequence.jsp?sequenceAction=edit&seqEditor=template&sequenceName=<%= Encode.forJavaScriptAttribute(templateName) %>')"><%= templateName%>
-    
-            </a>
-        </td>
-    </tr>
-    <%
-        }
-    %>
     </tbody>
 </table>
 <%

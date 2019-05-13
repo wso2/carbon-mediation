@@ -86,7 +86,6 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
         List<String> inboundEPList = new ArrayList<String>();
         List<String> messageStoreList = new ArrayList<String>();
         List<String> messageProcessorList = new ArrayList<String>();
-        List<String> templateList = new ArrayList<String>();
 
         List<Artifact.Dependency> dependencies = currentApplication.getAppConfig().
                 getApplicationArtifact().getDependencies();
@@ -131,8 +130,6 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
                 if(taskMetadata != null){
                     taskList.add(taskMetadata);
                 }
-            } else if (SynapseAppDeployerConstants.TEMPLATE_TYPE.equals(type)) {
-                templateList.add(instanceName);
             }
         }
 
@@ -148,7 +145,6 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
         data.setInboundEPs(inboundEPList.toArray(new String[inboundEPList.size()]));
         data.setMessageProcessors(messageProcessorList.toArray(new String[messageProcessorList.size()]));
         data.setMessageStores(messageStoreList.toArray(new String[messageStoreList.size()]));
-        data.setTemplates(templateList.toArray(new String[templateList.size()]));
         return data;
     }
 
