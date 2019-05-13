@@ -154,7 +154,7 @@
             window.location.href='<%=annonOriginator%>' + '?cancelled=true';
         <%} else {
         %>
-        window.location.href = "<%=SequenceEditorHelper.getForwardToFrom(session,editor)%>";
+            window.location.href = "<%=SequenceEditorHelper.getForwardToFrom(session)%>";
         <%}
         %>
     }
