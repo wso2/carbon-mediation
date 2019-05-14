@@ -977,7 +977,6 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         extensionContentTypeMap.put(".xsd", "Schema");
         extensionContentTypeMap.put(".xsl", "application/xsl+xml");
         extensionContentTypeMap.put(".xslt", "application/xslt+xml");
-        extensionContentTypeMap.put(".dmc", "application/datamapper");
         extensionContentTypeMap.put(".zip", "application/zip");
         extensionContentTypeMap.put(".wsdl", "WSDL");
 
