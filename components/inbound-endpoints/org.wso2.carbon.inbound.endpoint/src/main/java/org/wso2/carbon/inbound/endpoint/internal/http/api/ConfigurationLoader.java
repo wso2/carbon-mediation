@@ -106,8 +106,9 @@ public class ConfigurationLoader {
                             if (name == null || name.isEmpty()) {
                                 handleException("Name not specified in one or more handlers");
                             }
-                            if (!Boolean.parseBoolean(
-                                    System.getProperty(Constants.PREFIX_TO_ENABLE_INTERNAL_APIS + name))) {
+                            String property = Constants.PREFIX_TO_ENABLE_INTERNAL_APIS + name;
+                            if (!Boolean.parseBoolean(System.getProperty(property)) && !Boolean
+                                    .parseBoolean(System.getenv(property))) {
                                 continue;
                             }
                         } else {
