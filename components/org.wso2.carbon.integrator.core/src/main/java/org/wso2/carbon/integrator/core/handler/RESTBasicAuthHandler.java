@@ -47,7 +47,7 @@ public class RESTBasicAuthHandler implements Handler {
         Object headers = axis2MessageContext.getProperty(
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
-        if (headers != null && headers instanceof Map) {
+        if (headers instanceof Map) {
             Map headersMap = (Map) headers;
             if (headersMap.get(HTTPConstants.HEADER_AUTHORIZATION) == null) {
                 headersMap.clear();
@@ -60,8 +60,7 @@ public class RESTBasicAuthHandler implements Handler {
                 return false;
 
             } else {
-                String authHeader = (String) headersMap.get(HTTPConstants.HEADER_AUTHORIZATION);
-                String credentials = authHeader.substring(6).trim();
+                String credentials = (String) headersMap.get(HTTPConstants.HEADER_AUTHORIZATION);
                 if (processSecurity(credentials)) {
                     return true;
                 } else {
@@ -75,7 +74,7 @@ public class RESTBasicAuthHandler implements Handler {
                 }
             }
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -98,12 +97,14 @@ public class RESTBasicAuthHandler implements Handler {
      * @param credentials The Basic Auth credentials of the request
      * @return true if the credentials are authenticated successfully
      */
-    public boolean processSecurity(String credentials) {
-        String decodedCredentials = new String(new Base64().decode(credentials.getBytes()));
-        String username = decodedCredentials.split(":")[0];
-        String password = decodedCredentials.split(":")[1];
-        UserRealm realm = (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
+    private boolean processSecurity(String credentials) {
+
         try {
+            String decodedCredentials = new String(new Base64().decode(credentials.getBytes()));
+            String[] details = decodedCredentials.split(":");
+            String username = details[0];
+            String password = details[1];
+            UserRealm realm = (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
             UserStoreManager userStoreManager = realm.getUserStoreManager();
             return userStoreManager.authenticate(username, password);
         } catch (UserStoreException e) {
