@@ -165,10 +165,11 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 endpointName = endpointName.trim();
                 log.debug("Adding endpoint : " + endpointName + " to the configuration");
 
-                if (getSynapseConfiguration().getLocalRegistry()
-                            .get(endpointName) != null) {
+                Object entry = getSynapseConfiguration().getLocalRegistry().get(endpointName);
+                if (entry instanceof AbstractEndpoint ||
+                        (entry instanceof Entry && ((Entry) entry).getType() != Entry.REMOTE_ENTRY)) {
                     handleFault("The name " + endpointName +
-                                " is already used within the configuration", null);
+                            " is already used within the configuration", null);
                 } else {
                     SynapseConfiguration config = getSynapseConfiguration();
                     if (config.getEndpoint(endpointName) != null) {
