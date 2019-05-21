@@ -166,22 +166,11 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 log.debug("Adding endpoint : " + endpointName + " to the configuration");
 
                 Object entry = getSynapseConfiguration().getLocalRegistry().get(endpointName);
-                if (entry != null && entry instanceof AbstractEndpoint) {
+                if (entry instanceof AbstractEndpoint ||
+                        (entry instanceof Entry && ((Entry) entry).getType() != Entry.REMOTE_ENTRY)) {
                     handleFault("The name " + endpointName +
                             " is already used within the configuration", null);
                 } else {
-                    if (entry instanceof Entry) {
-                        /*
-                        * When updating an endpoint which is currently in use, a temporary Synapse config
-                        * Entry is getting created.
-                        * If this entry is remote type, we can identify that as the temporary entry and override it
-                        * with the correct endpoint.
-                        * */
-                        if (((Entry) entry).getType() != Entry.REMOTE_ENTRY) {
-                            handleFault("The name " + endpointName +
-                                    " is already used within the configuration", null);
-                        }
-                    }
                     SynapseConfiguration config = getSynapseConfiguration();
                     if (config.getEndpoint(endpointName) != null) {
                         handleFault("A endpoint with name "
