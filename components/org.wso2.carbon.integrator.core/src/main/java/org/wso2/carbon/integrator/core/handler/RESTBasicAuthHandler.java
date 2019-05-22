@@ -18,8 +18,10 @@
 
 package org.wso2.carbon.integrator.core.handler;
 
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -27,10 +29,15 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.Handler;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,13 +46,29 @@ import java.util.Map;
 public class RESTBasicAuthHandler implements Handler {
 
     private static final Log log = LogFactory.getLog(RESTBasicAuthHandler.class);
-
+        
+    private boolean isInitialized;
+	private String[] allowRoles;
+    
+    private Map<String, Object> properties;
+	
+	public RESTBasicAuthHandler() {
+		this.isInitialized = false;
+		this.allowRoles = null;
+        this.properties = new HashMap<String, Object>();
+	}
+	
     @Override
     public boolean handleRequest(MessageContext messageContext) {
         org.apache.axis2.context.MessageContext axis2MessageContext
                 = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
         Object headers = axis2MessageContext.getProperty(
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+        if (!isInitialized) {
+        	this.initialize(messageContext);
+        	isInitialized = true;
+        }
 
         if (headers != null && headers instanceof Map) {
             Map headersMap = (Map) headers;
@@ -58,11 +81,10 @@ public class RESTBasicAuthHandler implements Handler {
                 messageContext.setTo(null);
                 Axis2Sender.sendBack(messageContext);
                 return false;
-
             } else {
                 String authHeader = (String) headersMap.get(HTTPConstants.HEADER_AUTHORIZATION);
                 String credentials = authHeader.substring(6).trim();
-                if (processSecurity(credentials)) {
+                if (processSecurity(credentials, messageContext.getProperty("REST_API_CONTEXT").toString())) {
                     return true;
                 } else {
                     headersMap.clear();
@@ -77,19 +99,60 @@ public class RESTBasicAuthHandler implements Handler {
         }
         return true;
     }
+    
+    private void initialize(MessageContext context) {
+    	Parameter defaultAllowRoles = context.getConfiguration().getAxisConfiguration().getParameter("defaultAllowRoles");
+    	if (defaultAllowRoles != null) {
+    		String[] splittedAllowRoles = ((String) defaultAllowRoles.getValue()).split(",");
+    		if (splittedAllowRoles != null) {
+    			if (allowRoles != null) {
+    				allowRoles = (String[]) ArrayUtils.addAll(allowRoles, splittedAllowRoles);
+    			} else {
+    				allowRoles = splittedAllowRoles;
+    			}
+    		}
+    	}
+    	
+        if (allowRoles != null) {
+	    	UserRealm userRealm = (UserRealm) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+	                .getUserRealm();
+	    	
+	    	String resourceName = "API" + context.getProperty("REST_API_CONTEXT");
+	    	try {
+				AuthorizationManager manager = userRealm.getAuthorizationManager();
+	            for (String role : allowRoles) {
+	                manager.authorizeRole(role, resourceName,
+	                                      UserCoreConstants.INVOKE_SERVICE_PERMISSION);
+	            }
+			} catch (Exception e) {
+	            String msg = "Cannot apply security parameters for API " + resourceName;
+	            log.error(msg, e);
+			}
+        }
+	}
 
-    @Override
+	@Override
     public boolean handleResponse(MessageContext messageContext) {
         return true;
     }
 
     @Override
     public void addProperty(String s, Object o) {
+    	this.properties.put(s, o);
+    }
+    
+    public void setAllowRoles(String allowRolesParameter) {
+    	if (allowRolesParameter != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Authorizing roles " + allowRolesParameter);
+            }
+            this.allowRoles = allowRolesParameter.split(",");
+        }
     }
 
     @Override
     public Map getProperties() {
-        return null;
+    	return this.properties;
     }
 
     /**
@@ -98,17 +161,39 @@ public class RESTBasicAuthHandler implements Handler {
      * @param credentials The Basic Auth credentials of the request
      * @return true if the credentials are authenticated successfully
      */
-    public boolean processSecurity(String credentials) {
+    public boolean processSecurity(String credentials, String serviceName) {
+    	String username = null;
+    	String password = null;
+    	
+    	// Get username and password from the Authorization header 
         String decodedCredentials = new String(new Base64().decode(credentials.getBytes()));
-        String username = decodedCredentials.split(":")[0];
-        String password = decodedCredentials.split(":")[1];
+        if (decodedCredentials != null) {
+        	String[] splittedCredentials = decodedCredentials.split(":");
+        	if (splittedCredentials.length == 2) {
+                username = decodedCredentials.split(":")[0];
+                password = decodedCredentials.split(":")[1];        		
+        	}
+        }
+
         UserRealm realm = (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
+        String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
         try {
             UserStoreManager userStoreManager = realm.getUserStoreManager();
-            return userStoreManager.authenticate(username, password);
+            // Authenticate user
+            if (userStoreManager.authenticate(username, password)) {
+            	String resourceName = "API" + serviceName;
+            	// Authorize user
+	            if (realm.getAuthorizationManager()
+	            		.isUserAuthorized(tenantAwareUserName, resourceName,
+	                            UserCoreConstants.INVOKE_SERVICE_PERMISSION)) {
+	                return true;
+	            } else if (log.isDebugEnabled()) {
+                    log.debug("Authorization failure for user : " + tenantAwareUserName);
+                }
+            }
         } catch (UserStoreException e) {
             log.error("Error in authenticating user", e);
-            return false;
         }
+        return false;
     }
 }
