@@ -271,7 +271,7 @@ public class RestApiAdminClient {
 	public String getServerContext() throws AxisFault {
 		try {
 			String returnValue = ReadWSDLPrefix();
-			if (returnValue != null && returnValue.isEmpty()) {
+			if (returnValue != null && !returnValue.isEmpty()) {
 				return returnValue;
 			} else {
 				return stub.getServerContext();
