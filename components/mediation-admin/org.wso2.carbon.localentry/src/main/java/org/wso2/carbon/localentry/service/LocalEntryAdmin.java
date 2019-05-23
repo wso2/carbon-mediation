@@ -29,6 +29,7 @@ import org.apache.synapse.config.xml.EntrySerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.localentry.LocalEntryAdminException;
 import org.wso2.carbon.localentry.dos.EntryData;
 import org.wso2.carbon.localentry.util.ConfigHolder;
@@ -239,6 +240,26 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
     }
 
     /**
+     * Add an entry into the Synapse Configuration.
+     *
+     * @param element      Entry object to be added as an OMElement
+     * @param tenantDomain Tenant domain
+     * @return whether the operation is successful or not
+     * @throws LocalEntryAdminException if an entry exists with the same name or if the
+     *                                  element provided is not an entry element
+     */
+    public boolean addEntryForTenant(String element, String tenantDomain) throws LocalEntryAdminException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .setTenantDomain(tenantDomain, true);
+            return addEntry(element);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    /**
      * Saves the entry described with the OMElement representing the entry
      *
      * @param ele - OMElement representing the entry
@@ -305,6 +326,26 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
     }
 
     /**
+     * Saves the entry described with the OMElement.
+     *
+     * @param element      OMElement representing the entry
+     * @param tenantDomain Tenant domain
+     * @return whether the operation is successful or not
+     * @throws LocalEntryAdminException if the entry name already exists or if the element
+     *                                  does not represent a entry element
+     */
+    public boolean saveEntryForTenant(String element, String tenantDomain) throws LocalEntryAdminException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .setTenantDomain(tenantDomain, true);
+            return saveEntry(element);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    /**
      * Returns the OMelement representation of the entry given by sequence
      * name
      *
@@ -351,6 +392,26 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
     }
 
     /**
+     * Returns the OMElement representation of the entry given by sequence name.
+     *
+     * @param entryKey     Name of the entry to get
+     * @param tenantDomain Tenant domain
+     * @return OMElement representing the entryMediator of the given entry name
+     * @throws LocalEntryAdminException if any error occurred while getting the data from the
+     *                                  Synapse Configuration
+     */
+    public OMElement getEntryForTenant(String entryKey, String tenantDomain) throws LocalEntryAdminException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .setTenantDomain(tenantDomain, true);
+            return getEntry(entryKey);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    /**
      * Deletes the entry with the given name from SynapseConfiguration
      *
      * @param entryKey - Name of the entry to delete
@@ -388,6 +449,26 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             lock.unlock();
         }
         return false;
+    }
+
+    /**
+     * Deletes the entry with the given name from Synapse Configuration.
+     *
+     * @param entryKey     Name of the entry to delete
+     * @param tenantDomain Tenant domain
+     * @return whether the operation is successful or not
+     * @throws LocalEntryAdminException if the entry described by the given name does not
+     *                                  exist in the Synapse Configuration
+     */
+    public boolean deleteEntryForTenant(String entryKey, String tenantDomain) throws LocalEntryAdminException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .setTenantDomain(tenantDomain, true);
+            return deleteEntry(entryKey);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
     /**

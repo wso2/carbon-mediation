@@ -51,6 +51,21 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="saveEntryForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="element" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveEntryForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="paginatedEntryData">
                 <xs:complexType>
 
@@ -106,6 +121,21 @@
 
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getEntryForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="entryKey" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEntryForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getDependents">
                 <xs:complexType>
                     <xs:sequence>
@@ -145,6 +175,21 @@
                 </xs:complexType>
 
             </xs:element>
+            <xs:element name="deleteEntryForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="entryKey" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteEntryForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="addEntry">
                 <xs:complexType>
                     <xs:sequence>
@@ -154,6 +199,21 @@
             </xs:element>
             <xs:element name="addEntryResponse">
 
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addEntryForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="element" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addEntryForTenantResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -222,12 +282,24 @@
     <wsdl:message name="addEntryResponse">
         <wsdl:part name="parameters" element="ns1:addEntryResponse"/>
     </wsdl:message>
+    <wsdl:message name="addEntryForTenantRequest">
+        <wsdl:part name="parameters" element="ns1:addEntryForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="addEntryForTenantResponse">
+        <wsdl:part name="parameters" element="ns1:addEntryForTenantResponse"/>
+    </wsdl:message>
     <wsdl:message name="saveEntryRequest">
         <wsdl:part name="parameters" element="ns1:saveEntry"/>
     </wsdl:message>
     <wsdl:message name="saveEntryResponse">
 
         <wsdl:part name="parameters" element="ns1:saveEntryResponse"/>
+    </wsdl:message>
+    <wsdl:message name="saveEntryForTenantRequest">
+        <wsdl:part name="parameters" element="ns1:saveEntryForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="saveEntryForTenantResponse">
+        <wsdl:part name="parameters" element="ns1:saveEntryForTenantResponse"/>
     </wsdl:message>
     <wsdl:message name="entryDataRequest"/>
     <wsdl:message name="entryDataResponse">
@@ -246,6 +318,12 @@
     <wsdl:message name="deleteEntryResponse">
         <wsdl:part name="parameters" element="ns1:deleteEntryResponse"/>
     </wsdl:message>
+    <wsdl:message name="deleteEntryForTenantRequest">
+        <wsdl:part name="parameters" element="ns1:deleteEntryForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="deleteEntryForTenantResponse">
+        <wsdl:part name="parameters" element="ns1:deleteEntryForTenantResponse"/>
+    </wsdl:message>
 
     <wsdl:message name="getEntryNamesRequest"/>
     <wsdl:message name="getEntryNamesResponse">
@@ -257,6 +335,12 @@
     <wsdl:message name="getEntryResponse">
         <wsdl:part name="parameters" element="ns1:getEntryResponse"/>
 
+    </wsdl:message>
+    <wsdl:message name="getEntryForTenantRequest">
+        <wsdl:part name="parameters" element="ns1:getEntryForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="getEntryForTenantResponse">
+        <wsdl:part name="parameters" element="ns1:getEntryForTenantResponse"/>
     </wsdl:message>
     <wsdl:portType name="LocalEntryAdminServicePortType">
         <wsdl:operation name="getEntryDataCount">
@@ -281,10 +365,20 @@
             <wsdl:output message="axis2:addEntryResponse" wsaw:Action="urn:addEntryResponse"/>
             <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:addEntryLocalEntryAdminException"/>
         </wsdl:operation>
+        <wsdl:operation name="addEntryForTenant">
+            <wsdl:input message="axis2:addEntryForTenantRequest" wsaw:Action="urn:addEntryForTenant"/>
+            <wsdl:output message="axis2:addEntryForTenantResponse" wsaw:Action="urn:addEntryForTenantResponse"/>
+            <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:addEntryForTenantLocalEntryAdminException"/>
+        </wsdl:operation>
         <wsdl:operation name="saveEntry">
             <wsdl:input message="axis2:saveEntryRequest" wsaw:Action="urn:saveEntry"/>
             <wsdl:output message="axis2:saveEntryResponse" wsaw:Action="urn:saveEntryResponse"/>
             <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:saveEntryLocalEntryAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="saveEntryForTenant">
+            <wsdl:input message="axis2:saveEntryForTenantRequest" wsaw:Action="urn:saveEntryForTenant"/>
+            <wsdl:output message="axis2:saveEntryForTenantResponse" wsaw:Action="urn:saveEntryForTenantResponse"/>
+            <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:saveEntryForTenantLocalEntryAdminException"/>
         </wsdl:operation>
 
         <wsdl:operation name="entryData">
@@ -302,6 +396,11 @@
             <wsdl:output message="axis2:deleteEntryResponse" wsaw:Action="urn:deleteEntryResponse"/>
             <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:deleteEntryLocalEntryAdminException"/>
         </wsdl:operation>
+        <wsdl:operation name="deleteEntryForTenant">
+            <wsdl:input message="axis2:deleteEntryForTenantRequest" wsaw:Action="urn:deleteEntryForTenant"/>
+            <wsdl:output message="axis2:deleteEntryForTenantResponse" wsaw:Action="urn:deleteEntryForTenantResponse"/>
+            <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:deleteEntryForTenantLocalEntryAdminException"/>
+        </wsdl:operation>
         <wsdl:operation name="getEntryNames">
             <wsdl:input message="axis2:getEntryNamesRequest" wsaw:Action="urn:getEntryNames"/>
             <wsdl:output message="axis2:getEntryNamesResponse" wsaw:Action="urn:getEntryNamesResponse"/>
@@ -312,6 +411,11 @@
             <wsdl:input message="axis2:getEntryRequest" wsaw:Action="urn:getEntry"/>
             <wsdl:output message="axis2:getEntryResponse" wsaw:Action="urn:getEntryResponse"/>
             <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:getEntryLocalEntryAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEntryForTenant">
+            <wsdl:input message="axis2:getEntryForTenantRequest" wsaw:Action="urn:getEntryForTenant"/>
+            <wsdl:output message="axis2:getEntryForTenantResponse" wsaw:Action="urn:getEntryForTenantResponse"/>
+            <wsdl:fault message="axis2:LocalEntryAdminException" name="LocalEntryAdminException" wsaw:Action="urn:getEntryForTenantLocalEntryAdminException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="LocalEntryAdminServiceSoap11Binding" type="axis2:LocalEntryAdminServicePortType">
@@ -370,6 +474,18 @@
                 <soap:fault use="literal" name="LocalEntryAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="addEntryForTenant">
+            <soap:operation soapAction="urn:addEntryForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
+                <soap:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="saveEntry">
             <soap:operation soapAction="urn:saveEntry" style="document"/>
             <wsdl:input>
@@ -377,6 +493,18 @@
             </wsdl:input>
             <wsdl:output>
 
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
+                <soap:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveEntryForTenant">
+            <soap:operation soapAction="urn:saveEntryForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="LocalEntryAdminException">
@@ -420,6 +548,18 @@
                 <soap:fault use="literal" name="LocalEntryAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="deleteEntryForTenant">
+            <soap:operation soapAction="urn:deleteEntryForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
+                <soap:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getEntryNames">
             <soap:operation soapAction="urn:getEntryNames" style="document"/>
             <wsdl:input>
@@ -437,6 +577,18 @@
             <soap:operation soapAction="urn:getEntry" style="document"/>
             <wsdl:input>
 
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
+                <soap:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEntryForTenant">
+            <soap:operation soapAction="urn:getEntryForTenant" style="document"/>
+            <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
@@ -503,10 +655,34 @@
                 <soap12:fault use="literal" name="LocalEntryAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="addEntryForTenant">
+            <soap12:operation soapAction="urn:addEntryForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
+                <soap12:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="saveEntry">
             <soap12:operation soapAction="urn:saveEntry" style="document"/>
             <wsdl:input>
 
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
+                <soap12:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="saveEntryForTenant">
+            <soap12:operation soapAction="urn:saveEntryForTenant" style="document"/>
+            <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
@@ -553,6 +729,18 @@
                 <soap12:fault use="literal" name="LocalEntryAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="deleteEntryForTenant">
+            <soap12:operation soapAction="urn:deleteEntryForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
+                <soap12:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getEntryNames">
             <soap12:operation soapAction="urn:getEntryNames" style="document"/>
             <wsdl:input>
@@ -577,6 +765,18 @@
             </wsdl:output>
             <wsdl:fault name="LocalEntryAdminException">
 
+                <soap12:fault use="literal" name="LocalEntryAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEntryForTenant">
+            <soap12:operation soapAction="urn:getEntryForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="LocalEntryAdminException">
                 <soap12:fault use="literal" name="LocalEntryAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
@@ -623,6 +823,15 @@
                 <mime:content type="text/xml" part="addEntry"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="addEntryForTenant">
+            <http:operation location="addEntryForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="addEntryForTenant"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="addEntryForTenant"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="saveEntry">
             <http:operation location="saveEntry"/>
             <wsdl:input>
@@ -631,6 +840,15 @@
             </wsdl:input>
             <wsdl:output>
                 <mime:content type="text/xml" part="saveEntry"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveEntryForTenant">
+            <http:operation location="saveEntryForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="saveEntryForTenant"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="saveEntryForTenant"/>
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="entryData">
@@ -663,6 +881,15 @@
                 <mime:content type="text/xml" part="deleteEntry"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="deleteEntryForTenant">
+            <http:operation location="deleteEntryForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="deleteEntryForTenant"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="deleteEntryForTenant"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getEntryNames">
             <http:operation location="getEntryNames"/>
             <wsdl:input>
@@ -681,6 +908,15 @@
             </wsdl:input>
             <wsdl:output>
                 <mime:content type="text/xml" part="getEntry"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEntryForTenant">
+            <http:operation location="getEntryForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getEntryForTenant"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getEntryForTenant"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
