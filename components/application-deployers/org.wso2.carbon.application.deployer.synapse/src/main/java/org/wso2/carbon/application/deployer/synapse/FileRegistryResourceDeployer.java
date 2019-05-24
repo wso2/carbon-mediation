@@ -176,8 +176,8 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
                 continue;
             }
             String resourcePath = AppDeployerUtils.computeResourcePath(createRegistryKey(resource),resource.getFileName());
-            lightweightRegistry.newNonEmptyResource(resourcePath, false, null, readResourceContent(file), null);
-
+            String mediaType = resource.getMediaType();
+            lightweightRegistry.newNonEmptyResource(resourcePath, false, mediaType, readResourceContent(file), null);
         }
     }
 
