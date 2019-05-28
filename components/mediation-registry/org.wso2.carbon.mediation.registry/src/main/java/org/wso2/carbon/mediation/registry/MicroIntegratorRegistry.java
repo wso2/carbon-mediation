@@ -75,11 +75,11 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * File system path corresponding to the FILE url path. This is a system depending path
      * used for accessing resources as files.
      */
-    private String localRegistry = null;
+    private String localRegistry;
 
-    private String configRegistry = null;
+    private String configRegistry;
 
-    private String govRegistry = null;
+    private String govRegistry;
 
     /**
      * Specifies whether the registry is in the local host or a remote registry.
@@ -732,7 +732,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * @param metadata
      * @throws SynapseException
      */
-    private void writeToFile(URI parentName, String newFileName, String content, Properties metadata) throws SynapseException {
+    private void writeToFile(URI parentName, String newFileName, String content, Properties metadata) {
         /*
             search for parent. if found, create the new FILE in it
         */
@@ -761,9 +761,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * @param parent parent dir of the resource
      * @param resourceFileName filename of the resource
      * @param metadata metadata properties object
-     * @throws SynapseException
      */
-    private void writeMetadata(File parent, String resourceFileName, Properties metadata) throws SynapseException {
+    private void writeMetadata(File parent, String resourceFileName, Properties metadata) {
 
         File metadataDir = new File(parent, METADATA_DIR_NAME);
         if (!metadataDir.exists() && !metadataDir.mkdirs()) {
