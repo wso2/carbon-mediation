@@ -27,6 +27,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.apache.synapse.rest.RESTConstants;
 import org.junit.After;
 import org.junit.Test;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
@@ -51,11 +52,12 @@ public class DispatcherTestCase {
 
         InternalAPIDispatcher internalAPIDispatcher = new InternalAPIDispatcher(apis);
         MessageContext synCtx = createMessageContext();
-        setRequestProperties(synCtx, "/foo/bar", "GET");
+        setRequestProperties(synCtx, "/foo/bar?q=abc", "GET");
 
         boolean dispatchingCompleted = internalAPIDispatcher.dispatch(synCtx);
         Assert.assertTrue("Dispatcher failed to find correct API or Resource", dispatchingCompleted);
         Assert.assertTrue("Correct resource not invoked", (Boolean) synCtx.getProperty("Success"));
+        Assert.assertEquals("abc", synCtx.getProperty(RESTConstants.REST_QUERY_PARAM_PREFIX + "q"));
     }
 
     private MessageContext createMessageContext() throws AxisFault {

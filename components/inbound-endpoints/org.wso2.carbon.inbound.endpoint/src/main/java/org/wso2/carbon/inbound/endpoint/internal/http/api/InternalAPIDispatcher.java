@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.rest.RESTUtils;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
@@ -104,6 +103,7 @@ public class InternalAPIDispatcher {
                     synCtx.setProperty(RESTConstants.REST_URI_VARIABLE_PREFIX + entry.getKey(),
                             entry.getValue());
                 }
+                RESTUtils.populateQueryParamsToMessageContext(synCtx);
                 return resource;
             }
         }
