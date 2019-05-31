@@ -70,34 +70,43 @@ public class RESTBasicAuthHandler implements Handler {
         	isInitialized = true;
         }
 
+        String authHeader = null;
         if (headers != null && headers instanceof Map) {
             Map headersMap = (Map) headers;
-            if (headersMap.get(HTTPConstants.HEADER_AUTHORIZATION) == null) {
-                headersMap.clear();
-                axis2MessageContext.setProperty(BasicAuthConstants.HTTP_STATUS_CODE, BasicAuthConstants.SC_UNAUTHORIZED);
-                headersMap.put(BasicAuthConstants.WWW_AUTHENTICATE, BasicAuthConstants.WWW_AUTH_METHOD);
-                axis2MessageContext.setProperty(BasicAuthConstants.NO_ENTITY_BODY, true);
-                messageContext.setProperty(BasicAuthConstants.RESPONSE, BasicAuthConstants.TRUE);
-                messageContext.setTo(null);
-                Axis2Sender.sendBack(messageContext);
-                return false;
-            } else {
-                String authHeader = (String) headersMap.get(HTTPConstants.HEADER_AUTHORIZATION);
+            if (headersMap.get(HTTPConstants.HEADER_AUTHORIZATION) != null) {
+                authHeader = (String) headersMap.get(HTTPConstants.HEADER_AUTHORIZATION);
+            }
+        }
+        
+        if (authHeader == null) {
+            // No authorization header found in request, return 401
+            headersMap.clear();
+            axis2MessageContext.setProperty(BasicAuthConstants.HTTP_STATUS_CODE, BasicAuthConstants.SC_UNAUTHORIZED);
+            headersMap.put(BasicAuthConstants.WWW_AUTHENTICATE, BasicAuthConstants.WWW_AUTH_METHOD);
+            axis2MessageContext.setProperty(BasicAuthConstants.NO_ENTITY_BODY, true);
+            messageContext.setProperty(BasicAuthConstants.RESPONSE, BasicAuthConstants.TRUE);
+            messageContext.setTo(null);
+            Axis2Sender.sendBack(messageContext);
+            return false;
+        } else {
+            // The format of the Authorization header is :
+            //   Authorization: Basic <base64 value of user:password>
+            if (authHeader.startsWith("Basic ") {
                 String credentials = authHeader.substring(6).trim();
                 if (processSecurity(credentials, messageContext.getProperty("REST_API_CONTEXT").toString())) {
                     return true;
-                } else {
-                    headersMap.clear();
-                    axis2MessageContext.setProperty(BasicAuthConstants.HTTP_STATUS_CODE, BasicAuthConstants.SC_FORBIDDEN);
-                    axis2MessageContext.setProperty(BasicAuthConstants.NO_ENTITY_BODY, true);
-                    messageContext.setProperty(BasicAuthConstants.RESPONSE, BasicAuthConstants.TRUE);
-                    messageContext.setTo(null);
-                    Axis2Sender.sendBack(messageContext);
-                    return false;
                 }
             }
+
+            // The authentication header is not Basic or the authentication / authorization phase failed, return HTTP 403
+            headersMap.clear();
+            axis2MessageContext.setProperty(BasicAuthConstants.HTTP_STATUS_CODE, BasicAuthConstants.SC_FORBIDDEN);
+            axis2MessageContext.setProperty(BasicAuthConstants.NO_ENTITY_BODY, true);
+            messageContext.setProperty(BasicAuthConstants.RESPONSE, BasicAuthConstants.TRUE);
+            messageContext.setTo(null);
+            Axis2Sender.sendBack(messageContext);
+            return false;
         }
-        return true;
     }
     
     private void initialize(MessageContext context) {
@@ -162,22 +171,25 @@ public class RESTBasicAuthHandler implements Handler {
      * @return true if the credentials are authenticated successfully
      */
     public boolean processSecurity(String credentials, String serviceName) {
-    	String username = null;
-    	String password = null;
-    	
-    	// Get username and password from the Authorization header 
-        String decodedCredentials = new String(new Base64().decode(credentials.getBytes()));
-        if (decodedCredentials != null) {
-        	String[] splittedCredentials = decodedCredentials.split(":");
-        	if (splittedCredentials.length == 2) {
-                username = decodedCredentials.split(":")[0];
-                password = decodedCredentials.split(":")[1];        		
-        	}
-        }
-
-        UserRealm realm = (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
-        String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
         try {
+	    	String username = null;
+	    	String password = null;
+
+	    	// Get username and password from the Authorization header 
+	        String decodedCredentials = new String(new Base64().decode(credentials.getBytes()));
+	        if (decodedCredentials != null) {
+	        	String[] splittedCredentials = decodedCredentials.split(":");
+	        	if (splittedCredentials.length == 2) {
+	                username = decodedCredentials.split(":")[0];
+	                password = decodedCredentials.split(":")[1];        		
+	        	}
+			}
+	        if (username == null || password == null) {
+				throw new UserStoreException("Unable to get Username and Password values from Authorization header");
+			}
+
+            UserRealm realm = (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
+            String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
             UserStoreManager userStoreManager = realm.getUserStoreManager();
             // Authenticate user
             if (userStoreManager.authenticate(username, password)) {
