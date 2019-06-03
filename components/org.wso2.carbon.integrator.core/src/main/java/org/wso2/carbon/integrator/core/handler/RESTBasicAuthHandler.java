@@ -66,32 +66,38 @@ public class RESTBasicAuthHandler implements Handler {
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
         if (!isInitialized) {
-        	this.initialize(messageContext);
-        	isInitialized = true;
+            this.initialize(messageContext);
+            isInitialized = true;
         }
 
+        Map headersMap = null;
         String authHeader = null;
         if (headers != null && headers instanceof Map) {
-            Map headersMap = (Map) headers;
+            headersMap = (Map) headers;
             if (headersMap.get(HTTPConstants.HEADER_AUTHORIZATION) != null) {
                 authHeader = (String) headersMap.get(HTTPConstants.HEADER_AUTHORIZATION);
             }
         }
         
-        if (authHeader == null) {
+        if (headersMap == null || authHeader == null) {
             // No authorization header found in request, return 401
-            headersMap.clear();
-            axis2MessageContext.setProperty(BasicAuthConstants.HTTP_STATUS_CODE, BasicAuthConstants.SC_UNAUTHORIZED);
+	    if (headersMap == null) {
+                headersMap = new HashMap<String,String>();
+		axis2MessageContext.setProperty(
+                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headersMap);
+            } else {
+                headersMap.clear();
+	    }
             headersMap.put(BasicAuthConstants.WWW_AUTHENTICATE, BasicAuthConstants.WWW_AUTH_METHOD);
+            axis2MessageContext.setProperty(BasicAuthConstants.HTTP_STATUS_CODE, BasicAuthConstants.SC_UNAUTHORIZED);
             axis2MessageContext.setProperty(BasicAuthConstants.NO_ENTITY_BODY, true);
             messageContext.setProperty(BasicAuthConstants.RESPONSE, BasicAuthConstants.TRUE);
             messageContext.setTo(null);
             Axis2Sender.sendBack(messageContext);
-            return false;
         } else {
             // The format of the Authorization header is :
             //   Authorization: Basic <base64 value of user:password>
-            if (authHeader.startsWith("Basic ") {
+            if (authHeader.startsWith("Basic ")) {
                 String credentials = authHeader.substring(6).trim();
                 if (processSecurity(credentials, messageContext.getProperty("REST_API_CONTEXT").toString())) {
                     return true;
@@ -105,8 +111,8 @@ public class RESTBasicAuthHandler implements Handler {
             messageContext.setProperty(BasicAuthConstants.RESPONSE, BasicAuthConstants.TRUE);
             messageContext.setTo(null);
             Axis2Sender.sendBack(messageContext);
-            return false;
-        }
+	}
+	return false;
     }
     
     private void initialize(MessageContext context) {
