@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 /**
  * SAP requires to provide destination/server properties. <code>CarbonDestinationDataProvider </code>
@@ -91,12 +92,15 @@ public class CarbonDestinationDataProvider implements DestinationDataProvider, S
             for (String key : props.stringPropertyNames()) {
                 if (secretResolver != null && secretResolver.isInitialized()) {
                     String value = props.getProperty(key);
-                    if (value != null && value.startsWith(SAPConstants.SECRET_ALIAS_PREFIX)) {
-                        value = value.split(SAPConstants.SECRET_ALIAS_PREFIX)[1];
-                        if (secretResolver.isTokenProtected(value)) {
-                            props.put(key, secretResolver.resolve(value));
+                    if (value != null) {
+                        if (value.startsWith(SAPConstants.SECRET_ALIAS_PREFIX)) {
+                            value = value.split(SAPConstants.SECRET_ALIAS_PREFIX)[1];
+                            value = secretResolver.isTokenProtected(value) ? secretResolver.resolve(value) : value;
+                        } else {
+                            value = MiscellaneousUtil.resolve(value, secretResolver);
                         }
                     }
+                    props.put(key, value);
                 }
             }
             return props;
