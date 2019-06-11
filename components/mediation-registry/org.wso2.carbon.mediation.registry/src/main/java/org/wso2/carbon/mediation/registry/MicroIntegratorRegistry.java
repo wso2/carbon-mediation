@@ -34,6 +34,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,9 +47,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.xml.stream.XMLInputFactory;
@@ -63,6 +63,9 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     private static final int DELETE_RETRY_SLEEP_TIME = 10;
     private static final long DEFAULT_CACHABLE_DURATION = 0;
     private static final int MAX_KEYS = 200;
+    private static final String METADATA_DIR_NAME = ".metadata";
+    private static final String METADATA_FILE_SUFFIX = ".meta";
+    private static final String METADATA_KEY_MEDIA_TYPE = "mediaType";
 
     public static final int FILE = 1;
     public static final int HTTP = 2;
@@ -72,13 +75,11 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * File system path corresponding to the FILE url path. This is a system depending path
      * used for accessing resources as files.
      */
-    private String localRegistry = null;
+    private String localRegistry;
 
-    private String configRegistry = null;
+    private String configRegistry;
 
-    private String govRegistry = null;
-
-    private Map<String, String> fileExtensionMediaTypeMap = null;
+    private String govRegistry;
 
     /**
      * Specifies whether the registry is in the local host or a remote registry.
@@ -126,7 +127,6 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 addConfigProperty(name, value);
             }
         }
-        this.fileExtensionMediaTypeMap =  createFileExtensionsMap();
         log.debug("EI lightweight registry is initialized.");
 
     }
@@ -480,7 +480,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     }
 
     @Override
-    public void newNonEmptyResource(String path, boolean isDirectory, String contentType, String content, String propertyName) {
+    public void newNonEmptyResource(String path, boolean isDirectory, String mediaType, String content, String propertyName) {
 
         if (registryType == ESBRegistryConstants.LOCAL_HOST_REGISTRY) {
             String targetPath = resolveRegistryURI(path);
@@ -492,8 +492,13 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             String parent = getParentPath(targetPath, isDirectory);
             String fileName = getResourceName(targetPath);
 
+            Properties metadata = new Properties();
+            if (mediaType != null) {
+                metadata.setProperty(METADATA_KEY_MEDIA_TYPE, mediaType);
+            }
+
             try {
-                writeToFile(new URI(parent), fileName, content);
+                writeToFile(new URI(parent), fileName, content, metadata);
             } catch (Exception e) {
                 handleException("Error when adding a new resource", e);
             }
@@ -724,9 +729,10 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      *
      * @param parentName
      * @param newFileName
-     * @throws Exception
+     * @param metadata
+     * @throws SynapseException
      */
-    private void writeToFile(URI parentName, String newFileName, String content) throws Exception {
+    private void writeToFile(URI parentName, String newFileName, String content, Properties metadata) {
         /*
             search for parent. if found, create the new FILE in it
         */
@@ -734,16 +740,42 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         if (!parent.exists() && !parent.mkdirs()) {
             handleException("Unable to create parent directory: " + parentName);
         }
+
         File newFile = new File(parent, newFileName);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(newFile))) {
             writer.write(content);
             writer.flush();
+            writeMetadata(parent, newFileName, metadata);
 
             if (log.isDebugEnabled()) {
                 log.debug("Successfully content written to file : " + parentName + URL_SEPARATOR + newFileName);
             }
         } catch (IOException e) {
             handleException("Couldn't write to registry resource: " + parentName + URL_SEPARATOR + newFileName, e);
+        }
+    }
+
+    /**
+     * Writes metadata related to the given resource.
+     *
+     * @param parent parent dir of the resource
+     * @param resourceFileName filename of the resource
+     * @param metadata metadata properties object
+     */
+    private void writeMetadata(File parent, String resourceFileName, Properties metadata) {
+
+        File metadataDir = new File(parent, METADATA_DIR_NAME);
+        if (!metadataDir.exists() && !metadataDir.mkdirs()) {
+            handleException("Unable to create metadata directory: " + metadataDir.getPath());
+        }
+        File newMetadataFile = new File(metadataDir, resourceFileName + METADATA_FILE_SUFFIX);
+        try (BufferedWriter metadataWriter = new BufferedWriter(new FileWriter(newMetadataFile))) {
+            metadata.store(metadataWriter, null);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully written metadata to file: " + newMetadataFile.getPath());
+            }
+        } catch (IOException e) {
+            handleException("Couldn't write to metadata file: " + newMetadataFile.getPath(), e);
         }
     }
 
@@ -812,7 +844,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * @throws IOException
      */
     private OMNode readNonXML (URL url) throws IOException {
-        String mediaType = lookUpFileMediaType(url.getPath());
+
         URLConnection urlConnection = url.openConnection();
         urlConnection.connect();
 
@@ -821,6 +853,9 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             if (inputStream == null) {
                 return null;
             }
+
+            Properties metadata = getMetadata(url.getPath());
+            String mediaType = metadata.getProperty(METADATA_KEY_MEDIA_TYPE, ESBRegistryConstants.DEFAULT_MEDIA_TYPE);
 
             if (ESBRegistryConstants.DEFAULT_MEDIA_TYPE.equals(mediaType)) {
                 StringBuilder strBuilder = new StringBuilder();
@@ -961,45 +996,28 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     }
 
     /**
-     * Populate file extension to media type mapping
-     *
-     * @return Map which contains file extension to media type mapping
-     */
-    private Map<String, String> createFileExtensionsMap() {
-
-        Map<String, String> extensionContentTypeMap = new HashMap<>();
-
-        extensionContentTypeMap.put(".xml", "application/xml");
-        extensionContentTypeMap.put(".js", "application/javascript");
-        extensionContentTypeMap.put(".css", "text/css");
-        extensionContentTypeMap.put(".html", "text/html");
-        extensionContentTypeMap.put(".sql", "text/plain");
-        extensionContentTypeMap.put(".xsd", "Schema");
-        extensionContentTypeMap.put(".xsl", "application/xsl+xml");
-        extensionContentTypeMap.put(".xslt", "application/xslt+xml");
-        extensionContentTypeMap.put(".zip", "application/zip");
-        extensionContentTypeMap.put(".wsdl", "WSDL");
-
-        return extensionContentTypeMap;
-    }
-
-    /**
-     * Loopkup media-type for the relevant file from the mappings
+     * Get metadata of the registry resource.
      *
      * @param fileUrl File URL of the registry resource
-     * @return Media-type of the file
+     * @return Properties object containing metadata of the registry resource
      */
-    private String lookUpFileMediaType(String fileUrl) {
-        String extension = "";
-        int indexOfExtensionDot = fileUrl.lastIndexOf('.');
-        if (indexOfExtensionDot > 0) {
-            extension = fileUrl.substring(indexOfExtensionDot);
+    private Properties getMetadata(String fileUrl) {
+
+        Properties metadata = new Properties();
+        File file = new File(fileUrl);
+        String metadataFilePath = file.getParent()
+                                  + File.separator + METADATA_DIR_NAME
+                                  + File.separator + file.getName() + METADATA_FILE_SUFFIX;
+        File metadataFile = new File(metadataFilePath);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(metadataFile))) {
+            metadata.load(reader);
+        } catch (FileNotFoundException e) {
+            log.error("Metadata file cannot be found at " + metadataFile.getPath(), e);
+        } catch (IOException e) {
+            log.error("Error while reading file " + metadataFile.getPath(), e);
         }
 
-        String mediaType = ESBRegistryConstants.DEFAULT_MEDIA_TYPE;
-        if (fileExtensionMediaTypeMap.containsKey(extension)) {
-            mediaType = fileExtensionMediaTypeMap.get(extension);
-        }
-        return mediaType;
+        return metadata;
     }
 }

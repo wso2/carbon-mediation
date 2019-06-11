@@ -89,15 +89,15 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
      * @param parentAppName - name of the parent cApp
      */
     private void deployRegistryArtifacts(List<Artifact> artifacts, String parentAppName) {
-        for (Artifact artifact : artifacts) {
-            if (REGISTRY_RESOURCE_TYPE.equals(artifact.getType())) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Deploying registry artifact: " + artifact.getName());
-                }
-                RegistryConfig regConfig = buildRegistryConfig(artifact, parentAppName);
-                writeArtifactToRegistry(regConfig);
-            }
-        }
+        artifacts.stream()
+                 .filter(artifact -> REGISTRY_RESOURCE_TYPE.equals(artifact.getType()))
+                 .forEach(artifact -> {
+                     if (log.isDebugEnabled()) {
+                         log.debug("Deploying registry artifact: " + artifact.getName());
+                     }
+                     RegistryConfig regConfig = buildRegistryConfig(artifact, parentAppName);
+                     writeArtifactToRegistry(regConfig);
+                 });
     }
 
 
@@ -166,8 +166,8 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
         List<RegistryConfig.Resourse> resources = registryConfig.getResources();
 
         for (RegistryConfig.Resourse resource : resources) {
-            String filePath = registryConfig.getExtractedPath() + File.separator +
-                    AppDeployerConstants.RESOURCES_DIR + File.separator + resource.getFileName();
+            String filePath = registryConfig.getExtractedPath() + File.separator + AppDeployerConstants.RESOURCES_DIR
+                    + File.separator + resource.getFileName();
 
             // check whether the file exists
             File file = new File(filePath);
@@ -176,8 +176,8 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
                 continue;
             }
             String resourcePath = AppDeployerUtils.computeResourcePath(createRegistryKey(resource),resource.getFileName());
-            lightweightRegistry.newNonEmptyResource(resourcePath, false, null, readResourceContent(file), null);
-
+            String mediaType = resource.getMediaType();
+            lightweightRegistry.newNonEmptyResource(resourcePath, false, mediaType, readResourceContent(file), null);
         }
     }
 
