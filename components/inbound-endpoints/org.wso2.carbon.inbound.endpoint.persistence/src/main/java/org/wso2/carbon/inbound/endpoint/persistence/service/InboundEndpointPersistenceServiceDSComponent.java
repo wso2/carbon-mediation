@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.inbound.endpoint.persistence.service;
 
 import org.apache.commons.logging.Log;
@@ -25,36 +24,46 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.inbound.endpoint.persistence.ServiceReferenceHolder;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="inbound.endpoint.persistence.service" immediate="true"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="0..1"
- * policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
+@Component(
+        name = "inbound.endpoint.persistence.service",
+        immediate = true)
 public class InboundEndpointPersistenceServiceDSComponent {
 
     private static final Log log = LogFactory.getLog(InboundEndpointPersistenceServiceDSComponent.class);
 
     private static ConfigurationContextService configContextService = null;
-    
+
+    @Activate
     protected void activate(ComponentContext ctx) throws Exception {
+
         if (log.isDebugEnabled()) {
             log.debug("Activating Inbound Endpoint Persistence service....!");
         }
         BundleContext bndCtx = ctx.getBundleContext();
-        bndCtx.registerService(InboundEndpointPersistenceService.class.getName(),
-                               new InboundEndpointPersistenceServiceImpl(), null);
-
+        bndCtx.registerService(InboundEndpointPersistenceService.class.getName(), new
+                InboundEndpointPersistenceServiceImpl(), null);
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext compCtx) throws Exception {
+
     }
 
+    @Reference(
+            name = "registry.service",
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRegistryService")
     protected void setRegistryService(RegistryService registryService) {
+
         if (log.isDebugEnabled()) {
             log.debug("RegistryService bound to the inbound endpoint persistence service");
         }
@@ -62,22 +71,31 @@ public class InboundEndpointPersistenceServiceDSComponent {
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
+
         if (log.isDebugEnabled()) {
             log.debug("RegistryService unbound from the inbound endpoint persistence service");
         }
         ServiceReferenceHolder.getInstance().setRegistrySvc(null);
     }
 
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
+
         configContextService = contextService;
     }
 
-    protected void unsetConfigurationContextService(ConfigurationContextService contextService) {        
+    protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
+
         configContextService = null;
-    }    
-    
-    public static ConfigurationContextService getConfigContextService(){
-   	 return configContextService;
     }
-    
+
+    public static ConfigurationContextService getConfigContextService() {
+
+        return configContextService;
+    }
 }

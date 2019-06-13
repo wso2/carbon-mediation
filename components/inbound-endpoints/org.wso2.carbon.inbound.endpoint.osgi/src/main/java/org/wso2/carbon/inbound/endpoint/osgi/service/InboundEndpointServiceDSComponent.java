@@ -23,40 +23,51 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.utils.ConfigurationContextService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="inbound.endpoint.service" immediate="true"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
+@Component(
+        name = "inbound.endpoint.service",
+        immediate = true)
 public class InboundEndpointServiceDSComponent {
 
     private static final Log log = LogFactory.getLog(InboundEndpointServiceDSComponent.class);
 
+    @Activate
     protected void activate(ComponentContext ctx) throws Exception {
+
         if (log.isDebugEnabled()) {
             log.debug("Activating Inbound Endpoint service....!");
         }
         BundleContext bndCtx = ctx.getBundleContext();
-        bndCtx.registerService(InboundEndpointService.class.getName(),
-                new InboundEndpointServiceImpl(), null);
-
+        bndCtx.registerService(InboundEndpointService.class.getName(), new InboundEndpointServiceImpl(), null);
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext compCtx) throws Exception {
+
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         if (log.isDebugEnabled()) {
             log.debug("ConfigurationContextService bound to the ESB initialization process");
         }
         ServiceReferenceHolder.getInstance().setConfigurationContextService(configurationContextService);
     }
 
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         if (log.isDebugEnabled()) {
             log.debug("ConfigurationContextService unbound from the ESB environment");
         }

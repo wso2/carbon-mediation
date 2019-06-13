@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.mediation.dependency.mgt;
 
 import org.osgi.service.component.ComponentContext;
@@ -22,37 +21,39 @@ import org.osgi.framework.Bundle;
 import org.wso2.carbon.mediation.dependency.mgt.services.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import java.util.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="esb.config.dependency.mgt" immediate="true"
- */
+@Component(
+         name = "esb.config.dependency.mgt", 
+         immediate = true)
 public class DependencyManagementServiceComponent {
 
     private final Log log = LogFactory.getLog(this.getClass());
 
     private final List<String> pendingResolvers = new ArrayList<String>();
+
     private CustomResolversListener resolverListener;
+
     private BundleContext bndCtx;
+
     private Timer timer = new Timer();
+
     private ConfigurationTrackingServiceImpl configurationTrackingService;
 
+    @Activate
     protected void activate(ComponentContext cmpCtx) {
-
         bndCtx = cmpCtx.getBundleContext();
-        bndCtx.registerService(ResolverRegistrationService.class.getName(),
-                new ResolverRegistrationServiceImpl(), null);
-
+        bndCtx.registerService(ResolverRegistrationService.class.getName(), new ResolverRegistrationServiceImpl(), null);
         configurationTrackingService = new ConfigurationTrackingServiceImpl(bndCtx);
-
-        bndCtx.registerService(DependencyManagementService.class.getName(),
-                               new DependencyManagementServiceImpl(), null);
-        
+        bndCtx.registerService(DependencyManagementService.class.getName(), new DependencyManagementServiceImpl(), null);
         configurationTrackingService.setServiceRegistered(true);
-
         resolverListener = new CustomResolversListener(this, bndCtx);
-
         // Find the bundles with the MediatorDependencyResolver header
         for (Bundle bundle : bndCtx.getBundles()) {
             Dictionary headers = bundle.getHeaders();
@@ -61,25 +62,22 @@ public class DependencyManagementServiceComponent {
                 resolverListener.addResolverBundle(value.trim(), bundle);
             }
         }
-
         if (resolverListener.registerBundleListener()) {
             resolverListener.start();
-
         } else if (log.isDebugEnabled()) {
             log.debug("No custom dependency resolvers were found... Skipping...");
         }
-
-        //check whether pending list is empty, If so initialize Carbon
+        // check whether pending list is empty, If so initialize Carbon
         if (pendingResolvers.isEmpty()) {
             finishInitialization();
         } else {
-            //Scheduling timer to run if the required items are being delayed.
+            // Scheduling timer to run if the required items are being delayed.
             timer.scheduleAtFixedRate(new TimerTask() {
+
                 public void run() {
                     try {
                         if (!pendingResolvers.isEmpty()) {
-                            log.warn("Carbon initialization is delayed due to the following " +
-                                    "uninitialized mediator dependency resolvers...");
+                            log.warn("Carbon initialization is delayed due to the following " + "uninitialized mediator dependency resolvers...");
                             for (String configItem : pendingResolvers) {
                                 log.warn("Waiting for required resolver " + configItem);
                             }
@@ -94,11 +92,7 @@ public class DependencyManagementServiceComponent {
     private void finishInitialization() {
         resolverListener.unregisterBundleListener();
         timer.cancel();
-
-        bndCtx.registerService(ConfigurationTrackingService.class.getName(),
-                               (configurationTrackingService != null) ? configurationTrackingService :
-                               new ConfigurationTrackingServiceImpl(bndCtx), null);
-
+        bndCtx.registerService(ConfigurationTrackingService.class.getName(), (configurationTrackingService != null) ? configurationTrackingService : new ConfigurationTrackingServiceImpl(bndCtx), null);
         if (log.isDebugEnabled()) {
             log.debug("Configuration tracking service initialized");
         }
@@ -123,6 +117,4 @@ public class DependencyManagementServiceComponent {
             }
         }
     }
-
-
 }

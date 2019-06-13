@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.business.messaging.hl7.transport.internal;
 
 import org.apache.axis2.context.ConfigurationContext;
@@ -24,12 +23,16 @@ import org.wso2.carbon.business.messaging.hl7.transport.service.HL7TransportServ
 import org.wso2.carbon.core.transports.TransportService;
 import org.wso2.carbon.core.transports.TransportPersistenceManager;
 import org.wso2.carbon.utils.ConfigurationContextService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="mllp.transport.services" immediate="true"
- * @scr.reference name="config.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="1..1" policy="dynamic"  bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
+@Component(
+        name = "mllp.transport.services",
+        immediate = true)
 public class MLLPTransportServiceComponent {
 
     private static Log log = LogFactory.getLog(MLLPTransportServiceComponent.class);
@@ -37,43 +40,40 @@ public class MLLPTransportServiceComponent {
     private ConfigurationContextService contextService;
 
     public MLLPTransportServiceComponent() {
+
     }
 
+    @Activate
     protected void activate(ComponentContext ctxt) {
+
         ConfigurationContext configContext;
         HL7TransportService HL7Transport;
-        //Properties props;
+        // Properties props;
         if (log.isDebugEnabled()) {
             log.debug("MLLP Transport bundle is activated");
         }
-
         try {
             if (contextService != null) {
                 // Getting server's configContext instance
                 configContext = contextService.getServerConfigContext();
             } else {
-                throw new Exception(
-                        "ConfigurationContext is not found while loading org.wso2.carbon.business.messaging.hl7.transport bundle");
+                throw new Exception("ConfigurationContext is not found while loading org.wso2.carbon.business" +
+                        ".messaging.hl7.transport bundle");
             }
-
             // Save the transport configuration in the registry if not already done so
-            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
-                new TransportPersistenceManager(configContext.getAxisConfiguration()).saveTransportConfiguration(HL7TransportService.TRANSPORT_NAME,
-                        ctxt.getBundleContext().getBundle().getResource(HL7TransportService.TRANSPORT_CONF));
+            if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                new TransportPersistenceManager(configContext.getAxisConfiguration()).saveTransportConfiguration
+                        (HL7TransportService.TRANSPORT_NAME, ctxt.getBundleContext().getBundle().getResource
+                                (HL7TransportService.TRANSPORT_CONF));
             }
-
             // Instantiate HL7TransportService
             HL7Transport = new HL7TransportService();
-
             // This should ideally contain properties of HL7TransportService as a collection of
             // key/value pair. Here we do not require to add any elements.
-            //props = new Properties();
-
+            // props = new Properties();
             // Register the HL7TransportService under TransportService interface.
             // This will make TransportManagement component to find this.
-            ctxt.getBundleContext()
-                    .registerService(TransportService.class.getName(), HL7Transport, null);
-
+            ctxt.getBundleContext().registerService(TransportService.class.getName(), HL7Transport, null);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully registered the https transport service");
             }
@@ -82,15 +82,25 @@ public class MLLPTransportServiceComponent {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctxt) {
+
         log.debug("MLLP Transport bundle is deactivated ");
     }
 
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
+
         this.contextService = contextService;
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
+
         this.contextService = null;
     }
 }

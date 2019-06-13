@@ -37,46 +37,38 @@ import org.wso2.carbon.user.mgt.UserMgtConstants;
 import java.net.SocketException;
 import java.util.HashMap;
 
-/**
- * @scr.component name="CGServiceComponent" immediate="true"
- * @scr.reference name="user.realmservice.default"
- * interface="org.wso2.carbon.user.core.service.RealmService"
- * cardinality="1..1"
- * policy="dynamic" bind="setRealmService"
- * unbind="unsetRealmService"
- * @scr.reference name="server.configuration"
- * interface="org.wso2.carbon.base.api.ServerConfigurationService"
- * cardinality="1..1"
- * policy="dynamic"
- * bind="setServerConfiguration"
- * unbind="unsetServerConfiguration"
- */
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
+@Component(
+        name = "CGServiceComponent",
+        immediate = true)
 public class CGServiceComponent {
+
     private static Log log = LogFactory.getLog(CGServiceComponent.class);
 
     private ServerConfigurationService serverConfiguration;
+
     private RealmService realmService;
 
+    @Activate
     protected void activate(ComponentContext ctxt) {
         // CG needs to know the key store location and also add the csg user etc..
         if (this.serverConfiguration == null || this.realmService == null) {
-            log.error("Could not activated the CGServiceComponent. " +
-                    (this.serverConfiguration == null ?
-                            "ServerConfigurationService" : "RealmService") + "is null!");
+            log.error("Could not activated the CGServiceComponent. " + (this.serverConfiguration == null ?
+                    "ServerConfigurationService" : "RealmService") + "is null!");
             return;
         }
         try {
             // add the default cguser into the user store
-            String csgRoleName = CGUtils.getStringProperty(CGConstant.CG_ROLE_NAME,
-                    CGConstant.DEFAULT_CG_ROLE_NAME);
-
-            addCGUser(
-                    csgRoleName,
-                    CGUtils.getPermissionsList(),
-                    CGUtils.getStringProperty(CGConstant.CG_USER_NAME, CGConstant.DEFAULT_CG_USER),
-                    CGUtils.getStringProperty(CGConstant.CG_USER_PASSWORD,
-                            CGConstant.DEFAULT_CG_USER_PASSWORD));
-
+            String csgRoleName = CGUtils.getStringProperty(CGConstant.CG_ROLE_NAME, CGConstant.DEFAULT_CG_ROLE_NAME);
+            addCGUser(csgRoleName, CGUtils.getPermissionsList(), CGUtils.getStringProperty(CGConstant.CG_USER_NAME,
+                    CGConstant.DEFAULT_CG_USER), CGUtils.getStringProperty(CGConstant.CG_USER_PASSWORD, CGConstant
+                    .DEFAULT_CG_USER_PASSWORD));
         } catch (UserStoreException e) {
             log.error("Cloud not activated the CGServiceComponent.", e);
             return;
@@ -88,10 +80,8 @@ public class CGServiceComponent {
             log.error("Could not activated the CGServiceComponent.", e);
             return;
         }
-
         int port = CGUtils.getCGThriftServerPort();
-        int timeOut = CGUtils.getIntProperty(CGConstant.CG_THRIFT_CLIENT_TIMEOUT,
-                CGConstant.DEFAULT_TIMEOUT);
+        int timeOut = CGUtils.getIntProperty(CGConstant.CG_THRIFT_CLIENT_TIMEOUT, CGConstant.DEFAULT_TIMEOUT);
         String keyStoreURL = CGUtils.getKeyStoreFilePath();
         if (keyStoreURL == null) {
             log.error("KeyStore is missing and required for mutual SSL");
@@ -100,13 +90,11 @@ public class CGServiceComponent {
         if (log.isDebugEnabled()) {
             log.debug("Loading key store from the location '" + keyStoreURL + "'");
         }
-
         String keyStorePassWord = CGUtils.getKeyStorePassWord();
         if (keyStorePassWord == null) {
             log.error("KeyStore password is missing");
             return;
         }
-
         String trustStoreURL = CGUtils.getTrustStoreFilePath();
         if (trustStoreURL == null) {
             log.error("TrustStore is missing and required for mutual SSL");
@@ -115,36 +103,20 @@ public class CGServiceComponent {
         if (log.isDebugEnabled()) {
             log.debug("Loading trust store from the location '" + trustStoreURL + "'");
         }
-
         String trustStorePassWord = CGUtils.getTrustStorePassWord();
         if (trustStorePassWord == null) {
             log.error("TrustStore password is missing");
             return;
         }
-
-        WorkerPool workerPool =
-                WorkerPoolFactory.getWorkerPool(
-                        CGUtils.getIntProperty(
-                                CGConstant.CG_T_CORE, CGConstant.WORKERS_CORE_THREADS),
-                        CGUtils.getIntProperty(
-                                CGConstant.CG_T_MAX, CGConstant.WORKERS_MAX_THREADS),
-                        CGUtils.getIntProperty(
-                                CGConstant.CG_T_ALIVE, CGConstant.WORKER_KEEP_ALIVE),
-                        CGUtils.getIntProperty(
-                                CGConstant.CG_T_QLEN, CGConstant.WORKER_BLOCKING_QUEUE_LENGTH),
-                        "CGThriftServerHandler-worker-thread-group",
-                        "CGThriftServerHandler-worker");
+        WorkerPool workerPool = WorkerPoolFactory.getWorkerPool(CGUtils.getIntProperty(CGConstant.CG_T_CORE,
+                CGConstant.WORKERS_CORE_THREADS), CGUtils.getIntProperty(CGConstant.CG_T_MAX, CGConstant
+                .WORKERS_MAX_THREADS), CGUtils.getIntProperty(CGConstant.CG_T_ALIVE, CGConstant.WORKER_KEEP_ALIVE),
+                CGUtils.getIntProperty(CGConstant.CG_T_QLEN, CGConstant.WORKER_BLOCKING_QUEUE_LENGTH),
+                "CGThriftServerHandler-worker-thread-group", "CGThriftServerHandler-worker");
         CGThriftServerHandler csgThriftServerHandler = new CGThriftServerHandler(workerPool);
         CGThriftServer server = new CGThriftServer(csgThriftServerHandler);
         try {
-            server.start(
-                    hostName,
-                    port,
-                    timeOut,
-                    keyStoreURL,
-                    keyStorePassWord,
-                    trustStoreURL,
-                    trustStorePassWord,
+            server.start(hostName, port, timeOut, keyStoreURL, keyStorePassWord, trustStoreURL, trustStorePassWord,
                     "Cloud-Gateway-ThriftServer-main-thread");
         } catch (AxisFault axisFault) {
             log.error("Unable to start thrift server", axisFault);
@@ -155,29 +127,42 @@ public class CGServiceComponent {
         }
     }
 
+    @Reference(
+            name = "user.realmservice.default",
+            service = org.wso2.carbon.user.core.service.RealmService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRealmService")
     protected void setRealmService(RealmService realmService) {
+
         this.realmService = realmService;
     }
 
     protected void unsetRealmService(RealmService realmService) {
+
         if (this.realmService != null) {
             this.realmService = null;
         }
     }
 
+    @Reference(
+            name = "server.configuration",
+            service = org.wso2.carbon.base.api.ServerConfigurationService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetServerConfiguration")
     protected void setServerConfiguration(ServerConfigurationService configuration) {
+
         serverConfiguration = configuration;
     }
 
     protected void unsetServerConfiguration(ServerConfigurationService configuration) {
+
         serverConfiguration = null;
     }
 
-    private void addCGUser(String roleName,
-                           String[] permissionList,
-                           String csgUserName,
-                           String passWord)
-            throws UserStoreException {
+    private void addCGUser(String roleName, String[] permissionList, String csgUserName, String passWord) throws
+            UserStoreException {
         // add the required permission to the csg role
         String[] optimizedList = UserCoreUtil.optimizePermissions(permissionList);
         UserRealm realm = realmService.getBootstrapRealm();
@@ -185,32 +170,19 @@ public class CGServiceComponent {
             throw new UserStoreException("UI permission of admin is not allowed to change!");
         }
         AuthorizationManager authorizationManager = realm.getAuthorizationManager();
-        authorizationManager.clearRoleActionOnAllResources(roleName,
-                UserMgtConstants.EXECUTE_ACTION);
+        authorizationManager.clearRoleActionOnAllResources(roleName, UserMgtConstants.EXECUTE_ACTION);
         for (String permission : optimizedList) {
-            authorizationManager.authorizeRole(roleName, permission,
-                    UserMgtConstants.EXECUTE_ACTION);
+            authorizationManager.authorizeRole(roleName, permission, UserMgtConstants.EXECUTE_ACTION);
         }
-
         // set required permission for csguser to put/get/delete WSDLs etc..
         authorizationManager.authorizeRole(roleName, "/", "add");
         authorizationManager.authorizeRole(roleName, "/", "get");
         authorizationManager.authorizeRole(roleName, "/", "delete");
-
         UserStoreManager manager = realm.getUserStoreManager();
         // register the cg role if not registered already and add the cguser
-        
-
         if (!manager.isExistingUser(csgUserName)) {
-            manager.addUser(
-                    csgUserName,
-                    passWord,
-                    new String[]{},
-                    new HashMap<String, String>(),
-                    null,
-                    false);
+            manager.addUser(csgUserName, passWord, new String[]{}, new HashMap<String, String>(), null, false);
         }
-        
         if (!manager.isExistingRole(roleName)) {
             manager.addRole(roleName, new String[]{csgUserName}, null);
         }

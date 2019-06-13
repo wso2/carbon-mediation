@@ -24,30 +24,41 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.sink.EventSinkService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="org.wso2.carbon.event.sink.EventSinkServiceComponent" immediate="true"
- */
+@Component(
+        name = "org.wso2.carbon.event.sink.EventSinkServiceComponent",
+        immediate = true)
 public class EventSinkServiceComponent {
-	private static Log log = LogFactory.getLog(EventSinkServiceComponent.class);
-	private ServiceRegistration serviceRegistration;
 
-	protected void activate(final ComponentContext componentContext) {
-		final BundleContext bundleContext = componentContext.getBundleContext();
-		serviceRegistration = bundleContext.registerService(EventSinkService.class.getName(),
-		                                                    new EventSinkServiceImpl(), null);
+    private static Log log = LogFactory.getLog(EventSinkServiceComponent.class);
 
-		if (log.isDebugEnabled()) {
-			log.debug("Started EventSinkService");
-		}
-	}
+    private ServiceRegistration serviceRegistration;
 
-	protected void deactivate(ComponentContext componentContext) {
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
-		}
-		if (log.isDebugEnabled()) {
-			log.debug("Stopped EventSinkService");
-		}
-	}
+    @Activate
+    protected void activate(final ComponentContext componentContext) {
+
+        final BundleContext bundleContext = componentContext.getBundleContext();
+        serviceRegistration = bundleContext.registerService(EventSinkService.class.getName(), new
+                EventSinkServiceImpl(), null);
+        if (log.isDebugEnabled()) {
+            log.debug("Started EventSinkService");
+        }
+    }
+
+    @Deactivate
+    protected void deactivate(ComponentContext componentContext) {
+
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Stopped EventSinkService");
+        }
+    }
 }

@@ -13,28 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.mediator.event;
 
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.event.core.EventBroker;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="event.mediator.component" immediate="true"
- * @scr.reference name="eventbroker.service"
- * interface="org.wso2.carbon.event.core.EventBroker" cardinality="1..1"
- * policy="dynamic" bind="setEventBroker" unbind="unSetEventBroker"
- */
+@Component(
+        name = "event.mediator.component",
+        immediate = true)
 public class EventBrokerDS {
+
+    @Activate
     protected void activate(ComponentContext context) {
 
     }
 
+    @Reference(
+            name = "eventbroker.service",
+            service = org.wso2.carbon.event.core.EventBroker.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unSetEventBroker")
     protected void setEventBroker(EventBroker eventBroker) {
+
         EventBrokerHolder.getInstance().setEventBroker(eventBroker);
     }
 
     protected void unSetEventBroker(EventBroker eventBroker) {
+
         EventBrokerHolder.getInstance().setEventBroker(null);
     }
 }

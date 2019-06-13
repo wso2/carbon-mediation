@@ -37,7 +37,6 @@ import org.wso2.carbon.application.deployer.synapse.SynapseAppDeployerConstants;
 import org.wso2.carbon.application.deployer.synapse.service.SynapseAppDeployerService;
 import org.wso2.carbon.application.deployer.synapse.service.SynapseAppDeployerServiceImpl;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,14 +44,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="application.deployer.synapse" immediate="true"
- * @scr.reference name="synapse.env.service"
- * interface="org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService"
- * cardinality="1..n" policy="dynamic" bind="setSynapseEnvironmentService"
- * unbind="unsetSynapseEnvironmentService"
- */
+@Component(
+         name = "application.deployer.synapse", 
+         immediate = true)
 public class SynapseAppDeployerDSComponent implements ServiceListener {
 
     private static Log log = LogFactory.getLog(SynapseAppDeployerDSComponent.class);
@@ -67,39 +68,29 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
 
     private Timer pendingServicesObservationTimer = new Timer();
 
+    @Activate
     protected void activate(ComponentContext ctxt) {
         try {
             // Register synapse deployer as an OSGi service
             SynapseAppDeployer synapseDeployer = new SynapseAppDeployer();
-
             bndCtx = ctxt.getBundleContext();
-
-            appHandlerRegistration = bndCtx.registerService(
-                    AppDeploymentHandler.class.getName(), synapseDeployer, null);
-
-            URL reqFeaturesResource = ctxt.getBundleContext().getBundle()
-                    .getResource(AppDeployerConstants.REQ_FEATURES_XML);
+            appHandlerRegistration = bndCtx.registerService(AppDeploymentHandler.class.getName(), synapseDeployer, null);
+            URL reqFeaturesResource = ctxt.getBundleContext().getBundle().getResource(AppDeployerConstants.REQ_FEATURES_XML);
             if (reqFeaturesResource != null) {
                 InputStream xmlStream = reqFeaturesResource.openStream();
-                requiredFeatures = AppDeployerUtils
-                        .readRequiredFeaturs(new StAXOMBuilder(xmlStream).getDocumentElement());
+                requiredFeatures = AppDeployerUtils.readRequiredFeaturs(new StAXOMBuilder(xmlStream).getDocumentElement());
             }
-
             populateRequiredServices();
-
             if (requiredServices.isEmpty()) {
                 completeInitialization();
             } else {
-
                 StringBuffer ldapFilter = new StringBuffer("(|");
                 for (String service : requiredServices) {
                     ldapFilter.append("(").append(Constants.OBJECTCLASS).append("=").append(service).append(")");
                 }
                 ldapFilter.append(")");
-
                 bndCtx.addServiceListener(this, ldapFilter.toString());
-                ServiceReference[] serviceReferences =
-                        bndCtx.getServiceReferences((String) null, ldapFilter.toString());
+                ServiceReference[] serviceReferences = bndCtx.getServiceReferences((String) null, ldapFilter.toString());
                 if (serviceReferences != null) {
                     for (ServiceReference reference : serviceReferences) {
                         String service = ((String[]) reference.getProperty(Constants.OBJECTCLASS))[0];
@@ -120,6 +111,7 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctxt) {
         // Unregister the OSGi service
         if (appHandlerRegistration != null) {
@@ -133,14 +125,16 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
      * initialization is done in the activate method. Otherwise we have to do the activation here.
      *
      * @param synapseEnvironmentService SynapseEnvironmentService which contains information
-     *                                  about the new Synapse Instance
+     * about the new Synapse Instance
      */
-    protected void setSynapseEnvironmentService(
-            SynapseEnvironmentService synapseEnvironmentService) {
-
-        DataHolder.getInstance().addSynapseEnvironmentService(
-                synapseEnvironmentService.getTenantId(),
-                synapseEnvironmentService);
+    @Reference(
+             name = "synapse.env.service", 
+             service = org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService.class, 
+             cardinality = ReferenceCardinality.AT_LEAST_ONE, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetSynapseEnvironmentService")
+    protected void setSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
+        DataHolder.getInstance().addSynapseEnvironmentService(synapseEnvironmentService.getTenantId(), synapseEnvironmentService);
     }
 
     /**
@@ -149,22 +143,17 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
      *
      * @param synapseEnvironmentService synapseEnvironment
      */
-    protected void unsetSynapseEnvironmentService(
-            SynapseEnvironmentService synapseEnvironmentService) {
-        DataHolder.getInstance().removeSynapseEnvironmentService(
-                synapseEnvironmentService.getTenantId());
+    protected void unsetSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
+        DataHolder.getInstance().removeSynapseEnvironmentService(synapseEnvironmentService.getTenantId());
     }
-
 
     public static Map<String, List<Feature>> getRequiredFeatures() {
         return requiredFeatures;
     }
 
-
     public void serviceChanged(ServiceEvent serviceEvent) {
         if (serviceEvent.getType() == ServiceEvent.REGISTERED) {
-            String service =
-                    ((String[]) serviceEvent.getServiceReference().getProperty(Constants.OBJECTCLASS))[0];
+            String service = ((String[]) serviceEvent.getServiceReference().getProperty(Constants.OBJECTCLASS))[0];
             requiredServices.remove(service);
             if (log.isDebugEnabled()) {
                 log.debug("Removed pending service " + service);
@@ -178,9 +167,7 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
     private void populateRequiredServices() {
         Bundle[] bundles = bndCtx.getBundles();
         for (Bundle bundle : bundles) {
-            String requiredServiceList =
-                    (String) bundle.getHeaders().
-                            get(SynapseAppDeployerConstants.SYNAPSE_DEPLOYER_REQUIRED_SERVICES);
+            String requiredServiceList = (String) bundle.getHeaders().get(SynapseAppDeployerConstants.SYNAPSE_DEPLOYER_REQUIRED_SERVICES);
             if (requiredServiceList != null) {
                 String[] values = requiredServiceList.split(",");
                 for (String value : values) {
@@ -192,6 +179,7 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
 
     private void schedulePendingServicesObservationTimer() {
         pendingServicesObservationTimer.scheduleAtFixedRate(new TimerTask() {
+
             public void run() {
                 if (!requiredServices.isEmpty()) {
                     StringBuffer services = new StringBuffer();
@@ -205,11 +193,10 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
     }
 
     private void completeInitialization() {
-        bndCtx.registerService(SynapseAppDeployerService.class.getName(),
-                                                       new SynapseAppDeployerServiceImpl(), null);
+        bndCtx.registerService(SynapseAppDeployerService.class.getName(), new SynapseAppDeployerServiceImpl(), null);
         if (log.isDebugEnabled()) {
             log.debug("Synapse Application deployer activated");
         }
     }
-
 }
+

@@ -15,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.mediation.initializer;
 
 import org.apache.axis2.AxisFault;
@@ -45,6 +44,12 @@ import org.apache.synapse.task.TaskScheduler;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.ServerShutdownHandler;
@@ -85,173 +90,117 @@ import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * @scr.component name="esb.core.initializer" immediate="true"
- * @scr.reference name="task.description.repository.service"
- * interface="org.wso2.carbon.task.services.TaskDescriptionRepositoryService"
- * cardinality="1..1" policy="dynamic"
- * bind="setTaskDescriptionRepositoryService" unbind="unsetTaskDescriptionRepositoryService"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="1..1" policy="dynamic"
- * bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- * @scr.reference name="task.scheduler.service"
- * interface="org.wso2.carbon.task.services.TaskSchedulerService"
- * cardinality="1..1" policy="dynamic"
- * bind="setTaskSchedulerService" unbind="unsetTaskSchedulerService"
- * @scr.reference name="secret.callback.handler.service"
- * interface="org.wso2.carbon.securevault.SecretCallbackHandlerService"
- * cardinality="1..1" policy="dynamic"
- * bind="setSecretCallbackHandlerService" unbind="unsetSecretCallbackHandlerService"
- * @scr.reference name="esbntask.taskservice"
- * interface="org.wso2.carbon.mediation.ntask.internal.NtaskService" cardinality="0..1"
- * policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
- * @scr.reference name="inbound.endpoint.persistence.service"
- * interface="org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService"
- * cardinality="0..1" policy="dynamic"
- * bind="setInboundPersistenceService" unbind="unsetInboundPersistenceService"
- * @scr.reference name="ntask.service"
- * interface="org.wso2.carbon.ntask.core.service.TaskService"
- * cardinality="1..1" policy="dynamic" bind="setTaskService"
- * unbind="unsetTaskService"
- */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
+@Component(
+        name = "esb.core.initializer",
+        immediate = true)
 public class ServiceBusInitializer {
+
     private static final Log log = LogFactory.getLog(ServiceBusInitializer.class);
 
-    //    private static RegistryService registryService;
+    // private static RegistryService registryService;
     private static ServerConfigurationInformation configurationInformation;
 
     private static String configPath;
+
     private ConfigurationContextService configCtxSvc;
-    //    private SynapseRegistryService synRegSvc;
-    //    private DataSourceInformationRepositoryService dataSourceInformationRepositoryService;
+
+    // private SynapseRegistryService synRegSvc;
+    // private DataSourceInformationRepositoryService dataSourceInformationRepositoryService;
     private TaskDescriptionRepositoryService repositoryService;
+
     private TaskSchedulerService taskSchedulerService;
+
     private SecretCallbackHandlerService secretCallbackHandlerService;
 
     private ServerManager serverManager;
+
     private TaskService taskService;
 
+    @Activate
     protected void activate(ComponentContext ctxt) {
 
         log.debug("Activating Micro Integrator...");
-
-        PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext
-                .getThreadLocalCarbonContext();
+        PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
-
         if (taskService != null && !taskService.isServerInit()) {
             log.debug("Initialize Task Service");
             taskService.serverInitialized();
         }
-
         // FIXME: this is a hack to get rid of the https port retrieval from the axis2
         // configuration returning the non blocking https transport. Ideally we should be able
         // to fix this by making it possible to let the authentication of carbon be done through
         // the non blocking https transport
         setHttpsProtForConsole();
-
-        //clean up temp folder created for connector class loader reference
+        // clean up temp folder created for connector class loader reference
         String javaTempDir = System.getProperty("java.io.tmpdir");
-        String APP_UNZIP_DIR = javaTempDir.endsWith(File.separator) ?
-                javaTempDir + "libs" :
-                javaTempDir + File.separator + "libs";
+        String APP_UNZIP_DIR = javaTempDir.endsWith(File.separator) ? javaTempDir + "libs" : javaTempDir + File
+                .separator + "libs";
         cleanupTempDirectory(APP_UNZIP_DIR);
-
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             ConfigurationHolder.getInstance().setBundleContext(bndCtx);
-
             // initialize the lock
             Lock lock = new ReentrantLock();
-            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(
-                    ServiceBusConstants.SYNAPSE_CONFIG_LOCK, lock);
-
+            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(ServiceBusConstants
+                    .SYNAPSE_CONFIG_LOCK, lock);
             // first check which configuration should be active
-//            UserRegistry registry = registryService.getConfigSystemRegistry();
-
+            // UserRegistry registry = registryService.getConfigSystemRegistry();
             // init the multiple configuration tracker
-            ConfigurationManager configurationManager =
-                    new ConfigurationManager( configCtxSvc.getServerConfigContext());
+            ConfigurationManager configurationManager = new ConfigurationManager(configCtxSvc.getServerConfigContext());
             configurationManager.init();
-
             // set the event broker as a property
-/*
+            /*
             if (eventBroker != null) {
                 configCtxSvc.getServerConfigContext().setProperty("mediation.event.broker", eventBroker);
             }
 */
-
             // Initialize Synapse
             ServerContextInformation contextInfo = initESB("default");
-
             ServiceRegistration synCfgRegistration = null;
             ServiceRegistration synEnvRegistration = null;
-
             if (contextInfo.getSynapseConfiguration() != null) {
-
-                //Properties props = new Properties();
-                SynapseConfigurationService synCfgSvc
-                        = new SynapseConfigurationServiceImpl(contextInfo.getSynapseConfiguration(),
-                        MultitenantConstants.SUPER_TENANT_ID, configCtxSvc.getServerConfigContext());
-                synCfgRegistration = bndCtx.registerService(
-                        SynapseConfigurationService.class.getName(), synCfgSvc, null);
-
-                bndCtx.registerService(
-                        ServerShutdownHandler.class.getName(),
-                        new MPMShutdownHandler(
-                                synCfgSvc.getSynapseConfiguration().getAxisConfiguration()),
+                // Properties props = new Properties();
+                SynapseConfigurationService synCfgSvc = new SynapseConfigurationServiceImpl(contextInfo
+                        .getSynapseConfiguration(), MultitenantConstants.SUPER_TENANT_ID, configCtxSvc
+                        .getServerConfigContext());
+                synCfgRegistration = bndCtx.registerService(SynapseConfigurationService.class.getName(), synCfgSvc,
                         null);
-                initPersistence(synCfgSvc,"default");
+                bndCtx.registerService(ServerShutdownHandler.class.getName(), new MPMShutdownHandler(synCfgSvc
+                        .getSynapseConfiguration().getAxisConfiguration()), null);
+                initPersistence(synCfgSvc, "default");
                 if (log.isDebugEnabled()) {
                     log.debug("SynapseConfigurationService Registered");
                 }
-
             } else {
-                handleFatal("Couldn't register the SynapseConfigurationService, " +
-                        "SynapseConfiguration not found");
+                handleFatal("Couldn't register the SynapseConfigurationService, " + "SynapseConfiguration not found");
             }
-
             SynapseEnvironment synapseEnvironment = contextInfo.getSynapseEnvironment();
             if (synapseEnvironment != null) {
-
-                //Properties props = new Properties();
-                SynapseEnvironmentService synEnvSvc
-                        = new SynapseEnvironmentServiceImpl(synapseEnvironment,
+                // Properties props = new Properties();
+                SynapseEnvironmentService synEnvSvc = new SynapseEnvironmentServiceImpl(synapseEnvironment,
                         MultitenantConstants.SUPER_TENANT_ID, configCtxSvc.getServerConfigContext());
-                synEnvRegistration = bndCtx.registerService(
-                        SynapseEnvironmentService.class.getName(), synEnvSvc, null);
+                synEnvRegistration = bndCtx.registerService(SynapseEnvironmentService.class.getName(), synEnvSvc, null);
                 synapseEnvironment.registerSynapseHandler(new SynapseExternalPropertyConfigurator());
                 synapseEnvironment.registerSynapseHandler(new ProxyLogHandler());
-
                 if (log.isDebugEnabled()) {
                     log.debug("SynapseEnvironmentService Registered");
                 }
-
             } else {
-                handleFatal("Couldn't register the SynapseEnvironmentService, " +
-                        "SynapseEnvironment not found");
+                handleFatal("Couldn't register the SynapseEnvironmentService, " + "SynapseEnvironment not found");
             }
-
-            //Properties props = new Properties();
-            SynapseRegistrationsService synRegistrationsSvc
-                    = new SynapseRegistrationsServiceImpl(synCfgRegistration, synEnvRegistration,
-                    MultitenantConstants.SUPER_TENANT_ID, configCtxSvc.getServerConfigContext());
-            bndCtx.registerService(SynapseRegistrationsService.class.getName(),
-                    synRegistrationsSvc, null);
-
-            configCtxSvc.getServerConfigContext().setProperty(
-                    ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
-
+            // Properties props = new Properties();
+            SynapseRegistrationsService synRegistrationsSvc = new SynapseRegistrationsServiceImpl(synCfgRegistration,
+                    synEnvRegistration, MultitenantConstants.SUPER_TENANT_ID, configCtxSvc.getServerConfigContext());
+            bndCtx.registerService(SynapseRegistrationsService.class.getName(), synRegistrationsSvc, null);
+            configCtxSvc.getServerConfigContext().setProperty(ConfigurationManager.CONFIGURATION_MANAGER,
+                    configurationManager);
             // Start Inbound Endpoint Listeners
-            //tOdO need to fix inbound endpoints
+            // tOdO need to fix inbound endpoints
             EndpointListenerLoader.loadListeners();
-
-            registerInboundDeployer(configCtxSvc.getServerConfigContext()
-                            .getAxisConfiguration(),
-                    contextInfo.getSynapseEnvironment());
+            registerInboundDeployer(configCtxSvc.getServerConfigContext().getAxisConfiguration(), contextInfo
+                    .getSynapseEnvironment());
         } catch (Exception e) {
             handleFatal("Couldn't initialize the ESB...", e);
         } catch (Throwable t) {
@@ -259,17 +208,17 @@ public class ServiceBusInitializer {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctxt) {
+
         serverManager.stop();
         serverManager.shutdown();
     }
 
-    private void initPersistence(SynapseConfigurationService synCfgSvc, String configName)
-            throws AxisFault {
+    private void initPersistence(SynapseConfigurationService synCfgSvc, String configName) throws AxisFault {
         // Initialize the mediation persistence manager if required
         ServerConfiguration serverConf = ServerConfiguration.getInstance();
         String persistence = serverConf.getFirstProperty(ServiceBusConstants.PERSISTENCE);
-
         // Check whether persistence is disabled
         if (!ServiceBusConstants.DISABLED.equals(persistence)) {
             // Check the worker interval is set or not
@@ -279,18 +228,15 @@ public class ServiceBusInitializer {
                 try {
                     intervalInMillis = Long.parseLong(interval);
                 } catch (NumberFormatException e) {
-                    log.error("Invalid value " + interval + " specified for the mediation " +
-                            "persistence worker interval, Using defaults", e);
+                    log.error("Invalid value " + interval + " specified for the mediation " + "persistence worker " +
+                            "interval, Using defaults", e);
                 }
             }
-
             // Finally init the persistence manager
-            MediationPersistenceManager pm = new MediationPersistenceManager(
-                    configurationInformation.getSynapseXMLLocation(),
-                    synCfgSvc.getSynapseConfiguration(), intervalInMillis, configName);
-
-            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(new Parameter(
-                    ServiceBusConstants.PERSISTENCE_MANAGER, pm));
+            MediationPersistenceManager pm = new MediationPersistenceManager(configurationInformation
+                    .getSynapseXMLLocation(), synCfgSvc.getSynapseConfiguration(), intervalInMillis, configName);
+            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(new Parameter
+                    (ServiceBusConstants.PERSISTENCE_MANAGER, pm));
         } else {
             log.info("Persistence for mediation configuration is disabled");
         }
@@ -302,20 +248,16 @@ public class ServiceBusInitializer {
         if (CarbonUtils.isRunningInStandaloneMode()) {
             // Try to get the port information from the Carbon TransportManager
             // -- Standalone Mode --
-            final String TRANSPORT_MANAGER
-                    = "org.wso2.carbon.tomcat.ext.transport.ServletTransportManager";
+            final String TRANSPORT_MANAGER = "org.wso2.carbon.tomcat.ext.transport.ServletTransportManager";
             try {
                 Class transportManagerClass = Class.forName(TRANSPORT_MANAGER);
                 Object transportManager = transportManagerClass.newInstance();
                 Method method = transportManagerClass.getMethod("getPort", String.class);
                 int httpsPort = (Integer) method.invoke(transportManager, "https");
                 int httpPort = (Integer) method.invoke(transportManager, "http");
-
-
                 // required to properly log the management console URL
                 System.setProperty("carbon.https.port", Integer.toString(httpsPort));
                 System.setProperty("carbon.http.port", Integer.toString(httpPort));
-
                 System.setProperty("httpPort", Integer.toString(httpPort));
                 System.setProperty("httpsPort", Integer.toString(httpsPort));
                 // this is required for the dashboard to work
@@ -326,13 +268,11 @@ public class ServiceBusInitializer {
                 log.error("failed to set ports http/https", e);
             }
         } else {
-            // Try to get the port information from the carbon.xml
             // -- Webapp Deployment Mode --
             if (log.isDebugEnabled()) {
-                log.debug("TransportManager implementation not found. Switching to " +
-                        "webapp deployment mode. Reading HTTPS port from the carbon.xml.");
+                log.debug("TransportManager implementation not found. Switching to " + "webapp deployment mode. " +
+                        "Reading HTTPS port from the carbon.xml.");
             }
-
             String serverURL = config.getFirstProperty("ServerURL");
             if (serverURL != null) {
                 try {
@@ -346,10 +286,9 @@ public class ServiceBusInitializer {
                     log.error("Error while parsing the server URL " + serverURL, ex);
                 }
             } else {
-                log.warn("Server URL is not specified in the carbon.xml. Unable to " +
-                        "set the HTTPS port as a system property");
+                log.warn("Server URL is not specified in the carbon.xml. Unable to " + "set the HTTPS port as a " +
+                        "system property");
             }
-
         }
     }
 
@@ -357,109 +296,83 @@ public class ServiceBusInitializer {
 
         if (configCtxSvc != null) {
             ConfigurationContext configContext = configCtxSvc.getServerConfigContext();
-
             log.debug("Initializing Apache Synapse...");
-            configurationInformation =
-                    ServerConfigurationInformationFactory.createServerConfigurationInformation(
-                            configContext.getAxisConfiguration());
+            configurationInformation = ServerConfigurationInformationFactory.createServerConfigurationInformation
+                    (configContext.getAxisConfiguration());
             // ability to specify the SynapseServerName as a system property
             if (System.getProperty("SynapseServerName") != null) {
                 configurationInformation.setServerName(System.getProperty("SynapseServerName"));
             }
-
             // for now we override the default configuration location with the value in registry
             String synapseConfigsLocation = configurationInformation.getSynapseXMLLocation();
             if (synapseConfigsLocation != null) {
-                configurationInformation.setSynapseXMLLocation(
-                        synapseConfigsLocation + File.separator + name);
+                configurationInformation.setSynapseXMLLocation(synapseConfigsLocation + File.separator + name);
             } else {
-                configurationInformation.setSynapseXMLLocation(
-                        ServiceBusConstants.DEFAULT_SYNAPSE_CONFIGS_LOCATION + name);
+                configurationInformation.setSynapseXMLLocation(ServiceBusConstants.DEFAULT_SYNAPSE_CONFIGS_LOCATION +
+                        name);
             }
-
             configurationInformation.setCreateNewInstance(false);
-            configurationInformation.setServerControllerProvider(
-                    CarbonSynapseController.class.getName());
+            configurationInformation.setServerControllerProvider(CarbonSynapseController.class.getName());
             if (isRunningSamplesMode()) {
                 if (System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null) {
-                    configurationInformation.setSynapseXMLLocation(
-                            "repository" + File.separator + "samples" + File.separator + "synapse_sample_" +
-                                    System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                    configurationInformation.setSynapseXMLLocation("repository" + File.separator + "samples" + File
+                            .separator + "synapse_sample_" + System.getProperty(ServiceBusConstants
+                            .ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
                 } else {
-                    configurationInformation.setSynapseXMLLocation("samples" + File.separator + "service-bus" +
-                            File.separator + "synapse_sample_" +
-                            System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                    configurationInformation.setSynapseXMLLocation("samples" + File.separator + "service-bus" + File
+                            .separator + "synapse_sample_" + System.getProperty(ServiceBusConstants
+                            .EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
                 }
             }
-
             serverManager = new ServerManager();
             ServerContextInformation contextInfo = new ServerContextInformation(configContext,
                     configurationInformation);
-            //  TODO: Initialize with ndatasources
-            //            if (dataSourceInformationRepositoryService != null) {
-            //                DataSourceInformationRepository repository =
-            //                        dataSourceInformationRepositoryService.getDataSourceInformationRepository();
-            //                contextInfo.addProperty(DataSourceConstants.DATA_SOURCE_INFORMATION_REPOSITORY,
-            //                        repository);
-            //            }
-
+            // }
             if (taskSchedulerService != null) {
                 TaskScheduler scheduler = taskSchedulerService.getTaskScheduler();
                 contextInfo.addProperty(TaskConstants.TASK_SCHEDULER, scheduler);
             }
-
             if (repositoryService != null) {
-                TaskDescriptionRepository repository
-                        = repositoryService.getTaskDescriptionRepository();
+                TaskDescriptionRepository repository = repositoryService.getTaskDescriptionRepository();
                 contextInfo.addProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY, repository);
             }
-
             if (secretCallbackHandlerService != null) {
-                contextInfo.addProperty(SecurityConstants.PROP_SECRET_CALLBACK_HANDLER,
-                        secretCallbackHandlerService.getSecretCallbackHandler());
+                contextInfo.addProperty(SecurityConstants.PROP_SECRET_CALLBACK_HANDLER, secretCallbackHandlerService
+                        .getSecretCallbackHandler());
             }
-
             AxisConfiguration axisConf = configContext.getAxisConfiguration();
-            axisConf.addParameter(
-                    new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
-
+            axisConf.addParameter(new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
             if (isRunningDebugMode()) {
                 log.debug("Micro Integrator started in Debug mode for super tenant");
                 createSynapseDebugEnvironment(contextInfo);
             }
-
-            boolean initConnectors =
-                    !Boolean.valueOf(System.getProperty(ServiceBusConstants.DISABLE_CONNECTOR_INIT_SYSTEM_PROPERTY));
+            boolean initConnectors = !Boolean.valueOf(System.getProperty(ServiceBusConstants
+                    .DISABLE_CONNECTOR_INIT_SYSTEM_PROPERTY));
             if (initConnectors) {
                 // Enable connectors
                 SynapseArtifactInitUtils.initializeConnectors(axisConf);
             }
-
             serverManager.init(configurationInformation, contextInfo);
             serverManager.start();
-
-
-            AxisServiceGroup serviceGroup = axisConf.getServiceGroup(
-                    SynapseConstants.SYNAPSE_SERVICE_NAME);
+            AxisServiceGroup serviceGroup = axisConf.getServiceGroup(SynapseConstants.SYNAPSE_SERVICE_NAME);
             serviceGroup.addParameter("hiddenService", "true");
-
             return contextInfo;
-
         } else {
-            handleFatal("Couldn't initialize Synapse, " +
-                    "ConfigurationContext service or SynapseRegistryService is not available");
+            handleFatal("Couldn't initialize Synapse, " + "ConfigurationContext service or SynapseRegistryService is " +
+                    "not available");
         }
-
         // never executes, but keeps the compiler happy
         return null;
     }
 
     public static boolean isRunningSamplesMode() {
-        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null ||
-                System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null;
+
+        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null || System.getProperty
+                (ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null;
     }
 
     public static boolean isRunningDebugMode() {
+
         String debugMode = System.getProperty(ServiceBusConstants.ESB_DEBUG_SYSTEM_PROPERTY);
         return "true".equals(debugMode) || "super".equals(debugMode);
     }
@@ -497,8 +410,14 @@ public class ServiceBusInitializer {
         }
     }
 
-    protected void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
+    protected void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         if (log.isDebugEnabled()) {
             log.debug("ConfigurationContextService bound to the ESB initialization process");
             log.debug("configurationContextService : " + configurationContextService);
@@ -506,99 +425,130 @@ public class ServiceBusInitializer {
         this.configCtxSvc = configurationContextService;
     }
 
-    protected void unsetConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
+    protected void unsetConfigurationContextService(ConfigurationContextService configurationContextService) {
+
         if (log.isDebugEnabled()) {
             log.debug("ConfigurationContextService unbound from the ESB environment");
         }
         this.configCtxSvc = null;
     }
 
-    protected void setTaskDescriptionRepositoryService(
-            TaskDescriptionRepositoryService repositoryService) {
+    @Reference(
+            name = "task.description.repository.service",
+            service = org.wso2.carbon.task.services.TaskDescriptionRepositoryService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetTaskDescriptionRepositoryService")
+    protected void setTaskDescriptionRepositoryService(TaskDescriptionRepositoryService repositoryService) {
+
         if (log.isDebugEnabled()) {
             log.debug("TaskDescriptionRepositoryService bound to the ESB initialization process");
         }
         this.repositoryService = repositoryService;
     }
 
-    protected void unsetTaskDescriptionRepositoryService(
-            TaskDescriptionRepositoryService repositoryService) {
+    protected void unsetTaskDescriptionRepositoryService(TaskDescriptionRepositoryService repositoryService) {
+
         if (log.isDebugEnabled()) {
             log.debug("TaskDescriptionRepositoryService unbound from the ESB environment");
         }
         this.repositoryService = null;
     }
 
-    protected void setTaskSchedulerService(
-            TaskSchedulerService schedulerService) {
+    @Reference(
+            name = "task.scheduler.service",
+            service = org.wso2.carbon.task.services.TaskSchedulerService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetTaskSchedulerService")
+    protected void setTaskSchedulerService(TaskSchedulerService schedulerService) {
+
         if (log.isDebugEnabled()) {
             log.debug("TaskSchedulerService bound to the ESB initialization process");
         }
         this.taskSchedulerService = schedulerService;
     }
 
-    protected void unsetTaskSchedulerService(
-            TaskSchedulerService schedulerService) {
+    protected void unsetTaskSchedulerService(TaskSchedulerService schedulerService) {
+
         if (log.isDebugEnabled()) {
             log.debug("TaskSchedulerService unbound from the ESB environment");
         }
         this.taskSchedulerService = null;
     }
 
-    protected void setSecretCallbackHandlerService(
-            SecretCallbackHandlerService secretCallbackHandlerService) {
+    @Reference(
+            name = "secret.callback.handler.service",
+            service = org.wso2.carbon.securevault.SecretCallbackHandlerService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSecretCallbackHandlerService")
+    protected void setSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
+
         if (log.isDebugEnabled()) {
             log.debug("SecretCallbackHandlerService bound to the ESB initialization process");
         }
         this.secretCallbackHandlerService = secretCallbackHandlerService;
     }
 
-    protected void unsetSecretCallbackHandlerService(
-            SecretCallbackHandlerService secretCallbackHandlerService) {
+    protected void unsetSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
+
         if (log.isDebugEnabled()) {
             log.debug("SecretCallbackHandlerService unbound from the ESB environment");
         }
         this.secretCallbackHandlerService = null;
     }
 
+    @Reference(
+            name = "esbntask.taskservice",
+            service = org.wso2.carbon.mediation.ntask.internal.NtaskService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetTaskService")
     protected void setTaskService(NtaskService taskService) {
+
     }
 
     protected void unsetTaskService(NtaskService ntaskService) {
+
     }
 
     public static ServerConfigurationInformation getConfigurationInformation() {
+
         return configurationInformation;
     }
 
-
     protected static ServerConfigurationInformation getServerConfigurationInformation() {
+
         return configurationInformation;
     }
 
     private void handleFatal(String message) {
+
         log.fatal(message);
         // Do not do this -- throw new RuntimeException(message);
         // it causes the OSGi environment to reinitialize synapse which will result in a looping
     }
 
     private void handleFatal(String message, Exception e) {
+
         log.fatal(message, e);
         // Do not do this -- throw new RuntimeException(message, e);
         // it causes the OSGi environment to reinitialize synapse which will result in a looping
     }
 
     public class MPMShutdownHandler implements ServerShutdownHandler {
+
         private AxisConfiguration configuration;
 
         public MPMShutdownHandler(AxisConfiguration configuration) {
+
             this.configuration = configuration;
         }
 
         public void invoke() {
-            Parameter p = configuration.getParameter(
-                    ServiceBusConstants.PERSISTENCE_MANAGER);
+
+            Parameter p = configuration.getParameter(ServiceBusConstants.PERSISTENCE_MANAGER);
             if (p != null && p.getValue() instanceof MediationPersistenceManager) {
                 ((MediationPersistenceManager) p.getValue()).destroy();
             }
@@ -611,6 +561,7 @@ public class ServiceBusInitializer {
      * @param appUnzipDir
      */
     private static void cleanupTempDirectory(String appUnzipDir) {
+
         File tempDirector = new File(appUnzipDir);
         if (tempDirector.isDirectory()) {
             File[] entries = tempDirector.listFiles();
@@ -628,45 +579,44 @@ public class ServiceBusInitializer {
     /**
      * Register for inbound hot depoyment
      */
-    private void registerInboundDeployer(AxisConfiguration axisConfig,
-                                         SynapseEnvironment synEnv) {
-        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig
-                .getConfigurator();
-        SynapseArtifactDeploymentStore deploymentStore = synEnv
-                .getSynapseConfiguration().getArtifactDeploymentStore();
+    private void registerInboundDeployer(AxisConfiguration axisConfig, SynapseEnvironment synEnv) {
 
-        String synapseConfigPath = ServiceBusUtils
-                .getSynapseConfigAbsPath(synEnv.getServerContextInformation());
-
-        String inboundDirPath = synapseConfigPath + File.separator
-                + MultiXMLConfigurationBuilder.INBOUND_ENDPOINT_DIR;
-
-        for (InboundEndpoint inboundEndpoint : synEnv.getSynapseConfiguration()
-                .getInboundEndpoints()) {
+        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+        SynapseArtifactDeploymentStore deploymentStore = synEnv.getSynapseConfiguration().getArtifactDeploymentStore();
+        String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synEnv.getServerContextInformation());
+        String inboundDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.INBOUND_ENDPOINT_DIR;
+        for (InboundEndpoint inboundEndpoint : synEnv.getSynapseConfiguration().getInboundEndpoints()) {
             if (inboundEndpoint.getFileName() != null) {
-                deploymentStore.addRestoredArtifact(inboundDirPath
-                        + File.separator + inboundEndpoint.getFileName());
+                deploymentStore.addRestoredArtifact(inboundDirPath + File.separator + inboundEndpoint.getFileName());
             }
         }
-        deploymentEngine.addDeployer(new InboundEndpointDeployer(),
-                inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        deploymentEngine.addDeployer(new InboundEndpointDeployer(), inboundDirPath, ServiceBusConstants
+                .ARTIFACT_EXTENSION);
     }
 
+    @Reference(
+            name = "inbound.endpoint.persistence.service",
+            service = org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetInboundPersistenceService")
     protected void setInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
         // This service is just here to make sure that ServiceBus is not getting initialized
         // before the Inbound Endpoint Persistence component is up and running
     }
 
     protected void unsetInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
+
     }
 
     protected void setTaskService(TaskService taskService) {
+
         log.debug("Set Task Service");
         this.taskService = taskService;
     }
 
     protected void unsetTaskService(TaskService taskService) {
+
         this.taskService = null;
     }
-
 }

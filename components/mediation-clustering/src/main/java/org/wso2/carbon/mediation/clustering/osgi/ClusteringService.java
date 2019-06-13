@@ -23,63 +23,70 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.wso2.carbon.utils.ConfigurationContextService;
-
 import com.hazelcast.core.HazelcastInstance;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
- * 
- * @scr.component name="esbclustering.agentservice" immediate="true"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- * 
- **/
-
+ */
+@Component(
+        name = "esbclustering.agentservice",
+        immediate = true)
 public class ClusteringService {
 
     private static final Log log = LogFactory.getLog(ClusteringService.class);
-    
+
     private static ConfigurationContextService configContextService;
-    
+
     /**
-     * 
      * @param contextService
      */
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
+
         if (log.isDebugEnabled()) {
             log.debug("Setting Configuration Context Service [" + contextService + "]");
-        }        
+        }
         configContextService = contextService;
     }
 
     /**
-     * 
      * @param contextService
      */
-    protected void unsetConfigurationContextService(ConfigurationContextService contextService) {        
+    protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
+
         if (log.isDebugEnabled()) {
             log.debug("Unsetting Configuration Context Service [" + contextService + "]");
         }
         configContextService = null;
     }
-    
-    public static ConfigurationContextService  getConfigurationContextService(){
+
+    public static ConfigurationContextService getConfigurationContextService() {
+
         return configContextService;
     }
-    
+
     /**
-     * 
      * Get the hazelcast instance
-     * 
+     *
      * @return
      */
     public static HazelcastInstance getHazelcastInstance() {
+
         BundleContext ctx = FrameworkUtil.getBundle(ClusteringService.class).getBundleContext();
         ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
         if (ref == null) {
             return null;
         }
-        return (HazelcastInstance)ctx.getService(ref);
+        return (HazelcastInstance) ctx.getService(ref);
     }
-    
 }
