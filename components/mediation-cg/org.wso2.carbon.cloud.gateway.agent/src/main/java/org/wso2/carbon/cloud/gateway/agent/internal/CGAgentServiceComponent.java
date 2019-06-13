@@ -15,12 +15,17 @@
  */
 package org.wso2.carbon.cloud.gateway.agent.internal;
 
-
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.cloud.gateway.agent.observer.CGServiceObserver;
 import org.wso2.carbon.cloud.gateway.agent.service.CGAgentAdminService;
@@ -44,22 +49,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @scr.component name="org.wso2.carbon.cloud.gateway.agent.internal.CGAgentServiceComponent" immediate="true"
- * @scr.reference name="user.realmservice.default"
- * interface="org.wso2.carbon.user.core.service.RealmService"
- * cardinality="1..1"
- * policy="dynamic" bind="setRealmService"
- * unbind="unsetRealmService"
- * @scr.reference name="config.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="1..1"
- * policy="dynamic"
- * bind="setConfigurationContextService"
- * unbind="unsetConfigurationContextService"
- */
-
 @SuppressWarnings({"UnusedDeclaration"})
+@Component(
+        name = "org.wso2.carbon.cloud.gateway.agent.internal.CGAgentServiceComponent",
+        immediate = true)
 public class CGAgentServiceComponent {
 
     private static Log log = LogFactory.getLog(CGAgentServiceComponent.class);
@@ -72,60 +65,47 @@ public class CGAgentServiceComponent {
 
     private double reconnectionProgressionFactor;
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         if (this.configurationContextService == null) {
-            log.error("Cloud not activated the CGAgentServiceComponent. " +
-                    "ConfigurationContextService is null!");
+            log.error("Cloud not activated the CGAgentServiceComponent. " + "ConfigurationContextService is null!");
             return;
         }
-
         initialReconnectDuration = CGUtils.getLongProperty(CGConstant.INITIAL_RECONNECT_DURATION, 10000);
         reconnectionProgressionFactor = CGUtils.getDoubleProperty(CGConstant.PROGRESSION_FACTOR, 2.0);
-
-        String[] publishOptimizedList = UserCoreUtil.optimizePermissions(
-                CGConstant.CG_PUBLISH_PERMISSION_LIST);
-
-        String[] unpublishOptimizedList = UserCoreUtil.optimizePermissions(
-                CGConstant.CG_UNPUBLISH_PERMISSION_LIST);
-
+        String[] publishOptimizedList = UserCoreUtil.optimizePermissions(CGConstant.CG_PUBLISH_PERMISSION_LIST);
+        String[] unpublishOptimizedList = UserCoreUtil.optimizePermissions(CGConstant.CG_UNPUBLISH_PERMISSION_LIST);
         try {
             // add the publish and un publish roles
             UserRealm realm = realmService.getBootstrapRealm();
-            String publisherRole = UserCoreConstants.INTERNAL_DOMAIN + CarbonConstants.DOMAIN_SEPARATOR + CGConstant.CG_PUBLISH_ROLE_NAME;
-            String unpublisherRole = UserCoreConstants.INTERNAL_DOMAIN + CarbonConstants.DOMAIN_SEPARATOR + CGConstant.CG_UNPUBLISH_ROLE_NAME;
-
+            String publisherRole = UserCoreConstants.INTERNAL_DOMAIN + CarbonConstants.DOMAIN_SEPARATOR + CGConstant
+                    .CG_PUBLISH_ROLE_NAME;
+            String unpublisherRole = UserCoreConstants.INTERNAL_DOMAIN + CarbonConstants.DOMAIN_SEPARATOR +
+                    CGConstant.CG_UNPUBLISH_ROLE_NAME;
             AuthorizationManager authorizationManager = realm.getAuthorizationManager();
-/*            // Commenting the source to avoid database deadlock when clustered setup starts with shared database
+            /*            // Commenting the source to avoid database deadlock when clustered setup starts with shared
+             database
             authorizationManager.clearRoleActionOnAllResources(publisherRole,
                     UserMgtConstants.EXECUTE_ACTION);
             authorizationManager.clearRoleActionOnAllResources(unpublisherRole,
                     UserMgtConstants.EXECUTE_ACTION);*/
-
             for (String permission : publishOptimizedList) {
-                authorizationManager.authorizeRole(publisherRole, permission,
-                        UserMgtConstants.EXECUTE_ACTION);
+                authorizationManager.authorizeRole(publisherRole, permission, UserMgtConstants.EXECUTE_ACTION);
             }
-
             for (String permission : unpublishOptimizedList) {
-                authorizationManager.authorizeRole(unpublisherRole, permission,
-                        UserMgtConstants.EXECUTE_ACTION);
+                authorizationManager.authorizeRole(unpublisherRole, permission, UserMgtConstants.EXECUTE_ACTION);
             }
-
             String cgUserName = CGUtils.getStringProperty(CGConstant.CG_USER_NAME, CGConstant.DEFAULT_CG_USER);
-            String cgUserPassword = CGUtils.getStringProperty(CGConstant.CG_USER_PASSWORD,
-                    CGConstant.DEFAULT_CG_USER_PASSWORD);
-
+            String cgUserPassword = CGUtils.getStringProperty(CGConstant.CG_USER_PASSWORD, CGConstant
+                    .DEFAULT_CG_USER_PASSWORD);
             UserStoreManager manager = realm.getUserStoreManager();
-
             if (!manager.isExistingRole(publisherRole)) {
                 manager.addRole(publisherRole, new String[]{realm.getRealmConfiguration().getAdminUserName()}, null);
             }
-
-
             if (!manager.isExistingRole(unpublisherRole)) {
                 manager.addRole(unpublisherRole, new String[]{realm.getRealmConfiguration().getAdminUserName()}, null);
             }
-
             new Thread(new ServiceRePublishingTask(), "Cloud-Gateway-re-publishing-thread").start();
         } catch (Exception e) {
             log.error("Cloud not activated the CGAgentServiceComponent. ", e);
@@ -136,60 +116,79 @@ public class CGAgentServiceComponent {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext context) {
 
     }
 
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService configCtxService) {
+
         this.configurationContextService = configCtxService;
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
+
         if (this.configurationContextService != null) {
             this.configurationContextService = null;
         }
     }
 
+    @Reference(
+            name = "user.realmservice.default",
+            service = org.wso2.carbon.user.core.service.RealmService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRealmService")
     protected void setRealmService(RealmService realmService) {
+
         this.realmService = realmService;
     }
 
     protected void unsetRealmService(RealmService realmService) {
+
         if (this.realmService != null) {
             this.realmService = null;
         }
     }
 
     private class ServiceRePublishingTask implements Runnable {
+
         private CarbonContext carbonContext;
 
         public ServiceRePublishingTask() {
+
             this.carbonContext = CarbonContext.getThreadLocalCarbonContext();
         }
 
         public void run() {
+
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(carbonContext.getTenantDomain());
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(carbonContext.getTenantId());
             long retryDuration = initialReconnectDuration;
             while (true) {
-                if (CGUtils.isServerAlive("localhost",
-                        CarbonUtils.getTransportPort(configurationContextService, "http"))) {
+                if (CGUtils.isServerAlive("localhost", CarbonUtils.getTransportPort(configurationContextService,
+                        "http"))) {
                     List<String> pendingServices = getPendingService();
                     CGAgentAdminService adminService = new CGAgentAdminService();
                     for (String serviceName : pendingServices) {
                         try {
-                            boolean isAutomatic = adminService.getServiceStatus(serviceName).equals(
-                                    CGConstant.CG_SERVICE_STATUS_AUTO_MATIC);
+                            boolean isAutomatic = adminService.getServiceStatus(serviceName).equals(CGConstant
+                                    .CG_SERVICE_STATUS_AUTO_MATIC);
                             String serverName = adminService.getPublishedServer(serviceName);
                             adminService.unPublishService(serviceName, serverName, true);
                             adminService.publishService(serviceName, serverName, isAutomatic);
                             log.info("Service '" + serviceName + "', re-published successfully");
                         } catch (CGException e) {
-                            log.error("Error while re-publishing the previously published service '" + serviceName + "'," +
-                                    " you will need to re-publish the service manually!", e);
+                            log.error("Error while re-publishing the previously published service '" + serviceName +
+                                    "'," + " you will need to re-publish the service manually!", e);
                         }
                     }
-
                     // register observers for automatic published services
                     CGServiceObserver observer = new CGServiceObserver();
                     configurationContextService.getServerConfigContext().getAxisConfiguration().addObservers(observer);
@@ -206,6 +205,7 @@ public class CGAgentServiceComponent {
         }
 
         private List<String> getPendingService() {
+
             AxisConfiguration axisConfig = configurationContextService.getServerConfigContext().getAxisConfiguration();
             List<String> pendingServices = new ArrayList<String>();
             for (Map.Entry<String, AxisService> entry : axisConfig.getServices().entrySet()) {
@@ -217,9 +217,8 @@ public class CGAgentServiceComponent {
                 } catch (CGException e) {
                     log.error("Exception occurred while retrieving status for the " + axisService.getName());
                 }
-
                 if (SystemFilter.isAdminService(axisService) || SystemFilter.isHiddenService(axisService) ||
-                    axisService.isClientSide() || status.equals(CGConstant.CG_SERVICE_STATUS_UNPUBLISHED)) {
+                        axisService.isClientSide() || status.equals(CGConstant.CG_SERVICE_STATUS_UNPUBLISHED)) {
                     continue;
                 }
                 pendingServices.add(axisService.getName());

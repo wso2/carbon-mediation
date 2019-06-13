@@ -96,6 +96,11 @@
             <groupId>org.apache.ws.security.wso2</groupId>
             <artifactId>wss4j</artifactId>
         </dependency>
+    <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -129,5 +134,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

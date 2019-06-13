@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.wso2.carbon.mediation.configadmin;
 
 import org.wso2.carbon.mediation.configadmin.util.ConfigHolder;
@@ -22,40 +21,52 @@ import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingSe
 import org.osgi.service.component.ComponentContext;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="org.wso2.carbon.sequences" immediate="true"
- * @scr.reference name="synapse.registrations.service"
- * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
- * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
- * unbind="unsetSynapseRegistrationsService"
- * @scr.reference name="config.tracking.service"
- * interface="org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService"
- * cardinality="1..1" policy="dynamic"
- * bind="setConfigTrackingService" unbind="unsetConfigTrackingService"
- */
 @SuppressWarnings({"UnusedDeclaration", "JavaDoc"})
+@Component(
+        name = "org.wso2.carbon.sequences",
+        immediate = true)
 public class ConfigAdminServiceComponent {
 
     private static final Log log = LogFactory.getLog(ConfigAdminServiceComponent.class);
 
+    @Activate
     protected void activate(ComponentContext cmpCtx) {
+
         ConfigHolder.getInstance().setBundleContext(cmpCtx.getBundleContext());
     }
 
-    protected void setSynapseRegistrationsService(
-            SynapseRegistrationsService synapseRegistrationsService) {
-        ConfigHolder.getInstance().addSynapseRegistrationService(
-                synapseRegistrationsService.getTenantId(), synapseRegistrationsService);       
+    @Reference(
+            name = "synapse.registrations.service",
+            service = org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSynapseRegistrationsService")
+    protected void setSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
+
+        ConfigHolder.getInstance().addSynapseRegistrationService(synapseRegistrationsService.getTenantId(),
+                synapseRegistrationsService);
     }
 
-    protected void unsetSynapseRegistrationsService(
-            SynapseRegistrationsService synapseRegistrationsService) {
-        ConfigHolder.getInstance().removeSynapseRegistrationService(
-                synapseRegistrationsService.getTenantId());
+    protected void unsetSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
+
+        ConfigHolder.getInstance().removeSynapseRegistrationService(synapseRegistrationsService.getTenantId());
     }
 
+    @Reference(
+            name = "config.tracking.service",
+            service = org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigTrackingService")
     protected void setConfigTrackingService(ConfigurationTrackingService configTrackingService) {
+
         if (log.isDebugEnabled()) {
             log.debug("ConfigurationTrackingService bound to the ESB initialization process");
         }
@@ -63,6 +74,7 @@ public class ConfigAdminServiceComponent {
     }
 
     protected void unsetConfigTrackingService(ConfigurationTrackingService configTrackingService) {
+
         if (log.isDebugEnabled()) {
             log.debug("ConfigurationTrackingService unbound from the ESB environment");
         }

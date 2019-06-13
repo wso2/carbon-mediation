@@ -1,19 +1,18 @@
 /**
- *  Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package org.wso2.carbon.sequences.internal;
 
 import org.apache.axis2.context.ConfigurationContext;
@@ -51,34 +50,18 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @scr.component name="org.wso2.carbon.sequences" immediate="true"
- * @scr.reference name="configuration.context.service"
- * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- * @scr.reference name="synapse.config.service"
- * interface="org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService"
- * cardinality="1..1" policy="dynamic" bind="setSynapseConfigurationService"
- * unbind="unsetSynapseConfigurationService"
- * @scr.reference name="synapse.env.service"
- * interface="org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService"
- * cardinality="1..n" policy="dynamic" bind="setSynapseEnvironmentService"
- * unbind="unsetSynapseEnvironmentService"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="0..1" policy="dynamic"
- * bind="setRegistryService" unbind="unsetRegistryService"
- * @scr.reference name="dependency.mgt.service"
- * interface="org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService"
- * cardinality="0..1" policy="dynamic"
- * bind="setDependencyManager" unbind="unsetDependencyManager"
- * @scr.reference name="synapse.registrations.service"
- * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
- * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
- * unbind="unsetSynapseRegistrationsService"
- */
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 @SuppressWarnings({"UnusedDeclaration", "JavaDoc"})
-public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationContextObserver{
+@Component(
+        name = "org.wso2.carbon.sequences",
+        immediate = true)
+public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationContextObserver {
 
     private static final Log log = LogFactory.getLog(SequenceEditorServiceComponent.class);
 
@@ -86,20 +69,17 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
 
     private boolean activated = false;
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         try {
             BundleContext bndCtx = context.getBundleContext();
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
-            bndCtx.registerService(SequenceDeployerService.class.getName(),
-                                   new SequenceDeployerServiceImpl(), null);
+            bndCtx.registerService(SequenceDeployerService.class.getName(), new SequenceDeployerServiceImpl(), null);
             bndCtx.registerService(SequenceAdminService.class.getName(), new SequenceAdminService(), null);
-
-            SynapseEnvironmentService synEnvService =
-                    ConfigHolder.getInstance().getSynapseEnvironmentService(
-                            MultitenantConstants.SUPER_TENANT_ID);
-
-            registerDeployer(ConfigHolder.getInstance().getAxisConfiguration(),
-                    synEnvService.getSynapseEnvironment());
+            SynapseEnvironmentService synEnvService = ConfigHolder.getInstance().getSynapseEnvironmentService
+                    (MultitenantConstants.SUPER_TENANT_ID);
+            registerDeployer(ConfigHolder.getInstance().getAxisConfiguration(), synEnvService.getSynapseEnvironment());
             if (log.isDebugEnabled()) {
                 log.debug("Sequence Admin bundle is activated ");
             }
@@ -109,13 +89,14 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext context) {
-        Set<Map.Entry<Integer, SynapseEnvironmentService>> entrySet =
-                ConfigHolder.getInstance().getSynapseEnvironmentServices().entrySet();
+
+        Set<Map.Entry<Integer, SynapseEnvironmentService>> entrySet = ConfigHolder.getInstance()
+                .getSynapseEnvironmentServices().entrySet();
         for (Map.Entry<Integer, SynapseEnvironmentService> entry : entrySet) {
-            unregisterDeployer(
-                    entry.getValue().getConfigurationContext().getAxisConfiguration(),
-                    entry.getValue().getSynapseEnvironment());
+            unregisterDeployer(entry.getValue().getConfigurationContext().getAxisConfiguration(), entry.getValue()
+                    .getSynapseEnvironment());
         }
     }
 
@@ -126,14 +107,13 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
      * @param synapseEnvironment SynapseEnvironment to which this deployer belongs
      */
     private void unregisterDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) {
+
         if (axisConfig != null) {
             DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
-            String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(
-                    synapseEnvironment.getServerContextInformation());
-            String sequencesDirPath = synapseConfigPath
-                    + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR;
-            deploymentEngine.removeDeployer(
-                    sequencesDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+            String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment
+                    .getServerContextInformation());
+            String sequencesDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR;
+            deploymentEngine.removeDeployer(sequencesDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
         }
     }
 
@@ -143,48 +123,55 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
      * @param axisConfig         AxisConfiguration to which this deployer belongs
      * @param synapseEnvironment SynapseEnvironment to which this deployer belongs
      */
-    private void registerDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment)
-            throws SequenceEditorException {
+    private void registerDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) throws
+            SequenceEditorException {
+
         SynapseConfiguration synCfg = synapseEnvironment.getSynapseConfiguration();
         DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
         SynapseArtifactDeploymentStore deploymentStore = synCfg.getArtifactDeploymentStore();
-
-        String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(
-                synapseEnvironment.getServerContextInformation());
-        String sequenceDirPath = synapseConfigPath
-                + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR;
-
+        String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment
+                .getServerContextInformation());
+        String sequenceDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR;
         for (SequenceMediator seq : synCfg.getDefinedSequences().values()) {
             if (seq.getFileName() != null) {
-                deploymentStore.addRestoredArtifact(
-                        sequenceDirPath + File.separator + seq.getFileName());
+                deploymentStore.addRestoredArtifact(sequenceDirPath + File.separator + seq.getFileName());
             }
         }
         synchronized (axisConfig) {
-            deploymentEngine.addDeployer(new SequenceDeploymentInterceptor(),
-                    sequenceDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+            deploymentEngine.addDeployer(new SequenceDeploymentInterceptor(), sequenceDirPath, ServiceBusConstants
+                    .ARTIFACT_EXTENSION);
         }
     }
 
+    @Reference(
+            name = "configuration.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
-        ConfigHolder.getInstance().setAxisConfiguration(
-                cfgCtxService.getServerConfigContext().getAxisConfiguration());
+
+        ConfigHolder.getInstance().setAxisConfiguration(cfgCtxService.getServerConfigContext().getAxisConfiguration());
         ConfigHolder.getInstance().setConfigurationContextService(cfgCtxService);
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService cfgCtxService) {
+
         ConfigHolder.getInstance().setAxisConfiguration(null);
     }
 
-    protected void setSynapseConfigurationService(
-            SynapseConfigurationService synapseConfigurationService) {
+    @Reference(
+            name = "synapse.config.service",
+            service = org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSynapseConfigurationService")
+    protected void setSynapseConfigurationService(SynapseConfigurationService synapseConfigurationService) {
 
-        ConfigHolder.getInstance().setSynapseConfiguration(
-                synapseConfigurationService.getSynapseConfiguration());
+        ConfigHolder.getInstance().setSynapseConfiguration(synapseConfigurationService.getSynapseConfiguration());
     }
 
-    protected void unsetSynapseConfigurationService(
-            SynapseConfigurationService synapseConfigurationService) {
+    protected void unsetSynapseConfigurationService(SynapseConfigurationService synapseConfigurationService) {
 
         ConfigHolder.getInstance().setSynapseConfiguration(null);
     }
@@ -195,15 +182,19 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
      * initialization is done in the activate method. Otherwise we have to do the activation here.
      *
      * @param synapseEnvironmentService SynapseEnvironmentService which contains information
-     *                                  about the new Synapse Instance
+     * about the new Synapse Instance
      */
-    protected void setSynapseEnvironmentService(
-            SynapseEnvironmentService synapseEnvironmentService) {
-        boolean alreadyCreated = ConfigHolder.getInstance().getSynapseEnvironmentServices().
-                containsKey(synapseEnvironmentService.getTenantId());
+    @Reference(
+            name = "synapse.env.service",
+            service = org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSynapseEnvironmentService")
+    protected void setSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
 
-        ConfigHolder.getInstance().addSynapseEnvironmentService(
-                synapseEnvironmentService.getTenantId(),
+        boolean alreadyCreated = ConfigHolder.getInstance().getSynapseEnvironmentServices().containsKey
+                (synapseEnvironmentService.getTenantId());
+        ConfigHolder.getInstance().addSynapseEnvironmentService(synapseEnvironmentService.getTenantId(),
                 synapseEnvironmentService);
         if (activated) {
             if (!alreadyCreated) {
@@ -226,25 +217,39 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
      *
      * @param synapseEnvironmentService synapseEnvironment
      */
-    protected void unsetSynapseEnvironmentService(
-            SynapseEnvironmentService synapseEnvironmentService) {
-        ConfigHolder.getInstance().removeSynapseEnvironmentService(
-                synapseEnvironmentService.getTenantId());
+    protected void unsetSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
+
+        ConfigHolder.getInstance().removeSynapseEnvironmentService(synapseEnvironmentService.getTenantId());
     }
 
+    @Reference(
+            name = "registry.service",
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRegistryService")
     protected void setRegistryService(RegistryService regService) {
+
         if (log.isDebugEnabled()) {
             log.debug("RegistryService bound to the ESB initialization process");
         }
     }
 
     protected void unsetRegistryService(RegistryService regService) {
+
         if (log.isDebugEnabled()) {
             log.debug("RegistryService unbound from the ESB environment");
         }
     }
 
+    @Reference(
+            name = "dependency.mgt.service",
+            service = org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService.class,
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetDependencyManager")
     protected void setDependencyManager(DependencyManagementService dependencyMgr) {
+
         if (log.isDebugEnabled()) {
             log.debug("Dependency management service bound to the endpoint component");
         }
@@ -252,34 +257,39 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
     }
 
     protected void unsetDependencyManager(DependencyManagementService dependencyMgr) {
+
         if (log.isDebugEnabled()) {
             log.debug("Dependency management service unbound from the endpoint component");
         }
         ConfigHolder.getInstance().setDependencyManager(null);
     }
 
-     protected void setSynapseRegistrationsService(
-            SynapseRegistrationsService synapseRegistrationsService) {
+    @Reference(
+            name = "synapse.registrations.service",
+            service = org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSynapseRegistrationsService")
+    protected void setSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
+
     }
 
-    protected void unsetSynapseRegistrationsService(
-            SynapseRegistrationsService synapseRegistrationsService) {
+    protected void unsetSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
+
         int tenantId = synapseRegistrationsService.getTenantId();
         if (ConfigHolder.getInstance().getSynapseEnvironmentServices().containsKey(tenantId)) {
-            SynapseEnvironment env = ConfigHolder.getInstance().
-                    getSynapseEnvironmentService(tenantId).getSynapseEnvironment();
-
-            ConfigHolder.getInstance().removeSynapseEnvironmentService(
-                    synapseRegistrationsService.getTenantId());
-
-            AxisConfiguration axisConfig = synapseRegistrationsService.getConfigurationContext().
-                    getAxisConfiguration();
+            SynapseEnvironment env = ConfigHolder.getInstance().getSynapseEnvironmentService(tenantId)
+                    .getSynapseEnvironment();
+            ConfigHolder.getInstance().removeSynapseEnvironmentService(synapseRegistrationsService.getTenantId());
+            AxisConfiguration axisConfig = synapseRegistrationsService.getConfigurationContext().getAxisConfiguration();
             if (axisConfig != null) {
-                    unregisterDeployer(axisConfig, env);
+                unregisterDeployer(axisConfig, env);
             }
         }
     }
+
     public void createdConfigurationContext(ConfigurationContext configContext) {
+
         AxisConfiguration axisConfig = configContext.getAxisConfiguration();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         if (axisConfig != null) {
@@ -288,7 +298,7 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
                 try {
                     registerDeployer(axisConfig, synEnvService.getSynapseEnvironment());
                 } catch (SequenceEditorException e) {
-                    log.error("Error while initializing SequenceEditor Admin",e);
+                    log.error("Error while initializing SequenceEditor Admin", e);
                 }
             }
         }

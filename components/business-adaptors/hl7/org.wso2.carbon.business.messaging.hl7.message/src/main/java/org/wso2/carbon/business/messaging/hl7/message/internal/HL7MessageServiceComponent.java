@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.business.messaging.hl7.message.internal;
 
 import org.apache.axis2.context.ConfigurationContext;
@@ -23,38 +22,43 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.business.messaging.hl7.message.HL7MessageBuilder;
 import org.wso2.carbon.business.messaging.hl7.message.HL7MessageFormatter;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="hl7.message.services" immediate="true"
- * @scr.reference name="config.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="1..1" policy="dynamic"  bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- */
+@Component(
+        name = "hl7.message.services",
+        immediate = true)
 public class HL7MessageServiceComponent {
 
     private static Log log = LogFactory.getLog(HL7MessageServiceComponent.class);
+
     private ConfigurationContextService contextService;
 
     public HL7MessageServiceComponent() {
+
     }
 
+    @Activate
     protected void activate(ComponentContext ctxt) {
+
         ConfigurationContext configContext;
         if (log.isDebugEnabled()) {
             log.debug("HL7 Message Service activated");
         }
-
         try {
             if (contextService != null) {
                 // Getting server's configContext instance
                 configContext = contextService.getServerConfigContext();
             } else {
-                throw new Exception(
-                        "ConfigurationContext is not found while loading org.wso2.carbon.transport.fix bundle");
+                throw new Exception("ConfigurationContext is not found while loading org.wso2.carbon.transport.fix " +
+                        "bundle");
             }
-            configContext.getAxisConfiguration()
-                    .addMessageBuilder("application/edi-hl7", new HL7MessageBuilder());
-            configContext.getAxisConfiguration()
-                    .addMessageFormatter("application/edi-hl7", new HL7MessageFormatter());
+            configContext.getAxisConfiguration().addMessageBuilder("application/edi-hl7", new HL7MessageBuilder());
+            configContext.getAxisConfiguration().addMessageFormatter("application/edi-hl7", new HL7MessageFormatter());
             if (log.isDebugEnabled()) {
                 log.info("Set the HL7 message builder and formatter in the Axis2 context");
             }
@@ -66,17 +70,27 @@ public class HL7MessageServiceComponent {
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctxt) {
+
         if (log.isDebugEnabled()) {
             log.debug("HL7 Message Service deactivated");
         }
     }
 
+    @Reference(
+            name = "config.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
+
         this.contextService = contextService;
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
+
         this.contextService = null;
     }
 }

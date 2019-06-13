@@ -23,35 +23,46 @@ import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationServic
 import org.osgi.service.component.ComponentContext;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="application.mgt.synapse.dscomponent" immediate="true"
- * @scr.reference name="registry.service" interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic"  bind="setRegistryService" unbind="unsetRegistryService"
- * @scr.reference name="synapse.config.service" interface="org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService"
- * cardinality="1..1" policy="dynamic" bind="setSynapseConfigurationService" unbind="unsetSynapseConfigurationService"
- * @scr.reference name="application.manager" interface="org.wso2.carbon.application.deployer.service.ApplicationManagerService"
- * cardinality="1..1" policy="dynamic" bind="setAppManager" unbind="unsetAppManager"
- */
+@Component(
+         name = "application.mgt.synapse.dscomponent", 
+         immediate = true)
 public class SynapseAppServiceComponent {
+
     private static Log log = LogFactory.getLog(SynapseAppServiceComponent.class);
 
     private static RegistryService registryServiceInstance;
+
     private static SynapseConfigurationService scService;
+
     private static ApplicationManagerService applicationManager;
 
+    @Activate
     protected void activate(ComponentContext ctxt) {
         if (log.isDebugEnabled()) {
             log.debug("Activated SynapseAppServiceComponent");
         }
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctxt) {
         if (log.isDebugEnabled()) {
             log.debug("Deactivated SynapseAppServiceComponent");
         }
     }
 
+    @Reference(
+             name = "registry.service", 
+             service = org.wso2.carbon.registry.core.service.RegistryService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetRegistryService")
     protected void setRegistryService(RegistryService registryService) {
         registryServiceInstance = registryService;
     }
@@ -60,16 +71,26 @@ public class SynapseAppServiceComponent {
         registryServiceInstance = null;
     }
 
-    protected void setSynapseConfigurationService(
-            SynapseConfigurationService synapseConfigurationService) {
+    @Reference(
+             name = "synapse.config.service", 
+             service = org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetSynapseConfigurationService")
+    protected void setSynapseConfigurationService(SynapseConfigurationService synapseConfigurationService) {
         scService = synapseConfigurationService;
     }
 
-    protected void unsetSynapseConfigurationService(
-            SynapseConfigurationService synapseConfigurationService) {
+    protected void unsetSynapseConfigurationService(SynapseConfigurationService synapseConfigurationService) {
         scService = null;
     }
 
+    @Reference(
+             name = "application.manager", 
+             service = org.wso2.carbon.application.deployer.service.ApplicationManagerService.class, 
+             cardinality = ReferenceCardinality.MANDATORY, 
+             policy = ReferencePolicy.DYNAMIC, 
+             unbind = "unsetAppManager")
     protected void setAppManager(ApplicationManagerService appManager) {
         applicationManager = appManager;
     }
@@ -80,8 +101,7 @@ public class SynapseAppServiceComponent {
 
     public static ApplicationManagerService getAppManager() throws Exception {
         if (applicationManager == null) {
-            String msg = "Before activating Synapse App management service bundle, an instance of "
-                    + "ApplicationManager should be in existance";
+            String msg = "Before activating Synapse App management service bundle, an instance of " + "ApplicationManager should be in existance";
             log.error(msg);
             throw new Exception(msg);
         }
@@ -90,8 +110,7 @@ public class SynapseAppServiceComponent {
 
     public static RegistryService getRegistryService() throws Exception {
         if (registryServiceInstance == null) {
-            String msg = "Before activating Synapse App management service bundle, an instance of "
-                    + "RegistryService should be in existance";
+            String msg = "Before activating Synapse App management service bundle, an instance of " + "RegistryService should be in existance";
             log.error(msg);
             throw new Exception(msg);
         }
@@ -100,8 +119,7 @@ public class SynapseAppServiceComponent {
 
     public static SynapseConfigurationService getScService() throws Exception {
         if (scService == null) {
-            String msg = "Before activating Synapse App management service bundle, an instance of "
-                    + "SynapseConfigurationService should be in existance";
+            String msg = "Before activating Synapse App management service bundle, an instance of " + "SynapseConfigurationService should be in existance";
             log.error(msg);
             throw new Exception(msg);
         }

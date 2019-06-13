@@ -15,7 +15,6 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-
 package org.wso2.carbon.mediation.startup.internal;
 
 import org.apache.axis2.deployment.DeploymentEngine;
@@ -43,127 +42,138 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
 
-/**
- * @scr.component name="org.wso2.carbon.mediation.startup" immediate="true"
- * @scr.reference name="synapse.env.service"
- * interface="org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService"
- * cardinality="1..n" policy="dynamic"
- * bind="setSynapseEnvironmentService" unbind="unsetSynapseEnvironmentService"
- * @scr.reference name="synapse.registrations.service"
- * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
- * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
- * unbind="unsetSynapseRegistrationsService"
- */
-@SuppressWarnings({ "UnusedDeclaration", "JavaDoc" }) public class StartupAdminServiceComponent {
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-	private static final Log log = LogFactory.getLog(StartupAdminServiceComponent.class);
+@SuppressWarnings({"UnusedDeclaration", "JavaDoc"})
+@Component(
+        name = "org.wso2.carbon.mediation.startup",
+        immediate = true)
+public class StartupAdminServiceComponent {
 
-	private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
-			new HashMap<Integer, SynapseEnvironmentService>();
+    private static final Log log = LogFactory.getLog(StartupAdminServiceComponent.class);
+
+    private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices = new HashMap<Integer,
+            SynapseEnvironmentService>();
 
     /*private TaskDescriptionRepositoryService repositoryService;*/
+    private boolean initialized = false;
 
-	private boolean initialized = false;
+    @Activate
+    protected void activate(ComponentContext context) throws Exception {
 
-	protected void activate(ComponentContext context) throws Exception {
-		try {
-			initialized = true;
-			SynapseEnvironmentService synEnvService =
-					synapseEnvironmentServices.get(MultitenantConstants.SUPER_TENANT_ID);
-			if (synEnvService != null) {
-				context.getBundleContext()
-				       .registerService(TaskManagementService.class.getName(), new StartupAdminService(), null);
-				context.getBundleContext().registerService(JobMetaDataProviderService.class.getName(),
-				                                           new StartupJobMetaDataProviderService(), null);
-				registerDeployer(synEnvService.getConfigurationContext().getAxisConfiguration(),
-				                 synEnvService.getSynapseEnvironment());
-			} else {
-				log.error("Couldn't initialize the StartupManager, " +
-				          "SynapseEnvironment service and/or TaskDescriptionRepositoryService not found");
-			}
-		} catch (Throwable t) {
-			log.error("Couldn't initialize the StartupManager, " +
-			          "SynapseEnvironment service and/or TaskDescriptionRepositoryService not found");
-		}
-	}
+        try {
+            initialized = true;
+            SynapseEnvironmentService synEnvService = synapseEnvironmentServices.get(MultitenantConstants
+                    .SUPER_TENANT_ID);
+            if (synEnvService != null) {
+                context.getBundleContext().registerService(TaskManagementService.class.getName(), new
+                        StartupAdminService(), null);
+                context.getBundleContext().registerService(JobMetaDataProviderService.class.getName(), new
+                        StartupJobMetaDataProviderService(), null);
+                registerDeployer(synEnvService.getConfigurationContext().getAxisConfiguration(), synEnvService
+                        .getSynapseEnvironment());
+            } else {
+                log.error("Couldn't initialize the StartupManager, " + "SynapseEnvironment service and/or " +
+                        "TaskDescriptionRepositoryService not found");
+            }
+        } catch (Throwable t) {
+            log.error("Couldn't initialize the StartupManager, " + "SynapseEnvironment service and/or " +
+                    "TaskDescriptionRepositoryService not found");
+        }
+    }
 
-	protected void deactivate(ComponentContext context) throws Exception {
-		Set<Map.Entry<Integer, SynapseEnvironmentService>> entrySet = synapseEnvironmentServices.entrySet();
-		for (Map.Entry<Integer, SynapseEnvironmentService> entry : entrySet) {
-			unregistryDeployer(entry.getValue().getConfigurationContext().getAxisConfiguration(),
-			                   entry.getValue().getSynapseEnvironment());
-		}
-	}
+    @Deactivate
+    protected void deactivate(ComponentContext context) throws Exception {
 
-	private void registerDeployer(AxisConfiguration axisConfig, SynapseEnvironment synEnv) {
-		DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+        Set<Map.Entry<Integer, SynapseEnvironmentService>> entrySet = synapseEnvironmentServices.entrySet();
+        for (Map.Entry<Integer, SynapseEnvironmentService> entry : entrySet) {
+            unregistryDeployer(entry.getValue().getConfigurationContext().getAxisConfiguration(), entry.getValue()
+                    .getSynapseEnvironment());
+        }
+    }
 
-		SynapseArtifactDeploymentStore deploymentStore = synEnv.getSynapseConfiguration().getArtifactDeploymentStore();
+    private void registerDeployer(AxisConfiguration axisConfig, SynapseEnvironment synEnv) {
 
-		String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synEnv.getServerContextInformation());
-		String taskDirDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.TASKS_DIR;
+        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+        SynapseArtifactDeploymentStore deploymentStore = synEnv.getSynapseConfiguration().getArtifactDeploymentStore();
+        String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synEnv.getServerContextInformation());
+        String taskDirDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.TASKS_DIR;
+        for (Startup stp : synEnv.getSynapseConfiguration().getStartups()) {
+            if (stp.getFileName() != null) {
+                deploymentStore.addRestoredArtifact(taskDirDirPath + File.separator + stp.getFileName());
+            }
+        }
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new StartupTaskDeployer(), taskDirDirPath, ServiceBusConstants
+                    .ARTIFACT_EXTENSION);
+        }
+    }
 
-		for (Startup stp : synEnv.getSynapseConfiguration().getStartups()) {
-			if (stp.getFileName() != null) {
-				deploymentStore.addRestoredArtifact(taskDirDirPath + File.separator + stp.getFileName());
-			}
-		}
-		synchronized (axisConfig) {
-			deploymentEngine
-					.addDeployer(new StartupTaskDeployer(), taskDirDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
-		}
-	}
+    @Reference(
+            name = "synapse.env.service",
+            service = org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSynapseEnvironmentService")
+    protected void setSynapseEnvironmentService(SynapseEnvironmentService synEnvSvc) {
 
-	protected void setSynapseEnvironmentService(SynapseEnvironmentService synEnvSvc) {
-		boolean alreadyCreated = synapseEnvironmentServices.containsKey(synEnvSvc.getTenantId());
+        boolean alreadyCreated = synapseEnvironmentServices.containsKey(synEnvSvc.getTenantId());
+        synapseEnvironmentServices.put(synEnvSvc.getTenantId(), synEnvSvc);
+        if (initialized) {
+            int tenantId = synEnvSvc.getTenantId();
+            AxisConfiguration axisConfiguration = synEnvSvc.getConfigurationContext().getAxisConfiguration();
+            if (!alreadyCreated) {
+                registerDeployer(synEnvSvc.getConfigurationContext().getAxisConfiguration(), synEnvSvc
+                        .getSynapseEnvironment());
+            }
+        }
+    }
 
-		synapseEnvironmentServices.put(synEnvSvc.getTenantId(), synEnvSvc);
-		if (initialized) {
-			int tenantId = synEnvSvc.getTenantId();
-			AxisConfiguration axisConfiguration = synEnvSvc.getConfigurationContext().getAxisConfiguration();
+    protected void unsetSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
 
-			if (!alreadyCreated) {
-				registerDeployer(synEnvSvc.getConfigurationContext().getAxisConfiguration(),
-				                 synEnvSvc.getSynapseEnvironment());
-			}
-		}
-	}
+        synapseEnvironmentServices.remove(synapseEnvironmentService.getTenantId());
+    }
 
-	protected void unsetSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
-		synapseEnvironmentServices.remove(synapseEnvironmentService.getTenantId());
-	}
+    @Reference(
+            name = "synapse.registrations.service",
+            service = org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService.class,
+            cardinality = ReferenceCardinality.AT_LEAST_ONE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSynapseRegistrationsService")
+    protected void setSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
 
-	protected void setSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
+    }
 
-	}
+    protected void unsetSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
 
-	protected void unsetSynapseRegistrationsService(SynapseRegistrationsService synapseRegistrationsService) {
-		int tenantId = synapseRegistrationsService.getTenantId();
-		if (synapseEnvironmentServices.containsKey(tenantId)) {
-			SynapseEnvironment env = synapseEnvironmentServices.get(tenantId).
-					getSynapseEnvironment();
+        int tenantId = synapseRegistrationsService.getTenantId();
+        if (synapseEnvironmentServices.containsKey(tenantId)) {
+            SynapseEnvironment env = synapseEnvironmentServices.get(tenantId).getSynapseEnvironment();
+            synapseEnvironmentServices.remove(synapseRegistrationsService.getTenantId());
+            AxisConfiguration axisConfig = synapseRegistrationsService.getConfigurationContext().getAxisConfiguration();
+            if (axisConfig != null) {
+                unregistryDeployer(axisConfig, env);
+            }
+        }
+    }
 
-			synapseEnvironmentServices.remove(synapseRegistrationsService.getTenantId());
+    /**
+     * Un-registers the Task Deployer.
+     *
+     * @param axisConfig         AxisConfiguration to which this deployer belongs
+     * @param synapseEnvironment SynapseEnvironment to which this deployer belongs
+     */
+    private void unregistryDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) {
 
-			AxisConfiguration axisConfig = synapseRegistrationsService.getConfigurationContext().
-					getAxisConfiguration();
-			if (axisConfig != null) {
-				unregistryDeployer(axisConfig, env);
-			}
-		}
-	}
-
-	/**
-	 * Un-registers the Task Deployer.
-	 *
-	 * @param axisConfig         AxisConfiguration to which this deployer belongs
-	 * @param synapseEnvironment SynapseEnvironment to which this deployer belongs
-	 */
-	private void unregistryDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) {
-		DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
-		String synapseConfigPath =
-				ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment.getServerContextInformation());
-		String proxyDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.TASKS_DIR;
-		deploymentEngine.removeDeployer(proxyDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
-	}
+        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+        String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment
+                .getServerContextInformation());
+        String proxyDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.TASKS_DIR;
+        deploymentEngine.removeDeployer(proxyDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+    }
 }

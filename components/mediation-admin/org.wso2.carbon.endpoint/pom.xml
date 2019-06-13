@@ -1,66 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
         <version>4.6.152-SNAPSHOT</version>
     </parent>
-   <modelVersion>4.0.0</modelVersion>
-   <artifactId>org.wso2.carbon.endpoint</artifactId>
-   <packaging>bundle</packaging>
-   <version>4.6.152-SNAPSHOT</version>
-   <name>WSO2 Carbon - Endpoint Editor BE</name>
-   <url>http://wso2.org</url>
-   <dependencies>
-      <dependency>
-         <groupId>org.wso2.carbon.mediation</groupId>
-         <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.wso2.carbon.mediation</groupId>
-         <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.apache.synapse</groupId>
-         <artifactId>synapse-core</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.wso2.carbon</groupId>
-         <artifactId>org.wso2.carbon.logging</artifactId>
-      </dependency>
-       <dependency>
-           <groupId>org.wso2.carbon.deployment</groupId>
-           <artifactId>org.wso2.carbon.service.mgt</artifactId>
-       </dependency>
-   </dependencies>
-   <build>
-      <plugins>
-         <plugin>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.endpoint</artifactId>
+    <packaging>bundle</packaging>
+    <version>4.6.152-SNAPSHOT</version>
+    <name>WSO2 Carbon - Endpoint Editor BE</name>
+    <url>http://wso2.org</url>
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.deployment</groupId>
+            <artifactId>org.wso2.carbon.service.mgt</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>maven-scr-plugin</artifactId>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>maven-bundle-plugin</artifactId>
-            <extensions>true</extensions>
-            <configuration>
-               <instructions>
-                  <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                   <Bundle-Name>${project.artifactId}</Bundle-Name>
-                   <SYNAPSE_DEPLOYER-RequiredServices>
-                       org.wso2.carbon.endpoint.service.EndpointDeployerService
-                   </SYNAPSE_DEPLOYER-RequiredServices>
-                  <Export-Package>org.wso2.carbon.endpoint.service; version="${carbon.mediation.exp.pkg.version}",
+            <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <SYNAPSE_DEPLOYER-RequiredServices>
+                            org.wso2.carbon.endpoint.service.EndpointDeployerService
+                        </SYNAPSE_DEPLOYER-RequiredServices>
+                        <Export-Package>org.wso2.carbon.endpoint.service; version="${carbon.mediation.exp.pkg.version}",
                             org.wso2.carbon.endpoint.*; version="${carbon.mediation.exp.pkg.version}",
-                            org.wso2.carbon.endpoint; version="${carbon.mediation.exp.pkg.version}",</Export-Package>
-                  <Import-Package>!org.wso2.carbon.endpoint.service,
+                            org.wso2.carbon.endpoint; version="${carbon.mediation.exp.pkg.version}",
+                        </Export-Package>
+                        <Import-Package>!org.wso2.carbon.endpoint.service,
                             !org.wso2.carbon.endpoint,
                             org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
-                            *;resolution:=optional</Import-Package>
-                  <DynamicImport-Package>*</DynamicImport-Package>
-               </instructions>
-            </configuration>
-         </plugin>
-      </plugins>
-   </build>
+                            *;resolution:=optional
+                        </Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

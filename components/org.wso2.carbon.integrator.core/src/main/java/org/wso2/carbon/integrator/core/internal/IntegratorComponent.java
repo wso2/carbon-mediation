@@ -20,82 +20,100 @@ package org.wso2.carbon.integrator.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.base.CarbonBaseUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.tomcat.api.CarbonTomcatService;
 import org.wso2.carbon.utils.ConfigurationContextService;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Properties;
 
 /**
  * Declarative service component Integrator component.
  */
-
-/**
- * @scr.component name="org.wso2.carbon.integrator.core.internal.IntegratorComponent" immediate="true"
- * @scr.reference name="configuration.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService"
- * cardinality="1..1"
- * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- * @scr.reference name="1..1" interface="org.wso2.carbon.tomcat.api.CarbonTomcatService"
- * cardinality="1..1" policy="dynamic" bind="setCarbonTomcatService"  unbind="unsetCarbonTomcatService"
- */
+@Component(
+        name = "org.wso2.carbon.integrator.core.internal.IntegratorComponent",
+        immediate = true)
 public class IntegratorComponent {
+
     private static final Log log = LogFactory.getLog(IntegratorComponent.class);
 
     private static ConfigurationContextService contextService;
+
     private static CarbonTomcatService carbonTomcatService;
 
+    @Activate
     protected void activate(ComponentContext context) {
+
         log.debug("Activating Integrator component");
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext context) {
+
         log.debug("Deactivating Integrator component");
     }
 
+    @Reference(
+            name = "configuration.context.service",
+            service = org.wso2.carbon.utils.ConfigurationContextService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
+
         setContextService(contextService);
     }
 
     protected static void setContextService(ConfigurationContextService contextService) {
+
         IntegratorComponent.contextService = contextService;
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
+
         unsetConfigurationService();
     }
 
     protected static void unsetConfigurationService() {
+
         IntegratorComponent.contextService = null;
     }
 
     protected static void unsetTomcatService() {
+
         IntegratorComponent.carbonTomcatService = null;
     }
 
     protected static void setTomcatService(CarbonTomcatService carbonTomcatService) {
+
         IntegratorComponent.carbonTomcatService = carbonTomcatService;
     }
 
+    @Reference(
+            name = "1..1",
+            service = org.wso2.carbon.tomcat.api.CarbonTomcatService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetCarbonTomcatService")
     protected void setCarbonTomcatService(CarbonTomcatService contextService) {
+
         setTomcatService(contextService);
     }
 
     protected void unsetCarbonTomcatService(CarbonTomcatService contextService) {
+
         unsetTomcatService();
     }
 
     public static CarbonTomcatService getCarbonTomcatService() {
+
         return carbonTomcatService;
     }
 
     public static ConfigurationContextService getContextService() {
+
         return contextService;
     }
 }
-

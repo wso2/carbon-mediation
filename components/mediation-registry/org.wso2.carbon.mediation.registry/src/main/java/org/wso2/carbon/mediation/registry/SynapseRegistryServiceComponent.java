@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wso2.carbon.mediation.registry;
 
 import org.apache.commons.logging.Log;
@@ -28,34 +27,48 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 
 import java.util.Properties;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
-/**
- * @scr.component name="mediation.registry" immediate="true"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="1..1"
- * policy="dynamic"  bind="setRegistryService" unbind="unsetRegistryService"
- */
+@Component(
+        name = "mediation.registry",
+        immediate = true)
 public class SynapseRegistryServiceComponent {
 
     private static Log log = LogFactory.getLog(SynapseRegistryServiceComponent.class);
 
     public SynapseRegistryServiceComponent() {
+
     }
 
+    @Activate
     protected void activate(ComponentContext ctxt) {
-        ctxt.getBundleContext().registerService(SynapseRegistryService.class.getName(),
-                new SynapseRegistryServiceImpl(), null);
+
+        ctxt.getBundleContext().registerService(SynapseRegistryService.class.getName(), new
+                SynapseRegistryServiceImpl(), null);
     }
 
+    @Deactivate
     protected void deactivate(ComponentContext ctxt) {
+
     }
 
+    @Reference(
+            name = "registry.service",
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetRegistryService")
     protected void setRegistryService(RegistryService registryService) {
+
         if (log.isDebugEnabled()) {
             log.debug("RegistryService bound to the SynapseRegistry initialization process");
         }
         RegistryServiceHolder.getInstance().setRegistryService(registryService);
-
         try {
             PersistenceManager.getInstance().setRegistry(registryService.getConfigSystemRegistry());
         } catch (RegistryException e) {
@@ -64,6 +77,7 @@ public class SynapseRegistryServiceComponent {
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
+
         if (log.isDebugEnabled()) {
             log.debug("RegistryService unbound from the SynapseRegistry");
         }

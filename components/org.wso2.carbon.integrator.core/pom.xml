@@ -16,8 +16,8 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>carbon-mediation</artifactId>
@@ -37,7 +37,6 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
@@ -46,13 +45,16 @@
             <groupId>org.wso2.carbon.deployment</groupId>
             <artifactId>org.wso2.carbon.webapp.mgt</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -76,32 +78,30 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.2.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Private-Package>
-                            org.wso2.carbon.integrator.core.internal,
+                            org.wso2.carbon.integrator.core.internal
                         </Private-Package>
                         <Export-Package>
-                            ! org.wso2.carbon.integrator.core.internal,
+                            !org.wso2.carbon.integrator.core.internal,
                             org.wso2.carbon.integrator.core.*;version="${project.version}"
                         </Export-Package>
                         <Import-Package>
                             javax.servlet.*;version="[2.5,4)";resolution:=optional,
-                            org.wso2.carbon.utils;version="${carbon.kernel.imp.pkg.version}",
+                            org.wso2.carbon.utils;version="${carbon.kernel.imp.pkg.version}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
-
 </project>
