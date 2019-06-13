@@ -26,7 +26,6 @@ import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayload;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayloadEvent;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
-import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
@@ -138,7 +137,7 @@ public class StatisticsPublisher {
 		Event event = new Event(streamId, System.currentTimeMillis(), metaData, null, eventData);
 
 		// Has to use try-publish for asynchronous publishing
-		MessageFlowDataPublisherDataHolder.getInstance().getPublisherService().publish(event);
+		DataBridgePublisher.getDataPublisher().publish(event);
 	}
 
 	/**

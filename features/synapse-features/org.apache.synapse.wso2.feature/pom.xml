@@ -20,7 +20,7 @@
     <parent>
        <artifactId>synapse-features</artifactId>
        <groupId>org.wso2.carbon.mediation</groupId>
-       <version>4.6.108-SNAPSHOT</version>
+       <version>4.6.152-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -65,7 +65,7 @@
        </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
-            <artifactId>com.jayway.jsonpath</artifactId>
+            <artifactId>json-path</artifactId>
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
@@ -90,6 +90,18 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>accessors-smart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
         </dependency>
     </dependencies>
 
@@ -125,13 +137,16 @@
                                 <bundleDef>com.google.code.gson:gson:${gson.version}</bundleDef>
                                 <bundleDef>org.wso2.caching:wso2caching-core</bundleDef>
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
+                                <bundleDef>net.minidev:accessors-smart:${net.minidev.accessors-smart.version}</bundleDef>
+                                <bundleDef>org.ow2.asm:asm:${org.ow2.asm.asm.version}</bundleDef>
                                 <!-- Json schema validator dependencies -->
                                 <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:libphonenumber</bundleDef>
                                 <!--<bundleDef>org.wso2.orbit.joda-time:joda-time:${joda-time.version}</bundleDef>-->
                                 <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.github.fge:json-schema-validator-all</bundleDef>
+                                <bundleDef>org.apache.commons:commons-text:${commons-text.version}</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>

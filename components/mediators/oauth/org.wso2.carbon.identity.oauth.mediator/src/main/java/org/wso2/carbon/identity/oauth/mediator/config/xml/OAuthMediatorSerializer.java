@@ -56,6 +56,8 @@ public class OAuthMediatorSerializer extends AbstractMediatorSerializer {
             oauthElem.addAttribute(fac.createOMAttribute("password", nullNS, oauth.getPassword()));
         }
         oauth = (OAuthMediator) mediator;
+
+        serializeComments(oauthElem, ((OAuthMediator)mediator).getCommentsList());
         
         return oauthElem;
     }

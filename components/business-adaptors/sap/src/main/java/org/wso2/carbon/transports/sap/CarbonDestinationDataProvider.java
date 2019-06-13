@@ -117,7 +117,7 @@ public class CarbonDestinationDataProvider implements DestinationDataProvider, S
         String fileName = destination + "." + (server ? "server" : "dest");
         String confPath = System.getProperty("conf.location");
         if (confPath == null) {
-            confPath = Paths.get("repository", "conf").toString();
+            confPath = Paths.get("conf").toString();
         }
         File file1 = Paths.get(confPath, "sap", fileName).toFile();
         if (file1.exists()) {

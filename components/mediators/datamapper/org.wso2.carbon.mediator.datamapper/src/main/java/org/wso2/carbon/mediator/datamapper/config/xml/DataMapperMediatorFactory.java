@@ -126,6 +126,8 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
 
         processAuditStatus(datamapperMediator, element);
 
+        addAllCommentChildrenToList(element, datamapperMediator.getCommentsList());
+
         return datamapperMediator;
     }
 

@@ -20,24 +20,61 @@
     <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>business-adaptors-features</artifactId>
-      <version>4.6.108-SNAPSHOT</version>
+      <version>4.6.152-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.transports.sap.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - SAP Adapter Feature</name>
-    <version>4.6.108-SNAPSHOT</version>
+    <version>4.6.152-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for sap</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.transports.sap</artifactId>
         </dependency>
-    </dependencies>	
-   
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <properties>
+                <org.wso2.carbon.transports.sap.import.version>${carbon.mediation.version}
+                </org.wso2.carbon.transports.sap.import.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>released-version</id>
+                                <goals>
+                                    <goal>released-version</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <org.wso2.carbon.transports.sap.import.version>${releasedVersion.version}
+                </org.wso2.carbon.transports.sap.import.version>
+            </properties>
+        </profile>
+    </profiles>
+
+
     <build>
         <plugins>
             <plugin>
@@ -51,18 +88,19 @@
                         <goals>
                             <goal>p2-feature-gen</goal>
                         </goals>
-			
+
                         <configuration>
-			    <bundles>
-                            	<bundleDef>org.wso2.carbon:org.wso2.carbon.transports.sap</bundleDef>
-                            </bundles>	
+                            <bundles>
+                                <bundleDef>
+                                    org.wso2.carbon.mediation:org.wso2.carbon.transports.sap:${org.wso2.carbon.transports.sap.import.version}
+                                </bundleDef>
+                            </bundles>
                             <id>org.wso2.carbon.transports.sap</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
-		        </configuration>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>

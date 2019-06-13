@@ -428,4 +428,61 @@ public class MessageProcessorAdminServiceClient {
         log.error(message);
         throw new Exception(message);
     }
+
+    private Exception createException(String message, Exception e) throws Exception {
+        message = message + "::" + e.getMessage();
+        return new Exception(message);
+    }
+
+    /**
+     * Get the message from the associated queue
+     *
+     * @param processorName The MessageProcessor name
+     * @return <code>message</code> Returns message from the queue as a string
+     * @throws Exception
+     */
+    public String browseMessage(String processorName) throws Exception {
+        String message = null;
+        try {
+            if (processorName != null) {
+                message = stub.browseMessage(processorName);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return message;
+    }
+
+    /**
+     * Pop the message from the associated queue
+     *
+     * @param processorName The MessageProcessor name
+     * @return <code>true</code> if popMessage is successful, else <code>false</code>
+     * @throws Exception
+     */
+    public boolean popMessage(String processorName) throws Exception {
+        try {
+            return stub.popMessage(processorName);
+        } catch (Exception e) {
+            throw createException("Failed to pop the message from the queue", e);
+        }
+    }
+
+    /**
+     * Pop the message from the associated queue and redirect to specified queue
+     *
+     * @param processorName MessageProcessor name
+     * @param storeName Name of store to redirect the message
+     * @return <code>true</code> if popAndRedirectMessage is successful, else <code>false</code>
+     * @throws Exception
+     */
+    public boolean popAndRedirectMessage(String processorName, String storeName) throws Exception {
+        try {
+            return stub.popAndRedirectMessage(processorName, storeName);
+        } catch (Exception e) {
+            throw createException("Failed to redirect message to " + storeName, e);
+        }
+
+    }
+
 }

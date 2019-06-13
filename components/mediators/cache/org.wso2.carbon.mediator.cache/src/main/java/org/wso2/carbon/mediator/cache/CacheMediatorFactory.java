@@ -121,6 +121,17 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
      */
     private static final QName INCLUDE_AGE_HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                             CachingConstants.INCLUDE_AGE_HEADER_STRING);
+
+    /**
+     * QNama of the cache id.
+     */
+    private static final QName ATT_ID = new QName(CachingConstants.ID_STRING);
+
+    /**
+     * QName of the cache scope.
+     */
+    private static final QName ATT_SCOPE = new QName(CachingConstants.SCOPE_STRING);
+
     /**
      * The cache manager to be used in each cache instance.
      */
@@ -140,6 +151,12 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
         if (collectorAttr != null && collectorAttr.getAttributeValue() != null) {
             if ("true".equals(collectorAttr.getAttributeValue())) {
                 cache.setCollector(true);
+
+                OMAttribute scopeAttribute = elem.getAttribute(ATT_SCOPE);
+                if (scopeAttribute != null && scopeAttribute.getAttributeValue() != null) {
+                    cache.setScope(scopeAttribute.getAttributeValue().trim());
+                }
+
             } else if ("false".equals(collectorAttr.getAttributeValue())) {
                 cache.setCollector(false);
 
@@ -155,6 +172,21 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                     cache.setMaxMessageSize(Integer.parseInt(maxMessageSizeAttr.getAttributeValue().trim()));
                 } else {
                     cache.setMaxMessageSize(-1);
+                }
+
+                OMAttribute idAttribute = elem.getAttribute(ATT_ID);
+                if (idAttribute != null && idAttribute.getAttributeValue() != null) {
+                    cache.setId(idAttribute.getAttributeValue().trim());
+                }
+
+                OMAttribute hashGeneratorAttribute = elem.getAttribute(ATT_HASH_GENERATOR);
+                if (hashGeneratorAttribute != null && hashGeneratorAttribute.getAttributeValue() != null) {
+                    cache.setHashGenerator(hashGeneratorAttribute.getAttributeValue().trim());
+                }
+
+                OMAttribute scopeAttribute = elem.getAttribute(ATT_SCOPE);
+                if (scopeAttribute != null && scopeAttribute.getAttributeValue() != null) {
+                    cache.setScope(scopeAttribute.getAttributeValue().trim());
                 }
 
                 String className = null;
@@ -275,6 +307,9 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                 } else {
                     cache.setDigestGenerator(CachingConstants.DEFAULT_HASH_GENERATOR);
                 }
+
+                props.put(CachingConstants.PERMANENTLY_EXCLUDED_HEADERS_STRING,
+                        CachingConstants.PERMANENTLY_EXCLUDED_HEADERS);
                 cache.getDigestGenerator().init(props);
 
                 OMElement onCacheHitElem = elem.getFirstChildWithName(ON_CACHE_HIT_Q);
@@ -300,6 +335,11 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                     } else {
                         cache.setInMemoryCacheSize(-1);
                     }
+
+                    OMAttribute typeAttribute = implElem.getAttribute(ATT_TYPE);
+                    if (typeAttribute != null && typeAttribute.getAttributeValue() != null) {
+                        cache.setImplementationType(typeAttribute.getAttributeValue().trim());
+                    }
                 }
             } else {
                 handleException("The value for collector has to be either true or false");
@@ -307,6 +347,9 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
         } else {
             handleException("The collector attribute must be specified");
         }
+
+        addAllCommentChildrenToList(elem, cache.getCommentsList());
+
         return cache;
     }
 

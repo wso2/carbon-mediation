@@ -28,6 +28,7 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -67,7 +68,8 @@ public class KAFKAInjectHandler implements InjectHandler {
         byte[] msg = (byte[]) object;
 
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
-        msgCtx.setProperty("inbound.endpoint.name", name);
+        msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, name);
+        msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
         InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
         CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         log.debug("Processed Kafka Message ");

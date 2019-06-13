@@ -23,9 +23,13 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MessageProcessorFactory;
 import org.apache.synapse.config.xml.MessageProcessorSerializer;
+import org.apache.synapse.message.MessageConsumer;
+import org.apache.synapse.message.MessageProducer;
 import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.processor.impl.ScheduledMessageProcessor;
 import org.apache.synapse.message.processor.impl.failover.FailoverMessageForwardingProcessorView;
@@ -39,6 +43,7 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 
+
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -50,11 +55,10 @@ import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
-    private static Log log = LogFactory.getLog(MessageProcessorAdminService.class);
-
     public static final int MSGS_PER_PAGE = 10;
-    private static String CONF_LOCATION = "conf.location";
     public final static String DEFAULT_AXIS2_XML;
+    private static Log log = LogFactory.getLog(MessageProcessorAdminService.class);
+    private static String CONF_LOCATION = "conf.location";
 
     static {
         String confPath = System.getProperty(CONF_LOCATION);
@@ -755,4 +759,125 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         }
     }
 
+    /**
+     * Gets the message from the associated queue.
+     *
+     * @param processorName message processor name.
+     * @return <code>message</code> returns message received from the queue as a string.
+     */
+    public String browseMessage(String processorName) throws AxisFault {
+        SynapseConfiguration configuration = getSynapseConfiguration();
+        MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
+        String message = null;
+
+        try {
+            message = getMessageAsString(messageConsumer);
+        } catch (AxisFault e) {
+            handleException(log, "Failed to get message from the queue :", e);
+        } finally {
+            messageConsumer.cleanup();
+        }
+
+        return message;
+    }
+
+    private String getMessageAsString(MessageConsumer messageConsumer) throws AxisFault {
+        MessageContext messageContext;
+        String message = null;
+
+        if (messageConsumer.isAlive()) {
+            try {
+                messageContext = messageConsumer.receive();
+                if (messageContext != null) {
+                    message = messageContext.getEnvelope().toString();
+                }
+            } catch (SynapseException e) {
+                handleException(log, "MessageConsumer failed to receive message from queue :", e);
+            }
+        }
+        return  message;
+    }
+
+    /**
+     * Pops the message from the associated queue.
+     *
+     * @param processorName message processor name.
+     * @return <code>true</code> if ++ is successful, else <code>false</code>
+     */
+    public boolean popMessage(String processorName) throws AxisFault {
+        SynapseConfiguration configuration = getSynapseConfiguration();
+        MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
+
+        try {
+            return popMessageFromQueue(messageConsumer);
+        } catch (SynapseException e) {
+            throw createAxisFaultException(log, "Failed to pop the message from the queue", e);
+        } finally {
+            messageConsumer.cleanup();
+        }
+    }
+
+    private  boolean popMessageFromQueue(MessageConsumer messageConsumer) throws AxisFault {
+        try {
+            if (messageConsumer.receive() != null) {
+                return messageConsumer.ack();
+            }
+        } catch (SynapseException e) {
+           handleException(log, "MessageConsumer failed to receive or acknowledge the message :" , e);
+        }
+        return false;
+    }
+
+    /**
+     * Pops the message and redirects it to a specified queue.
+     *
+     * @param processorName message processor name.
+     * @param storeName name of the store to redirect the message.
+     * @return <code>true</code> if ++ is successful, else <code>false</code>
+     */
+    public boolean popAndRedirectMessage(String processorName, String storeName) throws AxisFault {
+        SynapseConfiguration configuration = getSynapseConfiguration();
+        MessageConsumer messageConsumer = getMessageConsumer(configuration, processorName);
+        MessageProducer messageProducer = configuration.getMessageStore(storeName).getProducer();
+        try {
+            return popAndRedirectMessageToStore(messageProducer, messageConsumer);
+        } catch (AxisFault e) {
+            throw createAxisFaultException(log, "Failed to redirect message to " + storeName, e);
+        } finally {
+            messageConsumer.cleanup();
+        }
+    }
+
+    private boolean popAndRedirectMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer)
+        throws AxisFault {
+        try {
+            MessageContext messageContext = messageConsumer.receive();
+            if (messageContext != null) {
+                messageProducer.storeMessage(messageContext);
+                return messageConsumer.ack();
+            }
+        } catch (SynapseException e) {
+            handleException(log, "Failed to redirect message. ", e);
+        }
+        return false;
+    }
+
+    /**
+     * Gets the messageConsumer associated with the specified processor.
+     *
+     * @param configuration SynapseConfiguration.
+     * @param processorName message processor instance
+     * @return <code>messageConsumer</code> object associated with specified processor.
+     */
+    private MessageConsumer getMessageConsumer(SynapseConfiguration configuration, String processorName) {
+        MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
+        String messageStoreName = processor.getMessageStoreName();
+        return configuration.getMessageStore(messageStoreName).getConsumer();
+    }
+
+    private AxisFault createAxisFaultException(Log log, String message, Exception e) throws AxisFault {
+        message = message + "::" + e.getMessage();
+        log.error(message, e);
+        return new AxisFault(message, e);
+    }
 }

@@ -28,11 +28,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.registry.AbstractRegistry;
 import org.apache.synapse.registry.RegistryEntry;
+import org.apache.synapse.util.SynapseBinaryDataSource;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,12 +45,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import javax.activation.DataHandler;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import static org.wso2.carbon.mediation.registry.ESBRegistryConstants.URL_SEPARATOR;
 
 public class MicroIntegratorRegistry extends AbstractRegistry {
 
@@ -56,6 +63,9 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     private static final int DELETE_RETRY_SLEEP_TIME = 10;
     private static final long DEFAULT_CACHABLE_DURATION = 0;
     private static final int MAX_KEYS = 200;
+    private static final String METADATA_DIR_NAME = ".metadata";
+    private static final String METADATA_FILE_SUFFIX = ".meta";
+    private static final String METADATA_KEY_MEDIA_TYPE = "mediaType";
 
     public static final int FILE = 1;
     public static final int HTTP = 2;
@@ -65,11 +75,11 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * File system path corresponding to the FILE url path. This is a system depending path
      * used for accessing resources as files.
      */
-    private String localRegistry = null;
+    private String localRegistry;
 
-    private String configRegistry = null;
+    private String configRegistry;
 
-    private String govRegistry = null;
+    private String govRegistry;
 
     /**
      * Specifies whether the registry is in the local host or a remote registry.
@@ -85,20 +95,25 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
 
     public MicroIntegratorRegistry() {
         //default registry is file system based resided in carbon home
-        String defaultFSRegRoot = RegistryHelper.getHome();
-        if (!defaultFSRegRoot.endsWith(File.separator)) {
-            defaultFSRegRoot = defaultFSRegRoot + File.separator;
+        String defaultFSRegRoot = RegistryHelper.getHome().replace(File.separator, URL_SEPARATOR);
+        if (!defaultFSRegRoot.endsWith(URL_SEPARATOR)) {
+            defaultFSRegRoot = defaultFSRegRoot + URL_SEPARATOR;
         }
         //Default registry root : <CARBON_HOME>/registry/
-        defaultFSRegRoot += "registry" + File.separator;
+        defaultFSRegRoot += "registry" + URL_SEPARATOR;
 
         //create default file system paths for registry
         //Default registry local registry location : <CARBON_HOME>/registry/local
-        this.localRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "local" + File.separator;
+        this.localRegistry = getUri(defaultFSRegRoot, "local");
         //Default registry config registry location : <CARBON_HOME>/registry/config
-        this.configRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "config" + File.separator;
+        this.configRegistry = getUri(defaultFSRegRoot, "config");
         //Default registry governance registry location : <CARBON_HOME>/registry/governance
-        this.govRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "governance" + File.separator;
+        this.govRegistry = getUri(defaultFSRegRoot, "governance");
+    }
+
+    private String getUri(String defaultFSRegRoot, String subDirectory) {
+        return Paths.get(defaultFSRegRoot + subDirectory).toUri().normalize().toString()
+                + ESBRegistryConstants.URL_SEPARATOR;
     }
 
     @Override
@@ -112,7 +127,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 addConfigProperty(name, value);
             }
         }
-        log.info("EI lightweight registry is initialized.");
+        log.debug("EI lightweight registry is initialized.");
 
     }
 
@@ -122,7 +137,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             log.debug("==> Repository fetch of resource with key : " + key);
         }
 
-        String resolvedRegKeyPath = resolveRegistryPath(key);
+        String resolvedRegKeyPath = resolveRegistryURI(key);
         URLConnection urlConnection;
         URL url = null;
         try {
@@ -209,7 +224,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
 
     @Override
     public boolean isResourceExists(String key) {
-        String resolvedRegKeyPath = resolveRegistryPath(key);
+        String resolvedRegKeyPath = resolveRegistryURI(key);
         try {
             // here, a URL object is created in order to remove the protocol from the file path
             File file = new File(new URL(resolvedRegKeyPath).getFile());
@@ -233,13 +248,13 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         if (log.isDebugEnabled()) {
             log.debug("==> Repository fetch of resource with key : " + key);
         }
-        String resolvedRegKeyPath = resolveRegistryPath(key);
+        String resolvedRegKeyPath = resolveRegistryURI(key);
         Properties result = new Properties();
 
         URL url = null;
         // get the path to the relevant property file
         try {
-            resolvedRegKeyPath = getPropertyFilePath(resolvedRegKeyPath);
+            resolvedRegKeyPath = getPropertyFileURI(resolvedRegKeyPath);
             url = new URL(resolvedRegKeyPath);
         } catch (MalformedURLException e) {
             handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
@@ -283,25 +298,25 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * @param originalURL the path to the resource
      * @return URL of the relevant property file
      */
-    private String getPropertyFilePath(String originalURL) throws MalformedURLException {
+    private String getPropertyFileURI(String originalURL) throws MalformedURLException {
 
         originalURL = originalURL.trim();
         // here, a URL object is created in order to remove the protocol from the file path
         boolean isDirectory = new File(new URL(originalURL).getFile()).isDirectory();
         if (!isDirectory) {
             // if the url is a file, the property file is expected to be present as a sibling
-            if (originalURL.endsWith(File.separator)) {
+            if (originalURL.endsWith(URL_SEPARATOR)) {
                 originalURL = originalURL.substring(0, originalURL.length() - 1);
             }
             return originalURL + ESBRegistryConstants.PROPERTY_EXTENTION;
         }
         // if the url is a folder, the property file is expected to be present as a child
-        String[] pathSegments = originalURL.split(File.separator);
+        String[] pathSegments = originalURL.split(URL_SEPARATOR);
         String folderName = pathSegments[pathSegments.length - 1];
-        if (originalURL.endsWith(File.separator)) {
+        if (originalURL.endsWith(URL_SEPARATOR)) {
             return originalURL + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
         }
-        return originalURL + File.separator + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
+        return originalURL + URL_SEPARATOR + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
     }
 
     @Override
@@ -311,7 +326,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         MediationRegistryEntryImpl entryEmbedded = new MediationRegistryEntryImpl();
 
         try {
-            URL url = new URL(resolveRegistryPath(key));
+            URL url = new URL(resolveRegistryURI(key));
             if ("file".equals(url.getProtocol())) {
                 try {
                     url.openStream();
@@ -337,9 +352,9 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             }
 
         } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + resolveRegistryPath(key), e);
+            handleException("Invalid URL reference " + resolveRegistryURI(key), e);
         } catch (IOException e) {
-            handleException("IO Error reading from URL " + resolveRegistryPath(key), e);
+            handleException("IO Error reading from URL " + resolveRegistryURI(key), e);
         }
 
         return entryEmbedded;
@@ -363,7 +378,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             entry = registryEntry;
         }
 
-        String resourcePath = resolveRegistryPath(entry.getKey());
+        String resourcePath = resolveRegistryURI(entry.getKey());
         String resourceRootEntry = entry.getKey();
 
         if (registryType == ESBRegistryConstants.LOCAL_HOST_REGISTRY) {
@@ -380,8 +395,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 return null;
             }
 
-            if (!resourceRootEntry.endsWith(ESBRegistryConstants.URL_SEPARATOR)) {
-                resourceRootEntry += ESBRegistryConstants.URL_SEPARATOR;
+            if (!resourceRootEntry.endsWith(URL_SEPARATOR)) {
+                resourceRootEntry += URL_SEPARATOR;
             }
 
             String[] children = file.list();
@@ -395,7 +410,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
 
                 // set if the registry entry is a FILE or a FOLDER
                 try {
-                    File entryFile = new File(new URI(resourcePath + File.separator + children[i]));
+                    File entryFile = new File(new URI(resourcePath + URL_SEPARATOR + children[i]));
                     if (entryFile.isDirectory()) {
                         registryEntry.setType(ESBRegistryConstants.FOLDER);
                     } else {
@@ -445,10 +460,10 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     @Override
     public void newResource(String path, boolean isDirectory) {
         if (registryType == ESBRegistryConstants.LOCAL_HOST_REGISTRY) {
-            String resolvedPath = resolveRegistryPath(path);
+            String resolvedPath = resolveRegistryURI(path);
 
-            if (isDirectory && !resolvedPath.endsWith(File.separator)) {
-                resolvedPath += File.separator;
+            if (isDirectory && !resolvedPath.endsWith(URL_SEPARATOR)) {
+                resolvedPath += URL_SEPARATOR;
             }
 
             String parent = getParentPath(resolvedPath, isDirectory);
@@ -465,20 +480,25 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     }
 
     @Override
-    public void newNonEmptyResource(String path, boolean isDirectory, String contentType, String content, String propertyName) {
+    public void newNonEmptyResource(String path, boolean isDirectory, String mediaType, String content, String propertyName) {
 
         if (registryType == ESBRegistryConstants.LOCAL_HOST_REGISTRY) {
-            String targetPath = resolveRegistryPath(path);
+            String targetPath = resolveRegistryURI(path);
 
-            if (isDirectory && !targetPath.endsWith(File.separator)) {
-                targetPath += File.separator;
+            if (isDirectory && !targetPath.endsWith(URL_SEPARATOR)) {
+                targetPath += URL_SEPARATOR;
             }
 
             String parent = getParentPath(targetPath, isDirectory);
             String fileName = getResourceName(targetPath);
 
+            Properties metadata = new Properties();
+            if (mediaType != null) {
+                metadata.setProperty(METADATA_KEY_MEDIA_TYPE, mediaType);
+            }
+
             try {
-                writeToFile(new URI(parent), fileName, content);
+                writeToFile(new URI(parent), fileName, content, metadata);
             } catch (Exception e) {
                 handleException("Error when adding a new resource", e);
             }
@@ -499,7 +519,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     public void updateResource(String path, Object value) {
         if (registryType == ESBRegistryConstants.LOCAL_HOST_REGISTRY) {
             try {
-                File file = new File(new URI(resolveRegistryPath(path)));
+                File file = new File(new URI(resolveRegistryURI(path)));
                 if (file.exists()) {
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                         writer.write(value.toString());
@@ -563,7 +583,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      */
     private void removeResource(String key) {
         try {
-            File resource = new File(new URI(resolveRegistryPath(key)));
+            File resource = new File(new URI(resolveRegistryURI(key)));
             if (resource.exists()) {
                 if (resource.isFile()) {
                     deleteFile(resource);
@@ -643,7 +663,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     }
 
     /**
-     * @param resourcePath If the resource is a directory it must end with File.separator
+     * @param resourcePath If the resource is a directory it must end with URL_SEPARATOR
      * @param isDirectory
      * @return
      */
@@ -651,10 +671,10 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         if (resourcePath != null) {
             String tempPath = resourcePath;
             if (isDirectory) {
-                tempPath = resourcePath.substring(0, resourcePath.lastIndexOf(File.separator));
+                tempPath = resourcePath.substring(0, resourcePath.lastIndexOf(URL_SEPARATOR));
             }
 
-            return tempPath.substring(0, tempPath.lastIndexOf(File.separator));
+            return tempPath.substring(0, tempPath.lastIndexOf(URL_SEPARATOR));
         }
         return "";
     }
@@ -662,10 +682,10 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     private String getResourceName(String path) {
         if (path != null) {
             String correctedPath = path;
-            if (path.endsWith(File.separator)) {
-                correctedPath = path.substring(0, path.lastIndexOf(File.separator));
+            if (path.endsWith(URL_SEPARATOR)) {
+                correctedPath = path.substring(0, path.lastIndexOf(URL_SEPARATOR));
             }
-            return correctedPath.substring(correctedPath.lastIndexOf(File.separator) + 1, correctedPath.length());
+            return correctedPath.substring(correctedPath.lastIndexOf(URL_SEPARATOR) + 1, correctedPath.length());
         }
         return "";
 
@@ -709,9 +729,10 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      *
      * @param parentName
      * @param newFileName
-     * @throws Exception
+     * @param metadata
+     * @throws SynapseException
      */
-    private void writeToFile(URI parentName, String newFileName, String content) throws Exception {
+    private void writeToFile(URI parentName, String newFileName, String content, Properties metadata) {
         /*
             search for parent. if found, create the new FILE in it
         */
@@ -719,16 +740,42 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         if (!parent.exists() && !parent.mkdirs()) {
             handleException("Unable to create parent directory: " + parentName);
         }
+
         File newFile = new File(parent, newFileName);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(newFile))) {
             writer.write(content);
             writer.flush();
+            writeMetadata(parent, newFileName, metadata);
 
             if (log.isDebugEnabled()) {
-                log.debug("Successfully content written to file : " + parentName + File.separator + newFileName);
+                log.debug("Successfully content written to file : " + parentName + URL_SEPARATOR + newFileName);
             }
         } catch (IOException e) {
-            handleException("Couldn't write to registry resource: " + parentName + File.separator + newFileName, e);
+            handleException("Couldn't write to registry resource: " + parentName + URL_SEPARATOR + newFileName, e);
+        }
+    }
+
+    /**
+     * Writes metadata related to the given resource.
+     *
+     * @param parent parent dir of the resource
+     * @param resourceFileName filename of the resource
+     * @param metadata metadata properties object
+     */
+    private void writeMetadata(File parent, String resourceFileName, Properties metadata) {
+
+        File metadataDir = new File(parent, METADATA_DIR_NAME);
+        if (!metadataDir.exists() && !metadataDir.mkdirs()) {
+            handleException("Unable to create metadata directory: " + metadataDir.getPath());
+        }
+        File newMetadataFile = new File(metadataDir, resourceFileName + METADATA_FILE_SUFFIX);
+        try (BufferedWriter metadataWriter = new BufferedWriter(new FileWriter(newMetadataFile))) {
+            metadata.store(metadataWriter, null);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully written metadata to file: " + newMetadataFile.getPath());
+            }
+        } catch (IOException e) {
+            handleException("Couldn't write to metadata file: " + newMetadataFile.getPath(), e);
         }
     }
 
@@ -755,7 +802,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * @param key
      * @return
      */
-    private String resolveRegistryPath (String key) {
+    private String resolveRegistryURI(String key) {
         String resolvedPath = null;
 
         if (key != null || !key.isEmpty()) {
@@ -778,12 +825,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 resourcePath = key;
             }
 
-            if (resourcePath.startsWith(ESBRegistryConstants.URL_SEPARATOR)) {
+            if (resourcePath.startsWith(URL_SEPARATOR)) {
                 resourcePath = resourcePath.substring(1);
-            }
-
-            if (ESBRegistryConstants.URL_SEPARATOR_CHAR != File.separatorChar && registryRoot.startsWith(ESBRegistryConstants.PROTOCOL_FILE)) {
-                resourcePath = resourcePath.replace(ESBRegistryConstants.URL_SEPARATOR_CHAR, File.separatorChar);
             }
 
             resolvedPath = registryRoot + resourcePath;
@@ -811,14 +854,22 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 return null;
             }
 
-            StringBuilder strBuilder = new StringBuilder();
-            try (BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = bReader.readLine()) != null) {
-                    strBuilder.append(line);
+            Properties metadata = getMetadata(url.getPath());
+            String mediaType = metadata.getProperty(METADATA_KEY_MEDIA_TYPE, ESBRegistryConstants.DEFAULT_MEDIA_TYPE);
+
+            if (ESBRegistryConstants.DEFAULT_MEDIA_TYPE.equals(mediaType)) {
+                StringBuilder strBuilder = new StringBuilder();
+                try (BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    String line;
+                    while ((line = bReader.readLine()) != null) {
+                        strBuilder.append(line);
+                    }
                 }
+                return OMAbstractFactory.getOMFactory().createOMText(strBuilder.toString());
+            } else {
+                return OMAbstractFactory.getOMFactory().createOMText(
+                        new DataHandler(new SynapseBinaryDataSource(inputStream, mediaType)), true);
             }
-            return OMAbstractFactory.getOMFactory().createOMText(strBuilder.toString());
         }
     }
 
@@ -862,8 +913,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                                         "relative to CARBON_HOME");
                             }
                             String pathFromCarbonHome = RegistryHelper.getHome();
-                            if (!pathFromCarbonHome.endsWith(File.separator)) {
-                                pathFromCarbonHome += File.separator;
+                            if (!pathFromCarbonHome.endsWith(URL_SEPARATOR)) {
+                                pathFromCarbonHome += URL_SEPARATOR;
                             }
                             pathFromCarbonHome = rootPathUrl.getProtocol() + ":" + pathFromCarbonHome + value;
                             rootPathUrl = new URL(pathFromCarbonHome);
@@ -876,21 +927,21 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                             }
                         }
 
-                        if (!value.endsWith(File.separator)) {
-                            value += File.separator;
+                        if (!value.endsWith(URL_SEPARATOR)) {
+                            value += URL_SEPARATOR;
                         }
 
                     } else if (ESBRegistryConstants.PROTOCOL_HTTP.equals(rootPathUrl.getProtocol())) {
                         registryProtocol = HTTP;
                         registryType = ESBRegistryConstants.REMOTE_HOST_REGISTRY;
-                        if (!value.endsWith(ESBRegistryConstants.URL_SEPARATOR)) {
-                            value += ESBRegistryConstants.URL_SEPARATOR;
+                        if (!value.endsWith(URL_SEPARATOR)) {
+                            value += URL_SEPARATOR;
                         }
 
                     } else if (ESBRegistryConstants.PROTOCOL_HTTPS.equals(rootPathUrl.getProtocol())) {
                         registryProtocol = HTTPS;
-                        if (!value.endsWith(ESBRegistryConstants.URL_SEPARATOR)) {
-                            value += ESBRegistryConstants.URL_SEPARATOR;
+                        if (!value.endsWith(URL_SEPARATOR)) {
+                            value += URL_SEPARATOR;
                         }
 
                     }
@@ -942,5 +993,31 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             return properties;
         }
         return null;
+    }
+
+    /**
+     * Get metadata of the registry resource.
+     *
+     * @param fileUrl File URL of the registry resource
+     * @return Properties object containing metadata of the registry resource
+     */
+    private Properties getMetadata(String fileUrl) {
+
+        Properties metadata = new Properties();
+        File file = new File(fileUrl);
+        String metadataFilePath = file.getParent()
+                                  + File.separator + METADATA_DIR_NAME
+                                  + File.separator + file.getName() + METADATA_FILE_SUFFIX;
+        File metadataFile = new File(metadataFilePath);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(metadataFile))) {
+            metadata.load(reader);
+        } catch (FileNotFoundException e) {
+            log.error("Metadata file cannot be found at " + metadataFile.getPath(), e);
+        } catch (IOException e) {
+            log.error("Error while reading file " + metadataFile.getPath(), e);
+        }
+
+        return metadata;
     }
 }

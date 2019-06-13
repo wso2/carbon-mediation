@@ -184,6 +184,9 @@
         });
     }
 
+    function viewMessage(name) {
+      document.location.href = "manageMessage.jsp?" + "messageProcessorName=" + name;
+    }
 </script>
 
 <div id="middle">
@@ -313,14 +316,15 @@
             %>
             <td>
                 <% if (mspData.getArtifactContainerName() != null) { %>
-                <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
-                   class="icon-link"
-                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                        key="edit"/></a>
-                <a href="#" onclick="#"
-                   id="delete_link" class="icon-link"
-                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
-                        key="delete"/></a>
+               <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
+                  class="icon-link"
+                  style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                  key="edit"/></a>
+               <a href="#" onclick="#"
+                  id="delete_link" class="icon-link"
+                  style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                  key="delete"/></a>
+
                 <% } else { %>
                 <a onclick="editRow('<%= type%>','<%=mspData.getName()%>')" href="#"
                    class="icon-link"
@@ -348,14 +352,15 @@
             %>
             <td>
                 <% if (mspData.getArtifactContainerName() != null) { %>
-                <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
-                   class="icon-link"
-                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                        key="edit"/></a>
-                <a href="#" onclick="#"
-                   id="delete_link" class="icon-link"
-                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
-                        key="delete"/></a>
+               <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
+                  class="icon-link"
+                  style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                  key="edit"/></a>
+               <a href="#" onclick="#"
+                  id="delete_link" class="icon-link"
+                  style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                  key="delete"/></a>
+
                 <% } else { %>
                 <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
                    class="icon-link"
@@ -372,6 +377,11 @@
                     <a href="#" class="icon-link" id="activate_link"
                        style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
                        onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
+                    <span class="icon-text"
+                      style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">|</span>
+                    <a href="#" class="icon-link" id="activate_link"
+                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                       onclick="viewMessage('<%= mspData.getName()%>')">View Message</a>
                 <span class="icon-text"
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
@@ -469,7 +479,7 @@
 
         <tr>
             <td style="width:155px;">
-                <a 
+                <a
                    href="manageMessageForwardingProcessor.jsp"  class="icon-link"
                    style="background: url(../admin/images/add.gif)  no-repeat;">
                     <fmt:message key="scheduled.message.forwarding.processor"/>
@@ -493,7 +503,7 @@
 
         <tr>
             <td style="width:155px;">
-                <a 
+                <a
                    href="manageMessageSamplingProcessor.jsp" class="icon-link"
                    style="background: url(../admin/images/add.gif)  no-repeat;">
                     <fmt:message key="message.sampling.processor"/>
@@ -505,7 +515,7 @@
         </tr>
         <tr>
             <td style="width:155px;">
-                <a 
+                <a
                    href="manageCustomMessageProcessor.jsp" class="icon-link"
                    style="background: url(../admin/images/add.gif) no-repeat;">
                     <fmt:message key="custom.message.processor"/>
@@ -516,6 +526,7 @@
             </td>
         </tr>
     </table>
+
 </div>
 </div>
 </div>

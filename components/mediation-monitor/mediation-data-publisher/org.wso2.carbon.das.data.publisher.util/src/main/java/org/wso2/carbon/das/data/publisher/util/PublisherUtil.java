@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.utils.CarbonUtils;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -46,7 +45,7 @@ public class PublisherUtil {
         if (hostAddress != null) {
             return hostAddress;
         }
-        String hostAddress =   ServerConfiguration.getInstance().getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_NODE_HOST_NAME);
+        String hostAddress =   ServerConfiguration.getInstance().getFirstProperty(AnalyticsDataPublisherConstants.FLOW_STATISTIC_NODE_HOST_NAME);
 
         if (hostAddress == null) {
             hostAddress =   ServerConfiguration.getInstance().getFirstProperty(HOST_NAME);

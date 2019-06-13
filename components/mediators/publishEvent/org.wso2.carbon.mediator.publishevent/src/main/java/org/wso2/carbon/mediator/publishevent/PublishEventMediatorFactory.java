@@ -157,6 +157,9 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 			throw new SynapseException(EVENT_SINK_QNAME.getLocalPart() + " element missing");
 		}
 		mediator.setEventSinkName(eventSinkElement.getText());
+
+		addAllCommentChildrenToList(omElement, mediator.getCommentsList());
+
 		return mediator;
 	}
 

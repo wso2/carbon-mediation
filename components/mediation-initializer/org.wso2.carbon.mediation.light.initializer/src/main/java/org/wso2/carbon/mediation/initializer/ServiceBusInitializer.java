@@ -48,6 +48,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.ServerShutdownHandler;
+import org.wso2.carbon.inbound.endpoint.EndpointListenerLoader;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.handler.ProxyLogHandler;
@@ -246,7 +247,7 @@ public class ServiceBusInitializer {
 
             // Start Inbound Endpoint Listeners
             //tOdO need to fix inbound endpoints
-//            EndpointListenerLoader.loadListeners();
+            EndpointListenerLoader.loadListeners();
 
             registerInboundDeployer(configCtxSvc.getServerConfigContext()
                             .getAxisConfiguration(),
@@ -423,7 +424,7 @@ public class ServiceBusInitializer {
                     new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
 
             if (isRunningDebugMode()) {
-                log.info("Micro Integrator started in Debug mode for super tenant");
+                log.debug("Micro Integrator started in Debug mode for super tenant");
                 createSynapseDebugEnvironment(contextInfo);
             }
 
@@ -488,7 +489,7 @@ public class ServiceBusInitializer {
             contextInfo.setSynapseDebugInterface(debugInterface);
             SynapseDebugManager debugManager = SynapseDebugManager.getInstance();
             contextInfo.setSynapseDebugManager(debugManager);
-            log.info("Synapse debug Environment created successfully");
+            log.debug("Synapse debug Environment created successfully");
         } catch (IOException ex) {
             log.error("Error while creating Synapse debug environment ", ex);
         } catch (InterruptedException ex) {

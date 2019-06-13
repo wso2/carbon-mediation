@@ -316,22 +316,30 @@ public class PersistenceUtils {
         //Read the property of web socket endpoint ws.use.port.offset
         boolean usePortOffset = Boolean.valueOf(properties.getProperty(WEBSOCKET_USE_PORT_OFFSET));
         if (usePortOffset) {
-            //if its true return port offset according to the below
-            ServerConfiguration carbonConfig = ServerConfiguration.getInstance();
-            String portOffset = System.getProperty(PORT_OFFSET_SYSTEM_VAR,
-                    carbonConfig.getFirstProperty(PORT_OFFSET_CONFIG));
-            try {
-                if ((portOffset != null)) {
-                    return Integer.parseInt(portOffset.trim());
-                } else {
-                    return 0;
-                }
-            } catch (NumberFormatException e) {
-                log.error("Invalid Port Offset: " + portOffset + ". Default value 0 will be used.", e);
-                return 0;
-            }
+            //if its true return port offset accordingly
+            return getPortOffset();
         }
         // else return the 0 as it not need to have port offset
         return 0;
     }
+
+    /**
+     * Used to get the port offset value of server.
+     *
+     * @return port offset of server
+     */
+    public static int getPortOffset() {
+
+        ServerConfiguration carbonConfig = ServerConfiguration.getInstance();
+        String portOffsetInCarbonXML = carbonConfig.getFirstProperty(PORT_OFFSET_CONFIG);
+        String portOffset = System.getProperty(PORT_OFFSET_SYSTEM_VAR, portOffsetInCarbonXML);
+
+        if (portOffset != null) {
+            return Integer.parseInt(portOffset.trim());
+        } else {
+            return 0;
+        }
+
+    }
+
 }

@@ -309,7 +309,7 @@
     <h2><fmt:message key="priority.design.text"/></h2>
 
     <div id="workArea">
-        <form name="main_form" id="main_form" action="save_design.jsp">
+        <form name="main_form" id="main_form" action="save_design.jsp" method="post">
         <table class="styledLeft noBorders" cellspacing="0" style="width:100%">
             <thead>
             <tr>

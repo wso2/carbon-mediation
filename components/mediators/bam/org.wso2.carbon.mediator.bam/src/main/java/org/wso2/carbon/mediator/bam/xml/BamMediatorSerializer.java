@@ -45,6 +45,8 @@ public class BamMediatorSerializer extends AbstractMediatorSerializer {
 
         bam.addChild(serverProfileElement);
 
+        serializeComments(bam, bamMediator.getCommentsList());
+
         return bam;
     }
 

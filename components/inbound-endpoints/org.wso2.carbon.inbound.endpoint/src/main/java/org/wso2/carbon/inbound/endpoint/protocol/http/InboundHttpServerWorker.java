@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -32,6 +33,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.core.axis2.ResponseState;
 import org.apache.synapse.core.axis2.SynapseMessageReceiver;
@@ -41,6 +43,7 @@ import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.RESTRequestHandler;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
+import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -68,6 +71,8 @@ public class InboundHttpServerWorker extends ServerWorker {
     private RESTRequestHandler restHandler;
     private Pattern dispatchPattern;
     private Matcher patternMatcher;
+    private boolean isInternalHttpInboundEndpoint;
+    private boolean isInternalHttpsInboundEndpoint;
 
     public InboundHttpServerWorker(int port, String tenantDomain,
                                    SourceRequest sourceRequest,
@@ -78,6 +83,8 @@ public class InboundHttpServerWorker extends ServerWorker {
         this.port = port;
         this.tenantDomain = tenantDomain;
         restHandler = new RESTRequestHandler();
+        isInternalHttpInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundHttpPort() == port);
+        isInternalHttpsInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundHttpsPort() == port);
     }
 
     public void run() {
@@ -98,6 +105,20 @@ public class InboundHttpServerWorker extends ServerWorker {
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
 
+                if (isInternalHttpInboundEndpoint) {
+                    doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
+                    boolean result = HTTPEndpointManager.getInstance().getInternalHttpApiDispatcher().dispatch(synCtx);
+                    respond(synCtx, result);
+                    return;
+                }
+
+                if (isInternalHttpsInboundEndpoint) {
+                    doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
+                    boolean result = HTTPEndpointManager.getInstance().getInternalHttpsApiDispatcher().dispatch(synCtx);
+                    respond(synCtx, result);
+                    return;
+                }
+
                 String endpointName =
                         HTTPEndpointManager.getInstance().getEndpointName(port, tenantDomain);
                 if (endpointName == null) {
@@ -116,21 +137,7 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
-                if (!isRESTRequest(axis2MsgContext, method)) {
-                    if (request.isEntityEnclosing()) {
-                        processEntityEnclosingRequest(axis2MsgContext, false);
-                    } else {
-                        processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
-                    }
-                } else {
-                    AxisOperation axisOperation = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisOperation();
-                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(null);
-                    String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-                    SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
-                    processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgContext, false);
-                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(axisOperation);
-
-                }
+                doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
 
                 dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
 
@@ -207,6 +214,25 @@ public class InboundHttpServerWorker extends ServerWorker {
         }
     }
 
+    private void doPreInjectTasks(MessageContext axis2MsgContext, Axis2MessageContext synCtx, String method) {
+
+        if (!isRESTRequest(axis2MsgContext, method)) {
+            if (request.isEntityEnclosing()) {
+                processEntityEnclosingRequest(axis2MsgContext, false);
+            } else {
+                processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
+            }
+        } else {
+            AxisOperation axisOperation = synCtx.getAxis2MessageContext().getAxisOperation();
+            synCtx.getAxis2MessageContext().setAxisOperation(null);
+            String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+            SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
+            processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgContext, false);
+            synCtx.getAxis2MessageContext().setAxisOperation(axisOperation);
+
+        }
+    }
+
     private void injectToMainSequence(org.apache.synapse.MessageContext synCtx,
                                       InboundEndpoint endpoint) {
 
@@ -247,7 +273,7 @@ public class InboundHttpServerWorker extends ServerWorker {
         if (log.isDebugEnabled()) {
             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
         }
-        synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
+        synCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, endpoint.getName());
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 
@@ -403,5 +429,23 @@ public class InboundHttpServerWorker extends ServerWorker {
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setOperationContext(opCtx);
 
         return synCtx;
+    }
+
+    /**
+     *Sends the respond back to the client.
+     * @param synCtx the MessageContext
+     * @param result the result of API Call
+     */
+    private void respond(org.apache.synapse.MessageContext synCtx, boolean result) {
+        synCtx.setTo(null);
+        synCtx.setResponse(true);
+        Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+        org.apache.axis2.context.MessageContext axis2MessageCtx = axis2smc.getAxis2MessageContext();
+        axis2MessageCtx.getOperationContext()
+                .setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
+        if (!result) {
+            axis2MessageCtx.setProperty(PassThroughConstants.HTTP_SC, "404");
+        }
+        Axis2Sender.sendBack(synCtx);
     }
 }

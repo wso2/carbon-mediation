@@ -16,9 +16,12 @@
 package org.wso2.carbon.inbound.endpoint;
 
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
@@ -40,6 +43,8 @@ import java.util.Set;
  * Listening Inbound Endpoints.
  */
 public class EndpointListenerLoader {
+
+    private static Log log = LogFactory.getLog(EndpointListenerLoader.class);
 
 
     /**
@@ -94,7 +99,9 @@ public class EndpointListenerLoader {
                 }
             }
         }
-        
+
+        loadInternalInboundApis();
+
         //Load tenats required for polling inbound protocols
         Map<String, Set<String>> mPollingEndpoints =
 		                                  InboundEndpointsDataStore.getInstance().getAllPollingingEndpointData();
@@ -105,4 +112,29 @@ public class EndpointListenerLoader {
             TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
         }
     }
+
+    /**
+     * This loads both internal http and https apis.
+     */
+    private static void loadInternalInboundApis() {
+
+        HTTPEndpointManager manager = HTTPEndpointManager.getInstance();
+
+        if (manager.isAnyInternalHttpApiEnabled()) {
+            HTTPEndpointManager.getInstance().startListener(manager.getInternalInboundHttpPort(),
+                    InboundHttpConstants.INTERNAL_HTTP_INBOUND_ENDPOINT_NAME, null);
+        }
+
+        if (manager.isAnyInternalHttpsApiEnabled()) {
+            if (ConfigurationLoader.isSslConfiguredSuccessfully()) {
+                manager.startSSLListener(manager.getInternalInboundHttpsPort(),
+                        InboundHttpConstants.INTERNAL_HTTPS_INBOUND_ENDPOINT_NAME,
+                        ConfigurationLoader.getSslConfiguration(), null);
+            } else {
+                log.error("SSL is not configured for Internal apis. Hence Internal Apis will not be available via "
+                        + "https.");
+            }
+        }
+    }
+
 }

@@ -2,117 +2,25 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>business-adaptors</artifactId>
-        <version>4.6.108-SNAPSHOT</version>
+        <version>4.6.152-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.transports.sap</artifactId>
-    <version>4.6.108-SNAPSHOT</version>
+    <version>4.6.152-SNAPSHOT</version>
     <packaging>${packaging.type}</packaging>
-    <name>SAP transport</name>
+    <name>WSO2 Carbon - SAP transport</name>
     <description>WSO2 Carbon - SAP Adapter</description>
 
     <profiles>
         <profile>
-            <id>jco-lib-absent</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/lib/sapjco-3.jar</missing>
-                </file>
-            </activation>
-            <properties>
-                <packaging.type>jar</packaging.type>
-            </properties>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/*.*</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>comp</id>
-                                <phase>compile</phase>
-                            </execution>
-                            <execution>
-                                <id>test-comp</id>
-                                <phase>test-compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>idoc-lib-absent</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/lib/sapidoc-3.jar</missing>
-                </file>
-            </activation>
-            <properties>
-                <packaging.type>jar</packaging.type>
-            </properties>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/*.*</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>comp</id>
-                                <phase>compile</phase>
-                            </execution>
-                            <execution>
-                                <id>test-comp</id>
-                                <phase>test-compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>jco-idoc-libs-present</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>jenkins</id>
             <properties>
                 <packaging.type>bundle</packaging.type>
             </properties>
 
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/*.*</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>comp</id>
-                                <phase>compile</phase>
-                            </execution>
-                            <execution>
-                                <id>test-comp</id>
-                                <phase>test-compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
@@ -133,7 +41,7 @@
                                         <property name="runtime-classpath" refid="maven.runtime.classpath" />
 
                                         <path id="lib.path.ref">
-                                            <fileset dir="${basedir}/lib" includes="*.jar" />
+                                            <fileset dir="${sap.lib.dir}" includes="*.jar" />
                                         </path>
 
                                         <echo message="Maven CLASS PATH : ${runtime-classpath}" />
@@ -180,6 +88,29 @@
         </profile>
     </profiles>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*.*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>comp</id>
+                        <phase>compile</phase>
+                    </execution>
+                    <execution>
+                        <id>test-comp</id>
+                        <phase>test-compile</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.axis2.wso2</groupId>
@@ -211,6 +142,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <packaging.type>jar</packaging.type>
     </properties>
 
 </project>
