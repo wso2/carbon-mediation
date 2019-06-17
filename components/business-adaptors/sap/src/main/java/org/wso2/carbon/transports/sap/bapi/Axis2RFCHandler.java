@@ -24,6 +24,7 @@ import com.sap.conn.jco.server.JCoServerContext;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.AbapException;
 import com.sap.conn.jco.AbapClassException;
+import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.transport.base.threads.WorkerPool;
@@ -57,10 +58,9 @@ public class Axis2RFCHandler implements JCoServerFunctionHandler {
 
     /**
      * handle bapi requests coming through SAP gateway
-     * @param jCoServerContext
-     *              JCO Server environment configuration
-     * @param jCoFunction
-     *              bAPI/rfc function being called
+     *
+     * @param jCoServerContext JCO Server environment configuration
+     * @param jCoFunction      bAPI/rfc function being called
      * @throws AbapException
      * @throws AbapClassException
      */
@@ -70,47 +70,55 @@ public class Axis2RFCHandler implements JCoServerFunctionHandler {
         if (log.isDebugEnabled()) {
             log.debug("New BAPI function call received");
         }
-        workerPool.execute(new BAPIWorker(jCoServerContext, jCoFunction));
+        //TODO experimental code - validate
+        String xml = jCoFunction.toXML();
+        ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
+        MessageContext msgContext = null;
+        try {
+            msgContext = endpoint.createMessageContext();
+            msgContext.setIncomingTransportName(SAPConstants.SAP_BAPI_PROTOCOL_NAME);
+            if (log.isDebugEnabled()) {
+                log.debug("Creating SOAP envelope from the BAPI function call");
+            }
+            SOAPEnvelope envelope = TransportUtils.createSOAPMessage(msgContext, bais,
+                    SAPConstants.SAP_CONTENT_TYPE);
+            msgContext.setEnvelope(envelope);
+        } catch (Exception e) {
+            log.error("Error while processing the BAPI call through the Axis engine", e);
+        } finally {
+            try {
+                bais.close();
+            } catch (IOException e) {
+                log.error("Error while closing the stream", e);
+            }
+        }
+        workerPool.execute(new BAPIWorker(msgContext));
     }
 
     private class BAPIWorker implements Runnable {
 
         private JCoServerContext serverContext;
         private JCoFunction function;
+        private MessageContext msgContext;
 
         public BAPIWorker(JCoServerContext serverContext, JCoFunction function) {
             this.serverContext = serverContext;
             this.function = function;
         }
 
+        BAPIWorker(MessageContext msgContext) {
+            this.msgContext = msgContext;
+        }
+
         public void run() {
             if (log.isDebugEnabled()) {
                 log.debug("Starting a new BAPI worker thread to process the incoming request");
             }
-            //TODO experimental code - validate
-            String xml = function.toXML();
-            ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes());
+            //pass the constructed IDOC message through Axis engine
             try {
-                MessageContext msgContext = endpoint.createMessageContext();
-                msgContext.setIncomingTransportName(SAPConstants.SAP_BAPI_PROTOCOL_NAME);
-
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating SOAP envelope from the BAPI function call");
-                }
-
-                SOAPEnvelope envelope = TransportUtils.createSOAPMessage(msgContext, bais,
-                        SAPConstants.SAP_CONTENT_TYPE);
-                msgContext.setEnvelope(envelope);
-                //pass the constructed IDOC message through Axis engine
                 AxisEngine.receive(msgContext);
-            } catch (Exception e) {
-                log.error("Error while processing the BAPI call through the Axis engine", e);
-            } finally {
-                try {
-                    bais.close();
-                } catch (IOException e) {
-                    log.error("Error while closing the stream", e);
-                }
+            } catch (AxisFault axisFault) {
+                log.error("Error while processing the BAPI call through the Axis engine", axisFault);
             }
         }
     }
