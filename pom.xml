@@ -2419,9 +2419,9 @@
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.4.37-SNAPSHOT</carbon.kernel.version>
+        <carbon.kernel.version>4.4.0-m1</carbon.kernel.version>
         <carbon.kernel.import.feature.version>4.4.0</carbon.kernel.import.feature.version>
-        <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
+        <carbon.kernel.imp.pkg.version>[4.5.0, 4.6.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
         <carbon.commons.version>4.6.51-SNAPSHOT</carbon.commons.version>
@@ -2448,13 +2448,13 @@
         <carbon.identity.oauth.version>6.0.168</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[6.0.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1-wso2v35</orbit.version.axis2>
+        <orbit.version.axis2>1.6.1-wso2v37</orbit.version.axis2>
         <orbit.version.axis2.client>${orbit.version.axis2}</orbit.version.axis2.client>
         <axis2-transports.base.version>${orbit.version.axis2}</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>${orbit.version.axis2}</axis2.json.version>
         <!-- Axiom Version -->
-        <axiom.version>1.2.11.wso2v13</axiom.version>
+        <axiom.version>1.2.11.wso2v16</axiom.version>
         <axiom.api.wso2.version>${axiom.version}</axiom.api.wso2.version>
         <orbit.version.axiom>${axiom.version}</orbit.version.axiom>
         <axiom.wso2.version>${axiom.version}</axiom.wso2.version>
