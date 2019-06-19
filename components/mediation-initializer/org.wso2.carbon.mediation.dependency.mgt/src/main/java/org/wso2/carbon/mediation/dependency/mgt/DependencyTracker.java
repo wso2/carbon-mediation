@@ -16,14 +16,24 @@
 
 package org.wso2.carbon.mediation.dependency.mgt;
 
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.AbstractSynapseObserver;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.endpoints.*;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.Startup;
+import org.apache.synapse.endpoints.AbstractEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.rest.API;
+import org.apache.synapse.rest.version.DefaultStrategy;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants;
+import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
+import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 
 import java.util.List;
 
@@ -360,5 +370,41 @@ public class DependencyTracker extends AbstractSynapseObserver {
                     ((SequenceMediator) sequence).getName());
             super.sequenceRemoved(sequence);
         }
+    }
+
+    @Override
+    public void apiRemoved(API api) {
+
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
+        Registry registry;
+
+        try {
+            registry = registryService.getConfigSystemRegistry(tenantId);
+        } catch (RegistryException e) {
+            log.error("Error occurred while retrieving config registry for cleaning custom swagger definition for " +
+                    "API: " + api.getName(), e);
+            return;
+        }
+
+        //Create resource path in registry
+        StringBuilder resourcePathBuilder = new StringBuilder();
+        resourcePathBuilder.append(SwaggerConstants.DEFAULT_SWAGGER_REGISTRY_PATH).append(api.getAPIName());
+        if (!(api.getVersionStrategy() instanceof DefaultStrategy)) {
+            resourcePathBuilder.append(":v").append(api.getVersion());
+        }
+        //resourcePathBuilder.append("/swagger.json");
+        String resourcePath = resourcePathBuilder.toString();
+
+        try {
+            if (registry.resourceExists(resourcePath)) {
+                registry.delete(resourcePath);
+                log.info("Cleaned custom swagger definition for API: " + api.getName() + " from registry location" +
+                        resourcePath);
+            }
+        } catch (RegistryException e) {
+            log.error("Error occurred while cleaning custom swagger definition for API: " + api.getName(), e);
+        }
+        super.apiRemoved(api);
     }
 }

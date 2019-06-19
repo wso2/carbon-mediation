@@ -14,7 +14,7 @@
   ~  limitations under the License.
   --%>
 <%@ page import="net.minidev.json.JSONObject" %>
-<%@ page import="org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.GenericApiObjectDefinition" %>
+<%@ page import="org.wso2.carbon.integrator.core.rest.api.swagger.GenericApiObjectDefinition" %>
 <%@ page import="org.apache.synapse.rest.API" %>
 <%@ page import="org.apache.synapse.config.SynapseConfigUtils" %>
 <%@ page import="org.wso2.carbon.context.PrivilegedCarbonContext" %>
@@ -24,7 +24,7 @@
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.SwaggerConstants" %>
+<%@ page import="org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants" %>
 
 <script src="swagger-editor/dist/swagger-editor-bundle.js"></script>
 <script src="swagger-editor/dist/swagger-editor-standalone-preset.js"></script>
@@ -34,38 +34,24 @@
 
 
 <%
-    ResourceBundle bundle = ResourceBundle.getBundle(
-            "org.wso2.carbon.rest.api.ui.i18n.Resources",
-            request.getLocale());
-    String url = CarbonUIUtil.getServerURL(this.getServletConfig()
-            .getServletContext(), session);
-    ConfigurationContext configContext = (ConfigurationContext) config
-            .getServletContext().getAttribute(
-                    CarbonConstants.CONFIGURATION_CONTEXT);
-    String cookie = (String) session
-            .getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    RestApiAdminClient client = new RestApiAdminClient(
-            configContext, url, cookie, bundle.getLocale());
+    ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.rest.api.ui.i18n.Resources", request.getLocale());
+    String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(), session);
+    ConfigurationContext configContext = (ConfigurationContext) config.getServletContext().
+                                                                    getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+    String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
+    RestApiAdminClient client = new RestApiAdminClient(configContext, url, cookie, bundle.getLocale());
     
     String apiName = request.getParameter("apiName");
-    String resourcePath = SwaggerConstants.Registry_path + apiName + "/swagger.json";
-    String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-    int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-    String swaggerJsonString = generateSwaggerJson(tenantDomain, apiName);
-    client.updateSwaggerDocument(swaggerJsonString, resourcePath, tenantId);
-    String apiDocContent = client.getSwaggerDocument(resourcePath, tenantId);
-%>
+    String action = request.getParameter("action");
 
-<%!
-    //generate the default swagger document for the API
-    private String generateSwaggerJson(String tenantDomain, String apiName) {
-        
-        API api = SynapseConfigUtils.getSynapseConfiguration(tenantDomain).getAPI(apiName);
-        JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
-        String swaggerJsonString = jsonDefinition.toString();
-        return swaggerJsonString;
-        
+    boolean enableEdit = true;
+
+    if ("tryIt".equals(action)) {
+        enableEdit = false;
     }
+
+    int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+    String apiDocContent = client.getSwaggerDocument(apiName, tenantId);
 %>
 
 <script type="text/javascript">
@@ -97,11 +83,8 @@
         $.ajax({
             type: "post",
             data: swagJson,
+            url: "swaggerOperations-ajaxprocessor.jsp?action=saveSwagger&apiName=<%=apiName%>",
             success: function (data) {
-                <%
-                       String swagJson= request.getParameter("swagJson");
-                       client.addSwaggerDocument(swagJson,resourcePath,tenantId);
-                %>
 
             }
         });
@@ -109,17 +92,36 @@
 
     }
 
+    function saveAndUpdateAPIChanges() {
+        var swagYaml = window.localStorage.getItem("swagger-editor-content");
+        var swagJson = {};
+        swagJson["swagJson"] = JSON.stringify(jsyaml.safeLoad(swagYaml));
+        $.ajax({
+            type: "post",
+            data: swagJson,
+            url: "swaggerOperations-ajaxprocessor.jsp?action=generateUpdatedAPI&apiName=<%=apiName%>",
+            success: function (data) {
+                document.location.href = "manageAPI.jsp?mode=generatedUpdate&apiName=<%=apiName%>";
+            }
+        });
+    }
+
     function discardChanges() {
 
-        document.location.href = "index.jsp";
+        document.location.href = "manageAPI.jsp?mode=edit&apiName=<%=apiName%>";
     }
 </script>
 
 <div id="swagger-editor-wrap">
+    <% if (enableEdit) { %>
     <div class=swagger-editor-button id="swagger-editor-button">
         <button class="btn btn-primary" id="update_swagger" onclick="saveChanges()">Apply Changes</button>
+        <button class="btn btn-primary" id="update_swaggerAndApi" onclick="saveAndUpdateAPIChanges()">
+            Apply Changes and Update API
+        </button>
         <button class="btn btn-secondary" id="close_swagger_editor" onclick="discardChanges()">Discard Changes</button>
     </div>
+    <% } %>
     <div id="swagger-editor">
     </div>
 </div>

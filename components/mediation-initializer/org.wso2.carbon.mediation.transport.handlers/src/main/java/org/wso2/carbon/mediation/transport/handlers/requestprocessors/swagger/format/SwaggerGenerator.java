@@ -24,14 +24,22 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.rest.API;
+import org.apache.synapse.rest.version.DefaultStrategy;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
-import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.SwaggerConstants;
+import org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants;
+import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
+import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.Resource;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * This is the base class used by swagger formatter classes(JSON and YAML) and contains generic functions.
@@ -107,6 +115,52 @@ public class SwaggerGenerator {
             apiName = requestUri.substring(1);
         }
         return apiName;
+    }
+
+    /**
+     * Function to extract swagger definition from the registry
+     *
+     * @param api API object
+     * @param request CarbonHttpRequest which contains the request URI info
+     * @return null if registry content unavailable or empty, otherwise relevant content
+     * @throws RegistryException
+     */
+    protected String retrieveFromRegistry(API api, CarbonHttpRequest request) throws RegistryException {
+
+        //Create resource path in registry
+        StringBuilder resourcePathBuilder = new StringBuilder();
+        resourcePathBuilder.append(SwaggerConstants.DEFAULT_SWAGGER_REGISTRY_PATH).append(api.getAPIName());
+        if (!(api.getVersionStrategy() instanceof DefaultStrategy)) {
+            resourcePathBuilder.append(":v").append(api.getVersion());
+        }
+        resourcePathBuilder.append("/swagger.json");
+        String resourcePath = resourcePathBuilder.toString();
+
+        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
+        String defString = null;
+
+        String tenantDomain = MultitenantUtils.getTenantDomainFromRequestURL(request.getRequestURI());
+        tenantDomain = (tenantDomain != null) ? tenantDomain : MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        PrivilegedCarbonContext.startTenantFlow();
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        Registry registry = registryService.getConfigSystemRegistry(tenantId);
+        Resource resource;
+
+        if (registry.resourceExists(resourcePath)) {
+            resource = registry.get(resourcePath);
+            if (resource.getContent() != null && (resource.getContent() instanceof byte[]) &&
+                    (((byte[])resource.getContent()).length > 0)) {
+                defString = new String((byte[]) resource.getContent(), Charset.defaultCharset());
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving swagger definition form registry path : " + resourcePath + " for api : " +
+                        api.getName() + " with definition: " + defString);
+            }
+        }
+
+        return defString;
     }
 
     /**

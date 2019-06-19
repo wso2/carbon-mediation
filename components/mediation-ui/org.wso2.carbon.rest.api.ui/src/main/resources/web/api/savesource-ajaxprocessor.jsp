@@ -65,9 +65,10 @@
     String apiString = request.getParameter("apiString");
     String resourceString = request.getParameter("resourceString");
     String mode = request.getParameter("mode");
+    boolean isGeneratedUpdateMode = "generatedUpdate".equals(mode);
     String strError = null;
     
-    if ("edit".equals(mode)) {
+    if ("edit".equals(mode) || isGeneratedUpdateMode) {
         if (apiString != null && !"".equals(apiString)) {
         	try{
             	client.updateApiFromString(apiName, apiString);

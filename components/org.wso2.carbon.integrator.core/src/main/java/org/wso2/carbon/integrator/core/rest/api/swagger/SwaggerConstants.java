@@ -14,20 +14,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger;
+package org.wso2.carbon.integrator.core.rest.api.swagger;
 
 import java.util.regex.Pattern;
 
 /**
  * Constants used in Swagger definition generation.
  */
-@Deprecated
 public class SwaggerConstants {
 
     /**
      * Content type "application/json" string for JSON messages
      */
     public static final String CONTENT_TYPE_JSON = "application/json";
+
+    /**
+     * Content type "application/xml" string for JSON messages
+     */
+    public static final String CONTENT_TYPE_XML = "application/xml";
 
     /**
      * Content type "application/x-yaml" string for YAML messages
@@ -83,6 +87,16 @@ public class SwaggerConstants {
      * Swagger element "paths" in http://swagger.io/specification/
      */
     static final String PATHS = "paths";
+
+    /**
+     * Swagger element "consumes" in http://swagger.io/specification/
+     */
+    public static String CONSUMES = "consumes";
+
+    /**
+     * Swagger element "produces" in http://swagger.io/specification/
+     */
+    public static String PRODUCES = "produces";
 
     /**
      * Swagger element "parameters" in http://swagger.io/specification/
@@ -165,6 +179,21 @@ public class SwaggerConstants {
     static final String PARAMETER_IN_QUERY = "query";
 
     /**
+     * Parameter type "body"
+     */
+    static final String PARAMETER_IN_BODY = "body";
+
+    /**
+     * Swagger element "schema" of body parameter in http://swagger.io/specification/
+     */
+    static final String PARAMETER_BODY_SCHEMA = "schema";
+
+    /**
+     * Swagger element "properties" of body schema in http://swagger.io/specification/
+     */
+    static final String PARAMETER_PROPERTIES = "properties";
+
+    /**
      * Protocols supported by API - both HTTP and HTTPS
      */
     static final int PROTOCOL_HTTP_AND_HTTPS = 0;
@@ -198,5 +227,37 @@ public class SwaggerConstants {
      * Path separator character
      */
     static final String PATH_SEPARATOR = "/";
+
+    /**
+     * Path to save the swagger document
+     */
+    public static String DEFAULT_SWAGGER_REGISTRY_PATH = "integrator/applicationdata/";
+
+    public static final String SWAGGER_JSON_FILE_PATH = "/swagger.json";
+
+    /**
+     * WSDL Prefix defined in transport listener in axis2.xml
+     */
+    public static String WSDL_EPR_PREFIX = "WSDLEPRPrefix";
+
+    /**
+     * Swagger operations
+     */
+    public static String OPERATION_HTTP_GET = "get";
+    public static String OPERATION_HTTP_POST = "post";
+    public static String OPERATION_HTTP_PUT = "put";
+    public static String OPERATION_HTTP_PATCH = "patch";
+    public static String OPERATION_HTTP_DELETE = "detele";
+    public static String OPERATION_HTTP_OPTIONS = "options";
+
+    /**
+     * Default consume mime types
+     */
+    public static String[] DEFAULT_CONSUMES = {CONTENT_TYPE_JSON, CONTENT_TYPE_XML};
+
+    /**
+     * Default produce mime types
+     */
+    public static String[] DEFAULT_PRODUCES = {CONTENT_TYPE_JSON, CONTENT_TYPE_XML};
 
 }

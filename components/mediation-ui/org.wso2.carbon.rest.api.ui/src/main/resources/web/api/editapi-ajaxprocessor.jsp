@@ -26,6 +26,7 @@
 <%@ page import="org.wso2.carbon.rest.api.ui.client.RestApiAdminClient" %>
 <%@ page import="org.wso2.carbon.rest.api.ui.util.RestAPIConstants" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.wso2.carbon.context.PrivilegedCarbonContext" %>
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -52,6 +53,8 @@
     String port = request.getParameter("port");
     String version = request.getParameter("version");
     String versionType = request.getParameter("versionType");
+    String mode = request.getParameter("mode");
+    boolean isGeneratedUpdateMode = "generatedUpdate".equals(mode);
 
     if (RestAPIConstants.VERSION_TYPE_NONE.equals(versionType)) {
         // in synapse, default version type is picked from empty string
@@ -112,6 +115,11 @@
             }
         }
         client.updateApi(apiData);
+        if (isGeneratedUpdateMode && session.getAttribute("swagJson") != null) {
+            // save swagger as well
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            client.updateSwaggerDocument(apiName, (String)session.getAttribute("swagJson"), tenantId);
+        }
     } catch (Exception e) {
         response.setStatus(450);
     }
@@ -121,4 +129,6 @@
     session.removeAttribute("inSeqXml");
     session.removeAttribute("outSeqXml");
     session.removeAttribute("faultSeqXml");
+    session.removeAttribute("swagJson");
+    session.removeAttribute("genUpdatedAPIStr");
 %>

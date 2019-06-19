@@ -22,4 +22,51 @@ public final class RestAPIConstants {
     public static final String VERSION_TYPE_NONE = "none";
     public static final String DEFAULT_PORT = "-1";
 
+    public static String DEFAULT_JSON_SWAGGER = "{\n" +
+            "  \"swagger\": \"2.0\",\n" +
+            "  \"info\": {\n" +
+            "    \"description\": \"Place Your Description Here\",\n" +
+            "    \"version\": \"1.0.0\",\n" +
+            "    \"title\": \"API_Name\"\n" +
+            "  },\n" +
+            "  \"host\": \"localhost:8280\",\n" +
+            "  \"basePath\": \"/APIBasePath\",\n" +
+            "  \"schemes\": [\n" +
+            "    \"https\",\n" +
+            "    \"http\"\n" +
+            "  ],\n" +
+            "  \"paths\": {\n" +
+            "    \"/samplePath\": {\n" +
+            "      \"post\": {\n" +
+            "        \"parameters\": [\n" +
+            "          {\n" +
+            "            \"in\": \"body\",\n" +
+            "            \"name\": \"body\",\n" +
+            "            \"description\": \"Sample body parameter\",\n" +
+            "            \"required\": true,\n" +
+            "            \"schema\": {\n" +
+            "              \"$ref\": \"#/definitions/sampleSchema\"\n" +
+            "            }\n" +
+            "          }\n" +
+            "        ],\n" +
+            "        \"responses\": {\n" +
+            "          \"default\": {\n" +
+            "            \"description\": \"default response\"\n" +
+            "          }\n" +
+            "        }\n" +
+            "      }\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"definitions\": {\n" +
+            "    \"sampleSchema\": {\n" +
+            "      \"type\": \"object\",\n" +
+            "      \"properties\": {\n" +
+            "        \"payload\": {\n" +
+            "          \"type\": \"string\"\n" +
+            "        }\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
+
 }

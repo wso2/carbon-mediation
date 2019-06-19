@@ -31,6 +31,7 @@
         isResourceUpdatePending = false;
     }
 
+    boolean generateMode = "generate".equals(request.getParameter("mode"));
 %>
 
 <div id="treeColapser"
@@ -40,12 +41,14 @@
 <div id="api.root" class="resources">
     <a class="root-endpoint">Root</a>
 
+    <% if (!generateMode) {%>
     <div class="sequenceToolbar"
          style="width:100px;" onclick="addResource()">
         <div>
             <a class="addChildStyle">Add Resource</a>
         </div>
     </div>
+    <% } %>
 </div>
 
 <%
@@ -60,11 +63,13 @@
                 <% } else { %>
                     <a class="resource" onclick="loadResourceData(this, false)">Resource</a>
                 <% } %>
+                <% if (!generateMode) { %>
 				<div style="width: 100px;" class="sequenceToolbar">
 					<div>
 						<a class="deleteStyle" onclick="<%="deleteResource(" + i + ")"%>">Delete</a>
 					</div>
 				</div>
+				<% } %>
 			</div>
 		</li>
 	    </ul>

@@ -1,5 +1,8 @@
 package org.wso2.carbon.rest.api.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import net.minidev.json.JSONObject;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -17,6 +20,7 @@ import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.rest.APIFactory;
+import org.apache.synapse.config.xml.rest.APISerializer;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.API;
 import org.apache.synapse.rest.RESTConstants;
@@ -27,14 +31,18 @@ import org.apache.synapse.rest.dispatch.URLMappingHelper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.CarbonConfigurationContextFactory;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.integrator.core.rest.api.swagger.APIGenException;
+import org.wso2.carbon.integrator.core.rest.api.swagger.APIGenerator;
+import org.wso2.carbon.integrator.core.rest.api.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
 import org.wso2.carbon.registry.core.Registry;
-import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.rest.api.APIData;
 import org.wso2.carbon.rest.api.APIDataSorter;
 import org.wso2.carbon.rest.api.APIException;
@@ -51,6 +59,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -61,7 +70,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	
     private static Log log = LogFactory.getLog(RestApiAdmin.class);
     private static final String TENANT_DELIMITER = "/t/";
-	
+    private static final String APPLICATION_JSON_TYPE = "application/json";
+
 	public boolean addApi(APIData apiData) throws APIException {
 		final Lock lock = getLock();
         try {
@@ -502,6 +512,23 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		}
 	}
 
+    /**
+     * Function to retrieve synapse API object for given API name
+     *
+     * @param apiName API name
+     * @return API object if exists, null otherwise
+     */
+    protected API getSynapseAPIByName(String apiName) {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            return synapseConfiguration.getAPI(apiName);
+        } finally {
+            lock.unlock();
+        }
+    }
+
 	/**
 	 * Set the tenant domain when a publisher tries to retrieve API his API in MT mode. When
 	 * publisher gets
@@ -938,13 +965,15 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     /**
      * Replace the swagger document in the registry with the given swagger json string
      *
+     * @param apiName
      * @param swaggerJsonString
-     * @param resourcePath
      * @param tenantId
      * @throws APIException
      */
-    public void addSwaggerDocument(String swaggerJsonString, String resourcePath, int tenantId) throws APIException {
+    public void addSwaggerDocument(String apiName, String swaggerJsonString, int tenantId) throws APIException {
 
+        String resourcePath =
+                SwaggerConstants.DEFAULT_SWAGGER_REGISTRY_PATH + apiName + SwaggerConstants.SWAGGER_JSON_FILE_PATH;
         RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
         try {
             Registry registry = registryService.getConfigSystemRegistry(tenantId);
@@ -954,7 +983,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (swaggerJsonString != null) {
                 resource = registry.newResource();
                 resource.setContent(swaggerJsonString);
-                resource.setMediaType("application/json");
+                resource.setMediaType(APPLICATION_JSON_TYPE);
                 registry.put(resourcePath, resource);
 
             }
@@ -968,13 +997,15 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     /**
      * Create a registry resource for the swagger document and update the registry resource with the default swagger
      *
+     * @param apiName Name of the API
      * @param swaggerJsonString
-     * @param resourcePath
      * @param tenantId
      * @throws APIException
      */
-    public void updateSwaggerDocument(String swaggerJsonString, String resourcePath, int tenantId) throws APIException {
+    public void updateSwaggerDocument(String apiName, String swaggerJsonString, int tenantId) throws APIException {
 
+        String resourcePath = SwaggerConstants.DEFAULT_SWAGGER_REGISTRY_PATH + apiName +
+                SwaggerConstants.SWAGGER_JSON_FILE_PATH;
         RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
         try {
             Registry registry = registryService.getConfigSystemRegistry(tenantId);
@@ -983,51 +1014,151 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (!registry.resourceExists(resourcePath)) {
                 resource = registry.newResource();
                 resource.setContent(swaggerJsonString);
-                resource.setMediaType("application/json");
-
-                registry.put(resourcePath, resource);
+                resource.setMediaType(APPLICATION_JSON_TYPE);
             } else {
-                org.wso2.carbon.registry.core.Resource apiDocResource = registry.get(resourcePath);
-                String apiDocContent = new String((byte[]) apiDocResource.getContent(), Charset.defaultCharset());
-                if (apiDocContent == null || apiDocContent.isEmpty()) {
-                    apiDocContent = swaggerJsonString;
-                    resource = registry.newResource();
-                    resource.setContent(apiDocContent);
-                    resource.setMediaType("application/json");
-                    registry.put(resourcePath, resource);
-
-                }
+                resource = registry.get(resourcePath);
+                resource.setContent(swaggerJsonString);
             }
+            registry.put(resourcePath, resource);
+
         } catch (RegistryException e) {
             handleException(log, "Could not update swagger document", e);
         }
     }
 
-    /** Return the registry resource for the provided location
-     * @param resourcePath
+
+
+    /**
+     * Return the registry resource for the provided location
+     *
+     * @param apiName
      * @param tenantId
      * @return
      * @throws APIException
      */
-    public String getSwaggerDocument(String resourcePath, int tenantId) throws APIException {
+    public String getSwaggerDocument(String apiName, int tenantId) throws APIException {
 
-        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
+        API api = getSynapseAPIByName(apiName);
+        if (api == null) {
+            throw new APIException("API with name \"" + apiName + "\" does not exists.");
+        }
+        String resourcePath =
+                SwaggerConstants.DEFAULT_SWAGGER_REGISTRY_PATH + apiName + SwaggerConstants.SWAGGER_JSON_FILE_PATH;
         String swaggerJsonString = null;
         try {
-            Registry registry = registryService.getConfigSystemRegistry(tenantId);
-
-            org.wso2.carbon.registry.core.Resource resource;
-            if (registry.resourceExists(resourcePath)) {
-                resource = registry.get(resourcePath);
-                swaggerJsonString = new String((byte[]) resource.getContent(), Charset.defaultCharset());
-            } else {
-                log.error("No resource found in the path " + resourcePath);
-            }
+            swaggerJsonString = getResourceFromRegistry(resourcePath, tenantId);
         } catch (RegistryException e) {
             handleException(log, "Could not get swagger document", e);
+        }
 
+        // Generate if not available
+        if (swaggerJsonString == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Generate swagger definition for the API : " + apiName);
+            }
+
+            try {
+                JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
+                swaggerJsonString = jsonDefinition.toString();
+            } catch (AxisFault axisFault) {
+                handleException(log, "Error occurred while generating swagger definition", axisFault);
+            }
         }
         return swaggerJsonString;
     }
 
+    /**
+     * Function to generate API from swagger definition (from JSON representation)
+     *
+     * @param swaggerJsonString swagger definition
+     * @return generated synapse API
+     * @throws APIException
+     */
+    public String generateAPIFromSwagger(String swaggerJsonString) throws APIException {
+
+        if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
+            handleException(log, "Swagger provided is empty, hence unable to generate API", null);
+        }
+
+        JsonParser jsonParser = new JsonParser();
+        JsonElement swaggerJson = jsonParser.parse(swaggerJsonString);
+        if (swaggerJson.isJsonObject()) {
+            APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
+            try {
+                API api = apiGenerator.generateSynapseAPI();
+                return APISerializer.serializeAPI(api).toString();
+            } catch (APIGenException e) {
+                handleException(log, "Error occurred while generating API", e);
+            }
+        } else {
+            handleException(log, "Error in swagger definition format: should be a json object", null);
+        }
+        // Definitely will not reach here
+        return "";
+    }
+
+    /**
+     * Function to generate updated existing API by referring to swagger definition (from JSON representation)
+     *
+     * @param swaggerJsonString swagger definition
+     * @param existingApiName name of the existing API
+     * @return generated synapse API
+     * @throws APIException
+     */
+    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, String existingApiName) throws APIException {
+
+        if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
+            handleException(log, "Provided swagger definition is empty, hence unable to generate API", null);
+        }
+
+        if (existingApiName == null || existingApiName.isEmpty()) {
+            handleException(log, "Provided existing API name is empty, hence unable to generate API", null);
+        }
+
+        JsonParser jsonParser = new JsonParser();
+        JsonElement swaggerJson = jsonParser.parse(swaggerJsonString);
+        if (swaggerJson.isJsonObject()) {
+            APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
+            try {
+                API api = apiGenerator.generateUpdatedSynapseAPI(getSynapseAPIByName(existingApiName));
+                return APISerializer.serializeAPI(api).toString();
+            } catch (APIGenException e) {
+                handleException(log, "Error occurred while generating API", e);
+            }
+        } else {
+            handleException(log, "Error in swagger definition format: should be a json object", null);
+        }
+        // Definitely will not reach here
+        return "";
+    }
+
+    /**
+     * Function to retrieve registry resource
+     *
+     * @param resourcePath
+     * @param tenantId
+     * @return resource string if resource exists and null otherwise
+     * @throws RegistryException When error occurred while retrieving config registry or while retrieving data from
+     * registry
+     */
+    private String getResourceFromRegistry(String resourcePath, int tenantId) throws RegistryException {
+
+        String swaggerJsonString = null;
+        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
+        Registry registry = registryService.getConfigSystemRegistry(tenantId);
+        org.wso2.carbon.registry.core.Resource resource;
+
+        if (registry.resourceExists(resourcePath)) {
+            resource = registry.get(resourcePath);
+            if (resource.getContent() != null && (resource.getContent() instanceof byte[]) &&
+                                                                        (((byte[])resource.getContent()).length > 0)) {
+                swaggerJsonString = new String((byte[]) resource.getContent(), Charset.defaultCharset());
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("No resource found in the path " + resourcePath);
+            }
+        }
+        return swaggerJsonString;
+    }
 }

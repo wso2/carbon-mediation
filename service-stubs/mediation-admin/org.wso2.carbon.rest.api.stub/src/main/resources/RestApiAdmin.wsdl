@@ -131,30 +131,59 @@
          <xs:element name="updateSwaggerDocument">
             <xs:complexType>
                <xs:sequence>
+                  <xs:element minOccurs="0" name="apiName" nillable="true" type="xs:string"/>
                   <xs:element minOccurs="0" name="swaggerJsonString" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="tenantId" nillable="true" type="xs:int"/>
+                  <xs:element minOccurs="0" name="tenantId" type="xs:int"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
          <xs:element name="addSwaggerDocument">
             <xs:complexType>
                <xs:sequence>
+                  <xs:element minOccurs="0" name="apiName" nillable="true" type="xs:string"/>
                   <xs:element minOccurs="0" name="swaggerJsonString" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="tenantId" nillable="true" type="xs:int"/>
+                  <xs:element minOccurs="0" name="tenantId" type="xs:int"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
          <xs:element name="getSwaggerDocument">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element minOccurs="0" name="resourcePath" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="apiName" nillable="true" type="xs:string"/>
                   <xs:element minOccurs="0" name="tenantId" type="xs:int"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
          <xs:element name="getSwaggerDocumentResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="generateAPIFromSwagger">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="swaggerJsonString" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="generateAPIFromSwaggerResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="generateUpdatedAPIFromSwagger">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="swaggerJsonString" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="existingApiName" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="generateUpdatedAPIFromSwaggerResponse">
             <xs:complexType>
                <xs:sequence>
                   <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
@@ -436,6 +465,18 @@
    <wsdl:message name="getSwaggerDocumentResponse">
       <wsdl:part name="parameters" element="ns1:getSwaggerDocumentResponse"/>
    </wsdl:message>
+   <wsdl:message name="generateAPIFromSwaggerRequest">
+      <wsdl:part name="parameters" element="ns1:generateAPIFromSwagger"/>
+   </wsdl:message>
+   <wsdl:message name="generateAPIFromSwaggerResponse">
+      <wsdl:part name="parameters" element="ns1:generateAPIFromSwaggerResponse"/>
+   </wsdl:message>
+   <wsdl:message name="generateUpdatedAPIFromSwaggerRequest">
+      <wsdl:part name="parameters" element="ns1:generateUpdatedAPIFromSwagger"/>
+   </wsdl:message>
+   <wsdl:message name="generateUpdatedAPIFromSwaggerResponse">
+      <wsdl:part name="parameters" element="ns1:generateUpdatedAPIFromSwaggerResponse"/>
+   </wsdl:message>
    <wsdl:message name="addApiRequest">
       <wsdl:part name="parameters" element="ns1:addApi"/>
    </wsdl:message>
@@ -575,6 +616,16 @@
          <wsdl:input message="tns:getSwaggerDocumentRequest" wsaw:Action="urn:getSwaggerDocument"/>
          <wsdl:output message="tns:getSwaggerDocumentResponse" wsaw:Action="urn:getSwaggerDocumentResponse"/>
          <wsdl:fault message="tns:RestApiAdminAPIException" name="RestApiAdminAPIException" wsaw:Action="urn:getSwaggerDocumentRestApiAdminAPIException"/>
+      </wsdl:operation>
+      <wsdl:operation name="generateAPIFromSwagger">
+         <wsdl:input message="tns:generateAPIFromSwaggerRequest" wsaw:Action="urn:generateAPIFromSwagger"/>
+         <wsdl:output message="tns:generateAPIFromSwaggerResponse" wsaw:Action="urn:generateAPIFromSwaggerResponse"/>
+         <wsdl:fault message="tns:RestApiAdminAPIException" name="RestApiAdminAPIException" wsaw:Action="urn:generateAPIFromSwaggerRestApiAdminAPIException"/>
+      </wsdl:operation>
+      <wsdl:operation name="generateUpdatedAPIFromSwagger">
+         <wsdl:input message="tns:generateUpdatedAPIFromSwaggerRequest" wsaw:Action="urn:generateUpdatedAPIFromSwagger"/>
+         <wsdl:output message="tns:generateUpdatedAPIFromSwaggerResponse" wsaw:Action="urn:generateUpdatedAPIFromSwaggerResponse"/>
+         <wsdl:fault message="tns:RestApiAdminAPIException" name="RestApiAdminAPIException" wsaw:Action="urn:generateUpdatedAPIFromSwaggerRestApiAdminAPIException"/>
       </wsdl:operation>
       <wsdl:operation name="addApi">
          <wsdl:input message="tns:addApiRequest" wsaw:Action="urn:addApi"/>
@@ -741,6 +792,30 @@
       </wsdl:operation>
       <wsdl:operation name="getSwaggerDocument">
          <soap:operation soapAction="urn:getSwaggerDocument" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="generateAPIFromSwagger">
+         <soap:operation soapAction="urn:generateAPIFromSwagger" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="generateUpdatedAPIFromSwagger">
+         <soap:operation soapAction="urn:generateUpdatedAPIFromSwagger" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -1033,6 +1108,30 @@
             <soap12:fault use="literal" name="RestApiAdminAPIException"/>
          </wsdl:fault>
       </wsdl:operation>
+      <wsdl:operation name="generateAPIFromSwagger">
+         <soap12:operation soapAction="urn:generateAPIFromSwagger" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap12:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="generateUpdatedAPIFromSwagger">
+         <soap12:operation soapAction="urn:generateUpdatedAPIFromSwagger" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="RestApiAdminAPIException">
+            <soap12:fault use="literal" name="RestApiAdminAPIException"/>
+         </wsdl:fault>
+      </wsdl:operation>
       <wsdl:operation name="addApi">
          <soap12:operation soapAction="urn:addApi" style="document"/>
          <wsdl:input>
@@ -1287,6 +1386,24 @@
       </wsdl:operation>
       <wsdl:operation name="getSwaggerDocument">
          <http:operation location="getSwaggerDocument"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="generateAPIFromSwagger">
+         <http:operation location="generateAPIFromSwagger"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="generateUpdatedAPIFromSwagger">
+         <http:operation location="generateUpdatedAPIFromSwagger"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>

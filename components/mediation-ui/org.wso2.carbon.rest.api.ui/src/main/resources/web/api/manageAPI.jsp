@@ -71,6 +71,16 @@
             configContext, url, cookie, bundle.getLocale());
 
     String mode = request.getParameter("mode");
+    boolean isGenerateMode = "generate".equals(mode);
+    boolean isGeneratedUpdateMode = "generatedUpdate".equals(mode);
+    boolean isGenerateQueryMode = false;
+    String disableInput = "";
+    if (isGenerateMode || isGeneratedUpdateMode) {
+        isGenerateQueryMode = true;
+        //Disable some inputs in API generation (from swagger)
+        disableInput = "disabled";
+    }
+
     boolean fromSourceView = session.getAttribute("fromSourceView") != null;
     session.removeAttribute("fromSourceView");
 
@@ -90,13 +100,14 @@
     String port = "";
     String version;
     String versionType;
+    String modeQuery = "";
 
     APIData apiData = null;
 
     List<ResourceData> resourceList;
     session.removeAttribute("mode");
     session.setAttribute("mode", mode);
-    if ("edit".equals(mode)) {
+    if ("edit".equals(mode) || isGeneratedUpdateMode) {
         //To apply changes that might have been made in the source view
         apiData = session.getAttribute("apiData") != null ? (APIData) session
 					.getAttribute("apiData") : null;
@@ -132,7 +143,8 @@
 			} else {
 				apiName = apiData.getName();
 				//if page loaded from API List view, new APIData should be loaded again.
-				if (!fromSourceView && !fromResourceSourceView) {
+				// but should not reload if applying swagger generated updates (isGeneratedUpdateMode)
+				if (!fromSourceView && !fromResourceSourceView && !isGeneratedUpdateMode) {
                     try {
                         apiData = client.getApiByName(apiName);
                     } catch (Exception e) {
@@ -266,9 +278,9 @@ function buildResourceTree() {
     jQuery.ajax({
                     type: "GET",
                     <% if(isResourceUpdatePending) { %>
-                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=true",
+                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=true<%= isGenerateQueryMode ? "&mode=generate" : ""%>",
                     <% } else { %>
-                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=false",
+                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=false<%= isGenerateQueryMode ? "&mode=generate" : ""%>",
                     <% } %>
                     data:  "data=null",
                     success: function(data) {
@@ -296,7 +308,8 @@ function loadResource(index, isUpdatePending) {
         CARBON.showConfirmationDialog('<fmt:message key="resource.update.pending"/>', function() {
             jQuery.ajax({
                       type: "GET",
-                      url: "loadResource-ajaxprocessor.jsp?discardResourceData=true",
+                      url: "loadResource-ajaxprocessor.jsp?discardResourceData=true<%= isGenerateQueryMode ?
+                                                                                            "&mode=generate" : ""%>",
                       cache: false,
                       data: { index:index },
                       success: function(data) {
@@ -311,7 +324,7 @@ function loadResource(index, isUpdatePending) {
     } else {
         jQuery.ajax({
                     type: "GET",
-                    url: "loadResource-ajaxprocessor.jsp",
+                    url: "loadResource-ajaxprocessor.jsp<%= isGenerateQueryMode ? "?mode=generate" : ""%>",
                     cache: false,
                     data: { index:index },
                     success: function(data) {
@@ -559,7 +572,7 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
 
 
         %>
-<%if("add".equals(mode)){%>
+<% if("add".equals(mode) || isGenerateMode){ %>
     jQuery.ajax({
                     type: "POST",
                     url: "addapi-ajaxprocessor.jsp",
@@ -579,11 +592,11 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
                         }
                     }
                 });
-<%}
-        else if("edit".equals(mode)){%>
+
+<% } else if("edit".equals(mode) || isGeneratedUpdateMode) { %>
     jQuery.ajax({
                     type: "POST",
-                    url: "editapi-ajaxprocessor.jsp",
+                    url: "editapi-ajaxprocessor.jsp<%= isGeneratedUpdateMode ? ("?mode=" + mode) : ""%>",
                     data: { apiName:apiNameValue, apiContext:apiContextValue, filename:apiFileName, hostname:hostname, port:port, version:version, versionType:versionType},
                     success: function(data) {
                         CARBON.showInfoDialog("<fmt:message key="api.update.success"/> ", function() {
@@ -598,7 +611,7 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
                         }
                     }
                 });
-<%}%>
+<% } %>
 }
 
 function validateAndSaveApi() {
@@ -754,6 +767,15 @@ function sourceView() {
     	}
     }
 
+    <% if(isGenerateMode) { %>
+    document.location.href = "generateAPIWizard2.jsp?" +
+        "apiName=" + apiNameValue +
+        "&apiContext=" + apiContextValue +
+        "&hostname=" + hostname +
+        "&port=" + port +
+        "&version=" + version +
+        "&versionType=" + versionType;
+    <% } else { %>
     document.location.href = "sourceview_api.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
         "&apiName=" + apiNameValue +
         "&apiContext=" + apiContextValue +
@@ -761,6 +783,7 @@ function sourceView() {
         "&port=" + port +
         "&version=" + version +
         "&versionType=" + versionType;
+    <% } %>
 
     goBack(1);
 }
@@ -787,13 +810,13 @@ function swaggerView() {
 
 <div id="middle">
     <h2>
-        <%
-            if ("edit".equals(mode)) {
-        %><fmt:message key="edit.api"/><%
-    } else {
-    %><fmt:message key="add.api"/><%
-        }
-    %>
+    <%if ("edit".equals(mode) || isGeneratedUpdateMode) {%>
+        <fmt:message key="edit.api"/>
+    <%} else if ("generate".equals(mode)) {%>
+        <fmt:message key="generate.api.wizard"/>
+    <%} else {%>
+        <fmt:message key="add.api"/>
+    <%}%>
     </h2>
 
     <div id="workArea">
@@ -812,12 +835,14 @@ function swaggerView() {
                                 key="switch.to.source"/>
                         </a>
                     </th>
+                    <% if (!(isGenerateMode || isGeneratedUpdateMode)) { %>
                     <th border="0">
                         <a style="background-image:url(images/favicon-16x16.png);" class="icon-link"
                            onclick="swaggerView()"><fmt:message
                                 key="switch.to.swagger.editor"/>
                         </a>
                     </th>
+                    <% } %>
                 </tr>
                 </thead>
                 <tbody>
@@ -847,7 +872,7 @@ function swaggerView() {
                                 <td>
                                     <div>
                                         /<input type="text" id="api.context"
-                                                value="<%=apiContext%>"/>
+                                                value="<%=apiContext%>" <%=disableInput%>/>
                                     </div>
                                     <input type="hidden" name="apicontext"
                                            value="<%=apiContext%>"/>
@@ -897,7 +922,7 @@ function swaggerView() {
                                     <fmt:message key="api.version"/>
                                 </td>
                                 <td>
-                                    <input type="text" id="api.version" value="<%=version%>"/>
+                                    <input type="text" id="api.version" value="<%=version%>" <%=disableInput%>/>
                                     <input type="hidden" name="api.version" value="<%=version%>"/>
                                 </td>
                             </tr>
