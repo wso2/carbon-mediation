@@ -92,7 +92,7 @@
             <artifactId>hapi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.openjpa.wso2</groupId>
+            <groupId>org.wso2.orbit.org.apache.openjpa</groupId>
             <artifactId>openjpa-all</artifactId>
         </dependency>
         <dependency>
