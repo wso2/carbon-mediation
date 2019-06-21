@@ -57,7 +57,7 @@
             <artifactId>hapi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.openjpa.wso2</groupId>
+            <groupId>org.wso2.orbit.org.apache.openjpa</groupId>
             <artifactId>openjpa-all</artifactId>
         </dependency>
     </dependencies>
@@ -90,7 +90,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.business.messaging.hl7.store</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.business.messaging.hl7.store.ui</bundleDef>
                                 <bundleDef>ca.uhn.hapi.wso2:hapi</bundleDef>
-                                <bundleDef>org.apache.openjpa.wso2:openjpa-all</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.openjpa:openjpa-all</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <!--<importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>-->
