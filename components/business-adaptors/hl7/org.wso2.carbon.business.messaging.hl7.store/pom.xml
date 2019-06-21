@@ -52,7 +52,7 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>org.apache.openjpa.wso2</groupId>
+                        <groupId>org.wso2.orbit.org.apache.openjpa</groupId>
                         <artifactId>openjpa-all</artifactId>
                         <version>${openjpa.version.wso2}</version>
                     </dependency>
