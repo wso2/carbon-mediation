@@ -56,7 +56,6 @@
                             org.wso2.carbon.mediator.service.*,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             org.apache.synapse.config.xml,
-                            org.wso2.carbon.mediator.service,
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
