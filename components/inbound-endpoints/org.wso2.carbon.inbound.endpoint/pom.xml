@@ -18,12 +18,12 @@
     <parent>
         <artifactId>inbound-endpoints</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.7.1</version>
+        <version>4.7.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
-    <version>4.7.1</version>
+    <version>4.7.2-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>javax.jms</groupId>
