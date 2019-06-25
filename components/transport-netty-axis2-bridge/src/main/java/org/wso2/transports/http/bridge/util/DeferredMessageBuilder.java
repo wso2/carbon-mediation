@@ -16,9 +16,7 @@
  * under the License.
  *
  */
-
 package org.wso2.transports.http.bridge.util;
-
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -55,7 +53,6 @@ import java.util.Iterator;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 
-
 /**
  * Class DeferredMessageBuilder contains the tools required to build the payload.
  */
@@ -66,8 +63,8 @@ public class DeferredMessageBuilder {
     public static final String RELAY_FORMATTERS_MAP = "__RELAY_FORMATTERS_MAP";
     public static final String FORCED_RELAY_FORMATTER = "__FORCED_RELAY_FORMATTER";
 
-    private Map<String, Builder> builders = new HashMap<String, Builder>();
-    private Map<String, MessageFormatter> formatters = new HashMap<String, MessageFormatter>();
+    private Map<String, Builder> builders = new HashMap<>();
+    private Map<String, MessageFormatter> formatters = new HashMap<>();
 
 
     public DeferredMessageBuilder() {
@@ -78,7 +75,7 @@ public class DeferredMessageBuilder {
         builders.put("application/xop+xml", new MTOMBuilder());
         builders.put("application/xml", new ApplicationXMLBuilder());
         builders.put("application/x-www-form-urlencoded",
-                new XFormURLEncodedBuilder());
+                     new XFormURLEncodedBuilder());
 
         // initialize the default formatters
         formatters.put("application/x-www-form-urlencoded", new XFormURLEncodedFormatter());
@@ -105,14 +102,14 @@ public class DeferredMessageBuilder {
     }
 
     public OMElement getDocument(MessageContext msgCtx, InputStream in) throws
-            XMLStreamException, IOException {
+                                                                        XMLStreamException, IOException {
 
         /**
          * HTTP Delete requests may contain entity body or not. Hence if the request is a HTTP DELETE, we have to verify
          * that the payload stream is empty or not.
          */
         if (HTTPConstants.HEADER_DELETE.equals(msgCtx.getProperty(Constants.Configuration.HTTP_METHOD)) &&
-                MessageUtils.isEmptyPayloadStream(in)) {
+            MessageUtils.isEmptyPayloadStream(in)) {
             msgCtx.setProperty(BridgeConstants.NO_ENTITY_BODY, Boolean.TRUE);
             return TransportUtils.createSOAPEnvelope(null);
         }
@@ -142,8 +139,8 @@ public class DeferredMessageBuilder {
             trasferEncoded = (String) transportHeaders.get(BridgeConstants.TRANSFER_ENCODING);
 
             if (contentType.equals(BridgeConstants.DEFAULT_CONTENT_TYPE)
-                    && (contentLength == null || Integer.parseInt(contentLength) == 0)
-                    && trasferEncoded == null) {
+                && (contentLength == null || Integer.parseInt(contentLength) == 0)
+                && trasferEncoded == null) {
                 msgCtx.setProperty(BridgeConstants.NO_ENTITY_BODY, true);
                 msgCtx.setProperty(Constants.Configuration.CONTENT_TYPE, "");
                 // msgCtx.setProperty(BridgeConstants.RELAY_EARLY_BUILD, true);
@@ -188,7 +185,7 @@ public class DeferredMessageBuilder {
                 // switch to default
                 builder = new SOAPBuilder();
                 try {
-                    if (contentLength != null && "0".equals(contentLength)) {
+                    if ("0".equals(contentLength)) {
                         element = new SOAP11Factory().getDefaultEnvelope();
                         //since we are setting an empty envelop to achieve the empty body, we have to set a different
                         //content-type other than text/xml, application/soap+xml or any other content-type which will
@@ -254,11 +251,9 @@ public class DeferredMessageBuilder {
                 return (Builder) o;
             }
         } catch (ClassNotFoundException e) {
-            handleException("Builder class not found :" +
-                    className, e);
+            handleException("Builder class not found :" + className, e);
         } catch (IllegalAccessException | InstantiationException e) {
-            handleException("Cannot initiate Builder class :" +
-                    className, e);
+            handleException("Cannot initiate Builder class :" + className, e);
         }
         return null;
     }
@@ -271,11 +266,9 @@ public class DeferredMessageBuilder {
                 return (MessageFormatter) o;
             }
         } catch (ClassNotFoundException e) {
-            handleException("MessageFormatter class not found :" +
-                    className, e);
+            handleException("MessageFormatter class not found :" + className, e);
         } catch (IllegalAccessException | InstantiationException e) {
-            handleException("Cannot initiate MessageFormatter class :" +
-                    className, e);
+            handleException("Cannot initiate MessageFormatter class :" + className, e);
         }
         return null;
     }
@@ -290,9 +283,10 @@ public class DeferredMessageBuilder {
      * responses with text/xml to be processed using the ApplicationXMLBuilder (which is technically wrong, it should be
      * the duty of the backend service to send the correct content type, which makes the most sense (refer RFC 1049),
      * alas, tis not the way of the World).
+     *
      * @param contentType
      * @param msgContext
-     * @return  MIME content type.
+     * @return MIME content type.
      */
     public static String getContentType(String contentType, MessageContext msgContext) {
         String type;
@@ -311,11 +305,10 @@ public class DeferredMessageBuilder {
         // application/xml if its a REST response, if not it will try to use the SOAPMessageBuilder.
         // isDoingREST should already be properly set by HTTPTransportUtils.initializeMessageContext
         if (null != msgContext.getProperty(BridgeConstants.INVOKED_REST)
-                && msgContext.getProperty(BridgeConstants.INVOKED_REST).equals(true)
-                && HTTPConstants.MEDIA_TYPE_TEXT_XML.equals(type)) {
+            && msgContext.getProperty(BridgeConstants.INVOKED_REST).equals(true)
+            && HTTPConstants.MEDIA_TYPE_TEXT_XML.equals(type)) {
             type = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
         }
         return type;
     }
 }
-

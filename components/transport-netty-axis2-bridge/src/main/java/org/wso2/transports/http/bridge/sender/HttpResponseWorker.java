@@ -59,15 +59,15 @@ public class HttpResponseWorker implements Runnable {
             responseMsgCtx = requestMsgCtx.getOperationContext().
                     getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
         } catch (AxisFault ex) {
-            LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + "Error getting response message context " +
-                    "from the operation context", ex);
+            LOG.error("{} Error getting response message context from the operation context",
+                      BridgeConstants.BRIDGE_LOG_PREFIX, ex);
             return;
         }
 
         responseMsgCtx.setServerSide(true);
         responseMsgCtx.setDoingREST(requestMsgCtx.isDoingREST());
         responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN,
-                requestMsgCtx.getProperty(MessageContext.TRANSPORT_IN));
+                                   requestMsgCtx.getProperty(MessageContext.TRANSPORT_IN));
         responseMsgCtx.setTransportIn(requestMsgCtx.getTransportIn());
         responseMsgCtx.setTransportOut(requestMsgCtx.getTransportOut());
         responseMsgCtx.setAxisMessage(requestMsgCtx.getOperationContext().getAxisOperation().
@@ -96,27 +96,27 @@ public class HttpResponseWorker implements Runnable {
         try {
             responseMsgCtx.setEnvelope(envelope);
         } catch (AxisFault axisFault) {
-            LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + "Error occurred while setting SOAP envelope", axisFault);
+            LOG.error("{} Error occurred while setting SOAP envelope", BridgeConstants.BRIDGE_LOG_PREFIX, axisFault);
         }
 
         // Set status code
         int statusCode = (int) httpResponse.getProperty(BridgeConstants.HTTP_STATUS_CODE);
         responseMsgCtx.setProperty(BridgeConstants.HTTP_STATUS_CODE_PROP, statusCode);
         responseMsgCtx.setProperty(BridgeConstants.HTTP_STATUS_CODE_DESCRIPTION_PROP,
-                httpResponse.getProperty(BridgeConstants.HTTP_REASON_PHRASE));
+                                   httpResponse.getProperty(BridgeConstants.HTTP_REASON_PHRASE));
         responseMsgCtx.setServerSide(true);
 
         // Set rest of the properties
         responseMsgCtx.setProperty(BridgeConstants.HTTP_CARBON_MESSAGE, httpResponse);
         responseMsgCtx.setProperty(BridgeConstants.HTTP_CLIENT_REQUEST_CARBON_MESSAGE,
-                requestMsgCtx.getProperty(BridgeConstants.HTTP_CLIENT_REQUEST_CARBON_MESSAGE));
+                                   requestMsgCtx.getProperty(BridgeConstants.HTTP_CLIENT_REQUEST_CARBON_MESSAGE));
 
         // Handover message to the axis engine for processing
         try {
             AxisEngine.receive(responseMsgCtx);
         } catch (AxisFault ex) {
-            LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + "Error occurred while processing " +
-                    "response message through Axis2", ex);
+            LOG.error("{} Error occurred while processing response message through Axis2",
+                      BridgeConstants.BRIDGE_LOG_PREFIX, ex);
         }
     }
 }

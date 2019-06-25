@@ -43,13 +43,13 @@ public class ResponseListener implements HttpConnectorListener {
 
     @Override
     public void onMessage(HttpCarbonMessage httpResponse) {
-        LOG.debug(BridgeConstants.BRIDGE_LOG_PREFIX + "Response received");
+        LOG.debug("{} Response received", BridgeConstants.BRIDGE_LOG_PREFIX);
         workerPool.execute(new HttpResponseWorker(requestMsgCtx, httpResponse));
     }
 
     @Override
     public void onError(Throwable throwable) {
-        LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + "Error while processing the response", throwable);
+        LOG.error("{} Error while processing the response", BridgeConstants.BRIDGE_LOG_PREFIX, throwable);
     }
 
 }

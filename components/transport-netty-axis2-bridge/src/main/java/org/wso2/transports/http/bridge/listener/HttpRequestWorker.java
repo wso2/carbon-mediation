@@ -48,7 +48,7 @@ public class HttpRequestWorker implements Runnable {
     private ConfigurationContext configurationContext;
     private HttpCarbonMessage incomingCarbonMsg;
 
-    public HttpRequestWorker(HttpCarbonMessage incomingCarbonMsg, ConfigurationContext configurationContext) {
+    HttpRequestWorker(HttpCarbonMessage incomingCarbonMsg, ConfigurationContext configurationContext) {
         this.configurationContext = configurationContext;
         this.incomingCarbonMsg = incomingCarbonMsg;
     }
@@ -80,9 +80,9 @@ public class HttpRequestWorker implements Runnable {
             if (localAddress != null) {
                 servicePrefix =
                         incomingCarbonMsg.getProperty(org.wso2.transport.http.netty.contract.Constants.PROTOCOL) +
-                                servicePrefixIndex + localAddress.getHostName() + ":" +
-                                incomingCarbonMsg.getProperty(
-                                        org.wso2.transport.http.netty.contract.Constants.LISTENER_PORT) + servicePrefix;
+                        servicePrefixIndex + localAddress.getHostName() + ":" +
+                        incomingCarbonMsg.getProperty(
+                                org.wso2.transport.http.netty.contract.Constants.LISTENER_PORT) + servicePrefix;
             }
         }
         msgCtx.setProperty(BridgeConstants.SERVICE_PREFIX, servicePrefix);
@@ -104,7 +104,7 @@ public class HttpRequestWorker implements Runnable {
         msgCtx.setProperty(Constants.Configuration.CONTENT_TYPE, contentTypeHeader);
         msgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE, contentType);
         if (contentTypeHeader == null || RequestUtils.isRESTRequest(contentTypeHeader) ||
-                RequestUtils.isRest(contentTypeHeader)) {
+            RequestUtils.isRest(contentTypeHeader)) {
             msgCtx.setProperty(BridgeConstants.REST_REQUEST_CONTENT_TYPE, contentType);
             msgCtx.setDoingREST(true);
         }
@@ -136,7 +136,7 @@ public class HttpRequestWorker implements Runnable {
         try {
             msgCtx.setEnvelope(envelope);
         } catch (AxisFault ex) {
-            LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + "Error occurred while setting the soap envelope", ex);
+            LOG.error("{} Error occurred while setting the soap envelope", BridgeConstants.BRIDGE_LOG_PREFIX, ex);
         }
     }
 }

@@ -22,7 +22,9 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.SessionContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.engine.AxisError;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
@@ -36,50 +38,82 @@ import org.wso2.transport.http.netty.contract.config.ServerBootstrapConfiguratio
 import org.wso2.transport.http.netty.contractimpl.DefaultHttpWsConnectorFactory;
 import org.wso2.transports.http.bridge.BridgeConstants;
 
+import java.net.UnknownHostException;
 import java.util.HashMap;
 
 /**
  * {@code Axis2HttpTransportListener} is the Axis2 Transport Listener implementation for HTTP transport.
- *
  */
 public class Axis2HttpTransportListener implements TransportListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(Axis2HttpTransportListener.class);
 
+    private ServerConnector serverConnector;
+    private WorkerPool workerPool;
+    private ConfigurationContext configurationContext;
+
     @Override
     public void init(ConfigurationContext configurationContext, TransportInDescription transportInDescription) {
 
-        WorkerPool workerPool = WorkerPoolFactory.getWorkerPool(BridgeConstants.DEFAULT_WORKER_POOL_SIZE_CORE,
+        LOG.info("Initializing Axis2HttpTransportListener");
+        this.configurationContext = configurationContext;
+        workerPool = WorkerPoolFactory.getWorkerPool(
+                BridgeConstants.DEFAULT_WORKER_POOL_SIZE_CORE,
                 BridgeConstants.DEFAULT_WORKER_POOL_SIZE_MAX,
                 BridgeConstants.DEFAULT_WORKER_THREAD_KEEPALIVE_SEC,
                 BridgeConstants.DEFAULT_WORKER_POOL_QUEUE_LENGTH,
                 BridgeConstants.HTTP_WORKER_THREAD_GROUP_NAME,
                 BridgeConstants.HTTP_WORKER_THREAD_ID);
 
-        HttpWsConnectorFactory httpWsConnectorFactory = new DefaultHttpWsConnectorFactory();
+        int portOffset = Integer.parseInt(System.getProperty("portOffset", "0"));
+        Parameter portParam = transportInDescription.getParameter(TransportListener.PARAM_PORT);
+        if (portParam == null) {
+            throw new AxisError("Port parameter is not specified for Axis2HttpTransportListener");
+        }
+        int port = Integer.parseInt(portParam.getValue().toString());
+        int operatingPort = port + portOffset;
+
+        String host;
+        Parameter hostParameter = transportInDescription.getParameter(TransportListener.HOST_ADDRESS);
+        if (hostParameter != null) {
+            host = ((String) hostParameter.getValue()).trim();
+        } else {
+            try {
+                host = java.net.InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                LOG.warn("Unable to lookup local host name, using 'localhost'");
+                host = "localhost";
+            }
+        }
 
         ListenerConfiguration listenerConfiguration = new ListenerConfiguration();
-        // TODO: Make host and port configurable from axis2.xml
-        listenerConfiguration.setPort(8280);
-        listenerConfiguration.setHost("localhost");
-        ServerConnector serverConnector = httpWsConnectorFactory
+        listenerConfiguration.setPort(operatingPort);
+        listenerConfiguration.setHost(host);
+
+        HttpWsConnectorFactory httpWsConnectorFactory = new DefaultHttpWsConnectorFactory();
+        serverConnector = httpWsConnectorFactory
                 .createServerConnector(new ServerBootstrapConfiguration(new HashMap<>()), listenerConfiguration);
+    }
+
+    @Override
+    public void start() {
+
+        LOG.info("Starting Axis2HttpTransportListener");
         ServerConnectorFuture serverConnectorFuture = serverConnector.start();
         serverConnectorFuture.setHttpConnectorListener(
                 new ConnectorListenerToAxisBridge(configurationContext, workerPool));
         try {
             serverConnectorFuture.sync();
         } catch (InterruptedException e) {
-            LOG.warn(BridgeConstants.BRIDGE_LOG_PREFIX + "Interrupted while waiting for server connector to start", e);
+            LOG.warn("{} Interrupted while waiting for server connector to start",
+                     BridgeConstants.BRIDGE_LOG_PREFIX, e);
+            Thread.currentThread().interrupt();
         }
     }
 
     @Override
-    public void start() {
-    }
-
-    @Override
     public void stop() {
+        LOG.info("Stopping Axis2HttpTransportListener");
     }
 
     @Override
@@ -99,6 +133,6 @@ public class Axis2HttpTransportListener implements TransportListener {
 
     @Override
     public void destroy() {
-
+        LOG.info("Destroying Axis2HttpTransportListener");
     }
 }

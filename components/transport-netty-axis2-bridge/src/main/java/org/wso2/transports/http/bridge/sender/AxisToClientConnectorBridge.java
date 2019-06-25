@@ -20,13 +20,14 @@ package org.wso2.transports.http.bridge.sender;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
-import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.axis2.transport.base.threads.WorkerPoolFactory;
@@ -46,12 +47,12 @@ import org.wso2.transport.http.netty.message.HttpMessageDataStreamer;
 import org.wso2.transport.http.netty.message.PooledDataStreamerFactory;
 import org.wso2.transports.http.bridge.BridgeConstants;
 import org.wso2.transports.http.bridge.listener.RequestUtils;
+import org.wso2.transports.http.bridge.util.MessageUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 
 /**
@@ -67,12 +68,15 @@ public class AxisToClientConnectorBridge extends AbstractHandler implements Tran
 
     @Override
     public void init(ConfigurationContext configurationContext, TransportOutDescription transportOutDescription) {
+
+        LOG.info("Initializing AxisToClientConnectorBridge");
         HttpWsConnectorFactory httpWsConnectorFactory = new DefaultHttpWsConnectorFactory();
         SenderConfiguration senderConfiguration = new SenderConfiguration();
         ConnectionManager connectionManager = new ConnectionManager(senderConfiguration.getPoolConfiguration());
         clientConnector = httpWsConnectorFactory
                 .createHttpClientConnector(new HashMap<>(), senderConfiguration, connectionManager);
-        workerPool = WorkerPoolFactory.getWorkerPool(BridgeConstants.DEFAULT_WORKER_POOL_SIZE_CORE,
+        workerPool = WorkerPoolFactory.getWorkerPool(
+                BridgeConstants.DEFAULT_WORKER_POOL_SIZE_CORE,
                 BridgeConstants.DEFAULT_WORKER_POOL_SIZE_MAX,
                 BridgeConstants.DEFAULT_WORKER_THREAD_KEEPALIVE_SEC,
                 BridgeConstants.DEFAULT_WORKER_POOL_QUEUE_LENGTH,
@@ -137,11 +141,7 @@ public class AxisToClientConnectorBridge extends AbstractHandler implements Tran
             clientRequest.respond(httpCarbonMessage);
 
             if (Boolean.TRUE.equals((msgCtx.getProperty(BridgeConstants.MESSAGE_BUILDER_INVOKED)))) {
-                final HttpMessageDataStreamer httpMessageDataStreamer =
-                        getHttpMessageDataStreamer(httpCarbonMessage);
-                OutputStream outputStream = httpMessageDataStreamer.getOutputStream();
-                OMElement omElement = msgCtx.getEnvelope().getBody().getFirstElement();
-                writeToStream(outputStream, omElement.toString());
+                writeWithFormatter(msgCtx, httpCarbonMessage);
             }
         } catch (ServerConnectorException e) {
             LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + "Error occurred while submitting the response " +
@@ -161,34 +161,38 @@ public class AxisToClientConnectorBridge extends AbstractHandler implements Tran
 
         // serialize
         if (Boolean.TRUE.equals(msgCtx.getProperty(BridgeConstants.MESSAGE_BUILDER_INVOKED))) {
-            final HttpMessageDataStreamer outboundMsgDataStreamer = getHttpMessageDataStreamer(httpCarbonMessage);
-            final OutputStream outputStream = outboundMsgDataStreamer.getOutputStream();
-            OMElement omElement = msgCtx.getEnvelope().getBody().getFirstElement();
-            writeToStream(outputStream, omElement.toString());
+            writeWithFormatter(msgCtx, httpCarbonMessage);
         }
-
     }
 
-    private void writeToStream(OutputStream outputStream, String omElementString) {
+    private void writeWithFormatter(MessageContext msgCtx, HttpCarbonMessage httpCarbonMessage) {
+
+        HttpMessageDataStreamer outboundMsgDataStreamer = getHttpMessageDataStreamer(httpCarbonMessage);
+        OutputStream outputStream = outboundMsgDataStreamer.getOutputStream();
+        OMOutputFormat format = MessageUtils.getOMOutputFormat(msgCtx);
         try {
-            outputStream.write(omElementString.getBytes(Charset.defaultCharset()));
-        } catch (IOException e) {
-            LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + e.getMessage());
+            MessageFormatter messageFormatter = MessageUtils.getMessageFormatter(msgCtx);
+            messageFormatter.writeTo(msgCtx, format, outputStream, false);
+        } catch (AxisFault axisFault) {
+            LOG.error("{} axis fault: {}", BridgeConstants.BRIDGE_LOG_PREFIX, axisFault.getMessage());
         } finally {
             try {
                 outputStream.close();
             } catch (IOException e) {
-                LOG.error(BridgeConstants.BRIDGE_LOG_PREFIX + e.getMessage());
+                LOG.error("{} error closing outputStream: {}", BridgeConstants.BRIDGE_LOG_PREFIX,
+                          e.getMessage());
             }
         }
     }
 
     @Override
     public void cleanup(MessageContext messageContext) {
+        LOG.debug("cleaning up AxisToClientConnectorBridge");
     }
 
     @Override
     public void stop() {
+        LOG.debug("stopping AxisToClientConnectorBridge");
     }
 
     private URL getDestinationURL(MessageContext msgContext) throws AxisFault {

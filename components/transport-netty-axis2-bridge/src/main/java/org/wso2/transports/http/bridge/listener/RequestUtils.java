@@ -46,29 +46,32 @@ import java.util.TreeMap;
 public class RequestUtils {
     private static final Logger LOG = LoggerFactory.getLogger(RequestUtils.class);
 
+    private RequestUtils() {
+    }
+
     static MessageContext convertCarbonMsgToAxis2MsgCtx(ConfigurationContext axis2ConfigurationCtx,
                                                         HttpCarbonMessage incomingCarbonMsg) {
         MessageContext msgCtx = new MessageContext();
         msgCtx.setMessageID(UIDGenerator.generateURNString());
         msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING,
-                Boolean.FALSE);
+                           Boolean.FALSE);
         msgCtx.setConfigurationContext(axis2ConfigurationCtx);
 
         msgCtx.setTransportOut(axis2ConfigurationCtx.getAxisConfiguration()
-                .getTransportOut(Constants.TRANSPORT_HTTP));
+                                       .getTransportOut(Constants.TRANSPORT_HTTP));
         msgCtx.setTransportIn(axis2ConfigurationCtx.getAxisConfiguration()
-                .getTransportIn(Constants.TRANSPORT_HTTP));
+                                      .getTransportIn(Constants.TRANSPORT_HTTP));
         msgCtx.setIncomingTransportName(Constants.TRANSPORT_HTTP);
 
         msgCtx.setServerSide(true);
         msgCtx.setProperty(Constants.Configuration.TRANSPORT_IN_URL,
-                incomingCarbonMsg.getProperty(org.wso2.transport.http.netty.contract.Constants.REQUEST_URL));
+                           incomingCarbonMsg.getProperty(org.wso2.transport.http.netty.contract.Constants.REQUEST_URL));
 
         msgCtx.setProperty(MessageContext.REMOTE_ADDR, incomingCarbonMsg.getProperty(
                 org.wso2.transport.http.netty.contract.Constants.REMOTE_ADDRESS).toString());
 
         msgCtx.setProperty(BridgeConstants.REMOTE_HOST,
-                incomingCarbonMsg.getProperty(org.wso2.transport.http.netty.contract.Constants.ORIGIN_HOST));
+                           incomingCarbonMsg.getProperty(org.wso2.transport.http.netty.contract.Constants.ORIGIN_HOST));
 
         // http transport header names are case insensitive
         Map<String, String> headers = new TreeMap<>(String::compareToIgnoreCase);
@@ -87,19 +90,19 @@ public class RequestUtils {
         if (msgCtx.getProperty(BridgeConstants.HTTP_METHOD) != null) {
             httpMethod = new HttpMethod((String) msgCtx.getProperty(BridgeConstants.HTTP_METHOD));
         } else {
-            LOG.warn(BridgeConstants.BRIDGE_LOG_PREFIX + "HttpMethod not found in Axis2MessageContext");
+            LOG.warn("{} HttpMethod not found in Axis2MessageContext", BridgeConstants.BRIDGE_LOG_PREFIX);
             isRequest = false;
         }
 
         HttpCarbonMessage outboundHttpCarbonMessage;
         if (isRequest) {
             // Request
-            LOG.info(BridgeConstants.BRIDGE_LOG_PREFIX + "Request");
+            LOG.debug("{} Request", BridgeConstants.BRIDGE_LOG_PREFIX);
             outboundHttpCarbonMessage = new HttpCarbonMessage(
                     new DefaultHttpRequest(HttpVersion.HTTP_1_1, httpMethod, ""));
         } else {
             // Response
-            LOG.info(BridgeConstants.BRIDGE_LOG_PREFIX + "Response");
+            LOG.debug("{} Response", BridgeConstants.BRIDGE_LOG_PREFIX);
             outboundHttpCarbonMessage = new HttpCarbonMessage(
                     new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK));
         }
@@ -123,10 +126,10 @@ public class RequestUtils {
         if (uri.startsWith(contextServicePath)) {
             // discard upto servicePath
             uri = uri.substring(uri.indexOf(contextServicePath) +
-                    contextServicePath.length());
+                                contextServicePath.length());
             // discard [proxy] service name if any
             int pos = uri.indexOf("/", 1);
-           if (pos > 0) {
+            if (pos > 0) {
                 uri = uri.substring(pos);
             } else {
                 pos = uri.indexOf("?");
@@ -155,7 +158,7 @@ public class RequestUtils {
             if (uri.startsWith(servicePath)) {
                 // discard upto servicePath
                 uri = uri.substring(uri.indexOf(contextServicePath)
-                        + contextServicePath.length());
+                                    + contextServicePath.length());
                 // discard [proxy] service name if any
                 pos = uri.indexOf("/", 1);
                 if (pos > 0) {
@@ -176,17 +179,17 @@ public class RequestUtils {
 
     static boolean isRESTRequest(String contentType) {
         return contentType != null &&
-                (contentType.contains("application/xml") ||
-                        contentType.contains("application/x-www-form-urlencoded") ||
-                        contentType.contains("multipart/form-data") ||
-                        contentType.contains("application/json") ||
-                        contentType.contains("application/jwt"));
+               (contentType.contains("application/xml") ||
+                contentType.contains("application/x-www-form-urlencoded") ||
+                contentType.contains("multipart/form-data") ||
+                contentType.contains("application/json") ||
+                contentType.contains("application/jwt"));
     }
 
     static boolean isRest(String contentType) {
         return contentType != null &&
-                !contentType.contains(SOAP11Constants.SOAP_11_CONTENT_TYPE) &&
-                !contentType.contains(SOAP12Constants.SOAP_12_CONTENT_TYPE);
+               !contentType.contains(SOAP11Constants.SOAP_11_CONTENT_TYPE) &&
+               !contentType.contains(SOAP12Constants.SOAP_12_CONTENT_TYPE);
     }
 
     static int populateSOAPVersion(MessageContext msgContext, String soapActionHeader, String contentType) {
@@ -195,7 +198,7 @@ public class RequestUtils {
             if (contentType.contains("application/soap+xml")) {
                 soapVersion = 2;
                 TransportUtils.processContentTypeForAction(contentType, msgContext);
-            } else if (contentType.indexOf("text/xml") > -1) {
+            } else if (contentType.contains("text/xml")) {
                 soapVersion = 1;
             } else if (isRESTRequest(contentType)) {
                 soapVersion = 1;
@@ -220,6 +223,7 @@ public class RequestUtils {
 
     /**
      * Get the EPR for the message passed in.
+     *
      * @param msgContext the message context
      * @return the destination EPR
      */

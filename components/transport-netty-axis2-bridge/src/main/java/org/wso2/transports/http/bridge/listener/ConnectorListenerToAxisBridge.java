@@ -29,7 +29,6 @@ import org.wso2.transports.http.bridge.BridgeConstants;
 /**
  * {@code ConnectorListenerToAxisBridge} receives the {@code HttpCarbonMessage} coming from the Netty HTTP transport,
  * converts them to {@code MessageContext} and finally deliver them to the axis engine.
- *
  */
 public class ConnectorListenerToAxisBridge implements HttpConnectorListener {
 
@@ -38,18 +37,19 @@ public class ConnectorListenerToAxisBridge implements HttpConnectorListener {
     private ConfigurationContext configurationContext;
     private WorkerPool workerPool;
 
-    public ConnectorListenerToAxisBridge(ConfigurationContext configurationContext, WorkerPool workerPool) {
+    ConnectorListenerToAxisBridge(ConfigurationContext configurationContext, WorkerPool workerPool) {
         this.configurationContext = configurationContext;
         this.workerPool = workerPool;
     }
 
     public void onMessage(HttpCarbonMessage httpCarbonMessage) {
-        LOG.debug(BridgeConstants.BRIDGE_LOG_PREFIX + "Message received to HTTP transport, submitting a worker to the pool to process");
+        LOG.debug("{} Message received to HTTP transport, submitting to worker pool for processing",
+                  BridgeConstants.BRIDGE_LOG_PREFIX);
         workerPool.execute(new HttpRequestWorker(httpCarbonMessage, configurationContext));
     }
 
     public void onError(Throwable throwable) {
+        LOG.error("Error occurred", throwable);
     }
-
 
 }
