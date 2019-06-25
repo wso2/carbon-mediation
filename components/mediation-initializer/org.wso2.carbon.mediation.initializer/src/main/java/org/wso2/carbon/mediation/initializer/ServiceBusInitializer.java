@@ -576,6 +576,12 @@ public class ServiceBusInitializer {
     //        this.dataSourceInformationRepositoryService = null;
     //    }
 
+    @Reference(
+            name = "task.description.repository.service",
+            service = org.wso2.carbon.task.services.TaskDescriptionRepositoryService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetTaskDescriptionRepositoryService")
     protected void setTaskDescriptionRepositoryService(
             TaskDescriptionRepositoryService repositoryService) {
 
