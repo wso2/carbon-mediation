@@ -21,7 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.xml.SynapsePath;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar;
-
+import org.wso2.carbon.sequences.ui.util.ns.SynapseJsonPathFactory;
+import org.wso2.carbon.sequences.ui.util.ns.XPathFactory;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -51,6 +52,60 @@ public class EnrichMediatorUtil {
             log.warn("Empty expression given for source/ target expression");
         }
         return targetValue;
+    }
+
+    /**
+     * Set the source and target expressions of the enrich mediator.
+     *
+     * @param enrichMediator    mediator bean instance
+     * @param configElementType element type (source or target)
+     * @param expression        expression from request
+     * @param type              target type from request
+     * @param session           browser session
+     */
+    public static void setExpression(EnrichMediator enrichMediator,
+                                     EnrichUIConstants.CONFIG_ELEMENT_TYPE configElementType, String expression,
+                                     String type, HttpSession session) {
+        if (expression != null && !expression.trim().equals("")) {
+
+            String property = null;
+            SynapsePath synapsePath = null;
+            String expressionId = configElementType.equals(EnrichUIConstants.CONFIG_ELEMENT_TYPE.SOURCE) ?
+                    EnrichUIConstants.SOURCE_EXPRESSION_ID : EnrichUIConstants.TARGET_EXPRESSION_ID;
+
+            if (type.equals("custom")) {
+                if (expressionId.startsWith(EnrichUIConstants.JSON_PATH)) {
+                    String extractedExp = extractJsonPathExpression(expressionId);
+                    SynapseJsonPathFactory synapseJsonPathFactory = SynapseJsonPathFactory.getInstance();
+                    synapsePath = synapseJsonPathFactory.createSynapseJsonPath(expressionId, extractedExp);
+                } else {
+                    XPathFactory xPathFactory = XPathFactory.getInstance();
+                    synapsePath = xPathFactory.createSynapseXPath(expressionId, expression, session);
+                }
+            } else if (type.equals("property")) {
+                property = expression;
+            }
+
+            if (configElementType.equals(EnrichUIConstants.CONFIG_ELEMENT_TYPE.SOURCE)) {
+                enrichMediator.setSourceType(type);
+                enrichMediator.setSourceExpression(synapsePath);
+                enrichMediator.setSourceProperty(property);
+            } else {
+                enrichMediator.setTargetExpression(synapsePath);
+                enrichMediator.setTargetProperty(property);
+            }
+        }
+    }
+
+    /**
+     * given an expression like json-eval($.person.name) this method will extract the $.person.name
+     *
+     * @param expression json-eval expression
+     * @return extracted string
+     */
+    private static String extractJsonPathExpression(String expression) {
+        int expLength = expression.length();
+        return expression.substring(EnrichUIConstants.JSON_PATH.length(), expLength - 1);
     }
 
 }
