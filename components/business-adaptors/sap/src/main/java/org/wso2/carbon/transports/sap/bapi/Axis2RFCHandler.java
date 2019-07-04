@@ -70,7 +70,6 @@ public class Axis2RFCHandler implements JCoServerFunctionHandler {
         if (log.isDebugEnabled()) {
             log.debug("New BAPI function call received");
         }
-        //TODO experimental code - validate
         String xml = jCoFunction.toXML();
         workerPool.execute(new BAPIWorker(xml));
     }
