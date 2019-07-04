@@ -35,7 +35,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.wso2.carbon.transports.sap.SAPConstants;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
+
 
 /**
  * This class handles BAPI calls returned from the SAP gateway.
@@ -93,10 +93,8 @@ public class Axis2RFCHandler implements JCoServerFunctionHandler {
             if (log.isDebugEnabled()) {
                 log.debug("Starting a new BAPI worker thread to process the incoming request");
             }
-            ByteArrayInputStream bais = new ByteArrayInputStream(this.xmlContent.getBytes());
-            MessageContext msgContext = null;
-            try {
-                msgContext = endpoint.createMessageContext();
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(this.xmlContent.getBytes())){
+                MessageContext msgContext = endpoint.createMessageContext();
                 msgContext.setIncomingTransportName(SAPConstants.SAP_BAPI_PROTOCOL_NAME);
                 if (log.isDebugEnabled()) {
                     log.debug("Creating SOAP envelope from the BAPI function call");
@@ -108,12 +106,6 @@ public class Axis2RFCHandler implements JCoServerFunctionHandler {
                 AxisEngine.receive(msgContext);
             } catch (Exception e) {
                 log.error("Error while processing the BAPI call through the Axis engine", e);
-            } finally {
-                try {
-                    bais.close();
-                } catch (IOException e) {
-                    log.error("Error while closing the stream", e);
-                }
             }
         }
     }
