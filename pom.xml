@@ -2401,10 +2401,10 @@
         <carbon.identity.framework.version>5.13.0</carbon.identity.framework.version>
         <carbon.identity.imp.pkg.version>[5.13.0, 6.0.0)</carbon.identity.imp.pkg.version>
         <!-- Carbon Rule version -->
-        <carbon.rule.version>4.5.0</carbon.rule.version>
+        <carbon.rule.version>4.5.1</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v113</synapse.version>
+        <synapse.version>2.1.7-wso2v114</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.2.0</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2521,7 +2521,7 @@
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
-        <fge.json.schema.validator.version>2.2.6.wso2v6</fge.json.schema.validator.version>
+        <fge.json.schema.validator.version>2.2.6.wso2v7</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
         <joda-time.version>2.9.4.wso2v1</joda-time.version>
         <google.guava.version>27.0-jre</google.guava.version>
@@ -2550,7 +2550,7 @@
         <jacoco.agent.version>0.8.2</jacoco.agent.version>
         <activemq.version>5.2.0</activemq.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
-        <version.org.wso2.orbit.javax.activation>1.1.1.wso2v2</version.org.wso2.orbit.javax.activation>
+        <version.org.wso2.orbit.javax.activation>1.1.1.wso2v3</version.org.wso2.orbit.javax.activation>
         <wso2.commons.text.orbit.version>1.6.wso2v1</wso2.commons.text.orbit.version>
         <osgi.framework.imp.pkg.version>[1.7.0,2.0.0)</osgi.framework.imp.pkg.version>
         <net.minidev.accessors-smart.version>1.2</net.minidev.accessors-smart.version>
