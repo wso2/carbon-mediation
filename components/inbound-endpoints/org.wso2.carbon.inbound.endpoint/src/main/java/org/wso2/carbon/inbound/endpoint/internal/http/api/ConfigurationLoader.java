@@ -51,6 +51,7 @@ public class ConfigurationLoader {
     private static final QName CLASS_Q = new QName("class");
     private static final QName NAME_ATT = new QName("name");
     private static final QName PROTOCOL_Q = new QName("protocol");
+    private static final QName HANDLERS_Q = new QName("handlers");
 
     private static final String APIS = "apis";
     private static final String SSL_CONFIG = "sslConfig";
@@ -115,13 +116,12 @@ public class ConfigurationLoader {
                         }
 
                         if (apiElement.getAttribute(CLASS_Q) != null) {
-
                             String className = apiElement.getAttributeValue(CLASS_Q);
                             if (!className.isEmpty()) {
 
                                 InternalAPI internalApi = createApi(className);
                                 internalApi.setName(name);
-
+                                populateHandlers(apiElement, internalApi);
                                 if (apiElement.getAttribute(PROTOCOL_Q) != null) {
 
                                     String protocols = apiElement.getAttributeValue(PROTOCOL_Q);
@@ -161,21 +161,60 @@ public class ConfigurationLoader {
         }
     }
 
+    private static void populateHandlers(OMElement apiElement, InternalAPI api) {
+
+        List<InternalAPIHandler> handlerList = new ArrayList<>();
+        OMElement handlersElement = apiElement.getFirstChildWithName(HANDLERS_Q);
+        if (handlersElement != null) {
+            Iterator<OMElement> handlers = handlersElement.getChildElements();
+
+            while (handlers.hasNext()) {
+                OMElement handlerElement = handlers.next();
+                if (handlerElement.getAttribute(NAME_ATT) != null) {
+                    String handlerName = handlerElement.getAttributeValue(NAME_ATT);
+                    if (handlerElement.getAttribute(CLASS_Q) != null) {
+                        String handlerClass = handlerElement.getAttributeValue(CLASS_Q);
+                        InternalAPIHandler handler = createHandler(handlerClass);
+                        handler.setName(handlerName);
+                        handlerList.add(handler);
+                    } else {
+                        handleException("Class attribute is not defined in " + handlerElement.getAttributeValue(NAME_ATT));
+                    }
+                } else {
+                    handleException("Name not defined in one or more handlers");
+                }
+            }
+        }
+        api.setHandlers(handlerList);
+    }
+
+    private static InternalAPIHandler createHandler(String classFQName) {
+
+        try {
+            Object obj = Class.forName(classFQName).newInstance();
+            if (obj instanceof InternalAPIHandler) {
+                return (InternalAPIHandler) obj;
+            } else {
+                throw new SynapseException("Error creating Internal InternalAPIHandler. "
+                        + "The InternalAPIHandler should be of type InternalAPIHandler");
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new SynapseException("Error creating Internal InternalAPIHandler for class name : " + classFQName, e);
+        }
+    }
+
     private static InternalAPI createApi(String classFQName) {
 
-        Object obj = null;
         try {
-            obj = Class.forName(classFQName).newInstance();
+            Object obj = Class.forName(classFQName).newInstance();
+            if (obj instanceof InternalAPI) {
+                return (InternalAPI) obj;
+            } else {
+                throw new SynapseException("Error creating Internal InternalAPI. The InternalAPI should be of type InternalAPI");
+            }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            handleException("Error creating Internal InternalAPI for class name : " + classFQName, e);
+            throw new SynapseException("Error creating Internal InternalAPI for class name : " + classFQName, e);
         }
-
-        if (obj instanceof InternalAPI) {
-            return (InternalAPI) obj;
-        } else {
-            handleException("Error creating Internal InternalAPI. The InternalAPI should be of type InternalAPI");
-        }
-        return null;
     }
 
     public static int getInternalInboundHttpPort() {
