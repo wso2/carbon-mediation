@@ -11,19 +11,19 @@ Welcome to the WSO2 Carbon Mediation source repository. This repository contains
 - Throttling implementation used by the WSO2 ESB
 - Implements the adapter to connect with ntask framework (carbon ntask) and provides the capabilities to build top level components like inbound endpoints which uses the ntask for cluster coordination
 
-#How to Contribute
+# How to Contribute
 
 * Please report issues at [WSO2 JIRA](https://wso2.org/jira/browse/ESBJAVA)
 * Send your pull requests to [carbon-mediation](https://github.com/wso2/carbon-mediation) repository
 
-#Contact us
+# Contact us
 
 WSO2 developers can be contacted via the mailing lists:
 
 * WSO2 Developers List : dev@wso2.org
 * WSO2 Architecture List : architecture@wso2.org
 
-##Jenkins Build Status
+## Jenkins Build Status
 
 |  Branch | Build Status |
 | :------------ |:-------------
