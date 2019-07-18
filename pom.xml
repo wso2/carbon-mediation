@@ -2372,6 +2372,12 @@
                 <artifactId>commons-text</artifactId>
                 <version>${wso2.commons.text.orbit.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>3.0.0</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
