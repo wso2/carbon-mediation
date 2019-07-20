@@ -13,7 +13,7 @@ Welcome to the WSO2 Carbon Mediation source repository. This repository contains
 
 # How to Contribute
 
-* Please report issues at [WSO2 JIRA](https://wso2.org/jira/browse/ESBJAVA)
+* Please report issues at [Github](https://github.com/wso2/product-ei/issues)
 * Send your pull requests to [carbon-mediation](https://github.com/wso2/carbon-mediation) repository
 
 # Contact us
@@ -27,4 +27,4 @@ WSO2 developers can be contacted via the mailing lists:
 
 |  Branch | Build Status |
 | :------------ |:-------------
-| carbon-mediation master      | [![Build Status](https://wso2.org/jenkins/job/carbon-mediation/badge/icon)](https://wso2.org/jenkins/job/carbon-mediation)
+| carbon-mediation master      | [![Build Status](https://wso2.org/jenkins/job/platform-builds/job/carbon-mediation/badge/icon)](https://wso2.org/jenkins/job/platform-builds/job/carbon-mediation)
