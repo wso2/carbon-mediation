@@ -16,7 +16,8 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.securewebsocket;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
@@ -25,7 +26,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketE
 
 public class InboundSecureWebsocketListener extends InboundWebsocketListener {
 
-    private static final Logger log = Logger.getLogger(InboundSecureWebsocketListener.class);
+    private static final Log log = LogFactory.getLog(InboundSecureWebsocketListener.class);
 
     private int port;
     private String name;

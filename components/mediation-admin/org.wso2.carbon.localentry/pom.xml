@@ -96,7 +96,7 @@
                             org.apache.axis2.description; version="${axis2.osgi.version.range}",
                             org.apache.axis2.engine; version="${axis2.osgi.version.range}",
                             org.apache.axis2.context; version="${axis2.osgi.version.range}",
-                            org.apache.commons.logging,
+                            org.apache.commons.logging; version="${import.package.version.commons.logging}",
                             org.apache.synapse,
                             org.apache.synapse.config,
                             org.apache.synapse.config.xml,

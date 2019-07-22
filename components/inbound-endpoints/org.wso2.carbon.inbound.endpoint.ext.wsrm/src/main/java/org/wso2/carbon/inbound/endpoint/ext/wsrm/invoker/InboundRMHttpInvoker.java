@@ -21,7 +21,8 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.AbstractInvoker;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.ext.wsrm.InboundRMResponseSender;
 import org.wso2.carbon.inbound.endpoint.ext.wsrm.RMRequestCallable;
 import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.RMConstants;
@@ -35,7 +36,7 @@ import java.util.concurrent.FutureTask;
  */
 public class InboundRMHttpInvoker extends AbstractInvoker {
 
-    private static Logger logger = Logger.getLogger(InboundRMHttpInvoker.class);
+    private static Log logger = LogFactory.getLog(InboundRMHttpInvoker.class);
     private String injectingSequence;
     private String onErrorSequence;
     private ExecutorService executorService;

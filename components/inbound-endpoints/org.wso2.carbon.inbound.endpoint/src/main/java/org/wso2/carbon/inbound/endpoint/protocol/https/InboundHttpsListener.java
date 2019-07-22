@@ -17,7 +17,8 @@
 package org.wso2.carbon.inbound.endpoint.protocol.https;
 
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
@@ -28,7 +29,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointMan
 
 public class InboundHttpsListener extends InboundHttpListener {
 
-    private static final Logger log = Logger.getLogger(InboundHttpListener.class);
+    private static final Log log = LogFactory.getLog(InboundHttpListener.class);
 
     private SSLConfiguration sslConfiguration;
     private int port;

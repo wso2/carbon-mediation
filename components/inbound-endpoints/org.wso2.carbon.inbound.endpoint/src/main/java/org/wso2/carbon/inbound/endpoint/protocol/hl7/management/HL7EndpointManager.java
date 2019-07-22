@@ -5,7 +5,8 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
@@ -42,7 +43,7 @@ import java.util.Map;
  */
 
 public class HL7EndpointManager extends AbstractInboundEndpointManager {
-    private static final Logger log = Logger.getLogger(HL7EndpointManager.class);
+    private static final Log log = LogFactory.getLog(HL7EndpointManager.class);
 
     private static HL7EndpointManager instance = new HL7EndpointManager();
 

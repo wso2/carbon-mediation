@@ -84,9 +84,9 @@
                 <version>${orbit.version.xmlschema}</version>
             </dependency>
 			<dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>${commons-logging.version}</version>
+                <groupId>org.ops4j.pax.logging</groupId>
+                <artifactId>pax-logging-api</artifactId>
+                <version>${pax.logging.api.version}</version>
             </dependency>
 			<dependency>
                 <groupId>org.apache.ws.commons.axiom.wso2</groupId>

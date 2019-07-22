@@ -46,7 +46,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=${javax.xml.namespace.version},
-                            org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.osgi.framework,
                             *;resolution:=optional,
                         </Import-Package>
@@ -59,8 +59,8 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>

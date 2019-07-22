@@ -28,7 +28,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.RMConstants;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ import java.util.Set;
 public class RequestInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private Set<Class<? extends Interceptor<?>>> interceptorSet;
-    private static final Logger logger = Logger.getLogger(RequestInterceptor.class);
+    private static final Log logger = LogFactory.getLog(RequestInterceptor.class);
 
     public RequestInterceptor() {
         /*

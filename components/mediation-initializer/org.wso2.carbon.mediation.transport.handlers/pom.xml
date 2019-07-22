@@ -48,7 +48,7 @@
                             javax.xml.namespace; version=0.0.0,
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
-                            org.apache.commons.logging,
+                            org.apache.commons.logging; version="${import.package.version.commons.logging}",
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.yaml.snakeyaml.*; version="${orbit.snakeyaml.import.version.range}",
                             *;resolution:=optional

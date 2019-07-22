@@ -24,7 +24,8 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -39,7 +40,7 @@ import javax.xml.stream.XMLStreamException;
  */
 public class InboundRMResponseSender implements InboundResponseSender {
 
-    private static final Logger logger = Logger.getLogger(InboundRMResponseSender.class);
+    private static final Log logger = LogFactory.getLog(InboundRMResponseSender.class);
 
     @Override
     public void sendBack(MessageContext messageContext) {

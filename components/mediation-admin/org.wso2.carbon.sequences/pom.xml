@@ -52,7 +52,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.commons.logging,
+                            org.apache.commons.logging; version="${import.package.version.commons.logging}",
                             org.osgi.framework,
                             org.wso2.carbon.sequences.common,
                             org.wso2.carbon.sequences.common.to,
@@ -90,8 +90,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.logging</artifactId>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>

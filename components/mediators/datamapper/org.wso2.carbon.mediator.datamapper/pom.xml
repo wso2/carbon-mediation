@@ -47,7 +47,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.osgi.framework,
                             *;resolution:=optional,
                         </Import-Package>

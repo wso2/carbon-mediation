@@ -131,8 +131,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -304,7 +304,7 @@
                             org.apache.axis2.description; version="${orbit.version.axis2}",
                             org.apache.axis2.engine; version="${orbit.version.axis2}",
                             org.apache.axis2.context; version="${orbit.version.axis2}",
-                            org.apache.commons.logging,
+                            org.apache.commons.logging; version="${import.package.version.commons.logging}",
                             org.apache.synapse,
                             org.apache.synapse.config,
                             org.apache.synapse.config.xml,

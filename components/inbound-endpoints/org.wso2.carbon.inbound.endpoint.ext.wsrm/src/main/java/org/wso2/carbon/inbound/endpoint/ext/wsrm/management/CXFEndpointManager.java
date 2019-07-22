@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.inbound.endpoint.ext.wsrm.management;
 
-/*import org.apache.log4j.Logger;
+/*import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -32,7 +33,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;*/
 public class CXFEndpointManager {
 
 /*
-    private static final Logger logger = Logger.getLogger(CXFEndpointManager.class);
+    private static final Log logger = LogFactory.getLog(CXFEndpointManager.class);
 
     */
 /**

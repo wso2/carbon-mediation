@@ -16,7 +16,8 @@
  * under the License.
  */
 package org.wso2.carbon.inbound.endpoint.protocol.generic;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
@@ -25,7 +26,7 @@ import java.lang.reflect.Constructor;
 
 public abstract class GenericInboundListener implements InboundRequestProcessor {
 
-    private static final Logger log = Logger.getLogger(GenericInboundListener.class);
+    private static final Log log = LogFactory.getLog(GenericInboundListener.class);
     public static final String PARAM_INBOUND_ENDPOINT_BEHAVIOR = "inbound.behavior";
     public static final String PARAM_INBOUND_ENDPOINT_BEHAVIOR_LISTENING = "listening";
 

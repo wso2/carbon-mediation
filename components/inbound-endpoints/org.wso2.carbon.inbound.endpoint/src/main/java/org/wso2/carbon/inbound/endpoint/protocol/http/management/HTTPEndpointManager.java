@@ -17,7 +17,8 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.http.management;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.SourceHandler;
@@ -53,7 +54,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     private static HTTPEndpointManager instance = new HTTPEndpointManager();
 
-    private static final Logger log = Logger.getLogger(HTTPEndpointManager.class);
+    private static final Log log = LogFactory.getLog(HTTPEndpointManager.class);
 
     private ConcurrentHashMap<String,ConcurrentHashMap<Integer, WorkerPoolConfiguration>> workerPoolMap =
                                   new ConcurrentHashMap<String, ConcurrentHashMap<Integer, WorkerPoolConfiguration>>();

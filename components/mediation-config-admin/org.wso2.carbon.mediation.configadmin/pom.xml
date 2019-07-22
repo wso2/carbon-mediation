@@ -88,7 +88,7 @@
                             javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
-                            org.apache.commons.logging,
+                            org.apache.commons.logging; version="${import.package.version.commons.logging}",
                             org.apache.synapse,
                             org.apache.synapse.config,
                             org.apache.synapse.config.xml,

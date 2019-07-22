@@ -22,7 +22,8 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
@@ -91,7 +92,7 @@ public class PersistenceUtils {
     private static OMFactory fac = OMAbstractFactory.getOMFactory();
     private static final OMNamespace nullNS =
             fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
-    private static final Logger log = Logger.getLogger(PersistenceUtils.class);
+    private static final Log log = LogFactory.getLog(PersistenceUtils.class);
 
     /**
      * Convert EndpointInfo to a OMElement

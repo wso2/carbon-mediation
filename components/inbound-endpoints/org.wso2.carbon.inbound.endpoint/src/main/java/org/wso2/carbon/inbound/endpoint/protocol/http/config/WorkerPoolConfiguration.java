@@ -16,14 +16,15 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http.config;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Wrapping class for Inbound Worker Pool Configs
  */
 public class WorkerPoolConfiguration {
 
-    private static final Logger log = Logger.getLogger(WorkerPoolConfiguration.class);
+    private static final Log log = LogFactory.getLog(WorkerPoolConfiguration.class);
 
     private int workerPoolCoreSize;
     private int workerPoolSizeMax;

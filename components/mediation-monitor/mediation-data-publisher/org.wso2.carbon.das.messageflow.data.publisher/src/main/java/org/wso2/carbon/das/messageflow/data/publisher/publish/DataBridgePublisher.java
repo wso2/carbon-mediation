@@ -19,7 +19,8 @@
 
 package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.das.data.publisher.util.AnalyticsDataPublisherConstants;
 import org.wso2.carbon.databridge.agent.AgentHolder;
@@ -34,7 +35,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 public class DataBridgePublisher {
 
     private static DataPublisher publisher;
-    private static Logger log = Logger.getLogger(DataBridgePublisher.class);
+    private static Log log = LogFactory.getLog(DataBridgePublisher.class);
     private static String receiverUrl;
     private static String authUrl;
     private static String username;

@@ -28,7 +28,8 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.util.PayloadHelper;
 import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.RMConstants;
 import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.SOAPEnvelopeCreator;
@@ -44,7 +45,7 @@ import java.util.Iterator;
  */
 public class ResponseInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    private static final Logger logger = Logger.getLogger(ResponseInterceptor.class);
+    private static final Log logger = LogFactory.getLog(ResponseInterceptor.class);
 
     public ResponseInterceptor() {
         super(Phase.PRE_STREAM);

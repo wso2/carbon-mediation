@@ -21,7 +21,8 @@ package org.wso2.carbon.inbound.endpoint.protocol.http;
 import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.http.HttpException;
 import org.apache.http.nio.NHttpServerConnection;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.SourceHandler;
@@ -41,7 +42,7 @@ import java.util.regex.Pattern;
  */
 public class InboundHttpSourceHandler extends SourceHandler {
 
-    private static final Logger log = Logger.getLogger(InboundHttpSourceHandler.class);
+    private static final Log log = LogFactory.getLog(InboundHttpSourceHandler.class);
 
     private final SourceConfiguration sourceConfiguration;
     private int port;
