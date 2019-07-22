@@ -18,12 +18,13 @@
 
 package org.wso2.carbon.inbound.endpoint.common;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 
 public abstract class AbstractInboundEndpointManager implements InboundEndpointManager {
-    private static final Logger log = Logger.getLogger(AbstractInboundEndpointManager.class);
+    private static final Log log = LogFactory.getLog(AbstractInboundEndpointManager.class);
 
     protected InboundEndpointsDataStore dataStore;
 

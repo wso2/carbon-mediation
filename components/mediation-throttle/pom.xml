@@ -80,7 +80,7 @@
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.neethi.*; version="${neethi.osgi.version}",
                             javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
-                            org.apache.commons.logging,
+                            org.apache.commons.logging; version="${import.package.version.commons.logging}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

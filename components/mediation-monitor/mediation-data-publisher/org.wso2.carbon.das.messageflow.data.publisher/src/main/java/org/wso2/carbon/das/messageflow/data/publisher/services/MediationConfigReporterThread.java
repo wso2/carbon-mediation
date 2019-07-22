@@ -17,7 +17,8 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.services;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.store.CompletedStructureStore;
 import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -29,7 +30,7 @@ import java.util.List;
 
 public class MediationConfigReporterThread extends Thread implements TenantInformation {
 
-    private static Logger log = Logger.getLogger(MediationConfigReporterThread.class);
+    private static Log log = LogFactory.getLog(MediationConfigReporterThread.class);
 
     private boolean shutdownRequested = false;
     private int tenantId = -1234;

@@ -30,7 +30,8 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
@@ -57,7 +58,7 @@ import java.util.concurrent.Callable;
  */
 public class RMRequestCallable implements Callable<Boolean> {
 
-    private static final Logger logger = Logger.getLogger(RMRequestCallable.class);
+    private static final Log logger = LogFactory.getLog(RMRequestCallable.class);
 
     private Exchange exchange;
     private Continuation continuation;

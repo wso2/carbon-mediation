@@ -19,7 +19,8 @@ package org.wso2.carbon.das.messageflow.data.publisher.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.flow.statistics.data.raw.BasicStatisticDataUnit;
 import org.apache.synapse.aspects.flow.statistics.data.raw.CallbackDataUnit;
@@ -43,7 +44,7 @@ import java.util.Map;
 public class MessageFlowReporterThread extends Thread {
     public static final String IGNORE_ELEMENT = "IgnoreElement";
     public static final int DEFAULT_HASHCODE = 0;
-    private static Logger log = Logger.getLogger(MessageFlowReporterThread.class);
+    private static Log log = LogFactory.getLog(MessageFlowReporterThread.class);
 
 
     private volatile boolean shutdownRequested = false;

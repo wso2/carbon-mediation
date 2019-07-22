@@ -495,7 +495,7 @@
             <!--4 Carbon4-Kernel  -->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.logging</artifactId>
+                <artifactId>pax-logging-api</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
             <dependency>
@@ -1912,9 +1912,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>${commons-logging.version}</version>
+                <groupId>org.ops4j.pax.logging</groupId>
+                <artifactId>pax-logging-api</artifactId>
+                <version>${pax.logging.api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.infinispan.wso2</groupId>
@@ -2374,8 +2374,8 @@
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.7.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.5.0-m1</carbon.kernel.version>
-        <carbon.kernel.import.feature.version>4.5.0-m1</carbon.kernel.import.feature.version>
+        <carbon.kernel.version>4.5.0-m3</carbon.kernel.version>
+        <carbon.kernel.import.feature.version>4.5.0-m3</carbon.kernel.import.feature.version>
         <carbon.kernel.imp.pkg.version>[4.5.0, 4.6.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
@@ -2456,7 +2456,8 @@
         <version.javax.servlet.jsp>2.2.0.v201112011158</version.javax.servlet.jsp>
         <version.javax.servlet>3.0.0.v201112011016</version.javax.servlet>
         <commons-pool.version>1.5.0.wso2v1</commons-pool.version>
-        <commons-logging.version>1.1.1</commons-logging.version>
+        <pax.logging.api.version>1.10.1</pax.logging.api.version>
+        <import.package.version.commons.logging>[1.2.0,2.0.0)</import.package.version.commons.logging>
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-beanutils.version>1.8.3</commons-beanutils.version>
         <commons-digester.version>1.8</commons-digester.version>

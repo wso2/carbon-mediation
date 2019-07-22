@@ -20,7 +20,8 @@ package org.wso2.carbon.inbound.endpoint.persistence;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.core.RegistryResources;
@@ -39,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InboundEndpointsDataStore {
 
-    private static final Logger log = Logger.getLogger(InboundEndpointsDataStore.class);
+    private static final Log log = LogFactory.getLog(InboundEndpointsDataStore.class);
 
     private Map<Integer,List<InboundEndpointInfoDTO>> endpointListeningInfo;
     //Store polling endpoints with <TenantId<Endpoint_Name>> format

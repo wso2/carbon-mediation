@@ -16,11 +16,12 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.websocket.configuration;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class NettyThreadPoolConfiguration {
 
-    private static final Logger log = Logger.getLogger(NettyThreadPoolConfiguration.class);
+    private static final Log log = LogFactory.getLog(NettyThreadPoolConfiguration.class);
 
     private int bossThreadPoolSize;
     private int workerThreadPoolSize;

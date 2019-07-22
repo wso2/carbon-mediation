@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.websocket.transport.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -43,7 +44,7 @@ public class SSLUtil {
     private static SSLContext serverSSLCtx = null;
     private static SSLContext clientSSLCtx = null;
 
-    private static final Logger LOGGER = Logger.getLogger(SSLUtil.class);
+    private static final Log LOGGER = LogFactory.getLog(SSLUtil.class);
 
     public static SSLContext createServerSSLContext(final String keyStoreLocation,
                                                     final String keyStorePwd) {

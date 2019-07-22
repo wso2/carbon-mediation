@@ -21,7 +21,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.ext.wsrm.interceptor.RequestInterceptor;
@@ -38,7 +39,7 @@ import java.net.URL;
  */
 public class InboundRMHttpListener extends GenericInboundListener {
 
-    private static final Logger logger = Logger.getLogger(InboundRMHttpListener.class);
+    private static final Log logger = LogFactory.getLog(InboundRMHttpListener.class);
     private InboundRMHttpInvoker invoker;
     private String cxfServerConfigFileLoc;
     private Server server;

@@ -49,8 +49,8 @@
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.logging</artifactId>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
@@ -88,7 +88,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            org.apache.commons.logging.*; version="${org.apache.commons.logging.version}",
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             !org.osgi.framework,
                             !javax.servlet,
                             !javax.servlet.http,

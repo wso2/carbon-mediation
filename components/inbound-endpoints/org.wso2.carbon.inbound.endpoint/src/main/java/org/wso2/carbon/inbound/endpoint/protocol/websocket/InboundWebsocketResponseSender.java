@@ -28,7 +28,8 @@ import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.commons.io.output.WriterOutputStream;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundResponseSender;
@@ -44,7 +45,7 @@ import java.io.StringWriter;
 
 public class InboundWebsocketResponseSender implements InboundResponseSender {
 
-    private Logger log = Logger.getLogger(InboundWebsocketResponseSender.class);
+    private Log log = LogFactory.getLog(InboundWebsocketResponseSender.class);
     private InboundWebsocketSourceHandler sourceHandler;
 
     public InboundWebsocketResponseSender(InboundWebsocketSourceHandler sourceHandler) {

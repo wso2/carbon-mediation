@@ -20,7 +20,8 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import org.apache.axis2.AxisFault;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -50,7 +51,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
 
     private InboundWebsocketSourceHandler sourceHandler;
 
-    private static final Logger log = Logger.getLogger(WebsocketEndpointManager.class);
+    private static final Log log = LogFactory.getLog(WebsocketEndpointManager.class);
 
     protected WebsocketEndpointManager() {
         super();

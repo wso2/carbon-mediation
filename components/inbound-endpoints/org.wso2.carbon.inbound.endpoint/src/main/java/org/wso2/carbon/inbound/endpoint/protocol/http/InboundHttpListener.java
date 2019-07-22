@@ -18,7 +18,8 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
@@ -38,7 +39,7 @@ import java.util.Collection;
  */
 public class InboundHttpListener implements InboundRequestProcessor {
 
-    private static final Logger log = Logger.getLogger(InboundHttpListener.class);
+    private static final Log log = LogFactory.getLog(InboundHttpListener.class);
 
     private String name;
     private int port;
