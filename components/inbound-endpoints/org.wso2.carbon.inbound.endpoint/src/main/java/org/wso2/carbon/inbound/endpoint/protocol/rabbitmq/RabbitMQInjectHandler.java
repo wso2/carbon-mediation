@@ -36,6 +36,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * RabbitMQInjectHandler uses to mediate the received RabbitMQ message
@@ -76,6 +78,14 @@ public class RabbitMQInjectHandler {
             msgCtx.setProperty(RabbitMQConstants.CORRELATION_ID, message.getMessageId());
         }
 
+        // Set the reply to queue name (in transport properties)
+        String replyTo = message.getReplyTo();
+        if (replyTo != null) {
+        	Map<String, String> trpHeaders = new HashMap<String, String>();
+        	trpHeaders.put(RabbitMQConstants.RABBITMQ_REPLY_TO, replyTo);
+        	axis2MsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, trpHeaders);
+        }
+        
         String contentType = message.getContentType();
         Builder builder = null;
         if (contentType == null) {
