@@ -58,6 +58,16 @@ public class InternalAPIDispatcher {
             return false;
         }
 
+        List<InternalAPIHandler> handlerList = internalApi.getHandlers();
+        // check null for apis' where handlers are not set
+        if (handlerList != null) {
+            for (InternalAPIHandler handler : handlerList) {
+                Boolean success = handler.invoke(synCtx);
+                if (!success) {
+                    return false;
+                }
+            }
+        }
         APIResource resource = findResource(synCtx, internalApi);
         if (resource == null) {
             log.warn("No matching Resource found in " + internalApi.getName() +

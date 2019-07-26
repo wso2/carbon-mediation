@@ -19,10 +19,14 @@ package internal.http.api;
 
 import org.wso2.carbon.inbound.endpoint.internal.http.api.APIResource;
 import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPI;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.InternalAPIHandler;
+
+import java.util.List;
 
 public class SampleInternalAPI implements InternalAPI {
 
     private String name;
+    private List<InternalAPIHandler> handlerList = null;
 
     @Override
     public APIResource[] getResources() {
@@ -44,5 +48,15 @@ public class SampleInternalAPI implements InternalAPI {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public void setHandlers(List<InternalAPIHandler> handlerList) {
+        this.handlerList = handlerList;
+    }
+
+    @Override
+    public List<InternalAPIHandler> getHandlers() {
+        return this.handlerList;
     }
 }

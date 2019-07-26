@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.inbound.endpoint.internal.http.api;
 
+import java.util.List;
+
 /**
  * {@code InternalAPI} is the interface that need to be implemented in order to register an internal API into EI.
  */
@@ -50,4 +52,16 @@ public interface InternalAPI {
      */
     void setName(String name);
 
+    /**
+     * Sets the handlers associated with the API
+     *
+     * @param handlerList list of handlers
+     */
+    void setHandlers(List<InternalAPIHandler> handlerList);
+
+    /**
+     * Gets the handlers associated with the API
+     *
+     */
+    List<InternalAPIHandler> getHandlers();
 }

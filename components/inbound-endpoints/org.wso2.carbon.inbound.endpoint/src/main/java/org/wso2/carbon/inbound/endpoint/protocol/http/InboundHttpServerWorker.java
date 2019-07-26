@@ -444,7 +444,9 @@ public class InboundHttpServerWorker extends ServerWorker {
         axis2MessageCtx.getOperationContext()
                 .setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
         if (!result) {
-            axis2MessageCtx.setProperty(PassThroughConstants.HTTP_SC, "404");
+            if (axis2MessageCtx.getProperty(PassThroughConstants.HTTP_SC) == null) {
+                axis2MessageCtx.setProperty(PassThroughConstants.HTTP_SC, "404");
+            }
         }
         Axis2Sender.sendBack(synCtx);
     }
