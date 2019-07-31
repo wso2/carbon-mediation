@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
@@ -14,26 +15,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format;
+
+package org.wso2.carbon.integrator.core.json.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.rest.API;
-import org.wso2.carbon.core.transports.CarbonHttpRequest;
-import org.wso2.carbon.core.transports.CarbonHttpResponse;
-import org.wso2.carbon.core.transports.HttpGetRequestProcessor;
-import org.wso2.carbon.integrator.core.json.utils.GSONUtils;
-import org.wso2.carbon.integrator.core.rest.api.swagger.GenericApiObjectDefinition;
-import org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,46 +31,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Provides Swagger definition for the API in YAML format.
+ * Utility class containing utility functions to manipulated GSON objects
  */
-public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetRequestProcessor {
+public class GSONUtils {
 
-    private static final Log log = LogFactory.getLog(SwaggerYamlProcessor.class);
-
-    /**
-     * Process incoming GET request and update the response with the swagger definition for the requested API.
-     *
-     * @param request              CarbonHttpRequest contains request information
-     * @param response             CarbonHttpResponse which will be updated with response information
-     * @param configurationContext axis2 configuration context
-     * @throws Exception if any exception occurred during definition generation
-     */
-    public void process(CarbonHttpRequest request, CarbonHttpResponse response,
-                        ConfigurationContext configurationContext) throws AxisFault {
-
-        API api = getAPIFromSynapseConfig(request);
-        if (api == null) {
-            handleException(request.getRequestURI());
-        } else {
-            //Retrieve from registry
-            String responseString;
-            try {
-                Yaml yamlDefinition = new Yaml();
-                String defFromRegistry = retrieveFromRegistry(api, request);
-                if (defFromRegistry != null) {
-                    JsonParser jsonParser = new JsonParser();
-                    responseString =
-                            yamlDefinition.dumpAsMap(GSONUtils.gsonJsonObjectToMap(jsonParser.parse(defFromRegistry)));
-                } else {
-                    responseString = yamlDefinition.dumpAsMap(new GenericApiObjectDefinition(api).getDefinitionMap());
-                }
-            } catch (RegistryException e) {
-                throw new AxisFault("Error occurred while retrieving swagger definition from registry", e);
-            }
-
-            updateResponse(response, responseString, SwaggerConstants.CONTENT_TYPE_YAML);
-        }
-    }
+    private static final Log log = LogFactory.getLog(GSONUtils.class);
 
     /**
      * Function to convert from GSON object model to generic map model.
@@ -88,7 +43,7 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
      * @param jsonElement gson object to transform
      * @return
      */
-    /*private Map jsonObjectToMap(JsonElement jsonElement) {
+    public static Map gsonJsonObjectToMap(JsonElement jsonElement) {
         Map<String, Object> gsonMap = new LinkedHashMap<>();
 
         if (jsonElement.isJsonObject()) {
@@ -110,10 +65,10 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
                         log.warn("Unknown JsonPrimitive type found : " + jsonPrimitive.toString());
                     }
                 } else if (entry.getValue().isJsonObject()) {
-                    gsonMap.put(entry.getKey(), jsonObjectToMap(entry.getValue()));
+                    gsonMap.put(entry.getKey(), gsonJsonObjectToMap(entry.getValue()));
 
                 } else if (entry.getValue().isJsonArray()) {
-                    gsonMap.put(entry.getKey(), jsonArrayToObjectArray(entry.getValue().getAsJsonArray()));
+                    gsonMap.put(entry.getKey(), gsonJsonArrayToObjectArray(entry.getValue().getAsJsonArray()));
 
                 } else {
                     // remaining JsonNull type
@@ -127,7 +82,7 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
         }
 
         return gsonMap;
-    }*/
+    }
 
     /**
      * Function to convert GSON array model to generic array model.
@@ -135,7 +90,7 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
      * @param jsonElement gson array to transform
      * @return
      */
-    /*private Object[] jsonArrayToObjectArray(JsonElement jsonElement) {
+    public static Object[] gsonJsonArrayToObjectArray(JsonElement jsonElement) {
         ArrayList<Object> jsonArrayList = new ArrayList<>();
 
         if (jsonElement.isJsonArray()) {
@@ -157,10 +112,10 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
                         log.warn("Unknown JsonPrimitive type found : " + jsonPrimitive.toString());
                     }
                 } else if (arrayElement.isJsonObject()) {
-                    jsonArrayList.add(jsonObjectToMap(arrayElement));
+                    jsonArrayList.add(gsonJsonObjectToMap(arrayElement));
 
                 } else if (arrayElement.isJsonArray()) {
-                    jsonArrayList.add(jsonArrayToObjectArray(arrayElement.getAsJsonArray()));
+                    jsonArrayList.add(gsonJsonArrayToObjectArray(arrayElement.getAsJsonArray()));
                 } else {
                     // remaining JsonNull
                     jsonArrayList.add(null);
@@ -172,6 +127,5 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
         }
 
         return jsonArrayList.toArray();
-    }*/
-
+    }
 }

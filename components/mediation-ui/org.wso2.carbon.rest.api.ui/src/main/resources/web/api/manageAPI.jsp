@@ -71,6 +71,17 @@
             configContext, url, cookie, bundle.getLocale());
 
     String mode = request.getParameter("mode");
+    boolean isGenerateMode = "generate".equals(mode);
+    boolean isGeneratedUpdateMode = "generatedUpdate".equals(mode);
+    boolean isAddAPIMode = "add".equals(mode);
+    boolean isGenerateQueryMode = false;
+    String disableInput = "";
+    if (isGenerateMode || isGeneratedUpdateMode) {
+        isGenerateQueryMode = true;
+        //Disable some inputs in API generation (from swagger)
+        disableInput = "disabled";
+    }
+
     boolean fromSourceView = session.getAttribute("fromSourceView") != null;
     session.removeAttribute("fromSourceView");
 
@@ -90,13 +101,17 @@
     String port = "";
     String version;
     String versionType;
+    String swaggerDefKey = "";
+    String swaggerDefURI = "";
+    String modeQuery = "";
+    String publishSwaggerType = "reg";
 
     APIData apiData = null;
 
     List<ResourceData> resourceList;
     session.removeAttribute("mode");
     session.setAttribute("mode", mode);
-    if ("edit".equals(mode)) {
+    if ("edit".equals(mode) || isGeneratedUpdateMode) {
         //To apply changes that might have been made in the source view
         apiData = session.getAttribute("apiData") != null ? (APIData) session
 					.getAttribute("apiData") : null;
@@ -132,7 +147,8 @@
 			} else {
 				apiName = apiData.getName();
 				//if page loaded from API List view, new APIData should be loaded again.
-				if (!fromSourceView && !fromResourceSourceView) {
+				// but should not reload if applying swagger generated updates (isGeneratedUpdateMode)
+				if (!fromSourceView && !fromResourceSourceView && !isGeneratedUpdateMode) {
                     try {
                         apiData = client.getApiByName(apiName);
                     } catch (Exception e) {
@@ -155,6 +171,14 @@
         hostname = apiData.getHost() != null ? apiData.getHost() : "";
         version = apiData.getVersion() != null ? apiData.getVersion() : "";
         versionType = apiData.getVersionType() != null ? apiData.getVersionType() : "";
+
+        String swaggerResource = apiData.getSwaggerDefKey() != null ? apiData.getSwaggerDefKey() : "";
+        publishSwaggerType = swaggerResource.startsWith("file:") ? "file" : "reg";
+        if (publishSwaggerType.equals("file")) {
+            swaggerDefURI = swaggerResource;
+        } else {
+            swaggerDefKey = swaggerResource;
+        }
 
         if (fromResourceSourceView) {
         	hostname = request.getParameter("hostname");
@@ -237,6 +261,29 @@ function init() {
 <%}%>
     // invoking this to enable/disable version textbox at the page load
     onSelectVersionType();
+    showHidePublishSwaggerOptionsOnLoad();
+}
+
+function showHidePublishSwaggerOptionsOnLoad() {
+    var publishSwaggerType = '<%=publishSwaggerType%>';
+    if (publishSwaggerType == 'reg') {
+        getElement('publishSwaggerCombo').selectedIndex = 0;
+        showHidePublishSwaggerOptions();
+    } else if (publishSwaggerType == 'file') {
+        getElement('publishSwaggerCombo').selectedIndex = 1;
+        showHidePublishSwaggerOptions();
+    }
+}
+
+function showHidePublishSwaggerOptions() {
+    var index;
+    if ((index = document.getElementById('publishSwaggerCombo').selectedIndex) == 0) {
+        showElem('swagger.reg');
+        hideElem('swagger.file');
+    } else if (index == 1) {
+        showElem('swagger.file');
+        hideElem('swagger.reg');
+    }
 }
 
 function treeColapse(icon) {
@@ -266,9 +313,9 @@ function buildResourceTree() {
     jQuery.ajax({
                     type: "GET",
                     <% if(isResourceUpdatePending) { %>
-                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=true",
+                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=true<%= isGenerateQueryMode ? "&mode=generate" : ""%>",
                     <% } else { %>
-                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=false",
+                        url: "treeBuilder-ajaxprocessor.jsp?updatePending=false<%= isGenerateQueryMode ? "&mode=generate" : ""%>",
                     <% } %>
                     data:  "data=null",
                     success: function(data) {
@@ -296,7 +343,8 @@ function loadResource(index, isUpdatePending) {
         CARBON.showConfirmationDialog('<fmt:message key="resource.update.pending"/>', function() {
             jQuery.ajax({
                       type: "GET",
-                      url: "loadResource-ajaxprocessor.jsp?discardResourceData=true",
+                      url: "loadResource-ajaxprocessor.jsp?discardResourceData=true<%= isGenerateQueryMode ?
+                                                                                            "&mode=generate" : ""%>",
                       cache: false,
                       data: { index:index },
                       success: function(data) {
@@ -311,7 +359,7 @@ function loadResource(index, isUpdatePending) {
     } else {
         jQuery.ajax({
                     type: "GET",
-                    url: "loadResource-ajaxprocessor.jsp",
+                    url: "loadResource-ajaxprocessor.jsp<%= isGenerateQueryMode ? "?mode=generate" : ""%>",
                     cache: false,
                     data: { index:index },
                     success: function(data) {
@@ -552,6 +600,15 @@ function updateResource(v) {
 function saveApi(apiNameValue, apiContextValue, hostname, port, version, versionType) {
     var apiFileName = document.getElementById("apiFileName").value;
 
+    var swaggerDefKey = "";
+    if (document.getElementById('publishSwaggerCombo').selectedIndex == 0) {
+        swaggerDefKey = document.getElementById("swaggerDefKey").value;
+    } else {
+        swaggerDefKey = document.getElementById("swaggerUriText").value;
+        if (swaggerDefKey.indexOf("file:") == -1) {
+            swaggerDefKey = "file:".concat(swaggerDefKey);
+        }
+    }
     apiContextValue = "/" + apiContextValue;
 <%
     resourceList =
@@ -559,11 +616,19 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
 
 
         %>
-<%if("add".equals(mode)){%>
+<% if("add".equals(mode) || isGenerateMode){ %>
     jQuery.ajax({
                     type: "POST",
                     url: "addapi-ajaxprocessor.jsp",
-                    data: { apiName:apiNameValue, apiContext:apiContextValue, hostname:hostname, port:port, version:version, versionType:versionType },
+                    data: {
+                            apiName:apiNameValue,
+                            apiContext:apiContextValue,
+                            hostname:hostname,
+                            port:port,
+                            version:version,
+                            versionType:versionType,
+                            swaggerDefKey:swaggerDefKey
+                          },
                     success: function(data) {
                         CARBON.showInfoDialog("<fmt:message key="api.add.success"/> ", function() {
                             document.location.href = "index.jsp";
@@ -579,12 +644,21 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
                         }
                     }
                 });
-<%}
-        else if("edit".equals(mode)){%>
+
+<% } else if("edit".equals(mode) || isGeneratedUpdateMode) { %>
     jQuery.ajax({
                     type: "POST",
-                    url: "editapi-ajaxprocessor.jsp",
-                    data: { apiName:apiNameValue, apiContext:apiContextValue, filename:apiFileName, hostname:hostname, port:port, version:version, versionType:versionType},
+                    url: "editapi-ajaxprocessor.jsp<%= isGeneratedUpdateMode ? ("?mode=" + mode) : ""%>",
+                    data: {
+                            apiName:apiNameValue,
+                            apiContext:apiContextValue,
+                            filename:apiFileName,
+                            hostname:hostname,
+                            port:port,
+                            version:version,
+                            versionType:versionType,
+                            swaggerDefKey:swaggerDefKey
+                          },
                     success: function(data) {
                         CARBON.showInfoDialog("<fmt:message key="api.update.success"/> ", function() {
                             document.location.href = "index.jsp";
@@ -598,7 +672,7 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
                         }
                     }
                 });
-<%}%>
+<% } %>
 }
 
 function validateAndSaveApi() {
@@ -754,6 +828,15 @@ function sourceView() {
     	}
     }
 
+    <% if(isGenerateMode) { %>
+    document.location.href = "generateAPIWizard2.jsp?" +
+        "apiName=" + apiNameValue +
+        "&apiContext=" + apiContextValue +
+        "&hostname=" + hostname +
+        "&port=" + port +
+        "&version=" + version +
+        "&versionType=" + versionType;
+    <% } else { %>
     document.location.href = "sourceview_api.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
         "&apiName=" + apiNameValue +
         "&apiContext=" + apiContextValue +
@@ -761,6 +844,7 @@ function sourceView() {
         "&port=" + port +
         "&version=" + version +
         "&versionType=" + versionType;
+    <% } %>
 
     goBack(1);
 }
@@ -782,18 +866,26 @@ function swaggerView() {
     var apiNameValue = document.getElementById('api.name').value;
     document.location.href = "swaggereditor.jsp?" +"&apiName=" + apiNameValue;
 }
+
+function showElem(id) {
+    document.getElementById(id).style.display = "";
+}
+
+function hideElem(id) {
+    document.getElementById(id).style.display = "none";
+}
 </script>
 
 
 <div id="middle">
     <h2>
-        <%
-            if ("edit".equals(mode)) {
-        %><fmt:message key="edit.api"/><%
-    } else {
-    %><fmt:message key="add.api"/><%
-        }
-    %>
+    <%if ("edit".equals(mode) || isGeneratedUpdateMode) {%>
+        <fmt:message key="edit.api"/>
+    <%} else if ("generate".equals(mode)) {%>
+        <fmt:message key="generate.api.wizard"/>
+    <%} else {%>
+        <fmt:message key="add.api"/>
+    <%}%>
     </h2>
 
     <div id="workArea">
@@ -812,12 +904,14 @@ function swaggerView() {
                                 key="switch.to.source"/>
                         </a>
                     </th>
+                    <% if (!(isGenerateMode || isGeneratedUpdateMode || isAddAPIMode)) { %>
                     <th border="0">
                         <a style="background-image:url(images/favicon-16x16.png);" class="icon-link"
                            onclick="swaggerView()"><fmt:message
                                 key="switch.to.swagger.editor"/>
                         </a>
                     </th>
+                    <% } %>
                 </tr>
                 </thead>
                 <tbody>
@@ -847,7 +941,7 @@ function swaggerView() {
                                 <td>
                                     <div>
                                         /<input type="text" id="api.context"
-                                                value="<%=apiContext%>"/>
+                                                value="<%=apiContext%>" <%=disableInput%>/>
                                     </div>
                                     <input type="hidden" name="apicontext"
                                            value="<%=apiContext%>"/>
@@ -897,8 +991,58 @@ function swaggerView() {
                                     <fmt:message key="api.version"/>
                                 </td>
                                 <td>
-                                    <input type="text" id="api.version" value="<%=version%>"/>
+                                    <input type="text" id="api.version" value="<%=version%>" <%=disableInput%>/>
                                     <input type="hidden" name="api.version" value="<%=version%>"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="leftCol-small">
+                                    <fmt:message key="api.swagger.definition"/>
+                                </td>
+                                <td >
+                                    <select id="publishSwaggerCombo" name="publishSwaggerCombo"
+                                                                            onchange="showHidePublishSwaggerOptions();">
+                                        <option id="publishSwaggerReg" selected="selected" value="reg">
+                                            <fmt:message key="select.swagger.reg"/>
+                                        </option>
+                                        <option id="publishSwaggerFile" value="file">
+                                            <fmt:message key="select.swagger.file"/>
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr id="swagger.reg">
+                                <td></td>
+                                <td>
+                                    <fmt:message key="swagger.refkey"/><br/>
+                                    <table cellspacing="0">
+                                        <tr>
+                                            <td class="nopadding">
+                                                <input type="text" name="swaggerDefKey" id="swaggerDefKey"
+                                                            value="<%=swaggerDefKey%>" readonly="readonly"/>
+                                    		</td>
+                                            <td class="nopadding">
+                                                <a href="#" class="registry-picker-icon-link" style="padding-left:30px"
+                                                           onclick="showRegistryBrowserWithoutLocalEntries('swaggerDefKey','/_system/config');">
+                                                    <fmt:message key="conf.registry"/>
+                                                </a>
+                                    		</td>
+                                            <td class="nopadding">
+                                                <a href="#" class="registry-picker-icon-link" style="padding-left:30px"
+                                                           onclick="showRegistryBrowserWithoutLocalEntries('swaggerDefKey','/_system/governance');">
+                                                    <fmt:message key="gov.registry"/>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr id="swagger.file">
+                                <td></td>
+                                <td >
+                                    <fmt:message key="swagger.uri"/><br/>
+                                    <input type="text" name="swaggerUriText" id="swaggerUriText"
+                                                            value="<%=swaggerDefURI%>">
                                 </td>
                             </tr>
                             <!-- Resources -->

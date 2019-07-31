@@ -55,6 +55,7 @@
     String apiNameWithVersion;
 
     String mode = request.getParameter("mode");
+    boolean isGeneratedUpdateMode = "generatedUpdate".equals(mode);
     List<ResourceData> resources = (List<ResourceData>) session.getAttribute("apiResources");
     ResourceData resourceArray[] = new ResourceData[resources.size()];
 
@@ -65,7 +66,7 @@
     version = request.getParameter("version");
     versionType = request.getParameter("versionType");
 
-    if ("edit".equals(mode)) {
+    if ("edit".equals(mode) || isGeneratedUpdateMode) {
 
         APIData apiData = new APIData();
         apiData.setName(apiName);
@@ -137,7 +138,7 @@
             return false;
         }
 
-        <%if ("edit".equals(mode)) {%>
+        <%if ("edit".equals(mode) || isGeneratedUpdateMode) {%>
             jQuery.ajax({
                 type: "POST",
                 url: "savesource-ajaxprocessor.jsp",

@@ -44,6 +44,7 @@
 <%@ page import="org.apache.synapse.rest.RESTConstants" %>
 <%@ page import="org.apache.synapse.SynapseException" %>
 <%@ page import="org.wso2.carbon.rest.api.ui.util.ApiEditorHelper" %>
+<%@ page import="org.wso2.carbon.context.PrivilegedCarbonContext" %>
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -65,12 +66,19 @@
     String apiString = request.getParameter("apiString");
     String resourceString = request.getParameter("resourceString");
     String mode = request.getParameter("mode");
+    boolean isGeneratedUpdateMode = "generatedUpdate".equals(mode);
     String strError = null;
     
-    if ("edit".equals(mode)) {
+    if ("edit".equals(mode) || isGeneratedUpdateMode) {
         if (apiString != null && !"".equals(apiString)) {
         	try{
             	client.updateApiFromString(apiName, apiString);
+            	if (isGeneratedUpdateMode && session.getAttribute("swagJson") != null) {
+                    // save swagger as well
+                    int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+                    client.updateSwaggerDocument(apiName, (String)session.getAttribute("swagJson"), tenantId);
+                    session.removeAttribute("swagJson");
+                }
         	}catch(AxisFault af){
         		strError = af.getMessage();%>
         		error::<%=strError%>::error

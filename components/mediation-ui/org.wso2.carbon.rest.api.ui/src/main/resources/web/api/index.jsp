@@ -45,7 +45,8 @@
     RestApiAdminClient client;
     
     String serviceContextPath = configContext.getServiceContextPath();
-    
+    String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
     String serverContext = "";
     APIData[] apis = null;
 
@@ -146,7 +147,11 @@
                 <div id="workArea">
                 	<a style="background-image: url(../admin/images/add.gif);" href="manageAPI.jsp?mode=add" class="icon-link">
                                 <fmt:message key="add.api"/>
-                    </a><br/><br/>
+                    </a>
+                    <a style="background-image: url(../admin/images/add.gif);" href="generateAPIWizard.jsp" class="icon-link">
+                                <fmt:message key="generate.api"/>
+                    </a>
+                    <br/><br/>
                     <%if (!apiSearchString.equals("")){
                     %>
                     <a style="background-image: url(images/search.gif);" href="index.jsp" class="icon-link">
@@ -437,6 +442,9 @@
 <a style="background-image: url(../admin/images/add.gif);" href="manageAPI.jsp?mode=add" class="icon-link">
                                 <fmt:message key="add.api"/>
 </a>
+<a style="background-image: url(../admin/images/add.gif);" href="generateAPIWizard.jsp" class="icon-link">
+                                <fmt:message key="generate.api"/>
+</a>
 <p>&nbsp;</p>
 <%
     if (apis != null) {
@@ -511,7 +519,7 @@
             <th><fmt:message key="api.select"/></th>
         	<th><fmt:message key="api.name"/></th>
         	<th><fmt:message key="api.invocation.url"/></th>
-        	<th colspan="5"><fmt:message key="apis.table.action.header"/></th>
+        	<th colspan="6"><fmt:message key="apis.table.action.header"/></th>
         </tr>
         </thead>
         <tbody>
@@ -643,23 +651,30 @@
                     <% } %>
                 </div>
             </td>
-            <td width="20px" style="text-align:left;border-left:none;width:100px;">
+            <td width="20px" style="text-align:left;border-left:none;border-right:none;width:100px;">
                 <div class="inlineDiv">
                     <% if (apiData.getArtifactContainerName() != null) { %>
                     <a style="color:gray;background-image:url(images/favicon-16x16.png);" class="icon-link" href="#"
                        onclick="#">swagger</a>
                     <% } else {
-                        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                         String url=null;
                         if (tenantDomain != "carbon.super") {
-                            url = serverContext + "/t/" + tenantDomain + "/" + apiData.getName();
+                            url = serverContext + "/t/" + tenantDomain + "/" + Encode.forHtmlAttribute(apiData.getName());
                         } else {
-                            url = serverContext + "/" + apiData.getName();
+                            url = serverContext + "/" + Encode.forHtmlAttribute(apiData.getName());
                         }
                     %>
                     <a style="background-image:url(images/favicon-16x16.png);" class="icon-link" href="<%=url + "?swagger.json"%>"
                        onclick="#" %>swagger</a>
                     <% } %>
+                </div>
+            </td>
+            <td width="20px" style="text-align:left;border-left:none;width:100px;">
+                <div class="inlineDiv">
+                    <a style="background-image:url(images/tryit.gif);" class="icon-link"
+                    href="swaggereditor.jsp?action=tryIt&apiName=<%=Encode.forHtmlAttribute(apiData.getName())%>"
+                       onclick="#"><fmt:message key="api.tryit"/></a>
+
                 </div>
             </td>
         </tr>

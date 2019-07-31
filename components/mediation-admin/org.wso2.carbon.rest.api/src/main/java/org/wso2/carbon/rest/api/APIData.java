@@ -45,6 +45,8 @@ public class APIData {
 	// version type describes the way "version" will be used
 	private String versionType;
 
+	private String swaggerDefKey;
+
 	public String getName() {
 		return name;
 	}
@@ -171,5 +173,21 @@ public class APIData {
 	 */
 	public void setVersionType(String versionType) {
 		this.versionType = versionType;
+	}
+
+	/**
+	 * Function to set Swagger definition path
+	 * @return
+	 */
+	public String getSwaggerDefKey() {
+		return swaggerDefKey;
+	}
+
+	/**
+	 * Function to set Swagger definition path
+	 * @param swaggerDefKey
+	 */
+	public void setSwaggerDefKey(String swaggerDefKey) {
+		this.swaggerDefKey = swaggerDefKey;
 	}
 }
