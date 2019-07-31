@@ -53,6 +53,7 @@
     String version;
     String versionType;
     String apiNameWithVersion;
+    String swaggerDefKey;
 
     String mode = request.getParameter("mode");
     boolean isGeneratedUpdateMode = "generatedUpdate".equals(mode);
@@ -66,6 +67,11 @@
     version = request.getParameter("version");
     versionType = request.getParameter("versionType");
 
+    swaggerDefKey = request.getParameter("swaggerDefKey");
+    if (swaggerDefKey.isEmpty()) {
+        swaggerDefKey = null;
+    }
+
     if ("edit".equals(mode) || isGeneratedUpdateMode) {
 
         APIData apiData = new APIData();
@@ -76,6 +82,7 @@
         apiData.setVersion(version == null || version.isEmpty() ? null : version);
         apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
+        apiData.setSwaggerDefKey(swaggerDefKey);
         source = client.getApiSource(apiData);
         sourceXml = ApiEditorHelper.parseStringToPrettyfiedString(source);
     } else {
@@ -87,6 +94,7 @@
         apiData.setVersion(version == null || version.isEmpty() ? null : version);
         apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
+        apiData.setSwaggerDefKey(swaggerDefKey);
         source = client.getApiSource(apiData);
         sourceXml = ApiEditorHelper.parseStringToPrettyfiedString(source);
     }

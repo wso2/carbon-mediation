@@ -828,6 +828,16 @@ function sourceView() {
     	}
     }
 
+    var swaggerDefKey = "";
+    if (document.getElementById('publishSwaggerCombo').selectedIndex == 0) {
+        swaggerDefKey = document.getElementById("swaggerDefKey").value;
+    } else {
+        swaggerDefKey = document.getElementById("swaggerUriText").value;
+        if (swaggerDefKey.indexOf("file:") == -1) {
+            swaggerDefKey = "file:".concat(swaggerDefKey);
+        }
+    }
+
     <% if(isGenerateMode) { %>
     document.location.href = "generateAPIWizard2.jsp?" +
         "apiName=" + apiNameValue +
@@ -835,7 +845,9 @@ function sourceView() {
         "&hostname=" + hostname +
         "&port=" + port +
         "&version=" + version +
-        "&versionType=" + versionType;
+        "&versionType=" + versionType +
+        "&swaggerDefKey=" + swaggerDefKey;
+
     <% } else { %>
     document.location.href = "sourceview_api.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
         "&apiName=" + apiNameValue +
@@ -843,7 +855,8 @@ function sourceView() {
         "&hostname=" + hostname +
         "&port=" + port +
         "&version=" + version +
-        "&versionType=" + versionType;
+        "&versionType=" + versionType +
+        "&swaggerDefKey=" + swaggerDefKey;
     <% } %>
 
     goBack(1);
