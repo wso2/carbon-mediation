@@ -27,7 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQUtils {
@@ -46,6 +48,43 @@ public class RabbitMQUtils {
 
     public static String getProperty(MessageContext mc, String key) {
         return (String) mc.getProperty(key);
+    }
+
+    public static Map getTransportHeaders(RabbitMQMessage message) {
+        Map<String, String> map = new HashMap<String, String>();
+
+        // correlation ID
+        if (message.getCorrelationId() != null) {
+            map.put(RabbitMQConstants.CORRELATION_ID, message.getCorrelationId());
+        }
+
+        // if a AMQP message ID is found
+        if (message.getMessageId() != null) {
+            map.put(RabbitMQConstants.MESSAGE_ID, message.getMessageId());
+        }
+
+        // replyto destination name
+        if (message.getReplyTo() != null) {
+            String dest = message.getReplyTo();
+            map.put(RabbitMQConstants.RABBITMQ_REPLY_TO, dest);
+        }
+
+        // expiration time
+        if (message.getExpiration() != null) {
+            String expiration = message.getExpiration();
+            map.put(RabbitMQConstants.EXPIRATION, expiration);
+        }
+
+        // any other transport properties / headers
+        Map<String, Object> headers = message.getHeaders();
+        if (headers != null && !headers.isEmpty()) {
+            for (String headerName : headers.keySet()) {
+                String value = headers.get(headerName).toString();
+                map.put(headerName, value);
+            }
+        }
+
+        return map;
     }
 
     public static boolean isDurableQueue(Hashtable<String, String> properties) {

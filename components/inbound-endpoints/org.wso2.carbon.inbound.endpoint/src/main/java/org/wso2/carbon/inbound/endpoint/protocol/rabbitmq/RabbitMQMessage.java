@@ -30,6 +30,7 @@ public class RabbitMQMessage {
     private String replyTo;
     private String messageId;
     private String soapAction;
+    private String expiration;
     private Map<String, Object> headers;
     private byte body[];
     private long deliveryTag;
@@ -198,5 +199,23 @@ public class RabbitMQMessage {
      */
     public long getDeliveryTag() {
         return deliveryTag;
+    }
+
+    /**
+     * get expiration time of the message set by transport
+     *
+     * @return expiration time of the message
+     */
+    public String getExpiration() {
+        return expiration;
+    }
+
+    /**
+     * set expiration time of the message assigned by the transport
+     *
+     * @param expiration to set
+     */
+    public void setExpiration(String expiration) {
+        this.expiration = expiration;
     }
 }
