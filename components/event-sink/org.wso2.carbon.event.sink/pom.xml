@@ -70,7 +70,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>3.2.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -80,7 +79,7 @@
                             org.wso2.carbon.event.sink.internal
                         </Private-Package>
                         <Import-Package>
-                            org.apache.commons.logging.*;; version="${import.package.version.commons.logging}",
+                            org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.osgi.framework;version="${osgi.framework.imp.pkg.version}",
                             *;resolution:=optional,
                         </Import-Package>
