@@ -76,6 +76,8 @@ public class RabbitMQInjectHandler {
             msgCtx.setProperty(RabbitMQConstants.CORRELATION_ID, message.getMessageId());
         }
 
+        axis2MsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, RabbitMQUtils.getTransportHeaders(message));
+
         String contentType = message.getContentType();
         Builder builder = null;
         if (contentType == null) {
