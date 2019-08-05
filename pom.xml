@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2</groupId>
         <artifactId>wso2</artifactId>
-        <version>1</version>
+        <version>1.2</version>
     </parent>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>carbon-mediation</artifactId>
@@ -125,13 +125,22 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <encoding>UTF-8</encoding>
                     <source>1.8</source>
-                    <target>1.8</target>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <!--This parameter disables doclint-->
+                            <doclint>none</doclint>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -139,7 +148,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>${maven.bundle.plugin.version}</version>
                     <extensions>true</extensions>
                     <configuration>
                         <obrRepository>NONE</obrRepository>
@@ -493,11 +502,6 @@
                 <type>mar</type>
             </dependency>
             <!--4 Carbon4-Kernel  -->
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>pax-logging-api</artifactId>
-                <version>${carbon.kernel.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.utils</artifactId>
@@ -2379,22 +2383,22 @@
         <carbon.kernel.imp.pkg.version>[4.5.0, 4.6.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.7.0</carbon.commons.version>
+        <carbon.commons.version>4.7.2</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.7.0, 5.0.0)</carbon.commons.imp.pkg.version>
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.9.0</carbon.deployment.version>
+        <carbon.deployment.version>4.9.5</carbon.deployment.version>
         <carbon.deployment.imp.pkg.version>[4.9.0, 5.0.0)</carbon.deployment.imp.pkg.version>
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.7.0</carbon.registry.version>
+        <carbon.registry.version>4.7.3</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.7.0, 5.0.0)</carbon.registry.imp.pkg.version>
         <!-- Analytic Commons version-->
-        <carbon.analytics.common.version>5.2.0</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.2.2</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.2.0, 6.0.0)</carbon.analytics.common.imp.pkg.version>
         <!-- carbon.identity.framework.version-->
-        <carbon.identity.framework.version>5.13.0</carbon.identity.framework.version>
-        <carbon.identity.imp.pkg.version>[5.13.0, 6.0.0)</carbon.identity.imp.pkg.version>
+        <carbon.identity.framework.version>5.14.0</carbon.identity.framework.version>
+        <carbon.identity.imp.pkg.version>[5.14.0, 6.0.0)</carbon.identity.imp.pkg.version>
         <!-- Carbon Rule version -->
-        <carbon.rule.version>4.5.1</carbon.rule.version>
+        <carbon.rule.version>4.5.2</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
         <synapse.version>2.1.7-wso2v115</synapse.version>
@@ -2439,7 +2443,7 @@
         <carbon.datastore.version>4.2.0</carbon.datastore.version>
         <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>
         <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
-        <org.wso2.securevault.version>1.1.2</org.wso2.securevault.version>
+        <org.wso2.securevault.version>1.1.3</org.wso2.securevault.version>
         <jsch.wso2.version>0.1.54.wso2v1</jsch.wso2.version>
         <commons.net.wso2.version>3.4.wso2v1</commons.net.wso2.version>
         <jcifs.wso2.version>1.3.17.wso2v1</jcifs.wso2.version>
@@ -2554,6 +2558,7 @@
         <maven.scr.plugin.version>1.26.0</maven.scr.plugin.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v1</version.org.wso2.orbit.javax.activation>
+        <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
