@@ -16,6 +16,9 @@ language: java
 install: true
 script: mvn clean install -fae -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
+jdk:
+  - openjdk8
+  
 cache:
   directories:
   - $HOME/.m2
