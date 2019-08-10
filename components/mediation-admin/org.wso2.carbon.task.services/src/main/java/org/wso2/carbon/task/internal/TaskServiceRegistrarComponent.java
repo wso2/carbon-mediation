@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
 @Component(
-        name = "task.service.registrar.componenet",
+        name = "mediation.task.services.component",
         immediate = true)
 public class TaskServiceRegistrarComponent {
 
