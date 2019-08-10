@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 @SuppressWarnings({"UnusedDeclaration", "JavaDoc"})
 @Component(
-        name = "org.wso2.carbon.sequences",
+        name = "org.wso2.carbon.configadmin.component",
         immediate = true)
 public class ConfigAdminServiceComponent {
 
