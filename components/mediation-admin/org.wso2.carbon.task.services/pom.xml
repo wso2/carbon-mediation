@@ -63,8 +63,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>org.wso2.carbon.task.internal</Private-Package>
+                        <Private-Package>org.wso2.carbon.task.services.internal</Private-Package>
                         <Export-Package>
+                            !org.wso2.carbon.task.services.internal.*,
                             org.wso2.carbon.task.services.*
                         </Export-Package>
                         <Import-Package>
