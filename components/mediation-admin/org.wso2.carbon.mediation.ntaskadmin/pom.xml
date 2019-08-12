@@ -20,10 +20,10 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
-        <version>4.7.6</version>
+        <version>4.7.7-SNAPSHOT</version>
     </parent>
 
-    <version>4.7.6</version>
+    <version>4.7.7-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.ntaskadmin</artifactId>
     <packaging>bundle</packaging>
