@@ -67,15 +67,18 @@ public class PersistenceManager {
     }
 
     public void setRegistry(Registry registry) {
+
         this.registry = registry;
-        try {
-            if (!registry.resourceExists(ESBRegistryConstants.ROOT_PATH)) {
-                CollectionImpl collection = new CollectionImpl();
-                collection.setPath(ESBRegistryConstants.ROOT_PATH);
-                registry.put(ESBRegistryConstants.ROOT_PATH, collection);
+        if (registry != null) {
+            try {
+                if (!registry.resourceExists(ESBRegistryConstants.ROOT_PATH)) {
+                    CollectionImpl collection = new CollectionImpl();
+                    collection.setPath(ESBRegistryConstants.ROOT_PATH);
+                    registry.put(ESBRegistryConstants.ROOT_PATH, collection);
+                }
+            } catch (RegistryException e) {
+                handleException("Error during initiating 'PersistenceManager'", e);
             }
-        } catch (RegistryException e) {
-            handleException("Error during initiating 'PersistenceManager'", e);
         }
     }
 

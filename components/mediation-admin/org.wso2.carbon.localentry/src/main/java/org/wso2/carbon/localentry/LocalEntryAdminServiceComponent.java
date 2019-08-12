@@ -110,11 +110,13 @@ public class LocalEntryAdminServiceComponent extends AbstractAxis2ConfigurationC
     private void unregisterDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) throws
             LocalEntryAdminException {
 
-        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
-        String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment
-                .getServerContextInformation());
-        String entriesDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR;
-        deploymentEngine.removeDeployer(entriesDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        if (axisConfig != null && synapseEnvironment != null) {
+            DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+            String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment
+                    .getServerContextInformation());
+            String entriesDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR;
+            deploymentEngine.removeDeployer(entriesDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
     /**

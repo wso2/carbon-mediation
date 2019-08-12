@@ -170,10 +170,12 @@ public class StartupAdminServiceComponent {
      */
     private void unregistryDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) {
 
-        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
-        String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment
-                .getServerContextInformation());
-        String proxyDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.TASKS_DIR;
-        deploymentEngine.removeDeployer(proxyDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        if (axisConfig != null && synapseEnvironment != null) {
+            DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+            String synapseConfigPath = ServiceBusUtils.getSynapseConfigAbsPath(synapseEnvironment
+                    .getServerContextInformation());
+            String proxyDirPath = synapseConfigPath + File.separator + MultiXMLConfigurationBuilder.TASKS_DIR;
+            deploymentEngine.removeDeployer(proxyDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 }
