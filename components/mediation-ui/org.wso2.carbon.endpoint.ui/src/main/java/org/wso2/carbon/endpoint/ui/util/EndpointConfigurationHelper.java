@@ -145,7 +145,7 @@ public class EndpointConfigurationHelper {
             } catch (SSLHandshakeException e) {
                 returnValue = "ssl_error";
             } catch (Exception e) {
-                returnValue = "Cannot establish connection to the provided address";
+                returnValue = "Error thrown when connecting to endpoint : " + e.getMessage();
             }
         }
         return returnValue;
