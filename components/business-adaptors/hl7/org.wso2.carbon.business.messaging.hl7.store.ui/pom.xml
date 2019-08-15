@@ -42,6 +42,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
+                            !org.wso2.carbon.business.messaging.hl7.store.internal.*,
                             org.wso2.carbon.business.messaging.hl7.store.ui.*,
                             org.wso2.carbon.business.messaging.hl7.store.*,
                             org.wso2.carbon.business.messaging.hl7.store.admin.*

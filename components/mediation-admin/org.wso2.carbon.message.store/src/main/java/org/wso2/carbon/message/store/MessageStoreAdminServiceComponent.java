@@ -61,7 +61,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 @SuppressWarnings({"UnusedDeclaration"})
 @Component(
-        name = "org.wso2.carbon.messageStore",
+        name = "org.wso2.carbon.message.store",
         immediate = true)
 public class MessageStoreAdminServiceComponent extends AbstractAxis2ConfigurationContextObserver {
 

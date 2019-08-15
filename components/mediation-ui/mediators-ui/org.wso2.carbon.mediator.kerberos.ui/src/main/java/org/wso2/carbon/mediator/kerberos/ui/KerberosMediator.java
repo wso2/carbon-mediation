@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.mediator.kerberos;
+package org.wso2.carbon.mediator.kerberos.ui;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
@@ -24,6 +24,7 @@ import org.apache.synapse.config.xml.ValueFactory;
 import org.apache.synapse.config.xml.ValueSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.mediators.Value;
+import org.wso2.carbon.mediator.kerberos.KerberosConstants;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 import org.wso2.carbon.mediator.service.MediatorException;
 
