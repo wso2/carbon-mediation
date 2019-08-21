@@ -15,8 +15,9 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.mediator.kerberos;
+package org.wso2.carbon.mediator.kerberos.ui.internal;
 
+import org.wso2.carbon.mediator.kerberos.ui.KerberosMediatorService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleActivator;
@@ -28,7 +29,7 @@ import org.wso2.carbon.mediator.service.MediatorService;
  */
 public class KerberosMediatorActivator implements BundleActivator {
 
-    private static final Log log = LogFactory.getLog(org.wso2.carbon.mediator.kerberos.KerberosMediatorActivator.class);
+    private static final Log log = LogFactory.getLog(org.wso2.carbon.mediator.kerberos.ui.internal.KerberosMediatorActivator.class);
 
     public void start(BundleContext bundleContext) throws Exception {
         if (log.isDebugEnabled()) {

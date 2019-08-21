@@ -41,9 +41,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Activator>org.wso2.carbon.mediator.kerberos.KerberosMediatorActivator</Bundle-Activator>
+                        <Bundle-Activator>org.wso2.carbon.mediator.kerberos.ui.internal.KerberosMediatorActivator</Bundle-Activator>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
+                            !org.wso2.carbon.mediator.kerberos.ui.*
                             org.wso2.carbon.mediator.kerberos.*,
                             !javax.servlet,
                             !javax.servlet.http,
@@ -53,7 +54,6 @@
                             javax.xml.namespace; version=0.0.0,
                             org.apache.commons.logging,
                             org.wso2.carbon.mediator.service.*,
-                            org.wso2.carbon.mediator.kerberos.*,
                             org.osgi.framework,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             org.jaxen,
