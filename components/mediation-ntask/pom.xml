@@ -76,6 +76,7 @@
                         </Export-Package>
                         <Import-Package>
                             !org.wso2.carbon.mediation.ntask.*,
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

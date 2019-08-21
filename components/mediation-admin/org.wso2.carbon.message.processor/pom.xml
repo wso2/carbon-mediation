@@ -107,6 +107,7 @@
                             org.wso2.carbon.core,
                             org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                             javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>

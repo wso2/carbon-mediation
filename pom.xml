@@ -2551,6 +2551,7 @@
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v3</version.org.wso2.orbit.javax.activation>
         <wso2.commons.text.orbit.version>1.6.wso2v1</wso2.commons.text.orbit.version>
         <osgi.framework.imp.pkg.version>[1.7.0,2.0.0)</osgi.framework.imp.pkg.version>
+        <imp.package.version.osgi.services>[1.2.0,2.0.0)</imp.package.version.osgi.services>
         <net.minidev.accessors-smart.version>1.2</net.minidev.accessors-smart.version>
         <org.ow2.asm.asm.version>5.2</org.ow2.asm.asm.version>
         <incremental.build.plugin.version>1.3.1</incremental.build.plugin.version>

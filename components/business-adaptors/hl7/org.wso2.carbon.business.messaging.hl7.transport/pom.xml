@@ -46,6 +46,7 @@
                             org.wso2.carbon.core.*,
                             org.wso2.carbon.utils.*,
                             org.osgi.framework,
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
