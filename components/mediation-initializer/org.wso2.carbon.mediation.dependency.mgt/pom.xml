@@ -78,6 +78,7 @@
                             org.wso2.carbon.mediation.dependency.mgt.*,
                         </Export-Package>
                         <Import-Package>
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

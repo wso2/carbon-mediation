@@ -81,6 +81,7 @@
                         <Import-Package>
                             org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.osgi.framework;version="${osgi.framework.imp.pkg.version}",
+                            org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional,
                         </Import-Package>
                         <Export-Package>
