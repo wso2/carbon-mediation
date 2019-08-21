@@ -88,7 +88,7 @@
                                 <bundleDef>org.wso2.orbit.org.yaml:snakeyaml:${orbit.version.snakeyaml}</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.task.server</importFeatureDef>
                                 <!--<importFeatureDef>org.wso2.carbon.event.server:${carbon.commons.version}</importFeatureDef>-->
                             </importFeatures>

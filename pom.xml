@@ -71,7 +71,6 @@
                 <module>features/mediation-initializer-features</module>
                 <module>features/mediator-features</module>
                 <module>features/mediation-ui-features</module>
-                <module>features/synapse-features</module>
                 <module>features/mediation-ntask-features</module>
                 <module>features/inbound-endpoints</module>
                 <module>features/mediation-clustering</module>
@@ -1753,9 +1752,9 @@
                 <type>zip</type>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
+                <groupId>org.apache.synapse</groupId>
                 <artifactId>org.apache.synapse.wso2.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
+                <version>${synapse.version}</version>
                 <type>zip</type>
             </dependency>
             <dependency>
@@ -2402,7 +2401,7 @@
         <carbon.rule.version>4.5.2</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v117</synapse.version>
+        <synapse.version>2.1.7-wso2v118</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.2.0</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
