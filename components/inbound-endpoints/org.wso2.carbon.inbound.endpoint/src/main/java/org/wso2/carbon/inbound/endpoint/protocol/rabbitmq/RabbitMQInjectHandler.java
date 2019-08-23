@@ -75,6 +75,7 @@ public class RabbitMQInjectHandler {
         } else {
             msgCtx.setProperty(RabbitMQConstants.CORRELATION_ID, message.getMessageId());
         }
+//        msgCtx.
 
         axis2MsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, RabbitMQUtils.getTransportHeaders(message));
 
@@ -130,7 +131,7 @@ public class RabbitMQInjectHandler {
             success = false;
         }
         SequenceMediator seq = (SequenceMediator) synapseEnvironment
-                .getSynapseConfiguration().getSequence(injectingSeq);        
+                .getSynapseConfiguration().getSequence(injectingSeq);
         if (seq != null) {
             if (log.isDebugEnabled()) {
                 log.debug("injecting message to sequence : " + injectingSeq);

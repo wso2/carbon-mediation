@@ -39,6 +39,18 @@
 
 <dependencies>
     <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-netty-shaded</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-protobuf</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-stub</artifactId>
+    </dependency>
+    <dependency>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>org.wso2.carbon.core</artifactId>
     </dependency>
