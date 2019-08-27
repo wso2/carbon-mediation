@@ -52,6 +52,7 @@
     String port = request.getParameter("port");
     String version = request.getParameter("version");
     String versionType = request.getParameter("versionType");
+    String swaggerDefKey = request.getParameter("swaggerDefKey");
 
     if (RestAPIConstants.VERSION_TYPE_NONE.equals(versionType)) {
         // in synapse, default version type is picked from empty string
@@ -92,6 +93,9 @@
     apiData.setPort(Integer.parseInt(port));
     apiData.setVersion(version);
     apiData.setVersionType(versionType);
+    if (swaggerDefKey != null) {
+        apiData.setSwaggerDefKey((swaggerDefKey.isEmpty() ? null : swaggerDefKey));
+    }
     ResourceData resources[] = new ResourceData[resourceList.size()];
     apiData.setResources(resourceList.toArray(resources));
     try {

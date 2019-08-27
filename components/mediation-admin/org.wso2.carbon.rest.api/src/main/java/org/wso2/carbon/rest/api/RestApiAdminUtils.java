@@ -56,6 +56,10 @@ public class RestApiAdminUtils {
             api.addAttribute("version-type", String.valueOf(apiData.getVersionType()), nullNS);
         }
 
+        if (apiData.getSwaggerDefKey() != null) {
+            api.addAttribute("publishSwagger", apiData.getSwaggerDefKey(), nullNS);
+        }
+
 		if (apiData.getResources() != null && apiData.getResources().length != 0) {
 			for (ResourceData resourceData : apiData.getResources()) {
 				api.addChild(retrieveResourceOMElement(resourceData));

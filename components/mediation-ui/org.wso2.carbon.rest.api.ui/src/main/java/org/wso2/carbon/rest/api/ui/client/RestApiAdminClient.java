@@ -28,6 +28,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.rest.api.stub.RestApiAdminAPIException;
 import org.wso2.carbon.rest.api.stub.RestApiAdminStub;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
 import org.wso2.carbon.rest.api.stub.types.carbon.ResourceData;
@@ -35,6 +36,7 @@ import org.wso2.carbon.rest.api.stub.types.carbon.ResourceData;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -337,5 +339,56 @@ public class RestApiAdminClient {
 			handleException(bundle.getString("could.not.disable.api.statistics"), e);
 		}
 		return null;
+	}
+
+	public String updateSwaggerDocument(String apiName, String swaggerDefinition, int tenantId) throws AxisFault {
+
+		try {
+			stub.updateSwaggerDocument(apiName, swaggerDefinition, tenantId);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.update.swagger.document"), e);
+		}
+		return null;
+	}
+
+	public String addSwaggerDocument(String apiName, String swaggerDefinition, int tenantId) throws AxisFault {
+
+		try {
+			stub.addSwaggerDocument(apiName, swaggerDefinition, tenantId);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.add.swagger.document"), e);
+		}
+		return null;
+	}
+
+	public String getSwaggerDocument(String apiName, int tenantId) throws AxisFault {
+
+		String swaggerJsonString = null;
+		try {
+			swaggerJsonString = stub.getSwaggerDocument(apiName, tenantId);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.get.swagger.document"), e);
+		}
+		return swaggerJsonString;
+	}
+
+	public String generateAPIFromSwagger(String swaggerJsonString) throws AxisFault {
+		String generatedAPI = null;
+		try {
+			generatedAPI = stub.generateAPIFromSwagger(swaggerJsonString);
+		} catch (RemoteException | RestApiAdminAPIException e) {
+			handleException(bundle.getString("could.not.generate.api"), e);
+		}
+		return generatedAPI;
+	}
+
+	public String generateUpdatedAPIFromSwagger(String swaggerJsonString, String existingApiName) throws AxisFault {
+		String generatedAPI = null;
+		try {
+			generatedAPI = stub.generateUpdatedAPIFromSwagger(swaggerJsonString, existingApiName);
+		} catch (RemoteException | RestApiAdminAPIException e) {
+			handleException(bundle.getString("could.not.generate.api"), e);
+		}
+		return generatedAPI;
 	}
 }

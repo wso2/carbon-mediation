@@ -212,6 +212,14 @@
     }
     session.setAttribute("index", index);
     session.setAttribute("apiResources", resources);
+
+    String mode = request.getParameter("mode");
+
+    String disableInput = "";
+    if ("generate".equals(mode)) {
+        //Disable some inputs in API generation (from swagger)
+        disableInput = "disabled";
+    }
 %>
 
 
@@ -388,7 +396,7 @@
         <input type="checkbox" name="methods" value="GET"
                style="display:inline; vertical-align: middle" <%if (hasGet) {%>
                checked="checked"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
 
         <div id="divPost" style="display:inline;">
             <fmt:message key="methods.post.label"/>
@@ -396,7 +404,7 @@
         <input type="checkbox" name="methods" value="POST"
                style="display:inline; vertical-align: middle" <%if (hasPost) {%>
                checked="checked"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
 
         <div id="divPut" style="display:inline;">
             <fmt:message key="methods.put.label"/>
@@ -404,7 +412,7 @@
         <input type="checkbox" name="methods" value="PUT"
                style="display:inline; vertical-align: middle" <%if (hasPut) {%>
                checked="checked"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
 
         <div id="divDelete" style="display:inline;">
             <fmt:message key="methods.delete.label"/>
@@ -412,7 +420,7 @@
         <input type="checkbox" name="methods" value="DELETE"
                style="display:inline; vertical-align: middle" <%if (hasDelete) {%>
                checked="checked"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
 
         <div id="divOptions" style="display:inline;">
             <fmt:message key="methods.options.label"/>
@@ -420,7 +428,7 @@
         <input type="checkbox" name="methods" value="OPTIONS"
                style="display:inline; vertical-align: middle" <%if (hasOptions) {%>
                checked="checked"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
 
         <div id="divHead" style="display:inline;">
             <fmt:message key="methods.head.label"/>
@@ -428,14 +436,14 @@
         <input type="checkbox" name="methods" value="HEAD"
                style="display:inline; vertical-align: middle" <%if (hasHead) {%>
                checked="checked"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
         <div id="divPatch" style="display:inline;">
             <fmt:message key="methods.patch.label"/>
         </div>
         <input type="checkbox" name="methods" value="PATCH"
                style="display:inline; vertical-align: middle" <%if (hasPatch) {%>
                checked="checked"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
     </td>
 </tr>
 <!-- URL Style-->
@@ -444,7 +452,7 @@
         <fmt:message key="resource.urlstyle.label"/>
     </td>
     <td>
-        <select id="urlStyle" onchange="urlStyleChanged()">
+        <select id="urlStyle" onchange="urlStyleChanged()" <%=disableInput%>>
             <option value="none" <%if (!hasUrlStyle) {%>selected="selected"<%}%>>
                 <fmt:message key="resource.urlstyle.none"/>
             </option>
@@ -475,7 +483,7 @@
                <%} else {%>
                			value="<%=selectedResource.getUrlMapping() == null ? 
                					"" : selectedResource.getUrlMapping()%>"
-                <%}%>/>
+                <%}%> <%=disableInput%>/>
     </td>
 </tr>
 

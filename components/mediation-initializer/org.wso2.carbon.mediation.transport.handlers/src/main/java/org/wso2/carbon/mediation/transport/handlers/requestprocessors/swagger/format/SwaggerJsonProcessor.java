@@ -19,18 +19,21 @@ package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.f
 import net.minidev.json.JSONObject;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.rest.API;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
 import org.wso2.carbon.core.transports.HttpGetRequestProcessor;
-import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.SwaggerConstants;
-import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.integrator.core.rest.api.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
 
 /**
  * Provides Swagger definition for the API in JSON format.
  */
 public class SwaggerJsonProcessor extends SwaggerGenerator implements HttpGetRequestProcessor {
-
+    Log log = LogFactory.getLog(SwaggerJsonProcessor.class);
     /**
      * Process incoming GET request and update the response with the swagger definition for the requested API
      *
@@ -41,14 +44,25 @@ public class SwaggerJsonProcessor extends SwaggerGenerator implements HttpGetReq
      */
     public void process(CarbonHttpRequest request, CarbonHttpResponse response,
                         ConfigurationContext configurationContext) throws AxisFault {
-
         API api = getAPIFromSynapseConfig(request);
 
         if (api == null) {
             handleException(request.getRequestURI());
         } else {
-            JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
-            String responseString = jsonDefinition.toString();
+            String responseString;
+            try {
+                responseString = retrieveFromRegistry(api, request);
+                if (responseString == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Generating swagger definition for: " + api.getName());
+                    }
+                    JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
+                    responseString = jsonDefinition.toString();
+                }
+            } catch (RegistryException e) {
+                throw new AxisFault("Error occurred while retrieving swagger definition from registry", e);
+
+            }
             updateResponse(response, responseString, SwaggerConstants.CONTENT_TYPE_JSON);
         }
     }

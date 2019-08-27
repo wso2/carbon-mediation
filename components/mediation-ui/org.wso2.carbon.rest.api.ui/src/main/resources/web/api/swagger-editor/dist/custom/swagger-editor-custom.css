@@ -1,0 +1,58 @@
+.models {
+    display: none;
+}
+
+.SplitPane vertical {
+    position: relative;
+}
+
+#swagger-editor .vertical {
+    position: relative !important;
+}
+
+#swagger-editor .dd-menu.long {
+    display: none;
+}
+
+#swagger-editor .base-url {
+    margin: 10px;
+}
+
+#swagger-editor-button .btn {
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 1px 1px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+#swagger-editor-button .btn-primary {
+    background-color: #444;
+    color: white;
+}
+
+#swagger-editor-button .btn-primary:hover {
+    background-color: #575757;
+
+}
+
+#swagger-editor-button .btn-secondary {
+    background-color: #004675;
+    color: white;
+}
+
+#swagger-editor-button .btn-secondary:hover {
+    background-color: #008CBA;
+
+}
+
+.swagger-editor-button {
+    background-color: #004675;
+
+}

@@ -20,7 +20,10 @@ import java.util.regex.Pattern;
 
 /**
  * Constants used in Swagger definition generation.
+ *
+ * This is deprecated and moved to org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants
  */
+@Deprecated
 public class SwaggerConstants {
 
     /**
@@ -197,4 +200,5 @@ public class SwaggerConstants {
      * Path separator character
      */
     static final String PATH_SEPARATOR = "/";
+
 }
