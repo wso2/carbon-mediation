@@ -326,7 +326,21 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         MediationRegistryEntryImpl entryEmbedded = new MediationRegistryEntryImpl();
 
         try {
-            URL url = new URL(resolveRegistryURI(key));
+            URL url;
+            String surl = resolveRegistryURI(key);
+            url = new URL(surl);
+
+            boolean isDirectory = new File(new URL(surl.trim()).getFile()).isDirectory();
+            if (isDirectory) {
+                String[] files = new File(new URL(surl).getFile()).list();
+                for (String file : files) {
+                    if (file.contains(ESBRegistryConstants.PROPERTY_EXTENTION)) {
+                        String resolvedRegKeyPath = getPropertyFileURI(surl);
+                        url = new URL(resolvedRegKeyPath);
+                    }
+                }
+            }
+
             if ("file".equals(url.getProtocol())) {
                 try {
                     url.openStream();
