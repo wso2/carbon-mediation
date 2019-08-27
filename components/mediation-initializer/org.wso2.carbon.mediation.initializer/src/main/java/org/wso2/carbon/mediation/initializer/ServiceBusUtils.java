@@ -75,7 +75,9 @@ public class ServiceBusUtils {
 
     public static MediationPersistenceManager getMediationPersistenceManager(
             AxisConfiguration axisCfg) {
-        
+        if (axisCfg == null) {
+            return null;
+        }
         Parameter p = axisCfg.getParameter(
                 ServiceBusConstants.PERSISTENCE_MANAGER);
         if (p != null) {
