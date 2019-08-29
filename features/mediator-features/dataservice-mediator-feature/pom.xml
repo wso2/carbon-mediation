@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2009-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ Licensed under the Apache License, Version 2.0 (the "License");
  ~ you may not use this file except in compliance with the License.
@@ -14,35 +14,25 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-
+        
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <parent>
+   <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
-      <artifactId>carbon-mediation</artifactId>
+      <artifactId>mediator-features</artifactId>
       <version>4.7.12-SNAPSHOT</version>
-      <relativePath>../../pom.xml</relativePath>
    </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <version>4.7.12-SNAPSHOT</version>
-    <artifactId>mediators</artifactId>
+    <artifactId>dataservice-mediator-feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Mediators Aggregator Module</name>
+    <name>WSO2 Carbon - Dataservice Mediator Feature Aggregator Module</name>
     <url>http://wso2.org</url>
+
     <modules>
-        <module>router</module>
-        <module>bam</module>
-        <module>command</module>
-        <module>event</module>
-        <module>fastXSLT</module>
-        <module>smooks</module>
-        <module>entitlement</module>
-        <module>oauth</module>
-        <module>publishEvent</module>
-        <module>cache</module>
-        <module>datamapper</module>
-        <module>kerberos</module>
-        <module>dataservice</module>
+        <module>org.wso2.carbon.mediator.dataservice.server.feature</module>
+        <module>org.wso2.carbon.mediator.dataservice.feature</module>
     </modules>
 </project>
+
