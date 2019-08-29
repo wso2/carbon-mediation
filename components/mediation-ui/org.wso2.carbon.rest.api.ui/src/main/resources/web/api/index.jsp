@@ -671,10 +671,21 @@
             </td>
             <td width="20px" style="text-align:left;border-left:none;width:100px;">
                 <div class="inlineDiv">
+                    <% if (apiData.getArtifactContainerName() != null) { %>
                     <a style="background-image:url(images/tryit.gif);" class="icon-link"
-                    href="swaggereditor.jsp?action=tryIt&apiName=<%=Encode.forHtmlAttribute(apiData.getName())%>"
+                       href="#"
                        onclick="#"><fmt:message key="api.tryit"/></a>
-
+                    <% } else {
+                        String url=null;
+                        if (tenantDomain != "carbon.super") {
+                            url = serverContext + "/t/" + tenantDomain + "/" + Encode.forHtmlAttribute(apiData.getName());
+                        } else {
+                            url = serverContext + "/" + Encode.forHtmlAttribute(apiData.getName());
+                        }
+                    %>
+                    <a style="background-image:url(images/tryit.gif);" class="icon-link" href="<%=url + "?swaggertryit"%>"
+                       onclick="#" target="_blank" %><fmt:message key="api.tryit"/></a>
+                    <% } %>
                 </div>
             </td>
         </tr>
