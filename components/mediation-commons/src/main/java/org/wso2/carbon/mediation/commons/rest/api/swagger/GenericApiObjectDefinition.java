@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.integrator.core.rest.api.swagger;
+package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.TransportInDescription;
@@ -29,7 +29,7 @@ import org.apache.synapse.rest.Resource;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
 import org.apache.synapse.rest.dispatch.URLMappingBasedDispatcher;
 import org.apache.synapse.rest.version.URLBasedVersionStrategy;
-import org.wso2.carbon.integrator.core.internal.IntegratorComponent;
+import org.wso2.carbon.mediation.commons.internal.MediationCommonsComponent;
 import org.wso2.carbon.utils.NetworkUtils;
 
 import java.net.SocketException;
@@ -105,7 +105,7 @@ public class GenericApiObjectDefinition {
             return api.getHost();
         } else {
             AxisConfiguration axisConfiguration =
-                    IntegratorComponent.getContextService().getServerConfigContext().getAxisConfiguration();
+                    MediationCommonsComponent.getContextService().getServerConfigContext().getAxisConfiguration();
 
             //Retrieve WSDLPrefix to retrieve host
             //If transport is limited to https, https host will generate. Otherwise http will be generated

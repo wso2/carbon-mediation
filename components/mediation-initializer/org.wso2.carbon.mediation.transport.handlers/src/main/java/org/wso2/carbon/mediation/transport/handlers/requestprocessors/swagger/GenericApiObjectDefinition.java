@@ -32,7 +32,7 @@ import java.util.regex.Matcher;
  * Generalized object structure for Swagger definitions of APIs. This structure contains set of Maps which compatible
  * with both JSON and YAML formats.
  *
- * This is deprecated and moved to org.wso2.carbon.integrator.core.rest.api.swagger.GenericApiObjectDefinition
+ * This is deprecated and moved to org.wso2.carbon.mediation.commons.swagger.GenericApiObjectDefinition
  */
 @Deprecated
 public class GenericApiObjectDefinition {

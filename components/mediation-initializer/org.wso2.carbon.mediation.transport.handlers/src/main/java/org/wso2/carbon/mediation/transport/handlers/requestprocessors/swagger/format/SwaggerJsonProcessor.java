@@ -25,8 +25,8 @@ import org.apache.synapse.rest.API;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
 import org.wso2.carbon.core.transports.HttpGetRequestProcessor;
-import org.wso2.carbon.integrator.core.rest.api.swagger.GenericApiObjectDefinition;
-import org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 
 /**

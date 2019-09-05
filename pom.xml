@@ -58,6 +58,7 @@
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
                 <module>components/mediation-throttle</module>
+                <module>components/mediation-commons</module>
                 <module>components/mediation-cg</module>
                 <module>components/org.wso2.carbon.integrator.core</module>
                 <module>features/thirdpartylib-features</module>
@@ -2350,6 +2351,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.integrator.core</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediation.commons</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>

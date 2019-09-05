@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * Constants used in Swagger definition generation.
  *
- * This is deprecated and moved to org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants
+ * This is deprecated and moved to org.wso2.carbon.mediation.commons.swagger.SwaggerConstants
  */
 @Deprecated
 public class SwaggerConstants {

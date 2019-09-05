@@ -28,7 +28,7 @@ import org.apache.synapse.rest.version.DefaultStrategy;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
-import org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
