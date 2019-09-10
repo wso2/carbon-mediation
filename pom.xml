@@ -49,11 +49,11 @@
                 <module>components/business-adaptors</module>
                 <module>components/mediation-admin</module>
                 <module>components/mediation-connector</module>
+                <module>components/inbound-endpoints</module>
                 <module>components/mediators</module>
                 <module>components/event-sink</module>
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
-                <module>components/inbound-endpoints</module>
                 <module>components/mediation-clustering</module>
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
@@ -2387,6 +2387,11 @@
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-stub</artifactId>
                 <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>inbound-endpoints</artifactId>
+                <version>${carbon.mediation.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

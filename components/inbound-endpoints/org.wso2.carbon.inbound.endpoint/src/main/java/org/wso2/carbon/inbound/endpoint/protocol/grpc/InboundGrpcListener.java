@@ -26,8 +26,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
-import org.wso2.grpc.Event;
-import org.wso2.grpc.EventServiceGrpc;
+import org.wso2.carbon.inbound.endpoint.protocol.grpc.util.Event;
+import org.wso2.carbon.inbound.endpoint.protocol.grpc.util.EventServiceGrpc;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -35,30 +35,24 @@ import java.util.concurrent.TimeUnit;
 public class InboundGrpcListener implements InboundRequestProcessor {
     private int port;
     private GrpcInjectHandler injectHandler;
-    private String name;
     private String injectingSeq;
     private String onErrorSeq;
     private SynapseEnvironment synapseEnvironment;
     private InboundProcessorParams params;
 
     public InboundGrpcListener(InboundProcessorParams params) {
+        this.injectingSeq = params.getInjectingSeq();
+        this.onErrorSeq = params.getOnErrorSeq();
+        this.synapseEnvironment = params.getSynapseEnvironment();
         String portParam = params.getProperties().getProperty(InboundGrpcConstants.INBOUND_ENDPOINT_PARAMETER_GRPC_PORT);
         try {
             port = Integer.parseInt(portParam);
         } catch (NumberFormatException e) {
             port = 8888;
-//            handleException("Please provide port number as integer instead of  port  " + portParam, e);
         }
-//
-//        this.name = params.getName();
-//        this.injectingSeq = params.getInjectingSeq();
-//        this.onErrorSeq = params.getOnErrorSeq();
-//        this.synapseEnvironment = params.getSynapseEnvironment();
-//        this.params = params;
-//        injectHandler = new GrpcInjectHandler(injectingSeq, onErrorSeq, false, synapseEnvironment);
+        injectHandler = new GrpcInjectHandler(injectingSeq, onErrorSeq, false, synapseEnvironment);
     }
 
-    @Override
     public void init() {
         try {
             this.start();
@@ -67,7 +61,6 @@ public class InboundGrpcListener implements InboundRequestProcessor {
         }
     }
 
-    @Override
     public void destroy() {
         try {
             this.stop();
@@ -83,26 +76,23 @@ public class InboundGrpcListener implements InboundRequestProcessor {
         if (server != null) {
             throw new IllegalStateException("Already started");
         }
-        server = ServerBuilder.forPort(8888).addService(new EventServiceGrpc.EventServiceImplBase() {
+        server = ServerBuilder.forPort(port).addService(new EventServiceGrpc.EventServiceImplBase() {
             @Override
             public void process(Event request, StreamObserver<Event> responseObserver) {
+                logger.info("############## GrpcInjectHandler.invoke().process() ##############");
                 if (logger.isDebugEnabled()) {
                     logger.debug("Server hit");
                 }
-//                injectHandler.invoke(request);
-                Event.Builder responseBuilder = Event.newBuilder();
-                responseBuilder.setPayload("server data");
-                Event response = responseBuilder.build();
-                responseObserver.onNext(response);
-                responseObserver.onCompleted();
+                injectHandler.invokeProcess(request, responseObserver);
             }
 
             @Override
             public void consume(Event request, StreamObserver<Empty> responseObserver) {
+                logger.info("############## GrpcInjectHandler.invoke().consume() ##############");
                 if (logger.isDebugEnabled()) {
                     logger.debug("Server hit with payload: " + request.toString());
                 }
-//                injectHandler.invoke(request);
+                injectHandler.invokeConsume(request, responseObserver);
                 responseObserver.onNext(Empty.getDefaultInstance());
                 responseObserver.onCompleted();
             }
