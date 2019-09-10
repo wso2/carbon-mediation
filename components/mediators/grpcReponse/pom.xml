@@ -18,31 +18,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-      <groupId>org.wso2.carbon.mediation</groupId>
-      <artifactId>carbon-mediation</artifactId>
-      <version>4.7.12-SNAPSHOT</version>
-      <relativePath>../../pom.xml</relativePath>
-   </parent>
+        <groupId>org.wso2.carbon.mediation</groupId>
+        <artifactId>mediators</artifactId>
+        <version>4.6.151</version>
+    </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.7.12-SNAPSHOT</version>
-    <artifactId>mediators</artifactId>
+    <artifactId>grpc-response-mediator</artifactId>
+    <version>4.6.151</version>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Mediators Aggregator Module</name>
+    <name>WSO2 Carbon - Publish GRPC Response mediator to Streaming Integrator</name>
     <url>http://wso2.org</url>
+
     <modules>
-        <module>router</module>
-        <module>bam</module>
-        <module>command</module>
-        <module>event</module>
-        <module>fastXSLT</module>
-        <module>smooks</module>
-        <module>entitlement</module>
-        <module>oauth</module>
-        <module>publishEvent</module>
-        <module>cache</module>
-        <module>datamapper</module>
-        <module>kerberos</module>
-        <module>grpcReponse</module>
+        <module>org.wso2.carbon.mediator.grpcresponse</module>
     </modules>
+
 </project>

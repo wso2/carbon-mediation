@@ -1,0 +1,91 @@
+/*
+ * Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.wso2.carbon.mediator.grpcresponse;
+
+import io.grpc.stub.StreamObserver;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.json.JsonUtil;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.wso2.carbon.inbound.endpoint.protocol.grpc.InboundGrpcConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.grpc.util.Event;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import static org.apache.axis2.Constants.Configuration.MESSAGE_TYPE;
+import static org.wso2.carbon.inbound.endpoint.protocol.grpc.InboundGrpcConstants.CONTENT_TYPE_JSON_MIME_TYPE;
+
+/**
+ * Mediator that extracts data from current message payload/header according to the given configuration.
+ * Extracted information is sent as an event.
+ */
+public class ResponseMediator extends AbstractMediator {
+    public boolean isContentAware() {
+        return true;
+    }
+
+    public boolean mediate(MessageContext messageContext) {
+        StreamObserver<Event> responseObserver = (StreamObserver<Event>) messageContext.getProperty(InboundGrpcConstants.GRPC_RESPONSE_OBSERVER);
+        if (responseObserver != null) {
+            org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+            Event.Builder responseBuilder = Event.newBuilder();
+            responseBuilder.setPayload(msgContext.getEnvelope().getBody().toString());
+            String content = null;
+            String contentType = msgContext.getProperty(MESSAGE_TYPE).toString();
+            if (contentType.equalsIgnoreCase(CONTENT_TYPE_JSON_MIME_TYPE)) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(JsonUtil.getJsonPayload(msgContext)));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                try {
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line);
+                    }
+                    content = stringBuilder.toString();
+                } catch (IOException e) {
+                    String msg = "Error occurred while converting payload to json. " + e.getMessage();
+                    log.error(msg, e);
+                    throw new SynapseException(msg, e);
+                }
+            } else if (contentType.equalsIgnoreCase(InboundGrpcConstants.CONTENT_TYPE_XML_MIME_TYPE) ||
+                    contentType.equalsIgnoreCase(InboundGrpcConstants.CONTENT_TYPE_TEXT_MIME_TYPE)) {
+                content = msgContext.getEnvelope().getBody().toString();
+            } else {
+                String msg = "Error occurred when sending response. " + contentType + " type not supported";
+                log.error(msg);
+                throw new SynapseException(msg);
+                // TODO: 9/4/19 throw synapse exception which will call err seq
+                // TODO: 8/30/19 log and drop? how to handle that in Grpc level in Siddhi
+            }
+            responseBuilder.setPayload(content);
+            Event response = responseBuilder.build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } else {
+            // TODO: 9/9/19 refactor error msg
+            String msg = "GRPC Response Observer is null. Please make sure the GRPC call accepts a response ";
+            this.log.error(msg);
+            throw new SynapseException(msg);
+        }
+        return true;
+    }
+}
