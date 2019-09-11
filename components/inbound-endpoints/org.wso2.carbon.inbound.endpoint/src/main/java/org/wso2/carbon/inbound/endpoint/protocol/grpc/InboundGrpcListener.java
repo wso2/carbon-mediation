@@ -34,30 +34,28 @@ import java.util.concurrent.TimeUnit;
 
 public class InboundGrpcListener implements InboundRequestProcessor {
     private int port;
-    private GrpcInjectHandler injectHandler;
-    private String injectingSeq;
-    private String onErrorSeq;
-    private SynapseEnvironment synapseEnvironment;
-    private InboundProcessorParams params;
+    private GRPCInjectHandler injectHandler;
+    private static final Logger log = Logger.getLogger(InboundGrpcListener.class.getName());
+    private Server server;
 
     public InboundGrpcListener(InboundProcessorParams params) {
-        this.injectingSeq = params.getInjectingSeq();
-        this.onErrorSeq = params.getOnErrorSeq();
-        this.synapseEnvironment = params.getSynapseEnvironment();
+        String injectingSeq = params.getInjectingSeq();
+        String onErrorSeq = params.getOnErrorSeq();
+        SynapseEnvironment synapseEnvironment = params.getSynapseEnvironment();
         String portParam = params.getProperties().getProperty(InboundGrpcConstants.INBOUND_ENDPOINT_PARAMETER_GRPC_PORT);
         try {
             port = Integer.parseInt(portParam);
         } catch (NumberFormatException e) {
             port = 8888;
         }
-        injectHandler = new GrpcInjectHandler(injectingSeq, onErrorSeq, false, synapseEnvironment);
+        injectHandler = new GRPCInjectHandler(injectingSeq, onErrorSeq, false, synapseEnvironment);
     }
 
     public void init() {
         try {
             this.start();
         } catch (IOException e) {
-            throw new SynapseException("IOException when starting gRPC server: " +e.getMessage());
+            throw new SynapseException("IOException when starting gRPC server: " + e.getMessage(), e);
         }
     }
 
@@ -69,58 +67,44 @@ public class InboundGrpcListener implements InboundRequestProcessor {
         }
     }
 
-    private static final Logger logger = Logger.getLogger(InboundGrpcListener.class.getName());
-    private Server server;
-
     public void start() throws IOException {
         if (server != null) {
-            throw new IllegalStateException("Already started");
+            throw new IllegalStateException("gRPC Listener Server already started");
         }
         server = ServerBuilder.forPort(port).addService(new EventServiceGrpc.EventServiceImplBase() {
             @Override
             public void process(Event request, StreamObserver<Event> responseObserver) {
-                logger.info("############## GrpcInjectHandler.invoke().process() ##############");
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Server hit");
-                }
+                log.debug("Event received for gRPC Listener process method");
                 injectHandler.invokeProcess(request, responseObserver);
             }
 
             @Override
             public void consume(Event request, StreamObserver<Empty> responseObserver) {
-                logger.info("############## GrpcInjectHandler.invoke().consume() ##############");
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Server hit with payload: " + request.toString());
-                }
+                log.debug("Event received for gRPC Listener consume method");
                 injectHandler.invokeConsume(request, responseObserver);
                 responseObserver.onNext(Empty.getDefaultInstance());
                 responseObserver.onCompleted();
             }
         }).build();
         server.start();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Server started");
-        }
+        log.debug("gRPC Listener Server started");
     }
 
     public void stop() throws InterruptedException {
         Server s = server;
         if (s == null) {
-            throw new IllegalStateException("Already stopped");
+            throw new IllegalStateException("gRPC Listener Server is already stopped");
         }
         server = null;
         s.shutdown();
         if (s.awaitTermination(1, TimeUnit.SECONDS)) {
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Server stopped");
-            }
+            log.debug("gRPC Listener Server stopped");
             return;
         }
         s.shutdownNow();
         if (s.awaitTermination(1, TimeUnit.SECONDS)) {
             return;
         }
-        throw new RuntimeException("Unable to shutdown server");
+        throw new RuntimeException("Unable to shutdown gRPC Listener Server");
     }
 }

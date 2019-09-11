@@ -2352,6 +2352,7 @@
                 <artifactId>org.wso2.carbon.integrator.core</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <!-- GRPC inbound endpoint and mediator dependencies start -->
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
@@ -2393,6 +2394,12 @@
                 <artifactId>inbound-endpoints</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.grpcresponse</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <!-- GRPC inbound endpoint and mediator dependencies end -->
         </dependencies>
     </dependencyManagement>
     <properties>

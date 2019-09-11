@@ -19,14 +19,13 @@
 
 package org.wso2.carbon.mediator.grpcresponse;
 
-import io.grpc.stub.StreamObserver;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.wso2.carbon.inbound.endpoint.protocol.grpc.GRPCResponseObserverWrapper;
 import org.wso2.carbon.inbound.endpoint.protocol.grpc.InboundGrpcConstants;
-import org.wso2.carbon.inbound.endpoint.protocol.grpc.util.Event;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,21 +35,20 @@ import static org.apache.axis2.Constants.Configuration.MESSAGE_TYPE;
 import static org.wso2.carbon.inbound.endpoint.protocol.grpc.InboundGrpcConstants.CONTENT_TYPE_JSON_MIME_TYPE;
 
 /**
- * Mediator that extracts data from current message payload/header according to the given configuration.
- * Extracted information is sent as an event.
+ * Mediator that extracts data and the gRPC responseObserver from current message payload/header
+ * according to the given configuration.
+ * Extracted information is sent as an gRPC event.
  */
 public class ResponseMediator extends AbstractMediator {
     public boolean isContentAware() {
         return true;
     }
-
     public boolean mediate(MessageContext messageContext) {
-        StreamObserver<Event> responseObserver = (StreamObserver<Event>) messageContext.getProperty(InboundGrpcConstants.GRPC_RESPONSE_OBSERVER);
+        GRPCResponseObserverWrapper responseObserver =
+                (GRPCResponseObserverWrapper) messageContext.getProperty(InboundGrpcConstants.GRPC_RESPONSE_OBSERVER);
         if (responseObserver != null) {
             org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-            Event.Builder responseBuilder = Event.newBuilder();
-            responseBuilder.setPayload(msgContext.getEnvelope().getBody().toString());
-            String content = null;
+            String content;
             String contentType = msgContext.getProperty(MESSAGE_TYPE).toString();
             if (contentType.equalsIgnoreCase(CONTENT_TYPE_JSON_MIME_TYPE)) {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(JsonUtil.getJsonPayload(msgContext)));
@@ -73,16 +71,11 @@ public class ResponseMediator extends AbstractMediator {
                 String msg = "Error occurred when sending response. " + contentType + " type not supported";
                 log.error(msg);
                 throw new SynapseException(msg);
-                // TODO: 9/4/19 throw synapse exception which will call err seq
-                // TODO: 8/30/19 log and drop? how to handle that in Grpc level in Siddhi
             }
-            responseBuilder.setPayload(content);
-            Event response = responseBuilder.build();
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
+            responseObserver.sendResponse(content);
         } else {
-            // TODO: 9/9/19 refactor error msg
-            String msg = "GRPC Response Observer is null. Please make sure the GRPC call accepts a response ";
+            String msg = "Message context doesn't contain gRPC Response Observer. " +
+                    "Please make sure the gRPC call accepts a response ";
             this.log.error(msg);
             throw new SynapseException(msg);
         }
