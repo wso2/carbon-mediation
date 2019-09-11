@@ -31,6 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
@@ -44,7 +45,6 @@ import org.milyn.persistence.util.PersistenceUtil;
 import org.milyn.scribe.adapter.jpa.EntityManagerRegister;
 import org.xml.sax.SAXException;
 
-import org.wso2.carbon.mediator.service.MediatorException;
 
 /**
  * Transforms the current message payload using the given Smooks configuration.
@@ -254,16 +254,14 @@ public class SmooksMediator extends AbstractMediator {
 			return shouldRecreate;
 		}
 	}
-	
-	private void handleException(String msg) {
-        log.error(msg);
-        throw new MediatorException(msg);
-    }
 
-    private void handleException(String msg, Exception ex) {
-        log.error(msg, ex);
-        throw new MediatorException(msg + " Caused by " + ex.getMessage());
-    }
+	private void handleException(String msg) {
+		throw new SynapseException(msg);
+	}
+
+	private void handleException(String msg, Exception ex) {
+		throw new SynapseException(msg + " Caused by " + ex.getMessage());
+	}
 
 	public String getConfigKey() {
 		return configKey;
