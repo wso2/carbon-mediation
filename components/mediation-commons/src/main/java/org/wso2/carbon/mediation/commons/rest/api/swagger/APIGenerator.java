@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.integrator.core.rest.api.swagger;
+package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,11 +38,9 @@ import org.apache.synapse.rest.API;
 import org.apache.synapse.rest.Resource;
 import org.apache.synapse.rest.dispatch.URITemplateHelper;
 import org.apache.synapse.rest.dispatch.URLMappingHelper;
-import org.apache.synapse.rest.version.AbstractVersionStrategy;
 import org.apache.synapse.rest.version.ContextVersionStrategy;
 import org.apache.synapse.rest.version.DefaultStrategy;
 import org.apache.synapse.rest.version.URLBasedVersionStrategy;
-import org.apache.synapse.rest.version.VersionStrategy;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 

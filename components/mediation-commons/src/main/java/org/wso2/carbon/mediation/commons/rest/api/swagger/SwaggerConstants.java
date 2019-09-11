@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.integrator.core.rest.api.swagger;
+package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 import java.util.regex.Pattern;
 

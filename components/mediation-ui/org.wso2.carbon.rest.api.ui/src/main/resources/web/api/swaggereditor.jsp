@@ -15,7 +15,7 @@
   --%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="net.minidev.json.JSONObject" %>
-<%@ page import="org.wso2.carbon.integrator.core.rest.api.swagger.GenericApiObjectDefinition" %>
+<%@ page import="org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition" %>
 <%@ page import="org.apache.synapse.rest.API" %>
 <%@ page import="org.apache.synapse.config.SynapseConfigUtils" %>
 <%@ page import="org.wso2.carbon.context.PrivilegedCarbonContext" %>
@@ -25,7 +25,7 @@
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="org.wso2.carbon.integrator.core.rest.api.swagger.SwaggerConstants" %>
+<%@ page import="org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>

@@ -55,6 +55,10 @@
             <artifactId>org.wso2.carbon.integrator.core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediation.commons</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>

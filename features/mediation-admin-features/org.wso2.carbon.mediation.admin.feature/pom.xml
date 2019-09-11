@@ -98,6 +98,10 @@
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon.mediation</groupId>
+         <artifactId>org.wso2.carbon.mediation.commons</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.sequences</artifactId>
       </dependency>
       <dependency>
@@ -169,6 +173,7 @@
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.proxyadmin.common</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.proxyadmin</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.rest.api</bundleDef>
+                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.commons</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.common</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task</bundleDef>

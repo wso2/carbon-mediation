@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.integrator.core.rest.api.swagger;
+package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 /**
  * Custom exception for API generation
