@@ -37,6 +37,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>components/mediation-commons</module>
                 <module>components/carbon-transports</module>
                 <module>components/carbon-mediation-startup</module>
                 <module>service-stubs/mediation-admin</module>
@@ -58,7 +59,6 @@
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
                 <module>components/mediation-throttle</module>
-                <module>components/mediation-commons</module>
                 <module>components/mediation-cg</module>
                 <module>components/org.wso2.carbon.integrator.core</module>
                 <module>features/thirdpartylib-features</module>

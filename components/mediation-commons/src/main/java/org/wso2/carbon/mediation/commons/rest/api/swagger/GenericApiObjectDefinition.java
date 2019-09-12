@@ -19,22 +19,14 @@
 package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.rest.API;
-import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.rest.Resource;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
 import org.apache.synapse.rest.dispatch.URLMappingBasedDispatcher;
 import org.apache.synapse.rest.version.URLBasedVersionStrategy;
-import org.wso2.carbon.mediation.commons.internal.MediationCommonsComponent;
-import org.wso2.carbon.utils.NetworkUtils;
 
-import java.net.SocketException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,9 +39,11 @@ import java.util.regex.Matcher;
 public class GenericApiObjectDefinition {
     private static final Log log = LogFactory.getLog(GenericApiObjectDefinition.class);
     private API api;
+    private ServerConfig serverConfig;
 
-    public GenericApiObjectDefinition(API api) {
+    public GenericApiObjectDefinition(API api, ServerConfig serverConfiguration) {
         this.api = api;
+        this.serverConfig = serverConfiguration;
     }
 
     /**
@@ -66,7 +60,7 @@ public class GenericApiObjectDefinition {
         apiMap.put(SwaggerConstants.INFO, getInfoMap());
 
         //Host is mandatory for TryIt
-        apiMap.put(SwaggerConstants.HOST, getHost());
+        apiMap.put(SwaggerConstants.HOST, serverConfig.getHost(api));
 
         //Schemes
         apiMap.put(SwaggerConstants.SCHEMES, getSchemes());
@@ -89,77 +83,6 @@ public class GenericApiObjectDefinition {
         return apiMap;
     }
 
-    /**
-     * Function to retrieve host for the swagger definition
-     * Host is extracted from following sources
-     *  1. Host configured in API definition
-     *  2. WSDLEPRPrefix configured in axis2.xml under http or https transport listeners
-     *  3. "hostname" parameter in axis2.xml (combined with http port configured for transport listener)
-     *  4. Server (machine) host (combined with http port configured for transport listener)
-     *
-     * @return return host
-     */
-    private String getHost() throws AxisFault {
-
-        if (api.getHost() != null) {
-            return api.getHost();
-        } else {
-            AxisConfiguration axisConfiguration =
-                    MediationCommonsComponent.getContextService().getServerConfigContext().getAxisConfiguration();
-
-            //Retrieve WSDLPrefix to retrieve host
-            //If transport is limited to https, https host will generate. Otherwise http will be generated
-            TransportInDescription transportIn = axisConfiguration.getTransportIn(
-                    api.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY ? "http" : "https");
-
-            if (transportIn != null) {
-                // Give priority to WSDLEPRPrefix
-                if (transportIn.getParameter(SwaggerConstants.WSDL_EPR_PREFIX) != null) {
-                    String wsdlPrefixParam = (String) transportIn.getParameter(SwaggerConstants.WSDL_EPR_PREFIX).getValue();
-                    if (!wsdlPrefixParam.isEmpty()) {
-                        //WSDLEPRPrefix available
-                        try {
-                            URI hostUri = new URI(wsdlPrefixParam);
-                            //Resolve port
-                            try {
-                                String protocol = transportIn.getName();
-
-                                if (("https".equals(protocol) && hostUri.getPort() == 443) ||
-                                        ("http".equals(protocol) && hostUri.getPort() == 80)) {
-                                    return hostUri.getHost();
-                                }
-                            } catch (NumberFormatException e) {
-                                throw new AxisFault("Error occurred while parsing the port", e);
-                            }
-
-                            return hostUri.getHost() + ":" + hostUri.getPort();
-                        } catch (URISyntaxException e) {
-                            log.error("WSDLEPRPrefix is not a valid URI", e);
-                        }
-                    } else {
-                        log.error("\"WSDLEPRPrefix\" is empty. Please provide relevant URI or comment out parameter");
-                    }
-                }
-
-                String portStr = (String) transportIn.getParameter("port").getValue();
-                String hostname = "localhost";
-
-                //Resolve hostname
-                if (axisConfiguration.getParameter("hostname") != null) {
-                    hostname = (String) axisConfiguration.getParameter("hostname").getValue();
-                } else {
-                    try {
-                        hostname = NetworkUtils.getLocalHostname();
-                    } catch (SocketException e) {
-                        log.warn("SocketException occurred when trying to obtain IP address of local machine");
-                    }
-                }
-                return hostname + ':' + portStr;
-            }
-
-            throw new AxisFault("http/https transport listeners are required in axis2.xml");
-        }
-    }
 
     /**
      * Provides structure for the "responses" element in swagger definition.

@@ -19,6 +19,7 @@ package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.f
 import com.google.gson.JsonParser;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.rest.API;
@@ -27,7 +28,9 @@ import org.wso2.carbon.core.transports.CarbonHttpResponse;
 import org.wso2.carbon.core.transports.HttpGetRequestProcessor;
 import org.wso2.carbon.integrator.core.json.utils.GSONUtils;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.ServerConfig;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
+import org.wso2.carbon.mediation.transport.handlers.DataHolder;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.yaml.snakeyaml.Yaml;
 
@@ -63,7 +66,9 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
                     responseString =
                             yamlDefinition.dumpAsMap(GSONUtils.gsonJsonObjectToMap(jsonParser.parse(defFromRegistry)));
                 } else {
-                    responseString = yamlDefinition.dumpAsMap(new GenericApiObjectDefinition(api).getDefinitionMap());
+                    ServerConfig serverConfig = new CarbonServerConfig();
+                    responseString =
+                            yamlDefinition.dumpAsMap(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
                 }
             } catch (RegistryException e) {
                 throw new AxisFault("Error occurred while retrieving swagger definition from registry", e);

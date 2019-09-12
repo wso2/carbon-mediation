@@ -215,6 +215,8 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
         //super.init(configurationContext, sourceHandler);
     	this.cfgCtx  =  configurationContext;
     	this.sourceHandler =  sourceHandler;
+    	DataHolder.getInstance().setAxisConfigurationContext(configurationContext);
+
         if (cfgCtx.getProperty("GETRequestProcessorMap") != null) {
             getRequestProcessors = (Map<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor>)
                     cfgCtx.getProperty("GETRequestProcessorMap");
