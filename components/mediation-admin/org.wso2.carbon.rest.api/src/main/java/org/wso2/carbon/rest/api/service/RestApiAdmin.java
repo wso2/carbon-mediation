@@ -34,6 +34,7 @@ import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.APIGenException;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.APIGenerator;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.ServerConfig;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
@@ -46,6 +47,7 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.rest.api.APIData;
 import org.wso2.carbon.rest.api.APIDataSorter;
 import org.wso2.carbon.rest.api.APIException;
+import org.wso2.carbon.rest.api.CarbonServerConfig;
 import org.wso2.carbon.rest.api.ConfigHolder;
 import org.wso2.carbon.rest.api.ResourceData;
 import org.wso2.carbon.rest.api.RestApiAdminUtils;
@@ -1097,7 +1099,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             }
 
             try {
-                JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
+                ServerConfig serverConfig = new CarbonServerConfig();
+                JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
                 swaggerJsonString = jsonDefinition.toString();
             } catch (AxisFault axisFault) {
                 handleException(log, "Error occurred while generating swagger definition", axisFault);
