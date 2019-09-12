@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.inbound.endpoint.protocol.grpc;
 
 import com.google.protobuf.Empty;
@@ -42,15 +43,26 @@ import java.io.InputStream;
 
 import static org.wso2.carbon.inbound.endpoint.protocol.grpc.InboundGrpcConstants.HEADER_MAP_SEQUENCE_PARAMETER_NAME;
 
-public class GrpcInjectHandler {
-    private static final Log log = LogFactory.getLog(GrpcInjectHandler.class);
-
+/**
+ * Inject gRPC message into the sequence
+ */
+public class GRPCInjectHandler {
+    private static final Log log = LogFactory.getLog(GRPCInjectHandler.class);
     private String injectingSeq;
     private String onErrorSeq;
     private boolean sequential;
     private SynapseEnvironment synapseEnvironment;
 
-    GrpcInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
+    /**
+     * constructor initialize parameters and synapseEnvironment
+     *
+     * @param injectingSeq injecting sequence mentioned in the inbound endpoint
+     * @param onErrorSeq error Sequence mentioned in the inbound endpoint
+     * @param sequential is sequential
+     * @param synapseEnvironment The SynapseEnvironment allows access into the the host SOAP engine. It allows
+     *                           the sending of messages, class loader access etc
+     */
+    GRPCInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
                       SynapseEnvironment synapseEnvironment) {
         this.injectingSeq = injectingSeq;
         this.onErrorSeq = onErrorSeq;
@@ -58,21 +70,36 @@ public class GrpcInjectHandler {
         this.synapseEnvironment = synapseEnvironment;
     }
 
+    /**
+     * This method will be called when the initiated gRPC call is expecting an response.
+     * This will inject the gRPC message to the to the message sequence as well as the responseObserver .
+     * inject the message.
+     * @param receivedEvent received event from gRPC
+     * @param responseObserver object to be used when sending the response back to the gRPC client
+     */
     public void invokeProcess(Event receivedEvent, StreamObserver<Event> responseObserver) {
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
             if (msgCtx != null) {
-                msgCtx.setProperty(InboundGrpcConstants.GRPC_RESPONSE_OBSERVER, responseObserver);
+                msgCtx.setProperty(InboundGrpcConstants.GRPC_RESPONSE_OBSERVER,
+                        new GRPCResponseObserverWrapper(responseObserver));
             }
             initiateSequenceAndInjectPayload(responseObserver, receivedEvent, msgCtx);
         } catch (SynapseException se) {
             throw se;
         } catch (Exception e) {
-            log.error("Error while processing the Grpc Message", e);
+            log.error("Error while processing the gRPC Message", e);
             throw new SynapseException("Error while processing the JMS Message", e);
         }
     }
 
+    /**
+     * This method will be called when the initiated gRPC call is not expecting an response.
+     * This will inject the gRPC message to the to the message sequence as well as the responseObserver .
+     * inject the message.
+     * @param receivedEvent received event from gRPC
+     * @param responseObserver object to be used to send message processing error back to gRPC client
+     */
     public void invokeConsume(Event receivedEvent, StreamObserver<Empty> responseObserver) {
         try {
             initiateSequenceAndInjectPayload(responseObserver, receivedEvent, createMessageContext());
@@ -84,20 +111,22 @@ public class GrpcInjectHandler {
         }
     }
 
-    private org.apache.synapse.MessageContext initiateSequenceAndInjectPayload(StreamObserver responseObserver,
-                                                                               Event receivedEvent,
-                                                                               org.apache.synapse.MessageContext msgCtx)
-            throws AxisFault {
+    private void initiateSequenceAndInjectPayload(StreamObserver responseObserver,
+                                                  Event receivedEvent,
+                                                  org.apache.synapse.MessageContext msgCtx) throws AxisFault {
         String msgPayload = receivedEvent.getPayload();
         String sequenceName = receivedEvent.getHeadersMap().get(HEADER_MAP_SEQUENCE_PARAMETER_NAME);
+        log.debug(receivedEvent.getHeadersMap().toString());
         SequenceMediator seq;
         if (sequenceName != null) {
+            log.debug(sequenceName + " sequence, received via gRPC headers.");
             seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(sequenceName);
         } else {
             if (injectingSeq == null || injectingSeq.isEmpty()) {
-                log.error("Sequence name not specified. Sequence : " + injectingSeq);
-                return null;
+                log.error("Sequence name is not specified in inbound endpoint or empty.");
+                return;
             }
+            log.debug(injectingSeq + " sequence, received via the inbound endpoint.");
             seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
         }
         msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
@@ -107,33 +136,41 @@ public class GrpcInjectHandler {
                 seq.init(synapseEnvironment);
             }
             seq.setErrorHandler(onErrorSeq);
-            if (log.isDebugEnabled()) {
-                log.debug("injecting received Grpc message to sequence : " + injectingSeq);
-            }
+            log.debug("injecting received gRPC message to sequence : " + injectingSeq);
             if (!synapseEnvironment.injectInbound(msgCtx, seq, this.sequential)) {
-                return null;
+                return;
             }
         } else {
             log.error("Sequence: " + injectingSeq + " not found");
         }
-        String contentType = receivedEvent.getHeadersMap().get(InboundGrpcConstants.HEADER_MAP_CONTENT_TYPE_PARAMETER_NAME);
         MessageContext axis2MsgCtx =
                 ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
         //setting transport headers
         axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS
                 , receivedEvent.getHeadersMap());
+        String contentType = receivedEvent.getHeadersMap().get(InboundGrpcConstants.HEADER_MAP_CONTENT_TYPE_PARAMETER_NAME);
+        log.debug(contentType + " Content-Type, received via the gRPC headers.");
         // Determine the message builder to use
-        // TODO: 8/28/19 get as a standarized MIME Type currently only support json and xml
-        if (InboundGrpcConstants.CONTENT_TYPE_JSON.equalsIgnoreCase(contentType)) {
-            contentType = InboundGrpcConstants.CONTENT_TYPE_JSON_MIME_TYPE;
-        } else if (InboundGrpcConstants.CONTENT_TYPE_XML.equalsIgnoreCase(contentType)) {
-            contentType = InboundGrpcConstants.CONTENT_TYPE_XML_MIME_TYPE;
+        if (contentType != null) {
+            if (InboundGrpcConstants.CONTENT_TYPE_JSON.equalsIgnoreCase(contentType)) {
+                contentType = InboundGrpcConstants.CONTENT_TYPE_JSON_MIME_TYPE;
+            } else if (InboundGrpcConstants.CONTENT_TYPE_XML.equalsIgnoreCase(contentType)) {
+                contentType = InboundGrpcConstants.CONTENT_TYPE_XML_MIME_TYPE;
+            } else {
+                log.error("Error occurred when processing gRPC message. " + contentType +
+                        " type found in gRPC header is not supported");
+                responseObserver.onError(
+                        new Throwable("Error occurred when processing gRPC message. " + contentType +
+                                " type found in gRPC header is not supported"));
+                return;
+            }
         } else {
-            log.error("Error ocurred when processing response. " + contentType + " type not supported");
-            // TODO: 9/4/19 log and throw
-            responseObserver.onError(new Throwable("Content type not supported. Error when processing GRPC Event"));
-            // TODO: 8/30/19 log and drop? how to handle that in Grpc level
+            log.error("Invalid content type found in gRPC header. JSON, XML and text is supported");
+            responseObserver.onError(
+                    new Throwable("Invalid content type found in gRPC header. JSON, XML and text is supported"));
+            return;
         }
+
         Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
         OMElement documentElement;
         // set the message payload to the message context
@@ -143,15 +180,14 @@ public class GrpcInjectHandler {
         } catch (Exception ex) {
             // Handle message building error
             log.error("Error while building the message", ex);
-            return null;
+            return;
         }
         // Inject the message to the sequence.
         msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
-        return msgCtx;
     }
 
     /**
-     * Create the initial message context for grpc
+     * Create the initial message context for gRPC
      */
     private org.apache.synapse.MessageContext createMessageContext() {
         org.apache.synapse.MessageContext msgCtx = synapseEnvironment
