@@ -1,6 +1,7 @@
 <%@ page import="org.apache.axiom.om.OMElement" %>
 <%@ page import="org.apache.axiom.om.util.AXIOMUtil" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.utils.MessageProcessorData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%
     String configuration = request.getParameter("messageProcessorString");
@@ -25,7 +26,7 @@
 
 
 <input type="hidden" id="tableParams" name="tableParams" value="<%=stringBuffer.toString()%>"/>
-<input id="Name" name="Name" type="hidden" value="<%=mpName%>"/>
-<input name="Provider" id="Provider" type="hidden" value="<%=mpProvider%>"/>
-<input name="MessageStore" id="MessageStore" type="hidden" value="<%=mpStore%>"/>
+<input id="Name" name="Name" type="hidden" value="<%=Encode.forHtml(mpName)%>"/>
+<input name="Provider" id="Provider" type="hidden" value="<%=Encode.forHtml(mpProvider)%>"/>
+<input name="MessageStore" id="MessageStore" type="hidden" value="<%=Encode.forHtml(mpStore)%>"/>
 <input name="TargetEndpoint" id="TargetEndpoint" type="hidden" value="<%=processorData.getTargetEndpoint()%>"/>
