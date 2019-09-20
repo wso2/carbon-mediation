@@ -193,7 +193,7 @@ function testURL(url) {
                        } else if (data.replace(/^\s+|\s+$/g, '') == 'unsupported') {
                            CARBON.showErrorDialog(jsi18n['unsupported.protocol']);
                        } else {
-                           CARBON.showErrorDialog(jsi18n['invalid.address']);
+                           CARBON.showErrorDialog(data);
                        }
                    });
     }
