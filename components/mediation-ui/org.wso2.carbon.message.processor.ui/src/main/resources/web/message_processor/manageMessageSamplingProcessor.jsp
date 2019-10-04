@@ -89,18 +89,6 @@
             return false;
         }
 
-        if (!isNumber(form.store_connection_retry_interval)) {
-            CARBON.showWarningDialog('<fmt:message key="number.field.cannot.be.minus"/>')
-            form.client_retry_interval.focus();
-            return false;
-        }
-
-        if (!isMinusOne(form.store_connection_attempts) && !isNumber(form.store_connection_attempts)) {
-            CARBON.showWarningDialog('<fmt:message key="number.field.cannot.be.minus"/>')
-            form.client_retry_interval.focus();
-            return false;
-        }
-
         return true;
     }
 
@@ -157,10 +145,6 @@
         addServiceParameter("quartz.conf", document.getElementById('quartz_conf').value);
         addServiceParameter("cronExpression", document.getElementById('cron_expression').value);
         addServiceParameter("is.active", document.getElementById('mp_state').value);
-        addServiceParameter("max.store.connection.attempts", 
-                                    document.getElementById('store_connection_attempts').value);
-        addServiceParameter("store.connection.retry.interval", 
-                                    document.getElementById('store_connection_retry_interval').value);
     }
 
     function addServiceParameter(parameter, value) {
@@ -425,26 +409,6 @@
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("concurrency")!=null))?processorData.getParams().get("concurrency"):"1"%>"
                                 />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="store.connection.attempts"/></td>
-                        <td><input type="text" id="store_connection_attempts" name="store_connection_attempts"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams()
-                                        .get("max.store.connection.attempts")!=null))?processorData.getParams()
-                                        .get("max.store.connection.attempts"):"-1"%>"
-                                />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="store.connection.retry.interval"/></td>
-                        <td><input type="text" id="store_connection_retry_interval"
-                        name="store_connection_retry_interval"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams()
-                                        .get("store.connection.retry.interval")!=null))?processorData.getParams()
-                                        .get("store.connection.retry.interval"):"1000"%>"/>
                         </td>
                     </tr>
                     <tr>
