@@ -100,6 +100,9 @@ public class RESTBasicAuthHandler implements Handler {
     private boolean processSecurity(String credentials) {
 
         try {
+            if(credentials.startsWith("Basic ")) {
+        		credentials = credentials.replaceAll("Basic ", "");
+        	}
             String decodedCredentials = new String(new Base64().decode(credentials.getBytes()));
             String[] details = decodedCredentials.split(":");
             String username = details[0];
