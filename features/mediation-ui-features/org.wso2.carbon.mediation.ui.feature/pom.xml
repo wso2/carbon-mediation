@@ -73,10 +73,6 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.priority.executors.ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.priority.executors.stub</artifactId>
         </dependency>
         <dependency>
@@ -201,7 +197,6 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.message.processor.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.message.store.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.message.store.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.priority.executors.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.priority.executors.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.proxyadmin.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.proxyadmin.stub</bundleDef>
