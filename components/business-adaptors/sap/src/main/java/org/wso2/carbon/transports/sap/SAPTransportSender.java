@@ -87,10 +87,42 @@ public class SAPTransportSender extends AbstractTransportSender {
     public static final int SAP_DESTINATION_ERROR = 8001;
 
     /**
+     * Left angle bracket
+     */
+    public static final String LEFT_ANGLE_BRACKET = "<";
+
+    /**
+     * Right angle bracket
+     */
+    public static final String RIGHT_ANGLE_BRACKET = ">";
+
+    /**
+     * Forward slash
+     */
+    public static final String FORWARD_SLASH = "/";
+
+    /**
+     * Opening tag of the aggregated response when transactions are enabled
+     */
+    private static final String AGGREGATED_RESPONSE_OPENING_TAG = LEFT_ANGLE_BRACKET + "BAPI_TRANSACTION" +
+                                                                  RIGHT_ANGLE_BRACKET;
+
+    /**
+     * Closing tag of the aggregated response when transactions are enabled
+     */
+    private static final String AGGREGATED_RESPONSE_CLOSING_TAG = LEFT_ANGLE_BRACKET + FORWARD_SLASH +
+                                                                  "BAPI_TRANSACTION" + RIGHT_ANGLE_BRACKET;
+
+    /**
      * This property allows to sent the original SAP error message without handling at SAP implementation and throwing
      * as an AxisFault
      */
     private static final String SAP_ESCAPE_ERROR_HANDLING = "sap.escape.error.handling";
+
+    /**
+     * The 'WAIT' field name.
+     */
+    public static final String FIELD_NAME_WAIT = "WAIT";
 
     @Override
     public void init(ConfigurationContext cfgCtx, TransportOutDescription trpOut) throws AxisFault {
@@ -201,31 +233,37 @@ public class SAPTransportSender extends AbstractTransportSender {
                         log.debug("Looking up the BAPI/RFC function: " + rfcFunctionName
                                   + ". In the meta data repository");
                     }
-                    String responseXML;
+
+                    JCoFunction function = getRFCfunction(destination, rfcFunctionName);
+                    RFCMetaDataParser.processMetaDataDocument(payLoad, function);
+                    String bapiResponse = evaluateRFCfunction(function, destination, escapeErrorHandling);
+
                     if (isTransaction(messageContext)) {
-                        //call BAPI function
-                        JCoFunction function = getRFCfunction(destination, rfcFunctionName);
-                        RFCMetaDataParser.processMetaDataDocument(payLoad, function);
-                        responseXML = evaluateRFCfunction(function, destination, escapeErrorHandling);
                         //commit the transaction
                         JCoFunction commitFunction = getRFCfunction(destination, SAPConstants.BAPI_TRANSACTION_COMMIT);
-                        Object headers = messageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+                        Object headers = messageContext.getProperty(org.apache.axis2.context.
+                                                                            MessageContext.TRANSPORT_HEADERS);
                         Map headersMap = (Map) headers;
                         String waitValue = (String) headersMap.get(SAP_WAIT);
                         if (waitValue != null && !waitValue.isEmpty()) {
-                            RFCMetaDataParser.processFieldValue("WAIT", waitValue, commitFunction);
+                            RFCMetaDataParser.processFieldValue(FIELD_NAME_WAIT, waitValue, commitFunction);
                         }
-                        evaluateRFCfunction(commitFunction, destination, escapeErrorHandling);
-                        if (log.isDebugEnabled()){
-                            log.debug("Committed transaction. Function: " + rfcFunctionName);
-                        }
-                    } else {
-                        //this is not transaction just calling the BAPI function and get the result
-                        JCoFunction function = getRFCfunction(destination, rfcFunctionName);
-                        RFCMetaDataParser.processMetaDataDocument(payLoad, function);
-                        responseXML = evaluateRFCfunction(function, destination, escapeErrorHandling);
+
+                        String commitResponse = evaluateRFCfunction(commitFunction, destination, escapeErrorHandling);
+
+                        // create an aggregated response containing both the BAPI response and the commit response
+                        StringBuilder sb = new StringBuilder();
+
+                        sb.append(AGGREGATED_RESPONSE_OPENING_TAG);
+                        sb.append(bapiResponse).append(commitResponse);
+                        sb.append(AGGREGATED_RESPONSE_CLOSING_TAG);
+
+                        bapiResponse = sb.toString();
+                        log.info("Committed transaction.");
                     }
-                    processResponse(messageContext, responseXML);
+
+                    processResponse(messageContext, bapiResponse);
                 } catch (Exception e) {
                     log.error("Error while sending request", e);
                     if (isTransaction(messageContext)) {
@@ -348,19 +386,23 @@ public class SAPTransportSender extends AbstractTransportSender {
             throw new AxisFault("Cloud not execute the RFC function: " + function, e);
         }
 
-        JCoStructure returnStructure = null;
-        try {
-            returnStructure = function.getExportParameterList().getStructure("RETURN");
-        } catch (Exception ignore) {
-
-        }
         // there seems to be some error that we need to report: TODO ?
         //If property "sap.escape.error.handling" is defined and is true, the original SAP exceptions will
         // be sent without being handled and thrown as an AxisFault
-        if (escapeErrorHandling == null || "".equals(escapeErrorHandling) || "false".equals(escapeErrorHandling)) {
-            if (returnStructure != null && (!(returnStructure.getString("TYPE").equals("")
-                    || returnStructure.getString("TYPE").equals("S")))) {
-                throw new AxisFault(returnStructure.getString("MESSAGE"));
+        if (function.getExportParameterList() != null) {
+            JCoStructure returnStructure;
+            returnStructure = function.getExportParameterList().getStructure("RETURN");
+
+            if (returnStructure != null) {
+                String type = returnStructure.getString("TYPE");
+                String returnStructureStr = returnStructure.toXML();
+
+                if ("false".equals(escapeErrorHandling)) {
+                    if (!("S".equals(type) || "I".equals(type) || "W".equals(type) || "".equals(type))) {
+                        throw new AxisFault("Erroneous response while invoking the function: " + function.getName() +
+                                            ", of type" + type + " response: " + returnStructureStr);
+                    }
+                }
             }
         }
 
