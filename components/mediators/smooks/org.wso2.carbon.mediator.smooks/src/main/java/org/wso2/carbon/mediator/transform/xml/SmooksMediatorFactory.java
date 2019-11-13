@@ -68,9 +68,7 @@ public class SmooksMediatorFactory extends AbstractMediatorFactory {
         } else {
             smooks.setOutput(new Output());
         }
-
         addAllCommentChildrenToList(omElement, smooks.getCommentsList());
-
         return smooks;
     }
 

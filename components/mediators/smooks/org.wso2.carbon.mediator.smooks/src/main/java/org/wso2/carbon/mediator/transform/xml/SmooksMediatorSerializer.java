@@ -41,9 +41,7 @@ public class SmooksMediatorSerializer extends AbstractMediatorSerializer {
     
         smooks.addChild(createInput(smooksMediator.getInput()));
         smooks.addChild(createOutput(smooksMediator.getOutput()));
-
         serializeComments(smooks, smooksMediator.getCommentsList());
-
         return smooks;
     }
 

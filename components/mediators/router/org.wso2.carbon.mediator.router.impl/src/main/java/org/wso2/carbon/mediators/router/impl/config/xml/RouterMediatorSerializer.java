@@ -86,9 +86,7 @@ public class RouterMediatorSerializer extends AbstractMediatorSerializer {
 
             routerElem.addChild(routeElem);
         }
-
         serializeComments(routerElem, m.getCommentsList());
-
         return routerElem;
     }
 

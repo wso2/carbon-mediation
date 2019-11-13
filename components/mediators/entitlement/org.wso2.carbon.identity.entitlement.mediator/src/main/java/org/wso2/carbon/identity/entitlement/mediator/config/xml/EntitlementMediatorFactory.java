@@ -194,9 +194,7 @@ public class EntitlementMediatorFactory extends AbstractMediatorFactory {
                         adviceMediatorElement, properties));
             }
         }
-
         addAllCommentChildrenToList(element, mediator.getCommentsList());
-
         return mediator;
     }
 
