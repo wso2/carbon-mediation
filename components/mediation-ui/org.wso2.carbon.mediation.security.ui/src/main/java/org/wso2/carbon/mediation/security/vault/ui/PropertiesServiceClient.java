@@ -134,7 +134,7 @@ public class PropertiesServiceClient {
 
 		if (start >= 0 && bean.getSysProperties() != null && bean.getSysProperties().length > 0) {
 			int length =
-			             start > 0 ? ((bean.getSysProperties().length - start) - 1)
+			             start > 0 ? ((bean.getSysProperties().length - start))
 			                      : bean.getSysProperties().length;
 			if (length > itemPerPage) {
 				length = itemPerPage;
