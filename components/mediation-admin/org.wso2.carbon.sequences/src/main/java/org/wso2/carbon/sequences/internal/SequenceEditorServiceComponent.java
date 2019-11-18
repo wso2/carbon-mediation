@@ -77,6 +77,7 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
             bndCtx.registerService(SequenceDeployerService.class.getName(), new SequenceDeployerServiceImpl(), null);
             bndCtx.registerService(SequenceAdminService.class.getName(), new SequenceAdminService(), null);
+            bndCtx.registerService(SequenceAdmin.class.getName(), new SequenceAdmin(), null);
             SynapseEnvironmentService synEnvService = ConfigHolder.getInstance().getSynapseEnvironmentService
                     (MultitenantConstants.SUPER_TENANT_ID);
             registerDeployer(ConfigHolder.getInstance().getAxisConfiguration(), synEnvService.getSynapseEnvironment());

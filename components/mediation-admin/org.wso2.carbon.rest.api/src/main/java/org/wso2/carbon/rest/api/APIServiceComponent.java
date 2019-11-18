@@ -75,6 +75,7 @@ public class APIServiceComponent extends AbstractAxis2ConfigurationContextObserv
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
             bndCtx.registerService(RestAPIDeployerService.class.getName(), new RestAPIDeployerServiceImpl(), null);
             bndCtx.registerService(RestApiAdminService.class.getName(), new RestApiAdminService(), null);
+            bndCtx.registerService(RestApiAdmin.class.getName(), new RestApiAdmin(), null);
             SynapseEnvironmentService synEnvService = ConfigHolder.getInstance().getSynapseEnvironmentService
                     (MultitenantConstants.SUPER_TENANT_ID);
             registerDeployer(ConfigHolder.getInstance().getAxisConfiguration(), synEnvService.getSynapseEnvironment());
