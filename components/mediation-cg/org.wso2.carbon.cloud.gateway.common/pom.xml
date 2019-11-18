@@ -19,10 +19,10 @@
     <parent>
         <artifactId>cg</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.7.26-SNAPSHOT</version>
+        <version>4.7.26</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <version>4.7.26-SNAPSHOT</version>
+    <version>4.7.26</version>
     <artifactId>org.wso2.carbon.cloud.gateway.common</artifactId>
     <packaging>bundle</packaging>
     <name>Cloud Gateway common component</name>
