@@ -293,8 +293,8 @@
 
             var apiGroupsString = '';
             jQuery('.chkBox').each(function(index) {
-                if(this.checked) {
-                    apiGroupsString += this.value + ':';
+                if (this.checked) {
+                    apiGroupsString += this.value + ';';
                 }
             });
 

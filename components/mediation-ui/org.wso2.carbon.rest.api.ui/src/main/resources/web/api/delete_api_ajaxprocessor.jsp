@@ -31,7 +31,7 @@
     String[] apiGroups = null;
     String apiString = request.getParameter("apiGroupsString");
     if (apiString != null && !apiString.equalsIgnoreCase("")) {
-        apiGroups = apiString.split(":");
+        apiGroups = apiString.split(";");
     }
 
     String deleteAllApiGroups = request.getParameter("deleteAllApiGroups");
