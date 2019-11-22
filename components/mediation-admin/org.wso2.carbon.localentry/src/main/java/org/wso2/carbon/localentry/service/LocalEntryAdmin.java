@@ -169,50 +169,6 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
     }
 
     /**
-     * Check entry exist in the synapseConfiguration
-     *
-     * @param entryKey - Entry object to be added as an OMElement
-     * @return whether the local entry is exist
-     * @throws LocalEntryAdminException if there any error in check existence.
-     */
-    public boolean isEntryExist(String entryKey) throws LocalEntryAdminException {
-
-        final Lock lock = getLock();
-        try {
-            lock.lock();
-
-            assertKeyEmpty(entryKey);
-            log.debug("Checking localEntry Exists : " + entryKey);
-
-            return getSynapseConfiguration().getLocalRegistry().containsKey(entryKey);
-
-        } catch (LocalEntryAdminException e) {
-            throw e;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Check local entry exist in the synapseConfiguration
-     *
-     * @param entryKey     - Entry object to be added as an
-     * @param tenantDomain tenantDomain
-     * @return whether the local entry is exist
-     * @throws LocalEntryAdminException if there any error in check existence.
-     */
-    public boolean isEntryExistForTenant(String entryKey, String tenantDomain) throws LocalEntryAdminException {
-
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .setTenantDomain(tenantDomain, true);
-            return isEntryExist(entryKey);
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
-        }
-    }
-    /**
      * Add a entry into the synapseConfiguration
      *
      * @param ele - Entry object to be added as an OMElement
