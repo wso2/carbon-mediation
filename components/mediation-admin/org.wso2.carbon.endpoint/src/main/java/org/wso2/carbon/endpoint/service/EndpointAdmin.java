@@ -1056,4 +1056,47 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             log.error("Could not send EndpointSynchronizeRequest for tenant " + tenantId, e);
         }
     }
+
+    /**
+     * Check endpoint entry exist in the synapseConfiguration
+     *
+     * @param endpointName - endpoint name to be check exist
+     * @return true if the endpoint was exist
+     * @throws EndpointAdminException if there error when checking endpoint existence.
+     */
+    public boolean isEndpointExist(String endpointName) throws EndpointAdminException {
+
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            assertNameNotEmpty(endpointName);
+            log.debug("Check Endpoint Existence : " + endpointName + " in the configuration");
+            return getSynapseConfiguration().getLocalRegistry().containsKey(endpointName.trim());
+        } catch (SynapseException syne) {
+            handleFault("Unable to check existence ", syne);
+        } finally {
+            lock.unlock();
+        }
+        return false;
+    }
+    /**
+     * Check endpoint entry exist in the tenant synapseConfiguration
+     *
+     * @param endpointName     - Endpoint name to be checked
+     * @param tenantDomain tenantDomain
+     * @return whether the local entry is exist
+     * @throws EndpointAdminException if there any error in check existence.
+     */
+    public boolean isEndpointExistForTenant(String endpointName, String tenantDomain) throws EndpointAdminException {
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .setTenantDomain(tenantDomain, true);
+            return isEndpointExist(endpointName);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
 }
