@@ -16,6 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.readers;
 
+import au.com.bytecode.opencsv.CSVReader;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
@@ -30,6 +31,7 @@ import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -98,24 +100,24 @@ public class CSVInputReader implements InputReader {
             throw new ReaderException(
                     "Request csv data not found. The csv records should contain in a <text></text> tag.");
         }
-        String[] lines = csvContent.split("\\r?\\n");
 
         Map<String, Object> fieldMap;
         List<String> fieldNamesList;
+        CSVReader csvReader = new CSVReader(new StringReader(csvContent));
+        List<String[]> allData = csvReader.readAll();
 
-        if (lines.length > 0) {
+        if (!allData.isEmpty()) {
             /* Retrieve field names from the JSON schema */
             fieldMap = (Map<String, Object>) ((Map<String, Object>) ((ArrayList) jsonSchemaMap.get(ITEMS_KEY)).get(0))
                     .get(PROPERTIES_KEY);
             fieldNamesList = new ArrayList<>(fieldMap.keySet());
             jsonBuilder.writeStartArray();
 
-            for (String line : lines) {
+            for (String[] items : allData) {
                 jsonBuilder.writeStartObject();
-                String[] items = line.split(",");
                 for (int i = 0; i < items.length; i++) {
                     writeFieldElement(fieldNamesList.get(i), items[i],
-                            getElementTypeByName(fieldNamesList.get(i), fieldMap));
+                                      getElementTypeByName(fieldNamesList.get(i), fieldMap));
                 }
                 jsonBuilder.writeEndObject();
             }
