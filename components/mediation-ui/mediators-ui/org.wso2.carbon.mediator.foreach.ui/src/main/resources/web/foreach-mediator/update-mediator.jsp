@@ -16,13 +16,17 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
 --%>
- 
+
 <%@ page import="org.wso2.carbon.mediator.foreach.ForEachMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.SynapseJsonPathFactory" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 
 <%
+    final String JSON_EVAL_START_STRING = "json-eval(";
+    final String ITR_EXPRESSION_KEY = "itr_expression";
+    
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
 
     if (!(mediator instanceof ForEachMediator)) {
@@ -31,7 +35,17 @@
     ForEachMediator foreachMediator = (ForEachMediator) mediator;
 
     XPathFactory xPathFactory = XPathFactory.getInstance();
-    foreachMediator.setExpression(xPathFactory.createSynapseXPath("itr_expression", request, session));
+    SynapseJsonPathFactory jsonPathFactory = SynapseJsonPathFactory.getInstance();
+    
+    String iterateExpression = request.getParameter(ITR_EXPRESSION_KEY);
+    if (iterateExpression.startsWith(JSON_EVAL_START_STRING)) {
+        foreachMediator.setExpression(
+                jsonPathFactory.createSynapseJsonPath(ITR_EXPRESSION_KEY,
+                        iterateExpression.trim().substring(
+                                JSON_EVAL_START_STRING.length(), iterateExpression.length() - 1)));
+    } else {
+        foreachMediator.setExpression(xPathFactory.createSynapseXPath(ITR_EXPRESSION_KEY, iterateExpression, session));
+    }
 
     foreachMediator.setSequenceRef(null);
 
