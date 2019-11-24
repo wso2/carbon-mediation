@@ -26,7 +26,7 @@ import org.wso2.carbon.mediator.service.ui.Mediator;
 public class JSONTransformMediatorService extends AbstractMediatorService {
 
     public String getTagLocalName() {
-        return "transform";
+        return "jsontransform";
     }
 
     public String getDisplayName() {

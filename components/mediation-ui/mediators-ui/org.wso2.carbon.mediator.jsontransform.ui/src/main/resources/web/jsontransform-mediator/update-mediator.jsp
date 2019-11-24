@@ -14,11 +14,10 @@
   ~  See the License for the specific language governing permissions and
   ~  limitations under the License.
   --%>
-<%@ page import="org.wso2.carbon.mediator.log.LogMediator" %>
+<%@ page import="org.wso2.carbon.mediator.jsontransform.JSONTransformMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
-<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 <%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ page import="org.apache.synapse.util.xpath.SynapseJsonPath" %>
 <%@ page import="org.jaxen.JaxenException" %>
@@ -26,17 +25,13 @@
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     MediatorProperty meditorProp = null;
-    if (!(mediator instanceof LogMediator)) {
+    if (!(mediator instanceof JSONTransformMediator)) {
         // todo : proper error handling
         throw new RuntimeException("Unable to edit the mediator");
     }
-    LogMediator logMediator = (LogMediator) mediator;
-    logMediator.setSeparator(request.getParameter("mediator.log.log_separator"));
-    logMediator.setLogLevel(Integer.parseInt(request.getParameter("mediator.log.log_level")));
-    logMediator.setLogCategory(Integer.parseInt(request.getParameter("mediator.log.category")));
-    logMediator.getProperties().clear(); // to avoid duplicates
-
-    XPathFactory xPathFactory = XPathFactory.getInstance();
+    JSONTransformMediator jsonTransformMed = (JSONTransformMediator) mediator;
+    jsonTransformMed.getProperties().clear(); // to avoid duplicates
+    
     String propertyCountParameter = request.getParameter("propertyCount");
     if (propertyCountParameter != null && !"".equals(propertyCountParameter)) {
         int propertyCount = 0;
@@ -47,29 +42,16 @@
                 if (name != null && !"".equals(name)) {
                     String valueId = "propertyValue" + i;
                     String value = request.getParameter(valueId);
-                    String expression = request.getParameter("propertyTypeSelection" + i);
-                    boolean isExpression = expression != null && "expression".equals(expression.trim());
                     MediatorProperty mp = new MediatorProperty();
                     mp.setName(name.trim());
                     if (value != null) {
-                        if (isExpression) {
-                            if(value.trim().startsWith("json-eval(")) {
-                                SynapsePath jsonPath = new SynapseJsonPath(value.trim().substring(10, value.length() - 1));
-                                mp.setPathExpression(jsonPath);
-                            } else {
-                                mp.setExpression(xPathFactory.createSynapseXPath(valueId, value.trim(), session));
-                            }
-                        } else {
-                            mp.setValue(value.trim());
-                        }
+                        mp.setValue(value.trim());
                     }
-                    logMediator.addProperty(mp);
+                    jsonTransformMed.addProperty(mp);
                 }
             }
         } catch (NumberFormatException ignored) {
             throw new RuntimeException("Invalid number format");
-        } catch (JaxenException exception) {
-            throw new RuntimeException("Invalid Path Expression");
         }
     }
 %>

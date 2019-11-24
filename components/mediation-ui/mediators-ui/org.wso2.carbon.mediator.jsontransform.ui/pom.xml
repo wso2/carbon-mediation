@@ -40,10 +40,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Activator>org.wso2.carbon.mediator.log.JsonTransformMediatorActivator</Bundle-Activator>                        
+                        <Bundle-Activator>org.wso2.carbon.mediator.jsontransform.JSONTransformMediatorActivator</Bundle-Activator>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            org.wso2.carbon.mediator.log.*,
+                            org.wso2.carbon.mediator.jsontransform.*,
                             !javax.servlet,
                             !javax.servlet.http,
                         </Export-Package>
