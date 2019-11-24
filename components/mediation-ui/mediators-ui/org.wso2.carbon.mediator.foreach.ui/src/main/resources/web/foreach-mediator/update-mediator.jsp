@@ -40,8 +40,7 @@
     String iterateExpression = request.getParameter(ITR_EXPRESSION_KEY);
     if (iterateExpression.startsWith(JSON_EVAL_START_STRING)) {
         foreachMediator.setExpression(
-                jsonPathFactory.createSynapseJsonPath(ITR_EXPRESSION_KEY,
-                        iterateExpression.trim().substring(
+                jsonPathFactory.createSynapseJsonPath(ITR_EXPRESSION_KEY, iterateExpression.trim().substring(
                                 JSON_EVAL_START_STRING.length(), iterateExpression.length() - 1)));
     } else {
         foreachMediator.setExpression(xPathFactory.createSynapseXPath(ITR_EXPRESSION_KEY, iterateExpression, session));

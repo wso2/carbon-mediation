@@ -20,10 +20,10 @@ package org.wso2.carbon.mediator.header;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.OMElementUtils;
-import org.apache.synapse.config.xml.SynapseXPathFactory;
-import org.apache.synapse.config.xml.SynapseXPathSerializer;
+import org.apache.synapse.config.xml.SynapsePath;
+import org.apache.synapse.config.xml.SynapsePathFactory;
+import org.apache.synapse.config.xml.SynapsePathSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
@@ -47,7 +47,7 @@ public class HeaderMediator extends AbstractMediator {
     private String scope = null; 
     
     /** An expression which should be evaluated, and the result set as the header value */
-    private SynapseXPath expression = null;
+    private SynapsePath expression = null;
     // An XML content as a complex header.
     private OMElement xml;
 
@@ -83,11 +83,11 @@ public class HeaderMediator extends AbstractMediator {
         this.value = value;
     }
 
-    public SynapseXPath getExpression() {
+    public SynapsePath getExpression() {
         return expression;
     }
 
-    public void setExpression(SynapseXPath expression) {
+    public void setExpression(SynapsePath expression) {
         this.expression = expression;
     }
 
@@ -140,7 +140,7 @@ public class HeaderMediator extends AbstractMediator {
 
             } else if (getExpression() != null) {
 
-                SynapseXPathSerializer.serializeXPath(
+                SynapsePathSerializer.serializePath(
                     getExpression(), header, "expression");
 
             } else if (getXml() == null) {
@@ -228,7 +228,7 @@ public class HeaderMediator extends AbstractMediator {
 
         } else if (exprn != null && exprn.getAttributeValue() != null) {
             try {
-                setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN));
+                setExpression(SynapsePathFactory.getSynapsePath(elem, ATT_EXPRN));
             } catch (JaxenException je) {
                 // TODO error
             }
