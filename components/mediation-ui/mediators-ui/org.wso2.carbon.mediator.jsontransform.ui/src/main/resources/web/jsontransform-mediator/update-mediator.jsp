@@ -21,6 +21,8 @@
 <%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ page import="org.apache.synapse.util.xpath.SynapseJsonPath" %>
 <%@ page import="org.jaxen.JaxenException" %>
+<%@ page import="org.apache.synapse.mediators.Value" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
@@ -53,6 +55,12 @@
         } catch (NumberFormatException ignored) {
             throw new RuntimeException("Invalid number format");
         }
+    }
+    
+    String keyVal = request.getParameter("mediator.jsontransform.key.static_val");
+    if (keyVal != null && !StringUtils.isEmpty(keyVal)) {
+        Value staticKey = new Value(keyVal);
+        jsonTransformMed.setSchemaKey(staticKey);
     }
 %>
 

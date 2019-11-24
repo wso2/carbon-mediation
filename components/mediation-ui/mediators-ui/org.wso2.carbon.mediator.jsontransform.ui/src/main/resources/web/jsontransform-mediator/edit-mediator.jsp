@@ -19,8 +19,11 @@
 <%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.apache.synapse.mediators.Value" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+
+<jsp:include page="../resources/resources-i18n-ajaxprocessor.jsp"/>
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
@@ -31,6 +34,15 @@
     JSONTransformMediator jsonTransformMediator = (JSONTransformMediator) mediator;
     List<MediatorProperty> mediatorPropertyList = jsonTransformMediator.getProperties();
     String propertyTableStyle = mediatorPropertyList.isEmpty() ? "display:none;" : "";
+    
+    String keyVal = "";
+    Value key = jsonTransformMediator.getSchemaKey();
+    
+    if (key != null) {
+        if (key.getKeyValue() != null) {
+            keyVal = key.getKeyValue();
+        }
+    }
 %>
 
 <fmt:bundle basename="org.wso2.carbon.mediator.jsontransform.ui.i18n.Resources">
@@ -46,6 +58,30 @@
         <h2><fmt:message key="mediator.jsontransform.header"/></h2>
     </td>
 </tr>
+    <tr>
+        <td>
+            <table class="normal">
+                <tr id="mediator.xslt.key.static">
+                    <td><fmt:message key="mediator.jsontransform.key"/></td>
+                    <td>
+                        <input class="longInput" type="text" id="mediator.jsontransform.key.static_val"
+                               name="mediator.jsontransform.key.static_val"
+                               value="<%=keyVal%>" readonly="true"/>
+                    </td>
+                    <td>
+                        <a href="#registryBrowserLink"
+                           class="registry-picker-icon-link"
+                           onclick="showRegistryBrowser('mediator.jsontransform.key.static_val','/_system/config')"><fmt:message
+                                key="conf.registry.keys"/></a>
+                        <a href="#registryBrowserLink"
+                           class="registry-picker-icon-link"
+                           onclick="showRegistryBrowser('mediator.jsontransform.key.static_val','/_system/governance')"><fmt:message
+                                key="gov.registry.keys"/></a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 <tr>
     <td>
         <h3 class="mediator">
