@@ -115,8 +115,21 @@ function isContainRaw(tbody) {
     return false;
 }
 
+function isSchemaOrPropertiesPresent(configurationemptymsg) {
+    let nsCount = document.getElementById("propertyCount");
+    let i = nsCount.value;
+    let currentCount = parseInt(i);
+    let schemaVal = document.getElementById("mediator.jsontransform.key.static_val");
+    if (schemaVal.value === "" && currentCount === 0) {
+        CARBON.showWarningDialog(configurationemptymsg);
+        return false;
+    }
+    return true;
+}
 
 function jsontransformMediatorValidate() {
-    return isValidProperties(logi18n["mediator.jsontransform.property.name.empty"], logi18n["mediator.jsontransform.property.value.empty"]);
+    return isValidProperties(logi18n["mediator.jsontransform.property.name.empty"],
+        logi18n["mediator.jsontransform.property.value.empty"]) &&
+        isSchemaOrPropertiesPresent(logi18n["mediator.jsontransform.configuration.empty"]);
 }
 
