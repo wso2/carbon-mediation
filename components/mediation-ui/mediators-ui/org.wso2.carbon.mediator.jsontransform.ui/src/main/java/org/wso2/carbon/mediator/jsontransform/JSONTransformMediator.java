@@ -21,7 +21,6 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.ValueFactory;
 import org.apache.synapse.config.xml.ValueSerializer;
-import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.mediators.Value;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 import org.wso2.carbon.mediator.service.util.MediatorProperty;
@@ -30,6 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
 
+/**
+ * UI Implementation of JSON Transform mediator
+ */
 public class JSONTransformMediator extends AbstractMediator {
     /** The holder for the custom properties */
     private final List<MediatorProperty> properties = new ArrayList<>();

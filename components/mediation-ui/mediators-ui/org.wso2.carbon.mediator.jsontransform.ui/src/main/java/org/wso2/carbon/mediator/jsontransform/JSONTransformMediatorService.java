@@ -21,7 +21,7 @@ import org.wso2.carbon.mediator.service.AbstractMediatorService;
 import org.wso2.carbon.mediator.service.ui.Mediator;
 
 /**
- * 
+ * Service class for JSON Transform Mediator to provide local names and group names
  */
 public class JSONTransformMediatorService extends AbstractMediatorService {
 

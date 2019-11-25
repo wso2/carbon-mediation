@@ -24,7 +24,7 @@ import org.osgi.framework.BundleContext;
 import org.wso2.carbon.mediator.service.MediatorService;
 
 /**
- *
+ * Bundle activator class to activate JSON Transform mediator UI
  */
 public class JSONTransformMediatorActivator implements BundleActivator {
 
