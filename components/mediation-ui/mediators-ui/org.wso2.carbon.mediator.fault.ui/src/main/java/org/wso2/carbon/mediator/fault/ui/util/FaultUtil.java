@@ -141,11 +141,11 @@ public class FaultUtil {
                     /* if failed set it as an string */
                     faultMediator.setFaultDetail(faultDetail);
                 }
-            } else if ("expression".equals(faultDetailType)) {
-                XPathFactory xPathFactory = XPathFactory.getInstance();
-                faultMediator.setFaultDetailExpr(xPathFactory.createSynapseXPath("detail", request, session));
-                faultMediator.setFaultDetail(null);
             }
+        } else if ("expression".equals(faultDetailType)) {
+            XPathFactory xPathFactory = XPathFactory.getInstance();
+            faultMediator.setFaultDetailExpr(xPathFactory.createSynapseXPath("detail", request, session));
+            faultMediator.setFaultDetail(null);
         }
     }
 

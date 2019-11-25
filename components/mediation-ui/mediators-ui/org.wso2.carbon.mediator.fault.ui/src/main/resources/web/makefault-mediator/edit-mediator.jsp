@@ -294,7 +294,7 @@
                     faultMediator.getFaultDetailExpr().getRootExpr() != null &&
                     faultMediator.getFaultDetailExpr().getRootExpr().getText() != null) {
                 isNSEditorRequiredForDetail = true;
-                String detailXPathString = FaultUtil.repalceDoubleQuotation(faultMediator.getFaultDetailExpr().getRootExpr().getText());
+                String detailXPathString = FaultUtil.repalceDoubleQuotation(faultMediator.getFaultDetailExpr().toString());
                 //TODO: why do we need to set the expression as followings, the comment line
                 //FaultUtil.repalceDoubleQuotation(faultMediator.getFaultReasonExpr().getRootExpr().getText());
                 // setting the expression as below would be enough
