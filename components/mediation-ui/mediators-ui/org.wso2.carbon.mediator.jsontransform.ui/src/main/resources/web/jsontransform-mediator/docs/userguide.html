@@ -2,7 +2,7 @@
 <html>
 <head>
     <!--
-    ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+    ~ Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
     ~
     ~ Licensed under the Apache License, Version 2.0 (the "License");
     ~ you may not use this file except in compliance with the License.
@@ -17,64 +17,38 @@
     ~ limitations under the License.
     -->
     <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
-    <title>Log Mediator - User Guide</title>
+    <title>JSON Transform Mediator - User Guide</title>
     <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
 </head>
 
 <body>
-<h1>Log Mediator</h1>
+<h1>JSON Transform Mediator</h1>
 
 <p>
-    With the log mediator, you can log messages being mediated.
+    The JSON Transform mediator is used to manipulate JSON payload.
 </p>
 
-<img alt="Log Mediator" src="images/log_mediator_screenshot.jpg"/>
+<img alt="JSON Transform Mediator" src="images/json_transform_mediator_screenshot.jpg"/>
 
 <p>
-    <strong>Figure1: Log Mediator</strong>
+    <strong>Figure1: JSON Transform Mediator</strong>
 </p>
 
-<h2>Log Category</h2>
+<h2>Schema</h2>
 <p>
-    You can select the log category to be one of following values. Following log levels correspond to ESB service level logs.
-</p>
-<ul>
-	<li>TRACE - Designates fine-grained informational events than the DEBUG.</li>
-	<li>DEBUG - Designates fine-grained informational events that are most useful to debug an application.</li>
-	<li>INFO - Designates informational messages that highlight the progress of the application at coarse-grained level.</li>
-	<li>WARN - Designates potentially harmful situations.</li>
-	<li>ERROR - Designates error events that might still allow the application to continue running.</li>
-	<li>FATAL - Designates very severe error events that will presumably lead the application to abort.</li>
-</ul>
-<p>You can add or edit the /repository/conf/log4j.properties file to select the category you want to log per service. The default log category is INFO</p>
-<h2>Log Level</h2>
-
-<p>
-    You can select the log level to be one of following values.
-</p>
-<ul>
-    <li>Simple: To, From, WSAction, SOAPAction, ReplyTo, MessageID and any properties</li>
-    <li>Headers: All SOAP header blocks and any properties</li>
-    <li>Full: All attributes included in log level 'simple' and the SOAP envelope and any properties</li>
-    <li>Custom: Only properties specified to the Log mediator</li>
-</ul>
-
-<h2>Log Separator</h2>
-
-<p>
-    The log separator is used to separate the attributes being logged. The default separator is ',' (comma).
+    You can provide a JSON schema to modify the JSON payload. The schema has to be stored in the Registry or as a Local Entry.
 </p>
 
 <h2>Adding Properties</h2>
 
 <p>
-    You can add custom messages to log as the messages mediate thorough the log mediator.
+    You can add synapse properties to control the XML to JSON transformation.
 </p>
 
-<img alt="Log Mediator Properties" src="images/log_mediator_properties_screenshot.jpg"/>
+<img alt="JSON Transform Mediator Properties" src="images/json_transform_mediator_properties_screenshot.jpg"/>
 
 <p>
-    <strong>Figure2: Log Mediator Properties</strong>
+    <strong>Figure2: JSON Transform Mediator Properties</strong>
 </p>
 
 <ul>
@@ -82,31 +56,7 @@
         Property Name: Name for the property
     </li>
     <li>
-        Property Value: The type of the property value, possible candidates are Value/Expression
-        <ul>
-            <li>
-                Value - A static text message
-            </li>
-            <li>
-                Expression - An xpath expression executed on each mediating message
-            </li>
-        </ul>
-    </li>
-    <li>
-        Value: The text or an expression you want to log
-    </li>
-    <li>
-        NSEditor: You can click this link to add namespaces if you are providing an expression.
-        You will be provided another panel named 'Namespace Editor' where you can provide any
-        number of namespace prefixes and url that you have used in the xpath expression. Here is an
-        example of the use of namespaces in an expression.
-
-        <img alt="Log Mediator property expression with namespaces" src="images/namespaces_screenshot.jpg"/>
-
-        <p>
-            <strong>Figure2: Log Mediator Properties - Providing Expression with Namespaces</strong>
-        </p>
-
+        Value: The value for the property.
     </li>
     <li>
         Action: Delete the property
