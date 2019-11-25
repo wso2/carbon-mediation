@@ -90,7 +90,7 @@ function deleteproperty(i) {
         var parentTBody = propRow.parentNode;
         if (parentTBody != undefined && parentTBody != null) {
             parentTBody.removeChild(propRow);
-            if (!isContainRaw(parentTBody)) {
+            if (!containsRow(parentTBody)) {
                 var propertyTable = document.getElementById("propertytable");
                 propertyTable.style.display = "none";
             }
@@ -99,7 +99,7 @@ function deleteproperty(i) {
     });
 }
 
-function isContainRaw(tbody) {
+function containsRow(tbody) {
     if (tbody.childNodes == null || tbody.childNodes.length == 0) {
         return false;
     } else {
