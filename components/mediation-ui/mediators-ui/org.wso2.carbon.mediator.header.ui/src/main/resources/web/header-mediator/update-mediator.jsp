@@ -18,6 +18,7 @@
 <%@ page import="org.wso2.carbon.mediator.header.HeaderMediator" %>
 <%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.SynapseJsonPathFactory" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.QNameFactory" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 <%@ page import="javax.xml.namespace.QName" %>
@@ -31,6 +32,9 @@
 <%@ page import="org.wso2.carbon.mediator.header.HeaderMediatorHelper" %>
 
 <%
+    final String JSON_EVAL_START_STRING = "json-eval(";
+    final String EXPRESSION_KEY = "mediator.header.val_ex";
+    
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     SynapseXPath xpath = null;
     String name = null;
@@ -63,8 +67,16 @@
         headerMediator.setAction(HeaderMediator.ACTION_SET);
         String actionType = request.getParameter("mediator.header.actionType");
         if ("expression".equals(actionType)) {
+            String expression = request.getParameter(EXPRESSION_KEY);
             XPathFactory xPathFactory = XPathFactory.getInstance();
-            headerMediator.setExpression(xPathFactory.createSynapseXPath("mediator.header.val_ex", request, session));
+            SynapseJsonPathFactory jsonPathFactory = SynapseJsonPathFactory.getInstance();
+            if (expression.startsWith(JSON_EVAL_START_STRING)) {
+                headerMediator.setExpression(
+                        jsonPathFactory.createSynapseJsonPath(EXPRESSION_KEY, expression.trim().substring(
+                                        JSON_EVAL_START_STRING.length(), expression.length() - 1)));
+            } else {
+                headerMediator.setExpression(xPathFactory.createSynapseXPath(EXPRESSION_KEY, expression, session));
+            }
             headerMediator.setXml(null);//value and expression does not include inline xml definition
         } else if ("value".equals(actionType)) {
             headerMediator.setValue(request.getParameter("mediator.header.val_ex"));

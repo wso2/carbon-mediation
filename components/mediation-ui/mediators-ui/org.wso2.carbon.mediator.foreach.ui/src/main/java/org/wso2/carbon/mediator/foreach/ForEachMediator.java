@@ -20,10 +20,10 @@ package org.wso2.carbon.mediator.foreach;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.config.xml.SynapseXPathFactory;
-import org.apache.synapse.config.xml.SynapseXPathSerializer;
+import org.apache.synapse.config.xml.SynapsePath;
+import org.apache.synapse.config.xml.SynapsePathFactory;
+import org.apache.synapse.config.xml.SynapsePathSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
@@ -34,7 +34,7 @@ import java.util.List;
 
 public class ForEachMediator extends AbstractListMediator {
 
-    private SynapseXPath expression = null;
+    private SynapsePath expression = null;
 
     private String sequenceRef = null;
 
@@ -50,11 +50,11 @@ public class ForEachMediator extends AbstractListMediator {
         return TAG_NAME;
     }
 
-    public SynapseXPath getExpression() {
+    public SynapsePath getExpression() {
         return expression;
     }
 
-    public void setExpression(SynapseXPath expression) {
+    public void setExpression(SynapsePath expression) {
         this.expression = expression;
     }
 
@@ -71,7 +71,7 @@ public class ForEachMediator extends AbstractListMediator {
         saveTracingState(forEachElem, this);
 
         if (expression != null) {
-            SynapseXPathSerializer.serializeXPath(expression, forEachElem, "expression");
+            SynapsePathSerializer.serializePath(expression, forEachElem, "expression");
         } else {
             throw new MediatorException("Missing expression of the ForEach which is required.");
         }
@@ -109,7 +109,7 @@ public class ForEachMediator extends AbstractListMediator {
         OMAttribute expression = elem.getAttribute(ATT_EXPRN);
         if (expression != null) {
             try {
-                this.expression = SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN);
+                this.expression = SynapsePathFactory.getSynapsePath(elem, ATT_EXPRN);
             } catch (JaxenException e) {
                 throw new MediatorException("Unable to build the ForEach Mediator. " +
                         "Invalid XPath " +
