@@ -64,6 +64,10 @@ public class JMSConstants {
     /** Root element name of JMS Map message payload representation */
     public static final String JMS_MAP_ELEMENT_NAME = "JMSMap";
     public static final String SET_ROLLBACK_ONLY = "SET_ROLLBACK_ONLY";
+
+    //Constant to represent jmsSession.recover()
+    static final String SET_RECOVER = "SET_RECOVER";
+
     public static final QName JMS_MAP_QNAME = new QName(JMS_MAP_NS, JMS_MAP_ELEMENT_NAME, "");
     /**
      * Constant that holds the name of the environment property
