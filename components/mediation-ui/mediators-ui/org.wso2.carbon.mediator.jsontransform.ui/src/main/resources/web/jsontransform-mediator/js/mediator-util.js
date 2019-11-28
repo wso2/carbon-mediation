@@ -37,14 +37,14 @@ function addproperty(nameemptymsg, valueemptymsg) {
 
     var nameTD = document.createElement("td");
     nameTD.innerHTML = "<input type='text' name='propertyName" + i + "' id='propertyName" + i + "'" +
-                       " />";
+        " />";
 
     var valueTD = document.createElement("td");
     valueTD.innerHTML = "<input type='text' name='propertyValue" + i + "' id='propertyValue" + i + "'" +
-                        " class='esb-edit small_textbox' />";
+        " class='esb-edit small_textbox' />";
 
     var deleteTD = document.createElement("td");
-    deleteTD.innerHTML =  "<a href='#' class='delete-icon-link' onclick='deleteproperty(" + i + ");return false;'>" +
+    deleteTD.innerHTML = "<a href='#' class='delete-icon-link' onclick='deleteproperty(" + i + ");return false;'>" +
         logi18n["mediator.jsontransform.action.delete"] + "</a>";
 
     propertyRaw.appendChild(nameTD);
@@ -84,18 +84,23 @@ function isValidProperties(nameemptymsg, valueemptymsg) {
 }
 
 function deleteproperty(i) {
-    CARBON.showConfirmationDialog(logi18n["mediator.jsontransform.delete.confirm"],function(){
-    var propRow = document.getElementById("propertyRaw" + i);
-    if (propRow != undefined && propRow != null) {
-        var parentTBody = propRow.parentNode;
-        if (parentTBody != undefined && parentTBody != null) {
-            parentTBody.removeChild(propRow);
-            if (!containsRow(parentTBody)) {
-                var propertyTable = document.getElementById("propertytable");
-                propertyTable.style.display = "none";
+    CARBON.showConfirmationDialog(logi18n["mediator.jsontransform.delete.confirm"], function () {
+        var propRow = document.getElementById("propertyRaw" + i);
+        if (propRow != undefined && propRow != null) {
+            var parentTBody = propRow.parentNode;
+            if (parentTBody != undefined && parentTBody != null) {
+                parentTBody.removeChild(propRow);
+                if (!containsRow(parentTBody)) {
+                    var propertyTable = document.getElementById("propertytable");
+                    propertyTable.style.display = "none";
+                }
+                var propertyCount = document.getElementById("propertyCount");
+                var count = propertyCount.value;
+                var currentCount = parseInt(count);
+                currentCount = currentCount - 1;
+                propertyCount.value = currentCount;
             }
         }
-    }
     });
 }
 

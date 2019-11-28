@@ -46,99 +46,99 @@
 %>
 
 <fmt:bundle basename="org.wso2.carbon.mediator.jsontransform.ui.i18n.Resources">
- <carbon:jsi18n
+    <carbon:jsi18n
             resourceBundle="org.wso2.carbon.mediator.jsontransform.ui.i18n.JSResources"
             request="<%=request%>"
             i18nObjectName="logi18n"/>
-<div>
-<script type="text/javascript" src="../jsontransform-mediator/js/mediator-util.js"></script>
-<table class="normal" width="100%">
-<tr>
-    <td>
-        <h2><fmt:message key="mediator.jsontransform.header"/></h2>
-    </td>
-</tr>
-    <tr>
-        <td>
-            <table class="normal">
-                <tr id="mediator.xslt.key.static">
-                    <td><fmt:message key="mediator.jsontransform.key"/></td>
-                    <td>
-                        <input class="longInput" type="text" id="mediator.jsontransform.key.static_val"
-                               name="mediator.jsontransform.key.static_val"
-                               value="<%=keyVal%>" readonly="true"/>
-                    </td>
-                    <td>
-                        <a href="#registryBrowserLink"
-                           class="registry-picker-icon-link"
-                           onclick="showRegistryBrowser('mediator.jsontransform.key.static_val','/_system/config')"><fmt:message
-                                key="conf.registry.keys"/></a>
-                        <a href="#registryBrowserLink"
-                           class="registry-picker-icon-link"
-                           onclick="showRegistryBrowser('mediator.jsontransform.key.static_val','/_system/governance')"><fmt:message
-                                key="gov.registry.keys"/></a>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-<tr>
-    <td>
-        <h3 class="mediator">
-            <fmt:message key="mediator.jsontransform.properties"/></h3>
-
-        <div style="margin-top:0px;">
-
-            <table id="propertytable" style="<%=propertyTableStyle%>;" class="styledInner">
-                <thead>
-                    <tr>
-                        <th width="15%"><fmt:message key="mediator.jsontransform.propertyName"/></th>
-                        <th width="15%"><fmt:message key="mediator.jsontransform.propertyValue"/></th>
-                        <th><fmt:message key="mediator.jsontransform.action"/></th>
-                    </tr>
-                    <tbody id="propertytbody">
-                        <%
-                            int i = 0;
-                            for (MediatorProperty mp : mediatorPropertyList) {
-                                if (mp != null) {
-                                    String value = mp.getValue();
-                        %>
-                        <tr id="propertyRaw<%=i%>">
-                            <td><input type="text" name="propertyName<%=i%>" id="propertyName<%=i%>"
-                                       class="esb-edit small_textbox"
-                                       value="<%=mp.getName()%>"/>
+    <div>
+        <script type="text/javascript" src="../jsontransform-mediator/js/mediator-util.js"></script>
+        <table class="normal" width="100%">
+            <tr>
+                <td>
+                    <h2><fmt:message key="mediator.jsontransform.header"/></h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table class="normal">
+                        <tr id="mediator.jsontransform.key.static">
+                            <td><fmt:message key="mediator.jsontransform.key"/></td>
+                            <td>
+                                <input class="longInput" type="text" id="mediator.jsontransform.key.static_val"
+                                       name="mediator.jsontransform.key.static_val"
+                                       value="<%=keyVal%>" readonly="true"/>
                             </td>
                             <td>
-                                <input id="propertyValue<%=i%>" name="propertyValue<%=i%>" type="text"
-                                       value="<%=value%>"
-                                       class="esb-edit"/>
+                                <a href="#registryBrowserLink"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('mediator.jsontransform.key.static_val','/_system/config')"><fmt:message
+                                        key="conf.registry.keys"/></a>
+                                <a href="#registryBrowserLink"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('mediator.jsontransform.key.static_val','/_system/governance')"><fmt:message
+                                        key="gov.registry.keys"/></a>
                             </td>
-                            <td><a href="#" class="delete-icon-link" 
-                                   onclick="deleteproperty(<%=i%>);return false;"><fmt:message
-                                    key="mediator.jsontransform.delete"/></a></td>
                         </tr>
-                        <% }
-                            i++;
-                        } %>
-                        <input type="hidden" name="propertyCount" id="propertyCount" value="<%=i%>"/>
-                    </tbody>
-                </thead>
-            </table>
-        </div>
-    </td>
-</tr>
-<tr>
-    <td>
-        <div style="margin-top:10px;">
-            <a name="addNameLink"></a>
-            <a class="add-icon-link"
-               href="#addNameLink"
-               onclick="addproperty('<fmt:message key="mediator.jsontransform.propemptyerror"/>',
-                       '<fmt:message key="mediator.jsontransform.valueemptyerror"/>')"><fmt:message
-                    key="mediator.jsontransform.addProperty"/></a>
-        </div>
-    </td>
-</tr>
-</table>
-</div>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3 class="mediator">
+                        <fmt:message key="mediator.jsontransform.properties"/></h3>
+                    
+                    <div style="margin-top:0px;">
+                        
+                        <table id="propertytable" style="<%=propertyTableStyle%>;" class="styledInner">
+                            <thead>
+                            <tr>
+                                <th width="15%"><fmt:message key="mediator.jsontransform.propertyName"/></th>
+                                <th width="15%"><fmt:message key="mediator.jsontransform.propertyValue"/></th>
+                                <th><fmt:message key="mediator.jsontransform.action"/></th>
+                            </tr>
+                            <tbody id="propertytbody">
+                            <%
+                                int i = 0;
+                                for (MediatorProperty mp : mediatorPropertyList) {
+                                    if (mp != null) {
+                                        String value = mp.getValue();
+                            %>
+                            <tr id="propertyRaw<%=i%>">
+                                <td><input type="text" name="propertyName<%=i%>" id="propertyName<%=i%>"
+                                           class="esb-edit small_textbox"
+                                           value="<%=mp.getName()%>"/>
+                                </td>
+                                <td>
+                                    <input id="propertyValue<%=i%>" name="propertyValue<%=i%>" type="text"
+                                           value="<%=value%>"
+                                           class="esb-edit"/>
+                                </td>
+                                <td><a href="#" class="delete-icon-link"
+                                       onclick="deleteproperty(<%=i%>);return false;"><fmt:message
+                                        key="mediator.jsontransform.delete"/></a></td>
+                            </tr>
+                            <% }
+                                i++;
+                            } %>
+                            <input type="hidden" name="propertyCount" id="propertyCount" value="<%=i%>"/>
+                            </tbody>
+                            </thead>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="margin-top:10px;">
+                        <a name="addNameLink"></a>
+                        <a class="add-icon-link"
+                           href="#addNameLink"
+                           onclick="addproperty('<fmt:message key="mediator.jsontransform.propemptyerror"/>',
+                                   '<fmt:message key="mediator.jsontransform.valueemptyerror"/>')"><fmt:message
+                                key="mediator.jsontransform.addProperty"/></a>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 </fmt:bundle>
