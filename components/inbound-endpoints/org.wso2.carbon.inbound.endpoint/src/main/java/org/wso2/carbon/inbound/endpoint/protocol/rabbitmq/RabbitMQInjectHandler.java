@@ -141,6 +141,7 @@ public class RabbitMQInjectHandler {
             seq.setErrorHandler(onErrorSeq);
             msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, inboundName);
+            msgCtx.setProperty(SynapseConstants.ARTIFACT_NAME, SynapseConstants.FAIL_SAFE_MODE_INBOUND_ENDPOINT + inboundName);
             synapseEnvironment.injectInbound(msgCtx, seq, sequential);
         } else {
             log.error("Sequence: " + injectingSeq + " not found");
