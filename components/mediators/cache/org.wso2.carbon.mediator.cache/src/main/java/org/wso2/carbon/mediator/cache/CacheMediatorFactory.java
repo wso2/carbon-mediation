@@ -347,9 +347,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
         } else {
             handleException("The collector attribute must be specified");
         }
-
         addAllCommentChildrenToList(elem, cache.getCommentsList());
-
         return cache;
     }
 

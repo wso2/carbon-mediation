@@ -70,9 +70,7 @@ public class BamMediatorFactory extends AbstractMediatorFactory {
                 log.error(errorMsg, e);
             }
         }
-
         addAllCommentChildrenToList(omElement, bam.getCommentsList());
-
         return bam;
     }
 

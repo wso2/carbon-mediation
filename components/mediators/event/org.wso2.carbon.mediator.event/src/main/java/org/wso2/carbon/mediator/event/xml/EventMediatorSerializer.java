@@ -46,9 +46,7 @@ public class EventMediatorSerializer extends AbstractMediatorSerializer {
             SynapseXPathSerializer.serializeXPath(eventMediator.getExpression(),
                     eventElement, "expression");
         }
-
         serializeComments(eventElement, ((EventMediator)mediator).getCommentsList());
-
         return eventElement;
     }
 

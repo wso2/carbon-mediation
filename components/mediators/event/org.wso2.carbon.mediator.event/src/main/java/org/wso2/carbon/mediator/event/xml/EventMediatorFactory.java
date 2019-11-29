@@ -54,9 +54,7 @@ public class EventMediatorFactory extends AbstractMediatorFactory {
                 handleException("Error parsing the expression: " + expression.getAttributeValue());
             }
         }
-
         addAllCommentChildrenToList(element, event.getCommentsList());
-
         return event;
     }
 

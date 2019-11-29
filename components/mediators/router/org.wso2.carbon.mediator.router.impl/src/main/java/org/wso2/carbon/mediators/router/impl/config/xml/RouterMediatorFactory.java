@@ -115,9 +115,7 @@ public class RouterMediatorFactory extends AbstractMediatorFactory {
 
             m.addRoute(route);
         }
-
         addAllCommentChildrenToList(elem, m.getCommentsList());
-
         return m;
     }
 

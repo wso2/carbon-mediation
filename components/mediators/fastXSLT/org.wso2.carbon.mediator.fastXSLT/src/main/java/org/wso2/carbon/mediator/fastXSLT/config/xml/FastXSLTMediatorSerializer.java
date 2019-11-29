@@ -55,9 +55,7 @@ public class FastXSLTMediatorSerializer extends AbstractMediatorSerializer {
             handleException("Invalid FastXSLT mediator. XSLT registry key is required");
         }
         saveTracingState(fastXSLT,mediator);
-
         serializeComments(fastXSLT, mediator.getCommentsList());
-        
         return fastXSLT;
     }
 

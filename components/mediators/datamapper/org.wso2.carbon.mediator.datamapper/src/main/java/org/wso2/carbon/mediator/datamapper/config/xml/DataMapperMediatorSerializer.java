@@ -100,9 +100,7 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
                                                              dataMapperMediator.getOutputType()));
 
         saveTracingState(dataMapperElement, dataMapperMediator);
-
         serializeComments(dataMapperElement, dataMapperMediator.getCommentsList());
-
         return dataMapperElement;
     }
 

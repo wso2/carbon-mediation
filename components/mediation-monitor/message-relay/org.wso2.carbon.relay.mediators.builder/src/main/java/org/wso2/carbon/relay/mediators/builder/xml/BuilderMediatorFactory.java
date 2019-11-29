@@ -107,9 +107,7 @@ public class BuilderMediatorFactory extends AbstractMediatorFactory {
                 }
             }
         }
-
         addAllCommentChildrenToList(omElement, builderMediator.getCommentsList());
-
         return builderMediator;
     }
 }

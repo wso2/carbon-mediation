@@ -76,9 +76,7 @@ public class FastXSLTMediatorFactory extends AbstractMediatorFactory {
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(transformMediator, elem);
-
         addAllCommentChildrenToList(elem, transformMediator.getCommentsList());
-
         return transformMediator;
     }
 }
