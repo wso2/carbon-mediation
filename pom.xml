@@ -2398,22 +2398,22 @@
         <carbon.kernel.imp.pkg.version>[4.5.3, 4.6.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.7.18</carbon.commons.version>
+        <carbon.commons.version>4.7.19</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.7.0, 5.0.0)</carbon.commons.imp.pkg.version>
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.9.14</carbon.deployment.version>
+        <carbon.deployment.version>4.9.15</carbon.deployment.version>
         <carbon.deployment.imp.pkg.version>[4.9.0, 5.0.0)</carbon.deployment.imp.pkg.version>
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.7.20</carbon.registry.version>
+        <carbon.registry.version>4.7.24</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.7.0, 5.0.0)</carbon.registry.imp.pkg.version>
         <!-- Analytic Commons version-->
-        <carbon.analytics.common.version>5.2.17</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.2.18</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.2.0, 6.0.0)</carbon.analytics.common.imp.pkg.version>
         <!-- carbon.identity.framework.version-->
         <carbon.identity.framework.version>5.15.17</carbon.identity.framework.version>
         <carbon.identity.imp.pkg.version>[5.14.0, 6.0.0)</carbon.identity.imp.pkg.version>
         <!-- Carbon Rule version -->
-        <carbon.rule.version>4.5.5</carbon.rule.version>
+        <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
         <synapse.version>2.1.7-wso2v139</synapse.version>
