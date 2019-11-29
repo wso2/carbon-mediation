@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class KAFKAMessageListener extends AbstractKafkaMessageListener {
 
     public KAFKAMessageListener(int threadCount, List<String> topics,
-                                Properties kafkaProperties, InjectHandler injectHandler)
+            Properties kafkaProperties, InjectHandler injectHandler)
             throws Exception {
         this.threadCount = threadCount;
         this.topics = topics;
