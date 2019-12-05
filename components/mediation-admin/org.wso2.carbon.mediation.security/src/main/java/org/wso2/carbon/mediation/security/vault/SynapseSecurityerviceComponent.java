@@ -29,7 +29,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.base.api.ServerConfigurationService;
-import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 
 @Component(
         name = "mediation.security",
@@ -51,7 +52,11 @@ public class SynapseSecurityerviceComponent {
         BundleContext bundleCtx = ctxt.getBundleContext();
         bundleCtx.registerService(MediationSecurityAdminService.class.getName(), new MediationSecurityAdminService(),
                 null);
-        SecureVaultLookupHandlerImpl.getDefaultSecurityService();
+        try {
+            SecureVaultLookupHandlerImpl.getDefaultSecurityService();
+        } catch (RegistryException e) {
+            log.error("Error while activating secure vault registry component", e);
+        }
     }
 
     @Deactivate
@@ -61,24 +66,24 @@ public class SynapseSecurityerviceComponent {
 
     @Reference(
             name = "registry.service",
-            service = org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService.class,
+            service = org.wso2.carbon.registry.core.service.RegistryService.class,
             cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC,
             unbind = "unsetRegistryService")
-    protected void setRegistryService(SynapseConfigurationService regService) {
+    protected void setRegistryService(RegistryService regService) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Registry bound to the ESB initialization process");
+            log.debug("RegistryService bound to the ESB initialization process");
         }
-        SecurityServiceHolder.getInstance().setRegistry(regService.getSynapseConfiguration().getRegistry());
+        SecurityServiceHolder.getInstance().setRegistryService(regService);
     }
 
-    protected void unsetRegistryService(SynapseConfigurationService regService) {
+    protected void unsetRegistryService(RegistryService regService) {
 
         if (log.isDebugEnabled()) {
             log.debug("RegistryService unbound from the ESB environment");
         }
-        SecurityServiceHolder.getInstance().setRegistry(null);
+        SecurityServiceHolder.getInstance().setRegistryService(null);
     }
 
     @Reference(

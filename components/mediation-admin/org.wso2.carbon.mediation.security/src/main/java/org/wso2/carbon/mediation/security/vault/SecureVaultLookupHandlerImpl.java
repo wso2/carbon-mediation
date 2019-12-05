@@ -23,9 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.registry.Registry;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.registry.core.session.UserRegistry;
 
 public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 
@@ -35,43 +36,71 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 
 	private ServerConfigurationService serverConfigService;
 
-	private Registry registry;
+	private RegistryService registryService;
+
+	UserRegistry registry = null;
 	
 	Object decryptlockObj = new Object();
 
-	private SecureVaultLookupHandlerImpl(ServerConfigurationService serverConfigurationService, Registry registry) {
+	private SecureVaultLookupHandlerImpl(ServerConfigurationService serverConfigurationService,
+										 RegistryService registryService) throws RegistryException {
 		this.serverConfigService = serverConfigurationService;
-		this.registry = registry;
-		init();
+		this.registryService = registryService;
+		try {
+			init();
+		} catch (RegistryException e) {
+			throw new RegistryException("Error while initializing the registry", e);
+		}
 	}
 
-	public static SecureVaultLookupHandlerImpl getDefaultSecurityService() {
+	public static SecureVaultLookupHandlerImpl getDefaultSecurityService() throws RegistryException {
 		return getDefaultSecurityService(SecurityServiceHolder.getInstance().getServerConfigurationService(),
-		                                 SecurityServiceHolder.getInstance().getRegistry());
+		                                 SecurityServiceHolder.getInstance().getRegistryService());
 	}
 
 	private static SecureVaultLookupHandlerImpl getDefaultSecurityService(
-			ServerConfigurationService serverConfigurationService, Registry registry) {
+			ServerConfigurationService serverConfigurationService, RegistryService registryService) throws RegistryException {
 		if (instance == null) {
-			instance = new SecureVaultLookupHandlerImpl(serverConfigurationService, registry);
+			instance = new SecureVaultLookupHandlerImpl(serverConfigurationService, registryService);
 		}
 		return instance;
 	}
 
-	private void init() {
-		// creating vault-specific storage repository (this happens only if resource not existing)
-		initRegistryRepo();
+	private void init() throws RegistryException {
+		try {
+			registry = registryService.getConfigSystemRegistry();
+			// creating vault-specific storage repository (this happens only if resource not existing)
+			initRegistryRepo();
+		} catch (RegistryException e) {
+			throw new RegistryException("Error while initializing the registry", e);
+		}
 	}
 
 	/**
 	 * Initializing the repository which requires to store the secure vault
 	 * cipher text
 	 */
-	private void initRegistryRepo() {
-		 //	Here, the secure vault resource is created, if it does not exist in the registry.
-		if (!registry.isResourceExists(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY)) {
-			registry.newResource(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY, true);
+	private void initRegistryRepo() throws RegistryException {
+		if (!isRepoExists()) {
+			org.wso2.carbon.registry.core.Collection secureVaultCollection =
+					registry.newCollection();
+			registry.put(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY,
+					secureVaultCollection);
 		}
+	}
+
+	/**
+	 * Checks whether the given repository already existing.
+	 *
+	 * @return
+	 */
+	protected boolean isRepoExists() {
+		try {
+			registry.get(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY);
+		} catch (RegistryException e) {
+			return false;
+		}
+		return true;
 	}
 
 	public String getProviderClass() {
