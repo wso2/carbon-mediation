@@ -312,7 +312,10 @@ public class JMSPollingConsumer {
                             }
                         } else {
                             // Need to recover the session to tell broker to send back messages on same session
-                            jmsConnectionFactory.recoverSession(session, false);
+                            // recoverSession method is used only in non transacted session
+                            if (!jmsConnectionFactory.isTransactedSession()) {
+                                jmsConnectionFactory.recoverSession(session, false);
+                            }
 
                             // Need to create a new consumer and session since
                             // we need to rollback the message
