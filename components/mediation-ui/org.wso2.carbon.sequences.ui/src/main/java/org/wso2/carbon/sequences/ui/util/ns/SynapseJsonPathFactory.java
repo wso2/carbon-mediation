@@ -32,6 +32,8 @@ public class SynapseJsonPathFactory {
 
     private final static SynapseJsonPathFactory instance = new SynapseJsonPathFactory();
 
+    private final static String JSON_EVAL = "json-eval(";
+
     private SynapseJsonPathFactory() {
         super();
     }
@@ -55,7 +57,12 @@ public class SynapseJsonPathFactory {
             if (!assertIDNotEmpty(id) || !assertSourceNotEmpty(source)) {
                 return null;
             }
-            SynapseJsonPath jsonPath = new SynapseJsonPath(source.trim());
+            String expression = source.trim();
+            if (expression.startsWith(JSON_EVAL)) {
+                int expLength = expression.length();
+                expression = expression.substring(JSON_EVAL.length(), expLength - 1);
+            }
+            SynapseJsonPath jsonPath = new SynapseJsonPath(expression);
             return jsonPath;
         } catch (JaxenException e) {
             String msg = "Error creating a JsonPath from text : " + source;

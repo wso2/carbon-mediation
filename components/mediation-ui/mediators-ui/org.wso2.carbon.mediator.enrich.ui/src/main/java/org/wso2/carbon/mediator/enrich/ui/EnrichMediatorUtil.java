@@ -74,10 +74,9 @@ public class EnrichMediatorUtil {
                     EnrichUIConstants.SOURCE_EXPRESSION_ID : EnrichUIConstants.TARGET_EXPRESSION_ID;
 
             if (type.equals("custom")) {
-                if (expressionId.startsWith(EnrichUIConstants.JSON_PATH)) {
-                    String extractedExp = extractJsonPathExpression(expressionId);
+                if (expression.startsWith(EnrichUIConstants.JSON_PATH)) {
                     SynapseJsonPathFactory synapseJsonPathFactory = SynapseJsonPathFactory.getInstance();
-                    synapsePath = synapseJsonPathFactory.createSynapseJsonPath(expressionId, extractedExp);
+                    synapsePath = synapseJsonPathFactory.createSynapseJsonPath(expressionId, expression);
                 } else {
                     XPathFactory xPathFactory = XPathFactory.getInstance();
                     synapsePath = xPathFactory.createSynapseXPath(expressionId, expression, session);
@@ -96,16 +95,4 @@ public class EnrichMediatorUtil {
             }
         }
     }
-
-    /**
-     * given an expression like json-eval($.person.name) this method will extract the $.person.name
-     *
-     * @param expression json-eval expression
-     * @return extracted string
-     */
-    private static String extractJsonPathExpression(String expression) {
-        int expLength = expression.length();
-        return expression.substring(EnrichUIConstants.JSON_PATH.length(), expLength - 1);
-    }
-
 }

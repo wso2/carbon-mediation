@@ -89,20 +89,25 @@
 //    aggregateMediator.setMinMessagesToComplete(-1);
 //}
 
+    String JSON_EVAL = "json-eval(";
 
     if (!aggregate_expr.equals("")) {
-        if (aggregate_expr.startsWith("json-eval(")) {
+        if (aggregate_expr.startsWith(JSON_EVAL)) {
             aggregateMediator.setAggregationExpression(synapsePathFactory.createSynapseJsonPath("aggregate_expr", request));
         } else {
             aggregateMediator.setAggregationExpression(xPathFactory.createSynapseXPath("aggregate_expr", request, session));
         }
     }
-       
-      if(!correlate_exp.equals("")){
+
+    if (!correlate_exp.isEmpty()) {
+        if (correlate_exp.startsWith(JSON_EVAL)) {
+            aggregateMediator.setCorrelateExpression(synapsePathFactory.createSynapseJsonPath("correlate_expr", request));
+        } else {
             aggregateMediator.setCorrelateExpression(xPathFactory.createSynapseXPath("correlate_expr", request, session));
-      } else {
-            aggregateMediator.setCorrelateExpression(null);
-      }
+        }
+    } else {
+        aggregateMediator.setCorrelateExpression(null);
+    }
       
       if (request.getParameter("mediator.aggregate.id") != null && 
     				  !request.getParameter("mediator.aggregate.id").trim().
