@@ -4,7 +4,7 @@ public interface SecureVaultConstants {
 	public static final String SYSTEM_CONFIG_CONNECTOR_SECURE_VAULT_CONFIG =
 	                                                                         "/_system/config/repository/components/secure-vault";
 	public static final String CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY =
-	                                                                      "conf:/repository/components/secure-vault";
+	                                                                      "/repository/components/secure-vault";
 	public static final String CARBON_HOME = "carbon.home";
 	public static final String SECRET_CONF = "secret-conf.properties";
 	public static final String CONF_LOCATION = "conf.location";
