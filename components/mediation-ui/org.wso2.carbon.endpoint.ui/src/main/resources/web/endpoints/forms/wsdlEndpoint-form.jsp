@@ -19,6 +19,7 @@
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.apache.synapse.config.xml.endpoints.TemplateFactory" %>
 <%@ page import="org.apache.synapse.endpoints.Template" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.endpoint.ui.client.EndpointAdminClient" %>
 <%@ page import="org.wso2.carbon.endpoint.ui.endpoints.ListEndpoint" %>
@@ -210,7 +211,7 @@
         }
         // Inline WSDL
         if (endpoint.getUri() != null) {
-            wsdlURI = endpoint.getUri();
+            wsdlURI = Encode.forHtml(endpoint.getUri());
         }
 
         // Service
