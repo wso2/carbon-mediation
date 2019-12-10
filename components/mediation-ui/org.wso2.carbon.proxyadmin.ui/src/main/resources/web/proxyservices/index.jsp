@@ -213,7 +213,7 @@
     String epOptions = "<option name=\"None\" value=\"None\">" + bundle.getString("select.ep.none") + "</option>";
     if (definedEPs != null && definedEPs.length > 0) {
         for (String definedEP : definedEPs) {
-            epOptions += "<option name=\"" + definedEP + "\" value=\"" + definedEP + "\">" + Encode.forHtmlContent(definedEP) + "</option>";
+            epOptions += "<option name=\"" + Encode.forHtmlAttribute(definedEP) + "\" value=\"" + Encode.forHtmlAttribute(definedEP) + "\">" + Encode.forHtmlContent(definedEP) + "</option>";
         }
     }
 
@@ -236,7 +236,7 @@
     String seqOptions = "";
     if (definedSeqs != null) {
         for (String definedSeq : definedSeqs) {
-            seqOptions += "<option name=\"" + definedSeq + "\" value=\"" + definedSeq + "\">" + Encode.forHtmlContent(definedSeq) + "</option>";
+            seqOptions += "<option name=\"" + Encode.forHtmlAttribute(definedSeq) + "\" value=\"" + Encode.forHtmlAttribute(definedSeq) + "\">" + Encode.forHtmlContent(definedSeq) + "</option>";
         }
     }
 
