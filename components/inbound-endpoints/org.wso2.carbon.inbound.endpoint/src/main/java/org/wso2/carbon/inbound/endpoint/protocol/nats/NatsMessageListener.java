@@ -1,10 +1,6 @@
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
-import io.nats.client.Nats;
-import io.nats.client.Connection;
-import io.nats.client.Options;
-import io.nats.client.Message;
-import io.nats.client.Subscription;
+import io.nats.client.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +16,6 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
 
 public class NatsMessageListener {
     private static final Log log = LogFactory.getLog(NatsMessageListener.class.getName());
@@ -88,28 +83,15 @@ public class NatsMessageListener {
     }
 
     public void consumeMessage(String sequenceName) throws InterruptedException {
-        //            CountDownLatch latch = new CountDownLatch(1);
-        //            Dispatcher dispatcher = connection.createDispatcher((message) -> {
-        //            log.info("Message Received to NATS Inbound EP: " + new String(message.getData(), StandardCharsets.UTF_8));
-        //            injectHandler.invoke(message, sequenceName);
-        //            if (message.getReplyTo() != null) {
-        //                String reply = natsProperties.getProperty(NatsConstants.REPLY);
-        //                connection.publish(message.getReplyTo(), (reply == null ? "" : reply).getBytes());
-        //            }
-        //            latch.countDown();
-        //            });
-        //            dispatcher.subscribe(subject);
-        //            latch.await();
-        // todo create the github issue to use sync message consuming
-        // todo if exception close connection and set null
         Subscription subscription = connection.subscribe(subject);
-        Message message = subscription.nextMessage(Duration.ZERO);
-        injectHandler.invoke(message, sequenceName);
-        log.info("Message Received to NATS Inbound EP: " + new String(message.getData(), StandardCharsets.UTF_8));
-        if (message.getReplyTo() != null) {
+        Message natsMessage = subscription.nextMessage(Duration.ZERO);
+        String message = new String(natsMessage.getData(), StandardCharsets.UTF_8);
+        log.info("Message Received to NATS Inbound EP: " + message);
+        if (natsMessage.getReplyTo() != null) {
             String reply = natsProperties.getProperty(NatsConstants.REPLY);
-            connection.publish(message.getReplyTo(), (reply == null ? "" : reply).getBytes());
+            connection.publish(natsMessage.getReplyTo(), (reply == null ? "" : reply).getBytes());
         }
+        injectHandler.invoke(message.getBytes(), sequenceName);
     }
 
     /**

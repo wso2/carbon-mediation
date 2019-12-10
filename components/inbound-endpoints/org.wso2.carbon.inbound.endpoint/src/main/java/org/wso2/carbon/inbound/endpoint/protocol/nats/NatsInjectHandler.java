@@ -22,7 +22,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 public class NatsInjectHandler {
     private static final Log log = LogFactory.getLog(NatsInjectHandler.class);

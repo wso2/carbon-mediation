@@ -38,7 +38,7 @@ public class NatsPollingConsumer {
             long currentTime = (new Date()).getTime();
             if (lastRanTime == null || ((lastRanTime + (scanInterval)) <= currentTime)) {
                 lastRanTime = currentTime;
-                poll(); // todo handle all Exceptions here
+                poll();
             } else {
                 printDebugLog("Skip cycle since concurrent rate is higher than the scan interval : NATS Inbound EP ");
             }
