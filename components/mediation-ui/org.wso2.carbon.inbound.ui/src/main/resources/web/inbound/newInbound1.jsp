@@ -18,6 +18,7 @@
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants"%>
 <%@page import="java.util.List"%>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -84,7 +85,7 @@ var kafkaSpecialParameters = null;
                         <td style="width:150px"><fmt:message key="inbound.name"/></td>
                         <td align="left">
                             <%=request.getParameter("inboundName")%>      
-                            <input name="inboundName" id="inboundName" type="hidden" value="<%=request.getParameter("inboundName")%>"/>                      
+                            <input name="inboundName" id="inboundName" type="hidden" value="<%=Encode.forHtmlAttribute(request.getParameter("inboundName"))%>"/>                      
                         </td>
                         <td></td>
                     </tr>
@@ -100,7 +101,7 @@ var kafkaSpecialParameters = null;
                                     isMBbased = true;
                                 }
                             %>
-                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundTypeValue%>"/>
+                            <input name="inboundType" id="inboundType" type="hidden" value="<%=Encode.forHtmlAttribute(inboundTypeValue)%>"/>
                         </td>
                         <td></td>
                     </tr>

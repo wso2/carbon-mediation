@@ -24,6 +24,7 @@
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1" %>
+<%@ page import="org.owasp.encoder.Encode" %>         
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"
            prefix="carbon" %>
@@ -41,7 +42,7 @@
             String classImpl = null;
             String protocol = null;
             if ((request.getParameter("inboundClass") == null || request.getParameter("inboundClass").equals(""))) {
-                protocol = request.getParameter("inboundType");
+                protocol = Encode.forHtml(request.getParameter("inboundType"));
             } else {
                 classImpl = request.getParameter("inboundClass");
             }
@@ -138,7 +139,7 @@
                     sParams.add(new ParamDTO(keyString, strVal));
                 }
             }
-            boolean added = client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"), request.getParameter("inboundErrorSequence"), protocol, classImpl, request.getParameter("inboundSuspend"), sParams);
+            boolean added = client.addInboundEndpoint(Encode.forHtml(request.getParameter("inboundName")), request.getParameter("inboundSequence"), request.getParameter("inboundErrorSequence"), protocol, classImpl, request.getParameter("inboundSuspend"), sParams);
             if (!added) {
     %>
     <script type="text/javascript">
