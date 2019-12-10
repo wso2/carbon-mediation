@@ -493,8 +493,8 @@
     }
 
     function showHidePublishWsdlOptionsOnLoad() {
-        var publishWsdl = '<%=publishWsdl%>';
-        var preservePolicy = '<%=preservePolicyOption%>';
+        var publishWsdl = '<%=Encode.forJavaScriptBlock(publishWsdl)%>';
+        var preservePolicy = '<%=Encode.forJavaScriptBlock(preservePolicyOption)%>';
         if (publishWsdl == 'none') {
             getElement('publishWsdlCombo').selectedIndex = 0;
             showHidePublishWsdlOptions();
@@ -537,7 +537,7 @@
     }
 
     function setSelectedForPreservePolicy() {
-       var preservePolicy = '<%=preservePolicyOption%>';
+       var preservePolicy = '<%=Encode.forJavaScriptBlock(preservePolicyOption)%>';
     	if (preservePolicy == 'true') {
    		getElement('preservePolicy').selectedIndex = 0;
     	} else if (preservePolicy == 'false') {
