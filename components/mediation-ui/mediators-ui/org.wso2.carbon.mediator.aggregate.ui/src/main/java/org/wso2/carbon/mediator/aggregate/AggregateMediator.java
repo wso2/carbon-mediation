@@ -64,7 +64,7 @@ public class AggregateMediator extends AbstractListMediator {
     private Value minMessagesToComplete;
     private Value maxMessagesToComplete;
 
-    private SynapseXPath correlateExpression = null;
+    private SynapsePath correlateExpression = null;
     private SynapsePath aggregationExpression = null;
 
     private String onCompleteSequenceRef = null;
@@ -104,11 +104,11 @@ public class AggregateMediator extends AbstractListMediator {
         this.completionTimeoutSec = completionTimeoutSec;
     }
 
-    public SynapseXPath getCorrelateExpression() {
+    public SynapsePath getCorrelateExpression() {
         return correlateExpression;
     }
 
-    public void setCorrelateExpression(SynapseXPath correlateExpression) {
+    public void setCorrelateExpression(SynapsePath correlateExpression) {
         this.correlateExpression = correlateExpression;
     }
 
@@ -146,7 +146,7 @@ public class AggregateMediator extends AbstractListMediator {
 
         if (correlateExpression != null) {
             OMElement corelateOn = fac.createOMElement("correlateOn", synNS);
-            SynapseXPathSerializer.serializeXPath(
+            SynapsePathSerializer.serializePath(
                 correlateExpression, corelateOn, "expression");
             aggregator.addChild(corelateOn);
         }
@@ -210,7 +210,7 @@ public class AggregateMediator extends AbstractListMediator {
             if (corelateExpr != null) {
                 try {
                     correlateExpression =
-                        SynapseXPathFactory.getSynapseXPath(corelateOn, EXPRESSION_Q);
+                        SynapsePathFactory.getSynapsePath(corelateOn, EXPRESSION_Q);
                 } catch (JaxenException e) {
                     throw new MediatorException("Unable to load the corelate XPATH expression");
                 }
