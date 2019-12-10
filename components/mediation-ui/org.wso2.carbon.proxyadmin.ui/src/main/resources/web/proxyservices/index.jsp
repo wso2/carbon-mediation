@@ -1205,7 +1205,7 @@
         </div>
         <input id="psName" name="psName" type="hidden" value="<%=Encode.forHtmlAttribute(name)%>">
         <input name="proxy.secured" type="hidden" value="<%=securityEnabled%>"/>
-        <input name="proxy.policies" type="hidden" value="<%=policyKeys%>" />
+        <input name="proxy.policies" type="hidden" value="<%=Encode.forHtmlAttribute(policyKeys)%>" />
     </td>
 </tr>
 <tr>
