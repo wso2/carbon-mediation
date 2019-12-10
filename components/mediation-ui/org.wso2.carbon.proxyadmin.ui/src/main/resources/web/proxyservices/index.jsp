@@ -155,7 +155,9 @@
         proxyTransports = pd.getTransports();
         if (proxyTransports != null && proxyTransports.length > 0 && proxyTransports[0] != null) {
             for (String proxyTransport : proxyTransports) {
-                tbody += "<tr><td>" + proxyTransport + "</td><td><input name=\"" + proxyTransport + "\" type=\"checkbox\" value=\"" + proxyTransport + "\" checked/></td></tr>";
+                tbody += "<tr><td>" + Encode.forHtmlContent(proxyTransport) + "</td>" +
+                            "<td><input name=\"" + Encode.forHtmlAttribute(proxyTransport) + "\" type=\"checkbox\" " +
+                                        "value=\"" + Encode.forHtmlAttribute(proxyTransport) + "\" checked/></td></tr>";
             }
         }
     }
@@ -167,9 +169,10 @@
                 }
             } else {
                 // selects http/https ransports since no transport is specified in the proxy service
-                tbody += "<tr><td>" + tp + "</td><td><input name=\"" + tp + "\" type=\"checkbox\" value=\"" + tp + "\"";
+                tbody += "<tr><td>" + Encode.forHtmlContent(tp) + "</td><td><input name=\"" +
+                            Encode.forHtmlAttribute(tp) + "\" type=\"checkbox\" value=\"" +Encode.forHtmlAttribute(tp) + "\"";
                         if(tp.startsWith("http")) {
-                            tbody += "checked";
+                            tbody += " checked";
                         }
                 tbody += "/></td></tr>";
             }
@@ -210,7 +213,7 @@
     String epOptions = "<option name=\"None\" value=\"None\">" + bundle.getString("select.ep.none") + "</option>";
     if (definedEPs != null && definedEPs.length > 0) {
         for (String definedEP : definedEPs) {
-            epOptions += "<option name=\"" + definedEP + "\" value=\"" + definedEP + "\">" + definedEP + "</option>";
+            epOptions += "<option name=\"" + definedEP + "\" value=\"" + definedEP + "\">" + Encode.forHtmlContent(definedEP) + "</option>";
         }
     }
 
@@ -233,7 +236,7 @@
     String seqOptions = "";
     if (definedSeqs != null) {
         for (String definedSeq : definedSeqs) {
-            seqOptions += "<option name=\"" + definedSeq + "\" value=\"" + definedSeq + "\">" + definedSeq + "</option>";
+            seqOptions += "<option name=\"" + definedSeq + "\" value=\"" + definedSeq + "\">" + Encode.forHtmlContent(definedSeq) + "</option>";
         }
     }
 
@@ -297,10 +300,10 @@
     Entry[] entries;
     String givenParams = "";
     if (pd != null && (entries = pd.getServiceParams()) != null && entries.length > 0 && entries[0] != null) {
-        givenParams = entries[0].getKey() + "#" + entries[0].getValue().replace("\n","");
+        givenParams = Encode.forHtmlContent(entries[0].getKey()) + "#" + Encode.forHtmlContent(entries[0].getValue().replace("\n",""));
         for (int i = 1; i < entries.length; i++) {
             if (entries[i] != null) {
-                givenParams += "::" + entries[i].getKey() + "#" + entries[i].getValue().replace("\n","");
+                givenParams += "::" + Encode.forHtmlContent(entries[i].getKey()) + "#" + Encode.forHtmlContent(entries[i].getValue().replace("\n",""));
             }
         }
     }
@@ -313,9 +316,9 @@
     String pinnedServers = "";
     String [] servers;
     if (pd != null && (servers = pd.getPinnedServers()) != null && servers.length > 0 && servers[0] != null) {
-        pinnedServers = servers[0];
+        pinnedServers = Encode.forHtmlAttribute(servers[0]);
         for (int i = 1; i < servers.length; i++) {
-            pinnedServers += "," + servers[i];
+            pinnedServers += "," + Encode.forHtmlAttribute(servers[i]);
         }
     }
 
@@ -412,9 +415,9 @@
     Entry[] resources;
     String givenWsdlResources = "";
     if (pd != null && (resources = pd.getWsdlResources()) != null && resources.length > 0 && resources[0] != null) {
-        givenWsdlResources = resources[0].getKey() + "," + resources[0].getValue();
+        givenWsdlResources = Encode.forHtmlContent(resources[0].getKey()) + "," + Encode.forHtmlContent(resources[0].getValue());
         for (int i = 1; i < resources.length; i++) {
-            givenWsdlResources += "::" + resources[i].getKey() + "," + resources[i].getValue();
+            givenWsdlResources += "::" + Encode.forHtmlContent(resources[i].getKey()) + "," + Encode.forHtmlContent(resources[i].getValue());
         }
         givenWsdlResources = givenWsdlResources.replaceAll("\\\\", "\\\\\\\\" );
         givenWsdlResources = givenWsdlResources.replaceAll("'","\\\\'");
@@ -497,7 +500,7 @@
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'inline') {
             getElement('publishWsdlCombo').selectedIndex = 1;
-            var text = '<%=wsdlText%>';
+            var text = '<%=Encode.forHtmlContent(wsdlText)%>';
             text = text.replace(/^<br>/,"");
             text = text.replace(/<br>/g,"\r\n");
             getElement('wsdlInlineText').value = text;
@@ -505,17 +508,17 @@
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'reg') {
             getElement('publishWsdlCombo').selectedIndex = 3;
-            getElement('wsdlRegText').value = '<%=wsdlText%>';
+            getElement('wsdlRegText').value = '<%=Encode.forHtmlContent(wsdlText)%>';
             setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'uri') {
             getElement('publishWsdlCombo').selectedIndex = 2;
-            getElement('wsdlUriText').value = '<%=wsdlText%>';
+            getElement('wsdlUriText').value = '<%=Encode.forHtmlContent(wsdlText)%>';
             setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'ep') {
             getElement('publishWsdlCombo').selectedIndex = 4;
-            getElement('wsdlEPText').value = '<%=wsdlText%>';
+            getElement('wsdlEPText').value = '<%=Encode.forHtmlContent(wsdlText)%>';
             setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         }
@@ -1177,7 +1180,7 @@
                 </td>
                 <td align="left">
                     <% if (!nameDisabled) { %>
-                    <input id="psName" name="psName" type="text" value="<%=name%>" onchange="changePSN()"  onkeypress="return validateProxyNameText(event)"/>
+                    <input id="psName" name="psName" type="text" value="<%=Encode.forHtmlAttribute(name)%>" onchange="changePSN()"  onkeypress="return validateProxyNameText(event)"/>
                     <% } else { %>
                         <strong><%=Encode.forHtmlContent(name)%></strong>
                     <% } %>
@@ -1568,7 +1571,7 @@
                                             <tr>
                                                 <td class="nopadding">
                                                     <input type="text" name="proxy.in.registry"
-                                                           id="proxy.in.registry" value="<%=inRegKey%>"
+                                                           id="proxy.in.registry" value="<%=Encode.forHtmlAttribute(inRegKey)%>"
                                                            style="width:300px"
                                                            readonly="readonly"/>
                                                 </td>
@@ -1662,7 +1665,7 @@
                                             <tr>
                                                 <td class="nopadding">
                                                     <input type="text" name="proxy.epr.registry"
-                                                           id="proxy.epr.registry" value="<%=eprRegKey%>"
+                                                           id="proxy.epr.registry" value="<%=Encode.forHtmlAttribute(eprRegKey)%>"
                                                            style="width:300px"
                                                            readonly="readonly" />
                                                 </td>
@@ -1759,7 +1762,7 @@
                                             <tr>
                                                 <td class="nopadding">
                                                     <input type="text" name="proxy.out.registry"
-                                                           id="proxy.out.registry" value="<%=outRegkey%>"
+                                                           id="proxy.out.registry" value="<%=Encode.forHtmlAttribute(outRegkey)%>"
                                                            style="width:300px"
                                                            readonly="readonly"/>
                                                 </td>
@@ -1850,7 +1853,7 @@
                                             <tr>
                                                 <td class="nopadding">
                                                     <input type="text" name="proxy.fault.registry"
-                                                           id="proxy.fault.registry" value="<%=faultRegKey%>"
+                                                           id="proxy.fault.registry" value="<%=Encode.forHtmlAttribute(faultRegKey)%>"
                                                            style="width:300px"
                                                            readonly="readonly"/>
                                                 </td>
