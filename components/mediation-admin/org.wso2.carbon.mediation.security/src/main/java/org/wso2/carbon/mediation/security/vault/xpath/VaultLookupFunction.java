@@ -27,8 +27,10 @@ import org.jaxen.Context;
 import org.jaxen.Function;
 import org.jaxen.FunctionCallException;
 import org.jaxen.function.StringFunction;
+import org.wso2.carbon.mediation.security.vault.SecretSrcData;
 import org.wso2.carbon.mediation.security.vault.SecureVaultLookupHandler;
 import org.wso2.carbon.mediation.security.vault.SecureVaultLookupHandlerImpl;
+import org.wso2.carbon.mediation.security.vault.VaultType;
 
 /**
  * Implements the XPath extension function synapse:vault-lookup(scope,prop-name)
@@ -79,8 +81,7 @@ public class VaultLookupFunction implements Function {
 		SecureVaultLookupHandler mediationSecurity;
 		try {
 			mediationSecurity = SecureVaultLookupHandlerImpl.getDefaultSecurityService();
-			String val = mediationSecurity.evaluate(argOne, synCtx);
-			return val;
+			return mediationSecurity.evaluate(argOne, getSecretSourceInfo(args), synCtx);
 		} catch (Exception msg) {
 			throw new FunctionCallException(msg);
 		}
@@ -94,6 +95,20 @@ public class VaultLookupFunction implements Function {
 		if (log.isDebugEnabled()) {
 			log.debug(msg);
 		}
+	}
+
+	private SecretSrcData getSecretSourceInfo (List args) {
+		if (args.size() == 3) {
+			String secretType = args.get(1).toString();
+			boolean isEncrypted = Boolean.parseBoolean(args.get(2).toString());
+
+			if (VaultType.DOCKER.toString().equalsIgnoreCase(secretType)) {
+				return new SecretSrcData(VaultType.DOCKER, isEncrypted);
+			} else if (VaultType.FILE.toString().equalsIgnoreCase(secretType)) {
+				return new SecretSrcData(VaultType.FILE, isEncrypted);
+			}
+		}
+		return new SecretSrcData();
 	}
 
 }
