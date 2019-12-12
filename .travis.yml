@@ -24,3 +24,9 @@ jdk:
 cache:
   directories:
   - $HOME/.m2
+
+before_install:
+  - wget https://archive.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
+  - tar xzvf apache-maven-3.6.0-bin.tar.gz
+  - export PATH=`pwd`/apache-maven-3.6.0/bin:$PATH
+  - mvn -v
