@@ -15,8 +15,11 @@
 language: java
 install: true
 
+before_script:
+  - mvn -N io.takari:maven:wrapper -Dmaven=3.6.0
+
 # Using -q Quiet output which only show errors, to overcome TravisCI log limit issue
-script: mvn clean install -fae -B -q -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+script: ./mvnw clean install -fae -B -q -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 jdk:
   - openjdk8
@@ -24,9 +27,3 @@ jdk:
 cache:
   directories:
   - $HOME/.m2
-
-before_install:
-  - wget https://archive.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
-  - tar xzvf apache-maven-3.6.0-bin.tar.gz
-  - export PATH=`pwd`/apache-maven-3.6.0/bin:$PATH
-  - mvn -v
