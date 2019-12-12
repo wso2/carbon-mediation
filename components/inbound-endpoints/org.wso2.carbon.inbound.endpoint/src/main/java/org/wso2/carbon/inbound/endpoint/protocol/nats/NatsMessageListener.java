@@ -1,6 +1,10 @@
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
-import io.nats.client.*;
+import io.nats.client.Connection;
+import io.nats.client.Options;
+import io.nats.client.Nats;
+import io.nats.client.Subscription;
+import io.nats.client.Message;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,7 +16,12 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.KeyManagementException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Properties;
@@ -83,7 +92,13 @@ public class NatsMessageListener {
     }
 
     public void consumeMessage(String sequenceName) throws InterruptedException {
-        Subscription subscription = connection.subscribe(subject);
+        Subscription subscription;
+        String queueGroup = natsProperties.getProperty(NatsConstants.QUEUE_GROUP);
+        if (StringUtils.isEmpty(queueGroup)) {
+           subscription = connection.subscribe(subject, queueGroup);
+        } else {
+            subscription = connection.subscribe(subject);
+        }
         Message natsMessage = subscription.nextMessage(Duration.ZERO);
         String message = new String(natsMessage.getData(), StandardCharsets.UTF_8);
         log.info("Message Received to NATS Inbound EP: " + message);

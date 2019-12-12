@@ -5,6 +5,7 @@ public class NatsConstants {
     private NatsConstants(){}
 
     public static final String SUBJECT = "subject";
+    public static final String QUEUE_GROUP = "queue.group";
     public static final String REPLY = "reply";
     public static final String BUFFER_SIZE = "buffer.size";
     public static final String TURN_ON_ADVANCED_STATS = "turn.on.advanced.stats";

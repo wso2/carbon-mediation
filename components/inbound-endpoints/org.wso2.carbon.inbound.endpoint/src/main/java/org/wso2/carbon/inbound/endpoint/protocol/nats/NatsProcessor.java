@@ -9,6 +9,7 @@ import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
+
 import java.util.Properties;
 
 public class NatsProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver, InboundTaskProcessor {
