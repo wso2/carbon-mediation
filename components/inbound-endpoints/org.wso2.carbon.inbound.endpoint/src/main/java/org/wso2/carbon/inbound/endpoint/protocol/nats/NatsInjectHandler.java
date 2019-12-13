@@ -1,5 +1,6 @@
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
+import io.nats.client.Connection;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.builder.Builder;
@@ -15,6 +16,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundEndpoint;
+import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -45,7 +47,7 @@ public class NatsInjectHandler {
      * Determine the message builder to use, set the message payload to the message context and
      * inject the message to the sequence
      */
-    public boolean invoke(Object object, String name) throws SynapseException {
+    public boolean invoke(Object object, String name, String replyTo, Connection connection) throws SynapseException {
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
             msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, name);
@@ -55,6 +57,11 @@ public class NatsInjectHandler {
             printDebugLog("Processed NATS Message.");
             MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                     .getAxis2MessageContext();
+
+            if (replyTo != null) {
+                msgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, new NatsReplySender(replyTo, connection));
+            }
+
             // Determine the message builder to use
             Builder builder;
             if (contentType == null) {

@@ -94,7 +94,7 @@ public class NatsMessageListener {
     public void consumeMessage(String sequenceName) throws InterruptedException {
         Subscription subscription;
         String queueGroup = natsProperties.getProperty(NatsConstants.QUEUE_GROUP);
-        if (StringUtils.isEmpty(queueGroup)) {
+        if (StringUtils.isNotEmpty(queueGroup)) {
            subscription = connection.subscribe(subject, queueGroup);
         } else {
             subscription = connection.subscribe(subject);
@@ -102,11 +102,7 @@ public class NatsMessageListener {
         Message natsMessage = subscription.nextMessage(Duration.ZERO);
         String message = new String(natsMessage.getData(), StandardCharsets.UTF_8);
         log.info("Message Received to NATS Inbound EP: " + message);
-        if (natsMessage.getReplyTo() != null) {
-            String reply = natsProperties.getProperty(NatsConstants.REPLY);
-            connection.publish(natsMessage.getReplyTo(), (reply == null ? "" : reply).getBytes());
-        }
-        injectHandler.invoke(message.getBytes(), sequenceName);
+        injectHandler.invoke(message.getBytes(), sequenceName, natsMessage.getReplyTo(), connection);
     }
 
     /**
