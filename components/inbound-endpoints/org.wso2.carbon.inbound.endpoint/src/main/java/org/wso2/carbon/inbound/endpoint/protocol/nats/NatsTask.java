@@ -9,31 +9,41 @@ import java.util.Properties;
 
 public class NatsTask extends InboundTask {
 
-    private static final Log logger = LogFactory.getLog(NatsTask.class.getName());
-
+    private static final Log log = LogFactory.getLog(NatsTask.class.getName());
     private NatsPollingConsumer natsPollingConsumer;
 
     NatsTask(NatsPollingConsumer natsPollingConsumer, long interval) {
-        logger.debug("Initializing.");
+        printDebugLog("Initializing.");
         this.natsPollingConsumer = natsPollingConsumer;
         this.interval = interval;
     }
 
     public void init(SynapseEnvironment se) {
-        logger.debug("Initializing.");
+        printDebugLog("Initializing.");
     }
 
     public void destroy() {
-        logger.debug("Destroying.");
+        printDebugLog("Destroying.");
     }
 
     public void taskExecute() {
-        logger.debug("Executing.");
+        printDebugLog("Executing.");
         natsPollingConsumer.execute();
     }
 
     @Override
     public Properties getInboundProperties() {
         return natsPollingConsumer.getInboundProperties();
+    }
+
+    /**
+     * Check if debug is enabled for logging.
+     *
+     * @param text log text
+     */
+    private void printDebugLog(String text) {
+        if (log.isDebugEnabled()) {
+            log.debug(text);
+        }
     }
 }

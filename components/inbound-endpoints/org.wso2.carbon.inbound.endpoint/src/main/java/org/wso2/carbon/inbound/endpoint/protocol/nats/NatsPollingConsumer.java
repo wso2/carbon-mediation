@@ -13,7 +13,7 @@ public class NatsPollingConsumer {
 
     private NatsInjectHandler injectHandler;
     private Properties natsProperties;
-    private NatsMessageListener messageListener;
+    private NatsMessageListener natsMessageListener;
     private String subject;
     private long scanInterval;
     private Long lastRanTime;
@@ -28,7 +28,7 @@ public class NatsPollingConsumer {
 
     void initializeMessageListener() {
         printDebugLog("Create the NATS message listener.");
-        messageListener = new NatsMessageListener(subject, injectHandler, natsProperties);
+        natsMessageListener = new CoreListener(subject, injectHandler, natsProperties);
     }
 
     public void execute() {
@@ -47,16 +47,16 @@ public class NatsPollingConsumer {
             log.error("An error occured while connecting to NATS server. " + e);
         } catch (InterruptedException e) {
             log.error("An error occurred while consuming the message. " + e);
-            messageListener.closeConnection();
+            natsMessageListener.closeConnection();
         } catch (Exception e) {
             log.error("Error while retrieving or injecting NATS message. " + e.getMessage(), e);
-            messageListener.closeConnection();
+            natsMessageListener.closeConnection();
         }
     }
 
     public Object poll() throws IOException, InterruptedException {
-        if (messageListener.createConnection() && injectHandler != null) {
-            messageListener.consumeMessage(name);
+        if (natsMessageListener.createConnection() && injectHandler != null) {
+            natsMessageListener.consumeMessage(name);
         }
         return null;
     }
