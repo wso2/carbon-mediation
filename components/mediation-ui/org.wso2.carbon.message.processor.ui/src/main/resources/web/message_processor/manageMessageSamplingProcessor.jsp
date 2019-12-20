@@ -126,6 +126,21 @@
         return false;
     }
 
+    function isNumber(aTextField) {
+        if (aTextField.value.trim() >= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function isMinusOne(aTextField) {
+        if (aTextField.value.trim() == -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     function submitTextContent(value) {
     	if(validateSubmit()){
