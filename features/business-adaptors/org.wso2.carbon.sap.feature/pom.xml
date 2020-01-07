@@ -51,25 +51,8 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>released-version</id>
-                                <goals>
-                                    <goal>released-version</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
             <properties>
-                <org.wso2.carbon.transports.sap.import.version>${releasedVersion.version}
-                </org.wso2.carbon.transports.sap.import.version>
+                <org.wso2.carbon.transports.sap.import.version>RELEASE</org.wso2.carbon.transports.sap.import.version>
             </properties>
         </profile>
     </profiles>
