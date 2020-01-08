@@ -31,7 +31,6 @@
     <url>http://wso2.org</url>
     <modules>
         <module>org.wso2.carbon.hl7.feature</module>
-        <module>org.wso2.carbon.sap.feature</module>
     </modules>
 </project>
 
