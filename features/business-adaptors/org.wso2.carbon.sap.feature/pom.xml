@@ -31,59 +31,76 @@
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for sap</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.transports.sap</artifactId>
-        </dependency>
-    </dependencies>
-
     <profiles>
         <profile>
             <id>jenkins</id>
-            <properties>
-                <org.wso2.carbon.transports.sap.import.version>${carbon.mediation.version}
-                </org.wso2.carbon.transports.sap.import.version>
-            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wso2.carbon.mediation</groupId>
+                    <artifactId>org.wso2.carbon.transports.sap</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.wso2.maven</groupId>
+                        <artifactId>carbon-p2-plugin</artifactId>
+                        <version>${carbon.p2.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>4-p2-feature-generation</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>p2-feature-gen</goal>
+                                </goals>
+
+                                <configuration>
+                                    <bundles>
+                                        <bundleDef>
+                                            org.wso2.carbon.mediation:org.wso2.carbon.transports.sap:${carbon.mediation.version}
+                                        </bundleDef>
+                                    </bundles>
+                                    <id>org.wso2.carbon.transports.sap</id>
+                                    <propertiesFile>../../etc/feature.properties</propertiesFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <org.wso2.carbon.transports.sap.import.version>RELEASE</org.wso2.carbon.transports.sap.import.version>
-            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.wso2.maven</groupId>
+                        <artifactId>carbon-p2-plugin</artifactId>
+                        <version>${carbon.p2.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>4-p2-feature-generation</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>p2-feature-gen</goal>
+                                </goals>
+
+                                <configuration>
+                                    <bundles>
+                                        <!-- We are not adding the feature here, since its not getting build
+                                        in the default profile -->
+                                    </bundles>
+                                    <id>org.wso2.carbon.transports.sap</id>
+                                    <propertiesFile>../../etc/feature.properties</propertiesFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.wso2.maven</groupId>
-                <artifactId>carbon-p2-plugin</artifactId>
-                <version>${carbon.p2.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>4-p2-feature-generation</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>p2-feature-gen</goal>
-                        </goals>
-
-                        <configuration>
-                            <bundles>
-                                <bundleDef>
-                                    org.wso2.carbon.mediation:org.wso2.carbon.transports.sap:${org.wso2.carbon.transports.sap.import.version}
-                                </bundleDef>
-                            </bundles>
-                            <id>org.wso2.carbon.transports.sap</id>
-                            <propertiesFile>../../etc/feature.properties</propertiesFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>
