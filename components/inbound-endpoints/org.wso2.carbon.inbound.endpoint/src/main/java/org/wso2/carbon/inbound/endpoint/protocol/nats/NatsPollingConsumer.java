@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.TimeoutException;
 
 public class NatsPollingConsumer {
 
@@ -28,6 +29,10 @@ public class NatsPollingConsumer {
 
     void initializeMessageListener() {
         printDebugLog("Create the NATS message listener.");
+        if (Boolean.parseBoolean(natsProperties.getProperty(NatsConstants.NATS_STREAMING))) {
+            natsMessageListener = new StreamingListener(subject, injectHandler, natsProperties);
+            return;
+        }
         natsMessageListener = new CoreListener(subject, injectHandler, natsProperties);
     }
 
@@ -43,10 +48,8 @@ public class NatsPollingConsumer {
                 printDebugLog("Skip cycle since concurrent rate is higher than the scan interval : NATS Inbound EP ");
             }
             printDebugLog("End : NATS Inbound EP : ");
-        } catch (IOException e) {
-            log.error("An error occured while connecting to NATS server. " + e);
-        } catch (InterruptedException e) {
-            log.error("An error occurred while consuming the message. " + e);
+        } catch (IOException | InterruptedException e) {
+            log.error("An error occurred while connecting to NATS server or consuming the message. " + e);
             natsMessageListener.closeConnection();
         } catch (Exception e) {
             log.error("Error while retrieving or injecting NATS message. " + e.getMessage(), e);
@@ -54,7 +57,7 @@ public class NatsPollingConsumer {
         }
     }
 
-    public Object poll() throws IOException, InterruptedException {
+    public Object poll() throws IOException, InterruptedException, TimeoutException {
         if (natsMessageListener.createConnection() && injectHandler != null) {
             natsMessageListener.consumeMessage(name);
         }

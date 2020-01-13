@@ -5,6 +5,7 @@ import io.nats.client.Options;
 import io.nats.client.Nats;
 import io.nats.client.Subscription;
 import io.nats.client.Message;
+import net.minidev.json.JSONUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,54 +42,52 @@ public class CoreListener implements NatsMessageListener {
 
     @Override public boolean createConnection() throws IOException, InterruptedException {
         if (connection == null) {
-            String bufferSize = natsProperties.getProperty(NatsConstants.BUFFER_SIZE);
-            String turnOnAdvancedStats = natsProperties.getProperty(NatsConstants.TURN_ON_ADVANCED_STATS);
-            String traceConnection = natsProperties.getProperty(NatsConstants.TRACE_CONNECTION);
-            String tlsProtocol = validateParameter(natsProperties.getProperty(NatsConstants.TLS_PROTOCOL));
-            String tlsKeyStoreType = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_TYPE));
-            String tlsKeyStoreLocation = validateParameter(
-                    natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_LOCATION));
-            String tlsKeyStorePassword = validateParameter(
-                    natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_PASSWORD));
-            String tlsTrustStoreType = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_TYPE));
-            String tlsTrustStoreLocation = validateParameter(
-                    natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_LOCATION));
-            String tlsTrustStorePassword = validateParameter(
-                    natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_PASSWORD));
-            String tlsKeyManagerAlgorithm = validateParameter(
-                    natsProperties.getProperty(NatsConstants.TLS_KEY_MANAGER_ALGORITHM));
-            String tlsTrustManagerAlgorithm = validateParameter(
-                    natsProperties.getProperty(NatsConstants.TLS_TRUST_MANAGER_ALGORITHM));
-
-            Options.Builder builder = new Options.Builder(natsProperties);
-
-            if (StringUtils.isNotEmpty(bufferSize)) {
-                builder.bufferSize(Integer.parseInt(bufferSize));
-            }
-
-            if (Boolean.parseBoolean(turnOnAdvancedStats)) {
-                builder.turnOnAdvancedStats();
-            }
-
-            if (Boolean.parseBoolean(traceConnection)) {
-                builder.traceConnection();
-            }
-
-            if (StringUtils.isNotEmpty(
-                    tlsProtocol + tlsTrustStoreType + tlsTrustStoreLocation + tlsTrustStorePassword + tlsKeyStoreType
-                            + tlsKeyStoreLocation + tlsKeyStorePassword + tlsKeyManagerAlgorithm
-                            + tlsTrustManagerAlgorithm)) {
-                SSLContext sslContext = createSSLContext(
-                        new TLSConnection(tlsProtocol, tlsTrustStoreType, tlsTrustStoreLocation, tlsTrustStorePassword,
-                                tlsKeyStoreType, tlsKeyStoreLocation, tlsKeyStorePassword, tlsKeyManagerAlgorithm,
-                                tlsTrustManagerAlgorithm));
-                if (sslContext != null) {
-                    builder.sslContext(sslContext);
-                }
-            }
-            connection = Nats.connect(builder.build());
+            connection = getNatsConnection();
         }
         return true;
+    }
+
+    public Connection getNatsConnection() throws IOException, InterruptedException {
+        String bufferSize = natsProperties.getProperty(NatsConstants.BUFFER_SIZE);
+        String turnOnAdvancedStats = natsProperties.getProperty(NatsConstants.TURN_ON_ADVANCED_STATS);
+        String traceConnection = natsProperties.getProperty(NatsConstants.TRACE_CONNECTION);
+        String tlsProtocol = validateParameter(natsProperties.getProperty(NatsConstants.TLS_PROTOCOL));
+        String tlsKeyStoreType = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_TYPE));
+        String tlsKeyStoreLocation = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_LOCATION));
+        String tlsKeyStorePassword = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_PASSWORD));
+        String tlsTrustStoreType = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_TYPE));
+        String tlsTrustStoreLocation = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_LOCATION));
+        String tlsTrustStorePassword = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_PASSWORD));
+        String tlsKeyManagerAlgorithm = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEY_MANAGER_ALGORITHM));
+        String tlsTrustManagerAlgorithm = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUST_MANAGER_ALGORITHM));
+
+        Options.Builder builder = new Options.Builder(natsProperties);
+
+        if (StringUtils.isNotEmpty(bufferSize)) {
+            builder.bufferSize(Integer.parseInt(bufferSize));
+        }
+
+        if (Boolean.parseBoolean(turnOnAdvancedStats)) {
+            builder.turnOnAdvancedStats();
+        }
+
+        if (Boolean.parseBoolean(traceConnection)) {
+            builder.traceConnection();
+        }
+
+        if (StringUtils.isNotEmpty(
+                tlsProtocol + tlsTrustStoreType + tlsTrustStoreLocation + tlsTrustStorePassword + tlsKeyStoreType
+                        + tlsKeyStoreLocation + tlsKeyStorePassword + tlsKeyManagerAlgorithm
+                        + tlsTrustManagerAlgorithm)) {
+            SSLContext sslContext = createSSLContext(
+                    new TLSConnection(tlsProtocol, tlsTrustStoreType, tlsTrustStoreLocation, tlsTrustStorePassword,
+                            tlsKeyStoreType, tlsKeyStoreLocation, tlsKeyStorePassword, tlsKeyManagerAlgorithm,
+                            tlsTrustManagerAlgorithm));
+            if (sslContext != null) {
+                builder.sslContext(sslContext);
+            }
+        }
+        return Nats.connect(builder.build());
     }
 
     @Override public void consumeMessage(String sequenceName) throws InterruptedException {
@@ -137,13 +136,16 @@ public class CoreListener implements NatsMessageListener {
      */
     private static SSLContext createSSLContext(TLSConnection tlsConnection) {
         try {
-            KeyStore keyStore = loadKeyStore(tlsConnection.getKeyStoreType(), tlsConnection.getKeyStoreLocation(),
-                    tlsConnection.getTrustStorePassword());
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(
-                    tlsConnection.getKeyManagerAlgorithm().equals("") ?
-                            NatsConstants.DEFAULT_TLS_ALGORITHM :
-                            tlsConnection.getKeyManagerAlgorithm());
-            keyManagerFactory.init(keyStore, tlsConnection.getKeyStorePassword().toCharArray());
+            KeyManagerFactory keyManagerFactory = null;
+            if (StringUtils.isNotEmpty(tlsConnection.getKeyStoreLocation())) {
+                KeyStore keyStore = loadKeyStore(tlsConnection.getKeyStoreType(), tlsConnection.getKeyStoreLocation(),
+                        tlsConnection.getTrustStorePassword());
+                keyManagerFactory = KeyManagerFactory.getInstance(
+                        tlsConnection.getKeyManagerAlgorithm().equals("") ?
+                                NatsConstants.DEFAULT_TLS_ALGORITHM :
+                                tlsConnection.getKeyManagerAlgorithm());
+                keyManagerFactory.init(keyStore, tlsConnection.getKeyStorePassword().toCharArray());
+            }
 
             KeyStore trustStore = loadKeyStore(tlsConnection.getTrustStoreType(), tlsConnection.getTrustStoreLocation(),
                     tlsConnection.getTrustStorePassword());
@@ -156,7 +158,7 @@ public class CoreListener implements NatsMessageListener {
             SSLContext sslContext = SSLContext.getInstance(tlsConnection.getProtocol().equals("") ?
                     Options.DEFAULT_SSL_PROTOCOL :
                     tlsConnection.getProtocol());
-            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
+            sslContext.init(keyManagerFactory == null ? null : keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
                     new SecureRandom());
             return sslContext;
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyManagementException e) {
@@ -180,6 +182,17 @@ public class CoreListener implements NatsMessageListener {
             store.load(in, trustStorePassword.toCharArray());
         }
         return store;
+    }
+
+    /**
+     * Check if debug is enabled for logging.
+     *
+     * @param text log text
+     */
+    private void printDebugLog(String text) {
+        if (log.isDebugEnabled()) {
+            log.debug(text);
+        }
     }
 }
 
@@ -245,5 +258,13 @@ class TLSConnection {
 
     String getTrustManagerAlgorithm() {
         return trustManagerAlgorithm;
+    }
+
+    @Override public String toString() {
+        return "TLSConnection{" + "protocol='" + protocol + '\'' + ", trustStoreType='" + trustStoreType + '\''
+                + ", trustStoreLocation='" + trustStoreLocation + '\'' + ", trustStorePassword='" + trustStorePassword
+                + '\'' + ", keyStoreType='" + keyStoreType + '\'' + ", keyStoreLocation='" + keyStoreLocation + '\''
+                + ", keyStorePassword='" + keyStorePassword + '\'' + ", keyManagerAlgorithm='" + keyManagerAlgorithm
+                + '\'' + ", trustManagerAlgorithm='" + trustManagerAlgorithm + '\'' + '}';
     }
 }
