@@ -1,6 +1,22 @@
+/*
+ * Copyright 2020 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
 import io.nats.client.Connection;
+import io.nats.client.Message;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.builder.Builder;
@@ -25,6 +41,9 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+/**
+ * Inject handler to inject NATS message into the sequence.
+ */
 public class NatsInjectHandler {
     private static final Log log = LogFactory.getLog(NatsInjectHandler.class);
 
@@ -54,7 +73,6 @@ public class NatsInjectHandler {
             msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
             CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
-            printDebugLog("Processed NATS Message.");
             MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                     .getAxis2MessageContext();
 
@@ -101,6 +119,7 @@ public class NatsInjectHandler {
         } catch (Exception e) {
             throw new SynapseException("Error while processing the NATS Message", e);
         }
+        printDebugLog("Processed NATS Message: " + new String((byte[])object));
         return true;
     }
 

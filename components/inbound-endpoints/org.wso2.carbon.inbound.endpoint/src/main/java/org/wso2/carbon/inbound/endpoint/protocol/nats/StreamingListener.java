@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
 import io.nats.streaming.*;
@@ -12,6 +27,9 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Streaming listener class which uses NATS streaming connection to receive messages.
+ */
 public class StreamingListener implements NatsMessageListener {
 
     private static final Log log = LogFactory.getLog(StreamingListener.class.getName());
@@ -90,7 +108,7 @@ public class StreamingListener implements NatsMessageListener {
         }
 
         if (isManualAck) {
-            subscriptionOptions.manualAcks();
+            subscriptionOptions.manualAcks(); // if subscriptionOptions.manualAcks() is not set, it will auto ack
         }
 
         if (StringUtils.isNotEmpty(ackWait)) {
@@ -113,28 +131,29 @@ public class StreamingListener implements NatsMessageListener {
             connection.subscribe(subject, queueGroup, natsMessage -> {
                 String message = new String(natsMessage.getData());
                 log.info("Message Received to NATS Inbound EP: " + message);
-                injectHandler.invoke(message.getBytes(), sequenceName, null, null);
+                boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
                 latch.countDown();
-                manuallyAck(isManualAck, natsMessage);
+                if (isInjected) acknowledge(isManualAck, natsMessage);
             }, subscriptionOptions.build());
         } else {
             connection.subscribe(subject, natsMessage -> {
                 String message = new String(natsMessage.getData());
                 log.info("Message Received to NATS Inbound EP: " + message);
-                injectHandler.invoke(message.getBytes(), sequenceName, null, null);
+                System.out.println("Message Received to NATS Inbound EP: " + message);
+                boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
                 latch.countDown();
-                manuallyAck(isManualAck, natsMessage);
+                if (isInjected) acknowledge(isManualAck, natsMessage);
             }, subscriptionOptions.build());
         }
         latch.await();
     }
 
-    private void manuallyAck(boolean isManualAck, Message natsMessage) {
+    private void acknowledge(boolean isManualAck, Message natsMessage) {
         if (isManualAck) {
             try {
                 natsMessage.ack();
             } catch (IOException e) {
-                log.error("An error occurred while sending manual ack. ", e);
+                log.error("An error occurred while sending manual ack. Message might get redelivered. Sequence number: " + natsMessage.getSequence(), e);
             }
         }
     }
