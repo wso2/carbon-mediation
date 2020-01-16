@@ -167,7 +167,7 @@ public class RabbitMQConnectionConsumer {
                 try {
                     ackState = injectHandler.invokeAndReturnAckState(message, inboundName);
                 } catch (Exception e) {         //we need to handle any exception upon injecting to mediation
-                    ackState = RabbitMQAckStates.REJECT_AND_REQUEUE;
+                    ackState = RabbitMQAckStates.REJECT;
                     mediationError = true;
                     log.error("Error while mediating message", e);
                 } finally {
@@ -176,7 +176,7 @@ public class RabbitMQConnectionConsumer {
                             try {
                                 channel.basicAck(message.getDeliveryTag(), false);
                             } catch (IOException e) {
-                                log.error("Error while sending an ack to the message", e);
+                                log.error("Error while acknowledging the message", e);
                             }
                         } else {
                             try {
@@ -392,6 +392,7 @@ public class RabbitMQConnectionConsumer {
         throw new RabbitMQException(msg, e);
     }
 }
+
 enum RabbitMQAckStates {
     ACK,
     REJECT,

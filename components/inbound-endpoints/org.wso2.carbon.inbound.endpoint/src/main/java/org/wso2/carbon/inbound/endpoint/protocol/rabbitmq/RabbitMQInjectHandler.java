@@ -29,6 +29,7 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -47,10 +48,20 @@ public class RabbitMQInjectHandler {
     private String onErrorSeq;
     private boolean sequential;
     private SynapseEnvironment synapseEnvironment;
+    private SequenceMediator seq;
 
     public RabbitMQInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
-                                 SynapseEnvironment synapseEnvironment) {
+                                 SynapseEnvironment synapseEnvironment) throws SynapseException {
         this.injectingSeq = injectingSeq;
+        if (injectingSeq == null || injectingSeq.equals("")) {
+            String msg = "Injecting Sequence name is not specified.";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+        seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
+        if (!seq.isInitialized()) {
+            seq.init(synapseEnvironment);
+        }
         this.onErrorSeq = onErrorSeq;
         this.sequential = sequential;
         this.synapseEnvironment = synapseEnvironment;
@@ -125,20 +136,10 @@ public class RabbitMQInjectHandler {
             log.error("Error while setting message payload to the message context :: "
                     + axisFault.getMessage());
         }
-        // Inject the message to the sequence.
 
-        if (injectingSeq == null || injectingSeq.equals("")) {
-            log.error("Sequence name not specified. Sequence : " + injectingSeq);
-            return RabbitMQAckStates.REJECT;
-        }
-        SequenceMediator seq = (SequenceMediator) synapseEnvironment
-                .getSynapseConfiguration().getSequence(injectingSeq);        
         if (seq != null) {
             if (log.isDebugEnabled()) {
                 log.debug("injecting message to sequence : " + injectingSeq);
-            }
-            if (!seq.isInitialized()) {
-                seq.init(synapseEnvironment);
             }
             seq.setErrorHandler(onErrorSeq);
             msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
