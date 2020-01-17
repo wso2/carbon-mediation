@@ -1850,11 +1850,6 @@
             </dependency>
             <!--12 Misc -->
             <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.transports.sap</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.securevault</groupId>
                 <artifactId>org.wso2.securevault</artifactId>
                 <version>${org.wso2.securevault.version}</version>
