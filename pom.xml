@@ -2374,6 +2374,16 @@
                 <artifactId>org.wso2.carbon.tenant.common</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.opensaml</groupId>
+                <artifactId>opensaml</artifactId>
+                <version>${opensaml.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.saml.common</groupId>
+                <artifactId>org.wso2.carbon.identity.saml.common.util</artifactId>
+                <version>${saml.common.util.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
@@ -2564,6 +2574,8 @@
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v1</version.org.wso2.orbit.javax.activation>
         <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
+        <saml.common.util.version>1.0.3</saml.common.util.version>
+        <opensaml.orbit.version>3.3.1.wso2v1</opensaml.orbit.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
