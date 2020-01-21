@@ -28,6 +28,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -59,7 +60,7 @@ public class RabbitMQInjectHandler {
             throw new SynapseException(msg);
         }
         seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
-        if (!seq.isInitialized()) {
+        if (seq != null && !seq.isInitialized()) {
             seq.init(synapseEnvironment);
         }
         this.onErrorSeq = onErrorSeq;
@@ -73,92 +74,104 @@ public class RabbitMQInjectHandler {
      *
      * @param message                    RabbitMQ message consumed
      * @param inboundName                Inbound Name
-     * @return Whether message should be Acked/Rejected/Requeued
+     * @return Whether message should be Acked/Rejected/Requeued and whether mediationError is true/false
      */
-    public RabbitMQAckStates invokeAndReturnAckState(RabbitMQMessage message, String inboundName) {
+    public AckStatesAndMediationError invokeAndReturnAckState(RabbitMQMessage message, String inboundName) {
 
-        org.apache.synapse.MessageContext msgCtx = createMessageContext();
-        log.debug("Processed RabbitMQ Message ");
-        MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
-                .getAxis2MessageContext();
-        // Determine the message builder to use
-        String amqpCorrelationID = message.getCorrelationId();
-        if (amqpCorrelationID != null && amqpCorrelationID.length() > 0) {
-            msgCtx.setProperty(RabbitMQConstants.CORRELATION_ID, amqpCorrelationID);
-        } else {
-            msgCtx.setProperty(RabbitMQConstants.CORRELATION_ID, message.getMessageId());
-        }
-
-        axis2MsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, RabbitMQUtils.getTransportHeaders(message));
-
-        String contentType = message.getContentType();
-        Builder builder = null;
-        if (contentType == null) {
-            log.warn("Unable to determine content type for message " +
-                    msgCtx.getMessageID() + " setting to text/plain");
-            contentType = RabbitMQConstants.DEFAULT_CONTENT_TYPE;
-            message.setContentType(contentType);
-        }
-
-        int index = contentType.indexOf(';');
-        String type = index > 0 ? contentType.substring(0, index)
-                                : contentType;
+        org.apache.synapse.MessageContext msgCtx = null;
         try {
-            builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
-        } catch (AxisFault axisFault) {
-            log.error("Error while creating message builder :: "
-                      + axisFault.getMessage());
-
-        }
-        if (builder == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("No message builder found for type '" + type
-                          + "'. Falling back to SOAP.");
-            }
-            builder = new SOAPBuilder();
-        }
-
-        OMElement documentElement = null;
-        // set the message payload to the message context
-        InputStream in = new ByteArrayInputStream(message.getBody());
-        try {
-            documentElement = builder.processDocument(in, contentType,
-                    axis2MsgCtx);
-        } catch (AxisFault axisFault) {
-            log.error("Error while processing message :: "
-                    + axisFault.getMessage());
-        }
-
-        try {
-            msgCtx.setEnvelope(TransportUtils
-                    .createSOAPEnvelope(documentElement));
-        } catch (AxisFault axisFault) {
-            log.error("Error while setting message payload to the message context :: "
-                    + axisFault.getMessage());
-        }
-
-        if (seq != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("injecting message to sequence : " + injectingSeq);
-            }
-            seq.setErrorHandler(onErrorSeq);
-            msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
-            msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, inboundName);
-            msgCtx.setProperty(SynapseConstants.ARTIFACT_NAME, SynapseConstants.FAIL_SAFE_MODE_INBOUND_ENDPOINT + inboundName);
-            synapseEnvironment.injectInbound(msgCtx, seq, sequential);
-        } else {
-            log.error("Sequence: " + injectingSeq + " not found");
-        }
-
-        if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_ROLLBACK_ONLY, false)) {
-            if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_REQUEUE_ON_ROLLBACK, true)) {
-                return RabbitMQAckStates.REJECT_AND_REQUEUE;
+            msgCtx = createMessageContext();
+            log.debug("Processed RabbitMQ Message ");
+            MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
+                    .getAxis2MessageContext();
+            // Determine the message builder to use
+            String amqpCorrelationID = message.getCorrelationId();
+            if (amqpCorrelationID != null && amqpCorrelationID.length() > 0) {
+                msgCtx.setProperty(RabbitMQConstants.CORRELATION_ID, amqpCorrelationID);
             } else {
-                return RabbitMQAckStates.REJECT;
+                msgCtx.setProperty(RabbitMQConstants.CORRELATION_ID, message.getMessageId());
             }
-        }
 
-        return RabbitMQAckStates.ACK;
+            axis2MsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, RabbitMQUtils.getTransportHeaders(message));
+
+            String contentType = message.getContentType();
+            Builder builder = null;
+            if (contentType == null) {
+                log.warn("Unable to determine content type for message " +
+                        msgCtx.getMessageID() + " setting to text/plain");
+                contentType = RabbitMQConstants.DEFAULT_CONTENT_TYPE;
+                message.setContentType(contentType);
+            }
+
+            int index = contentType.indexOf(';');
+            String type = index > 0 ? contentType.substring(0, index)
+                    : contentType;
+            try {
+                builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
+            } catch (AxisFault axisFault) {
+                log.error("Error while creating message builder :: "
+                        + axisFault.getMessage());
+
+            }
+            if (builder == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("No message builder found for type '" + type
+                            + "'. Falling back to SOAP.");
+                }
+                builder = new SOAPBuilder();
+            }
+
+            OMElement documentElement = null;
+            // set the message payload to the message context
+            InputStream in = new ByteArrayInputStream(message.getBody());
+            try {
+                documentElement = builder.processDocument(in, contentType,
+                        axis2MsgCtx);
+            } catch (AxisFault axisFault) {
+                log.error("Error while processing message :: "
+                        + axisFault.getMessage());
+            }
+
+            try {
+                msgCtx.setEnvelope(TransportUtils
+                        .createSOAPEnvelope(documentElement));
+            } catch (AxisFault axisFault) {
+                log.error("Error while setting message payload to the message context :: "
+                        + axisFault.getMessage());
+            }
+
+            if (seq != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("injecting message to sequence : " + injectingSeq);
+                }
+                seq.setErrorHandler(onErrorSeq);
+                msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+                msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, inboundName);
+                msgCtx.setProperty(SynapseConstants.ARTIFACT_NAME, SynapseConstants.FAIL_SAFE_MODE_INBOUND_ENDPOINT + inboundName);
+                synapseEnvironment.injectInbound(msgCtx, seq, sequential);
+            } else {
+                log.error("Sequence: " + injectingSeq + " not found");
+            }
+
+            if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_ROLLBACK_ONLY, false)) {
+                if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_REQUEUE_ON_ROLLBACK, true)) {
+                    return new AckStatesAndMediationError(RabbitMQAckStates.REJECT_AND_REQUEUE, false);
+                } else {
+                    return new AckStatesAndMediationError(RabbitMQAckStates.REJECT, false);
+                }
+            }
+
+            return new AckStatesAndMediationError(RabbitMQAckStates.ACK, false);
+
+        } catch (Exception e) {         //we need to handle any exception upon injecting to mediation
+            if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_REQUEUE_ON_ROLLBACK, false)) {
+                log.error("Error while mediating message. Message is requeued as " +
+                        "SET_REQUEUE_ON_ROLLBACK property is set to true.", e);
+                return new AckStatesAndMediationError(RabbitMQAckStates.REJECT_AND_REQUEUE, true);
+            }
+            log.error("Error while mediating message. Message is rejected.", e);
+            return new AckStatesAndMediationError(RabbitMQAckStates.REJECT, true);
+        }
     }
 
     private boolean readMessageCtxProperty(org.apache.synapse.MessageContext msgCtx, String propertyName,
