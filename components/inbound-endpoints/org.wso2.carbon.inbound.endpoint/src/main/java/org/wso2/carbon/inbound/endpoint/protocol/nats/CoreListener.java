@@ -20,7 +20,6 @@ import io.nats.client.Options;
 import io.nats.client.Nats;
 import io.nats.client.Subscription;
 import io.nats.client.Message;
-import net.minidev.json.JSONUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +45,7 @@ import java.util.Properties;
  * Core listener class which uses core NATS connection to receive messages.
  */
 public class CoreListener implements NatsMessageListener {
+
     private static final Log log = LogFactory.getLog(CoreListener.class.getName());
     private String subject;
     private NatsInjectHandler injectHandler;
@@ -58,6 +58,10 @@ public class CoreListener implements NatsMessageListener {
         this.natsProperties = natsProperties;
     }
 
+    /**
+     * Create the connection to the Core NATS server.
+     * @return boolean value whether connection is created.
+     */
     @Override public boolean createConnection() throws IOException, InterruptedException {
         if (connection == null) {
             connection = getNatsConnection();
@@ -65,6 +69,10 @@ public class CoreListener implements NatsMessageListener {
         return true;
     }
 
+    /**
+     * Create and return the Core NATS connection.
+     * @return the Core NATS connection.
+     */
     public Connection getNatsConnection() throws IOException, InterruptedException {
         String bufferSize = natsProperties.getProperty(NatsConstants.BUFFER_SIZE);
         String turnOnAdvancedStats = natsProperties.getProperty(NatsConstants.TURN_ON_ADVANCED_STATS);
@@ -108,6 +116,10 @@ public class CoreListener implements NatsMessageListener {
         return Nats.connect(builder.build());
     }
 
+    /**
+     * Consume the message received and inject into the sequence.
+     * @param sequenceName the sequence to inject the message to.
+     */
     @Override public void consumeMessage(String sequenceName) throws InterruptedException {
         Subscription subscription;
         String queueGroup = natsProperties.getProperty(NatsConstants.QUEUE_GROUP);
@@ -119,7 +131,7 @@ public class CoreListener implements NatsMessageListener {
         Message natsMessage = subscription.nextMessage(Duration.ofMillis(100));
         if (natsMessage != null) {
             String message = new String(natsMessage.getData(), StandardCharsets.UTF_8);
-            log.info("Message Received to NATS Inbound EP: " + message);
+            printDebugLog("Message Received to NATS Inbound EP: " + message);
             injectHandler.invoke(message.getBytes(), sequenceName, natsMessage.getReplyTo(), connection);
         } else {
             printDebugLog("Message is null.");
@@ -280,13 +292,5 @@ class TLSConnection {
 
     String getTrustManagerAlgorithm() {
         return trustManagerAlgorithm;
-    }
-
-    @Override public String toString() {
-        return "TLSConnection{" + "protocol='" + protocol + '\'' + ", trustStoreType='" + trustStoreType + '\''
-                + ", trustStoreLocation='" + trustStoreLocation + '\'' + ", trustStorePassword='" + trustStorePassword
-                + '\'' + ", keyStoreType='" + keyStoreType + '\'' + ", keyStoreLocation='" + keyStoreLocation + '\''
-                + ", keyStorePassword='" + keyStorePassword + '\'' + ", keyManagerAlgorithm='" + keyManagerAlgorithm
-                + '\'' + ", trustManagerAlgorithm='" + trustManagerAlgorithm + '\'' + '}';
     }
 }

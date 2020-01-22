@@ -23,7 +23,7 @@ import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import java.util.Properties;
 
 /**
- * NatsTask class is used to schedule tasks for inbound NATS processor when required (coordination==true).
+ * NatsTask class is used to schedule tasks for inbound NATS processor when coordination required.
  */
 public class NatsTask extends InboundTask {
 

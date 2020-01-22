@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -44,6 +45,10 @@ public class StreamingListener implements NatsMessageListener {
         this.natsProperties = natsProperties;
     }
 
+    /**
+     * Create the connection to the NATS Streaming server.
+     * @return boolean value whether connection is created.
+     */
     @Override public boolean createConnection() throws IOException, InterruptedException {
         if (connection == null) {
             String natsStreamingUrl = natsProperties.getProperty(NatsConstants.NATS_STREAMING_URL);
@@ -89,10 +94,12 @@ public class StreamingListener implements NatsMessageListener {
         return true;
     }
 
+    /**
+     * Consume the message received and inject into the sequence.
+     * @param sequenceName the sequence to inject the message to.
+     */
     @Override public void consumeMessage(String sequenceName)
             throws InterruptedException, IOException, TimeoutException {
-        CountDownLatch latch = new CountDownLatch(1);
-
         SubscriptionOptions.Builder subscriptionOptions = new SubscriptionOptions.Builder();
 
         String durableName = natsProperties.getProperty(NatsConstants.NATS_STREAMING_DURABLE_NAME);
@@ -127,27 +134,41 @@ public class StreamingListener implements NatsMessageListener {
             subscriptionOptions.dispatcher(dispatcher);
         }
 
+        CountDownLatch latch = new CountDownLatch(1);
         if (StringUtils.isNotEmpty(queueGroup)) {
-            connection.subscribe(subject, queueGroup, natsMessage -> {
-                String message = new String(natsMessage.getData());
-                log.info("Message Received to NATS Inbound EP: " + message);
-                boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
-                latch.countDown();
-                if (isInjected) acknowledge(isManualAck, natsMessage);
-            }, subscriptionOptions.build());
+            try {
+               connection.subscribe(subject, queueGroup, natsMessage -> {
+                    String message = new String(natsMessage.getData());
+                    printDebugLog("Message Received to NATS Inbound EP: " + message);
+                    boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
+                    if (isInjected) acknowledge(isManualAck, natsMessage); // message is acknowledged only if the message is successfully injected to sequence (only for manual acks)
+                    latch.countDown();
+                }, subscriptionOptions.build());
+            } finally {
+                // It will wait for scanInterval * 75% milliseconds for another message before releasing the thread
+                latch.await(new NatsPollingConsumer().getScanInterval() * 75/100, TimeUnit.MILLISECONDS);
+            }
         } else {
-            connection.subscribe(subject, natsMessage -> {
-                String message = new String(natsMessage.getData());
-                log.info("Message Received to NATS Inbound EP: " + message);
-                System.out.println("Message Received to NATS Inbound EP: " + message);
-                boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
-                latch.countDown();
-                if (isInjected) acknowledge(isManualAck, natsMessage);
-            }, subscriptionOptions.build());
+            try {
+                connection.subscribe(subject, natsMessage -> {
+                    String message = new String(natsMessage.getData());
+                    printDebugLog("Message Received to NATS Inbound EP: " + message);
+                    boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
+                    if (isInjected) acknowledge(isManualAck, natsMessage); // message is acknowledged only if the message is successfully injected to sequence (only for manual acks)
+                    latch.countDown();
+                }, subscriptionOptions.build());
+            } finally {
+                // It will wait for scanInterval * 75% milliseconds for another message before releasing the thread
+                latch.await(new NatsPollingConsumer().getScanInterval() * 75/100, TimeUnit.MILLISECONDS);
+            }
         }
-        latch.await();
     }
 
+    /**
+     * Check if manual acks is set to true and ack manually.
+     * @param isManualAck boolean to enable manual ack.
+     * @param natsMessage the NATS message
+     */
     private void acknowledge(boolean isManualAck, Message natsMessage) {
         if (isManualAck) {
             try {
@@ -158,6 +179,9 @@ public class StreamingListener implements NatsMessageListener {
         }
     }
 
+    /**
+     * Close the connection to NATS Streaming server and set connection to null.
+     */
     @Override public void closeConnection() {
         try {
             if (connection != null) {

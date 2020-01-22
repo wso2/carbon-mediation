@@ -29,8 +29,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class NatsPollingConsumer {
 
-    private static final Log log = LogFactory.getLog(NatsProcessor.class.getName());
-
+    private static final Log log = LogFactory.getLog(NatsPollingConsumer.class.getName());
     private NatsInjectHandler injectHandler;
     private Properties natsProperties;
     private NatsMessageListener natsMessageListener;
@@ -44,11 +43,14 @@ public class NatsPollingConsumer {
         this.scanInterval = scanInterval;
         this.name = name;
         this.subject = natsProperties.getProperty(NatsConstants.SUBJECT);
-        if (subject == null) {
-            throw new SynapseException("NATS subject cannot be null.");
-        }
+        if (subject == null) throw new SynapseException("NATS subject cannot be null.");
     }
 
+    NatsPollingConsumer() {}
+
+    /**
+     * Initialize the message listener to use (Core NATS or NATS Streaming).
+     */
     void initializeMessageListener() {
         printDebugLog("Create the NATS message listener.");
         if (Boolean.parseBoolean(natsProperties.getProperty(NatsConstants.NATS_STREAMING))) {
@@ -58,6 +60,9 @@ public class NatsPollingConsumer {
         natsMessageListener = new CoreListener(subject, injectHandler, natsProperties);
     }
 
+    /**
+     * Called at taskExecute to execute the NATS Task.
+     */
     public void execute() {
         try {
             printDebugLog("Executing : NATS Inbound EP : ");
@@ -79,6 +84,9 @@ public class NatsPollingConsumer {
         }
     }
 
+    /**
+     * Create the NATS connection and poll messages.
+     */
     public Object poll() throws IOException, InterruptedException, TimeoutException {
         if (natsMessageListener.createConnection() && injectHandler != null) {
             natsMessageListener.consumeMessage(name);
@@ -86,12 +94,22 @@ public class NatsPollingConsumer {
         return null;
     }
 
-    void registerHandler(NatsInjectHandler processingHandler) {
-        injectHandler = processingHandler;
+    /**
+     *
+     * Register a handler to implement injection of the retrieved message.
+     *
+     * @param injectHandler the injectHandler
+     */
+    void registerHandler(NatsInjectHandler injectHandler) {
+        this.injectHandler = injectHandler;
     }
 
     public Properties getInboundProperties() {
         return natsProperties;
+    }
+
+    public long getScanInterval() {
+        return scanInterval;
     }
 
     /**

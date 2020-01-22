@@ -24,8 +24,8 @@ import org.apache.synapse.inbound.InboundResponseSender;
  */
 public class NatsReplySender implements InboundResponseSender {
 
-    String replyTo;
-    Connection connection;
+    private String replyTo;
+    private Connection connection;
 
     public NatsReplySender(String replyTo, Connection connection) {
         this.replyTo = replyTo;

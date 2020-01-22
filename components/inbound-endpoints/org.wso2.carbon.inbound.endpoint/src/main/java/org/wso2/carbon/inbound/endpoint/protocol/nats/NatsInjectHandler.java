@@ -16,7 +16,6 @@
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
 import io.nats.client.Connection;
-import io.nats.client.Message;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.builder.Builder;
@@ -76,6 +75,7 @@ public class NatsInjectHandler {
             MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                     .getAxis2MessageContext();
 
+            // Check if the reply to field is null and send the response the the NATS publisher from the Respond Mediator
             if (replyTo != null) {
                 msgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, new NatsReplySender(replyTo, connection));
             }

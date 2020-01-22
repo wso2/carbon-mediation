@@ -66,6 +66,9 @@ public class NatsProcessor extends InboundRequestProcessorImpl implements TaskSt
         this.synapseEnvironment = params.getSynapseEnvironment();
     }
 
+    /**
+     * Called at the time of synapse artifact deployment.
+     */
     @Override public void init() {
         log.info("Initializing inbound NATS listener for inbound endpoint " + name);
         pollingConsumer = new NatsPollingConsumer(natsProperties, interval, name);
@@ -75,19 +78,32 @@ public class NatsProcessor extends InboundRequestProcessorImpl implements TaskSt
         start();
     }
 
+    /**
+     * Stop the inbound polling processor. This will be called when inbound is
+     * undeployed/redeployed or when server stop.
+     */
     @Override public void destroy() {
         super.destroy();
     }
 
+
+    /**
+     * Register/start the schedule service.
+     */
     public void start() {
         InboundTask task = new NatsTask(pollingConsumer, interval);
         start(task, ENDPOINT_POSTFIX);
     }
 
-    public void update() {
+    public void update() {  // This will not be called for inbound endpoints
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Remove inbound endpoints.
+     *
+     * @param removeTask whether to remove scheduled task from the registry or not.
+     */
     @Override public void destroy(boolean removeTask) {
         if (removeTask) {
             destroy();
