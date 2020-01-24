@@ -28,7 +28,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -60,7 +59,10 @@ public class RabbitMQInjectHandler {
             throw new SynapseException(msg);
         }
         seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
-        if (seq != null && !seq.isInitialized()) {
+        if (seq == null) {
+            throw new SynapseException("Sequence Mediator is null.");
+        }
+        if (!seq.isInitialized()) {
             seq.init(synapseEnvironment);
         }
         this.onErrorSeq = onErrorSeq;
@@ -76,7 +78,7 @@ public class RabbitMQInjectHandler {
      * @param inboundName                Inbound Name
      * @return Whether message should be Acked/Rejected/Requeued and whether mediationError is true/false
      */
-    public AckStatesAndMediationError invokeAndReturnAckState(RabbitMQMessage message, String inboundName) {
+    public States invokeAndReturnAckState(RabbitMQMessage message, String inboundName) {
 
         org.apache.synapse.MessageContext msgCtx = null;
         try {
@@ -155,22 +157,22 @@ public class RabbitMQInjectHandler {
 
             if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_ROLLBACK_ONLY, false)) {
                 if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_REQUEUE_ON_ROLLBACK, true)) {
-                    return new AckStatesAndMediationError(RabbitMQAckStates.REJECT_AND_REQUEUE, false);
+                    return new States(RabbitMQAckStates.REJECT_AND_REQUEUE, false);
                 } else {
-                    return new AckStatesAndMediationError(RabbitMQAckStates.REJECT, false);
+                    return new States(RabbitMQAckStates.REJECT, false);
                 }
             }
 
-            return new AckStatesAndMediationError(RabbitMQAckStates.ACK, false);
+            return new States(RabbitMQAckStates.ACK, false);
 
         } catch (Exception e) {         //we need to handle any exception upon injecting to mediation
             if (readMessageCtxProperty(msgCtx, RabbitMQConstants.SET_REQUEUE_ON_ROLLBACK, false)) {
                 log.error("Error while mediating message. Message is requeued as " +
                         "SET_REQUEUE_ON_ROLLBACK property is set to true.", e);
-                return new AckStatesAndMediationError(RabbitMQAckStates.REJECT_AND_REQUEUE, true);
+                return new States(RabbitMQAckStates.REJECT_AND_REQUEUE, true);
             }
             log.error("Error while mediating message. Message is rejected.", e);
-            return new AckStatesAndMediationError(RabbitMQAckStates.REJECT, true);
+            return new States(RabbitMQAckStates.REJECT, true);
         }
     }
 

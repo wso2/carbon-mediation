@@ -156,19 +156,19 @@ public class RabbitMQConnectionConsumer {
                 }
                 message = getConsumerDelivery(queueingConsumer);
             } catch (InterruptedException | ShutdownSignalException | ConsumerCancelledException e) {
-                log.debug("Exception occurred while consuming the message", e);
+                log.warn("Exception occurred while consuming the message", e);
                 continue;
             }
 
             if (message != null) {
                 idle = false;
                 RabbitMQAckStates ackState = RabbitMQAckStates.REJECT_AND_REQUEUE;
-                AckStatesAndMediationError ackStatesAndMediationError;
+                States states;
                 boolean mediationError;
                 try {
-                    ackStatesAndMediationError = injectHandler.invokeAndReturnAckState(message, inboundName);
-                    ackState = ackStatesAndMediationError.ackState;
-                    mediationError = ackStatesAndMediationError.mediationError;
+                    states = injectHandler.invokeAndReturnAckState(message, inboundName);
+                    ackState = states.ackState;
+                    mediationError = states.mediationError;
                 } finally {
                     if (!autoAck) {
                         if (ackState == RabbitMQAckStates.ACK) {
@@ -398,11 +398,11 @@ enum RabbitMQAckStates {
     REJECT_AND_REQUEUE
 }
 
-class AckStatesAndMediationError {
+class States {
     RabbitMQAckStates ackState;
     boolean mediationError;
 
-    AckStatesAndMediationError(RabbitMQAckStates ackState, boolean mediationError) {
+    States(RabbitMQAckStates ackState, boolean mediationError) {
         this.ackState = ackState;
         this.mediationError = mediationError;
     }
