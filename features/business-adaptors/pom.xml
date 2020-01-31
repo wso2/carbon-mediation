@@ -20,18 +20,17 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>carbon-mediation</artifactId>
-        <version>4.7.30</version>
+        <version>4.7.34-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>4.7.30</version>
+    <version>4.7.34-SNAPSHOT</version>
     <artifactId>business-adaptors-features</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Business Adaptors Feature Aggregator Module</name>
     <url>http://wso2.org</url>
     <modules>
         <module>org.wso2.carbon.hl7.feature</module>
-        <module>org.wso2.carbon.sap.feature</module>
     </modules>
 </project>
 

@@ -15,11 +15,11 @@
 	<parent>
     	<artifactId>entitlement-mediator-feature</artifactId>
     	<groupId>org.wso2.carbon.mediation</groupId>
-   	<version>4.7.30</version>
+   	<version>4.7.34-SNAPSHOT</version>
 	</parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.xacml.mediator.feature</artifactId>
-    <version>4.7.30</version>
+    <version>4.7.34-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - XACML Mediation Feature</name>
     <url>http://wso2.org</url>
@@ -48,6 +48,14 @@
         <dependency>
             <groupId>slf4j.wso2</groupId>
             <artifactId>slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.saml.common</groupId>
+            <artifactId>org.wso2.carbon.identity.saml.common.util</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -78,6 +86,8 @@
                                 <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.authenticator.stub</bundleDef>
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.opensaml:opensaml</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.saml.common:org.wso2.carbon.identity.saml.common.util</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <!--<importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.import.feature.version}</importFeatureDef>-->

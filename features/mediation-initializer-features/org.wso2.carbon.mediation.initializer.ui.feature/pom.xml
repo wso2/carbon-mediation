@@ -19,12 +19,12 @@
     <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-initializer-features</artifactId>
-      <version>4.7.30</version>
+      <version>4.7.34-SNAPSHOT</version>
     </parent>
 
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.7.30</version>
+    <version>4.7.34-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.initializer.ui.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer UI Feature</name>
@@ -64,7 +64,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.initializer.ui</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui:compatible:${carbon.kernel.feature.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

@@ -24,6 +24,7 @@
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@page import="java.util.List" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -150,7 +151,7 @@
             jQuery.ajax({
                 type: "POST",
                 url: "savesource-ajaxprocessor.jsp",
-                data: { mode:"<%=mode%>", apiName:"<%=apiNameWithVersion%>", apiString:source },
+                data: { mode:"<%=Encode.forJavaScript(mode)%>", apiName:"<%=Encode.forJavaScript(apiNameWithVersion)%>", apiString:source },
                 success: function(data) {
                     var strData = new String(data);
                     if (strData.indexOf("error:") !=-1) {
@@ -168,7 +169,7 @@
             jQuery.ajax({
                 type: "POST",
                 url: "savesource-ajaxprocessor.jsp",
-                data: { mode:"<%=mode%>", apiString:source },
+                data: { mode:"<%=Encode.forJavaScript(mode)%>", apiString:source },
                 success: function(data) {
                     var strData = new String(data);
                     if (strData.indexOf("error:") !=-1) {
@@ -208,7 +209,7 @@
             url: "switchtodesign-ajaxprocessor.jsp",
             data: { apiSource:source },
             success: function(data) {
-                document.location.href = "manageAPI.jsp?ordinal=1&mode=" + "<%=mode%>" + "&apiName=" + "<%=apiName%>";
+                document.location.href = "manageAPI.jsp?ordinal=1&mode=" + "<%=Encode.forJavaScript(mode)%>" + "&apiName=" + "<%=Encode.forJavaScript(apiName)%>";
             }
         });
     }
