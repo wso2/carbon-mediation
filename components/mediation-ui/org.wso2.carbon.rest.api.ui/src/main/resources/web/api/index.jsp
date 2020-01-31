@@ -653,39 +653,30 @@
             </td>
             <td width="20px" style="text-align:left;border-left:none;border-right:none;width:100px;">
                 <div class="inlineDiv">
-                    <% if (apiData.getArtifactContainerName() != null) { %>
-                    <a style="color:gray;background-image:url(images/favicon-16x16.png);" class="icon-link" href="#"
-                       onclick="#">swagger</a>
-                    <% } else {
-                        String url=null;
+                    <%
+                        String swaggerUrl=null;
                         if (tenantDomain != "carbon.super") {
-                            url = serverContext + "/t/" + tenantDomain + "/" + Encode.forHtmlAttribute(apiData.getName());
+                            swaggerUrl = serverContext + "/t/" + tenantDomain + "/" + Encode.forHtmlAttribute(apiData.getName());
                         } else {
-                            url = serverContext + "/" + Encode.forHtmlAttribute(apiData.getName());
+                            swaggerUrl = serverContext + "/" + Encode.forHtmlAttribute(apiData.getName());
                         }
                     %>
-                    <a style="background-image:url(images/favicon-16x16.png);" class="icon-link" href="<%=url + "?swagger.json"%>"
+                    <a style="background-image:url(images/favicon-16x16.png);" class="icon-link" href="<%=swaggerUrl + "?swagger.json"%>"
                        onclick="#" %>swagger</a>
-                    <% } %>
                 </div>
             </td>
             <td width="20px" style="text-align:left;border-left:none;width:100px;">
                 <div class="inlineDiv">
-                    <% if (apiData.getArtifactContainerName() != null) { %>
-                    <a style="background-image:url(images/tryit.gif);" class="icon-link"
-                       href="#"
-                       onclick="#"><fmt:message key="api.tryit"/></a>
-                    <% } else {
-                        String url=null;
+                    <%
+                        String tryitUrl=null;
                         if (tenantDomain != "carbon.super") {
-                            url = serverContext + "/t/" + tenantDomain + "/" + Encode.forHtmlAttribute(apiData.getName());
+                            tryitUrl = serverContext + "/t/" + tenantDomain + "/" + Encode.forHtmlAttribute(apiData.getName());
                         } else {
-                            url = serverContext + "/" + Encode.forHtmlAttribute(apiData.getName());
+                            tryitUrl = serverContext + "/" + Encode.forHtmlAttribute(apiData.getName());
                         }
                     %>
-                    <a style="background-image:url(images/tryit.gif);" class="icon-link" href="<%=url + "?swaggertryit"%>"
+                    <a style="background-image:url(images/tryit.gif);" class="icon-link" href="<%=tryitUrl + "?swaggertryit"%>"
                        onclick="#" target="_blank" %><fmt:message key="api.tryit"/></a>
-                    <% } %>
                 </div>
             </td>
         </tr>
