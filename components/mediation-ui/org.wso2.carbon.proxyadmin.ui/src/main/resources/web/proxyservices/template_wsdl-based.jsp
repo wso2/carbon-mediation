@@ -175,7 +175,7 @@
                     throw new Exception("The proxy service name is empty or contains invalid characters");
                 }
 
-                wsdlURL = request.getParameter("mainWsdlURL");
+                wsdlURL = Encode.forJavaScriptAttribute(request.getParameter("mainWsdlURL"));
                 if (wsdlURL == null || "".equals(wsdlURL)) {
                     throw new Exception("The WSDL URL has not been specified");
                 }
