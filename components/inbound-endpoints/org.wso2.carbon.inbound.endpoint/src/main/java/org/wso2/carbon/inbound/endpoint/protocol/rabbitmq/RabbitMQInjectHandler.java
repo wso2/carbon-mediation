@@ -60,7 +60,7 @@ public class RabbitMQInjectHandler {
         }
         seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
         if (seq == null) {
-            throw new SynapseException("Sequence Mediator is null.");
+            throw new SynapseException("Specified injecting sequence: " + injectingSeq + "is invalid.");
         }
         if (!seq.isInitialized()) {
             seq.init(synapseEnvironment);
