@@ -1094,17 +1094,29 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
         // Generate if not available
         if (swaggerJsonString == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Generate swagger definition for the API : " + apiName);
-            }
+            swaggerJsonString = generateSwaggerFromSynapseAPI(api);
+        }
+        return swaggerJsonString;
+    }
 
-            try {
-                ServerConfig serverConfig = new CarbonServerConfig();
-                JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
-                swaggerJsonString = jsonDefinition.toString();
-            } catch (AxisFault axisFault) {
-                handleException(log, "Error occurred while generating swagger definition", axisFault);
-            }
+    /**
+     * Function to generate API from swagger definition (from JSON representation)
+     *
+     * @param api existing synapse API
+     * @return generated swagger
+     * @throws APIException
+     */
+    public String generateSwaggerFromSynapseAPI(API api) throws APIException {
+        String swaggerJsonString = "";
+        if (log.isDebugEnabled()) {
+            log.debug("Generate swagger definition for the API : " + api.getAPIName());
+        }
+
+        try {
+            JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
+            swaggerJsonString = jsonDefinition.toString();
+        } catch (AxisFault axisFault) {
+            handleException(log, "Error occurred while generating swagger definition", axisFault);
         }
         return swaggerJsonString;
     }
@@ -1143,7 +1155,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * Function to generate updated existing API by referring to swagger definition (from JSON representation)
      *
      * @param swaggerJsonString swagger definition
-     * @param existingApiName name of the existing API
+     * @param existingApiName   name of the existing API
      * @return generated synapse API
      * @throws APIException
      */
@@ -1163,6 +1175,41 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
             try {
                 API api = apiGenerator.generateUpdatedSynapseAPI(getSynapseAPIByName(existingApiName));
+                return APISerializer.serializeAPI(api).toString();
+            } catch (APIGenException e) {
+                handleException(log, "Error occurred while generating API", e);
+            }
+        } else {
+            handleException(log, "Error in swagger definition format: should be a json object", null);
+        }
+        // Definitely will not reach here
+        return "";
+    }
+
+    /**
+     * Function to generate updated existing API by referring to swagger definition (from JSON representation)
+     *
+     * @param swaggerJsonString swagger definition
+     * @param existingApi existing synapse API
+     * @return generated synapse API
+     * @throws APIException
+     */
+    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, API existingApi) throws APIException {
+
+        if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
+            handleException(log, "Provided swagger definition is empty, hence unable to generate API", null);
+        }
+
+        if (existingApi == null) {
+            handleException(log, "Provided existing API name is empty, hence unable to generate API", null);
+        }
+
+        JsonParser jsonParser = new JsonParser();
+        JsonElement swaggerJson = jsonParser.parse(swaggerJsonString);
+        if (swaggerJson.isJsonObject()) {
+            APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
+            try {
+                API api = apiGenerator.generateUpdatedSynapseAPI(existingApi);
                 return APISerializer.serializeAPI(api).toString();
             } catch (APIGenException e) {
                 handleException(log, "Error occurred while generating API", e);
