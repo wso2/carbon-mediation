@@ -1158,7 +1158,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * Function to generate updated existing API by referring to swagger definition (from JSON representation)
      *
      * @param swaggerJsonString swagger definition
-     * @param existingApiName  name of the existing API
+     * @param existingApiName name of the existing API
      * @return generated synapse API
      * @throws APIException
      */
