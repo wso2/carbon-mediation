@@ -86,6 +86,7 @@ public abstract class GenericPollingConsumer {
                 log.debug("Processed Custom inbound EP Message of Content-type : " + contentType);
             }             
             MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext)msgCtx).getAxis2MessageContext();
+            msgCtx.setProperty(GenericConstants.INBOUND_ENDPOINT_NAME, name);
             // Determine the message builder to use
             Builder builder;
             if (contentType == null) {
