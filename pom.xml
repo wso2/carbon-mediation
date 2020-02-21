@@ -2416,7 +2416,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v143</synapse.version>
+        <synapse.version>2.1.7-wso2v146</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.3.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2529,7 +2529,7 @@
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
-        <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
+        <javax.xml.soap.imp.pkg.version>0.0.0</javax.xml.soap.imp.pkg.version>
         <javax.jsr311.api.version>1.1.1</javax.jsr311.api.version>
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
