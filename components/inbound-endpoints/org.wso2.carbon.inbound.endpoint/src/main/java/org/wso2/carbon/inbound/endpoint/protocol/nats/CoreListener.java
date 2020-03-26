@@ -18,8 +18,8 @@ package org.wso2.carbon.inbound.endpoint.protocol.nats;
 import io.nats.client.Connection;
 import io.nats.client.Options;
 import io.nats.client.Nats;
-import io.nats.client.Subscription;
-import io.nats.client.Message;
+import io.nats.client.Dispatcher;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +38,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.KeyManagementException;
 import java.security.cert.CertificateException;
-import java.time.Duration;
 import java.util.Properties;
 
 /**
@@ -60,6 +59,7 @@ public class CoreListener implements NatsMessageListener {
 
     /**
      * Create the connection to the Core NATS server.
+     *
      * @return boolean value whether connection is created.
      */
     @Override public boolean createConnection() throws IOException, InterruptedException {
@@ -71,6 +71,7 @@ public class CoreListener implements NatsMessageListener {
 
     /**
      * Create and return the Core NATS connection.
+     *
      * @return the Core NATS connection.
      */
     public Connection getNatsConnection() throws IOException, InterruptedException {
@@ -82,10 +83,14 @@ public class CoreListener implements NatsMessageListener {
         String tlsKeyStoreLocation = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_LOCATION));
         String tlsKeyStorePassword = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEYSTORE_PASSWORD));
         String tlsTrustStoreType = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_TYPE));
-        String tlsTrustStoreLocation = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_LOCATION));
-        String tlsTrustStorePassword = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_PASSWORD));
-        String tlsKeyManagerAlgorithm = validateParameter(natsProperties.getProperty(NatsConstants.TLS_KEY_MANAGER_ALGORITHM));
-        String tlsTrustManagerAlgorithm = validateParameter(natsProperties.getProperty(NatsConstants.TLS_TRUST_MANAGER_ALGORITHM));
+        String tlsTrustStoreLocation = validateParameter(
+                natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_LOCATION));
+        String tlsTrustStorePassword = validateParameter(
+                natsProperties.getProperty(NatsConstants.TLS_TRUSTSTORE_PASSWORD));
+        String tlsKeyManagerAlgorithm = validateParameter(
+                natsProperties.getProperty(NatsConstants.TLS_KEY_MANAGER_ALGORITHM));
+        String tlsTrustManagerAlgorithm = validateParameter(
+                natsProperties.getProperty(NatsConstants.TLS_TRUST_MANAGER_ALGORITHM));
 
         Options.Builder builder = new Options.Builder(natsProperties);
 
@@ -118,23 +123,27 @@ public class CoreListener implements NatsMessageListener {
 
     /**
      * Consume the message received and inject into the sequence.
+     *
      * @param sequenceName the sequence to inject the message to.
      */
-    @Override public void consumeMessage(String sequenceName) throws InterruptedException {
-        Subscription subscription;
+    @Override public void consumeMessage(String sequenceName) {
+        Dispatcher dispatcher;
+        dispatcher = connection.createDispatcher(natsMessage -> {
+            if (natsMessage != null) {
+                String message = new String(natsMessage.getData(), StandardCharsets.UTF_8);
+                log.info("Message Received to NATS Inbound EP: " + message);
+                printDebugLog("Message Received to NATS Inbound EP: " + message);
+                injectHandler.invoke(message.getBytes(), sequenceName, natsMessage.getReplyTo(), connection);
+            } else {
+                printDebugLog("Message is null.");
+            }
+        });
+
         String queueGroup = natsProperties.getProperty(NatsConstants.QUEUE_GROUP);
         if (StringUtils.isNotEmpty(queueGroup)) {
-            subscription = connection.subscribe(subject, queueGroup);
+            dispatcher.subscribe(subject, queueGroup);
         } else {
-            subscription = connection.subscribe(subject);
-        }
-        Message natsMessage = subscription.nextMessage(Duration.ofMillis(100));
-        if (natsMessage != null) {
-            String message = new String(natsMessage.getData(), StandardCharsets.UTF_8);
-            printDebugLog("Message Received to NATS Inbound EP: " + message);
-            injectHandler.invoke(message.getBytes(), sequenceName, natsMessage.getReplyTo(), connection);
-        } else {
-            printDebugLog("Message is null.");
+            dispatcher.subscribe(subject);
         }
     }
 
@@ -174,10 +183,9 @@ public class CoreListener implements NatsMessageListener {
             if (StringUtils.isNotEmpty(tlsConnection.getKeyStoreLocation())) {
                 KeyStore keyStore = loadKeyStore(tlsConnection.getKeyStoreType(), tlsConnection.getKeyStoreLocation(),
                         tlsConnection.getTrustStorePassword());
-                keyManagerFactory = KeyManagerFactory.getInstance(
-                        tlsConnection.getKeyManagerAlgorithm().equals("") ?
-                                NatsConstants.DEFAULT_TLS_ALGORITHM :
-                                tlsConnection.getKeyManagerAlgorithm());
+                keyManagerFactory = KeyManagerFactory.getInstance(tlsConnection.getKeyManagerAlgorithm().equals("") ?
+                        NatsConstants.DEFAULT_TLS_ALGORITHM :
+                        tlsConnection.getKeyManagerAlgorithm());
                 keyManagerFactory.init(keyStore, tlsConnection.getKeyStorePassword().toCharArray());
             }
 
@@ -192,8 +200,8 @@ public class CoreListener implements NatsMessageListener {
             SSLContext sslContext = SSLContext.getInstance(tlsConnection.getProtocol().equals("") ?
                     Options.DEFAULT_SSL_PROTOCOL :
                     tlsConnection.getProtocol());
-            sslContext.init(keyManagerFactory == null ? null : keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
-                    new SecureRandom());
+            sslContext.init(keyManagerFactory == null ? null : keyManagerFactory.getKeyManagers(),
+                    trustManagerFactory.getTrustManagers(), new SecureRandom());
             return sslContext;
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyManagementException e) {
             log.error("Invalid TLS parameters. Establishing connection without TLS if possible.", e);

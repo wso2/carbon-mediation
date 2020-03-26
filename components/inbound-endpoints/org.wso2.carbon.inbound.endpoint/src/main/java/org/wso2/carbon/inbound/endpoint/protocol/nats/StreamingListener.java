@@ -15,17 +15,22 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
-import io.nats.streaming.*;
+import io.nats.streaming.StreamingConnection;
+import io.nats.streaming.Subscription;
+import io.nats.streaming.Options;
+import io.nats.streaming.StreamingConnectionFactory;
+import io.nats.streaming.SubscriptionOptions;
+import io.nats.streaming.Message;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.wso2.carbon.inbound.endpoint.protocol.nats.management.NatsEndpointManager;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -38,6 +43,7 @@ public class StreamingListener implements NatsMessageListener {
     private NatsInjectHandler injectHandler;
     private Properties natsProperties;
     private StreamingConnection connection;
+    private Subscription subscription;
 
     public StreamingListener(String subject, NatsInjectHandler injectHandler, Properties natsProperties) {
         this.subject = subject;
@@ -47,6 +53,7 @@ public class StreamingListener implements NatsMessageListener {
 
     /**
      * Create the connection to the NATS Streaming server.
+     *
      * @return boolean value whether connection is created.
      */
     @Override public boolean createConnection() throws IOException, InterruptedException {
@@ -60,9 +67,27 @@ public class StreamingListener implements NatsMessageListener {
             String pingInterval = natsProperties.getProperty(NatsConstants.NATS_STREAMING_PING_INTERVAL);
             String traceConnection = natsProperties.getProperty(NatsConstants.NATS_STREAMING_TRACE_CONNECTION);
 
-            Options.Builder builder = new Options.Builder().natsUrl(StringUtils.isEmpty(natsStreamingUrl) ? NatsConstants.DEFAULT_NATS_STREAMING_URL : natsStreamingUrl)
-                    .clientId(natsStreamingClientId)
-                    .clusterId(StringUtils.isEmpty(natsStreamingClusterId) ? NatsConstants.DEFAULT_NATS_STREAMING_CLUSTER_ID : natsStreamingClusterId);
+            Options.Builder builder = new Options.Builder().natsUrl(
+                    StringUtils.isEmpty(natsStreamingUrl) ? NatsConstants.DEFAULT_NATS_STREAMING_URL : natsStreamingUrl)
+                    .clientId(natsStreamingClientId).clusterId(StringUtils.isEmpty(natsStreamingClusterId) ?
+                            NatsConstants.DEFAULT_NATS_STREAMING_CLUSTER_ID :
+                            natsStreamingClusterId).connectionLostHandler((streamingConnection, e) -> {
+                        NatsMessageConsumer messageConsumer = NatsEndpointManager.getInstance().getMessageConsumer();
+                        try {
+                            if (connection != null) connection.close();
+                            connection = null;
+                            subscription = null;
+                            messageConsumer.consumeMessage();
+                        } catch (IOException | InterruptedException ex) {
+                            log.error("An error occurred while connecting to NATS server, consuming messages or while closing the connection. " + ex);
+                            messageConsumer.closeConnection();
+                        } catch (SynapseException ex) {
+                            log.error("Error while retrieving or injecting NATS message. " + e.getMessage(), ex);
+                        } catch (Exception ex) {
+                            log.error("Error while retrieving or injecting NATS message or closing conection. " + e.getMessage(), ex);
+                            messageConsumer.closeConnection();
+                        }
+                    });
 
             if (Boolean.parseBoolean(natsProperties.getProperty(NatsConstants.USE_CORE_NATS_CONNECTION))) {
                 builder.natsConn(new CoreListener(subject, injectHandler, natsProperties).getNatsConnection());
@@ -96,6 +121,7 @@ public class StreamingListener implements NatsMessageListener {
 
     /**
      * Consume the message received and inject into the sequence.
+     *
      * @param sequenceName the sequence to inject the message to.
      */
     @Override public void consumeMessage(String sequenceName)
@@ -134,38 +160,20 @@ public class StreamingListener implements NatsMessageListener {
             subscriptionOptions.dispatcher(dispatcher);
         }
 
-        CountDownLatch latch = new CountDownLatch(1);
-        if (StringUtils.isNotEmpty(queueGroup)) {
-            try {
-               connection.subscribe(subject, queueGroup, natsMessage -> {
-                    String message = new String(natsMessage.getData());
-                    printDebugLog("Message Received to NATS Inbound EP: " + message);
-                    boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
-                    if (isInjected) acknowledge(isManualAck, natsMessage); // message is acknowledged only if the message is successfully injected to sequence (only for manual acks)
-                    latch.countDown();
-                }, subscriptionOptions.build());
-            } finally {
-                // It will wait for scanInterval * 75% milliseconds for another message before releasing the thread
-                latch.await(new NatsPollingConsumer().getScanInterval() * 75/100, TimeUnit.MILLISECONDS);
-            }
-        } else {
-            try {
-                connection.subscribe(subject, natsMessage -> {
-                    String message = new String(natsMessage.getData());
-                    printDebugLog("Message Received to NATS Inbound EP: " + message);
-                    boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
-                    if (isInjected) acknowledge(isManualAck, natsMessage); // message is acknowledged only if the message is successfully injected to sequence (only for manual acks)
-                    latch.countDown();
-                }, subscriptionOptions.build());
-            } finally {
-                // It will wait for scanInterval * 75% milliseconds for another message before releasing the thread
-                latch.await(new NatsPollingConsumer().getScanInterval() * 75/100, TimeUnit.MILLISECONDS);
-            }
-        }
+        subscription = connection.subscribe(subject, queueGroup, natsMessage -> {
+            String message = new String(natsMessage.getData());
+            printDebugLog("Message Received to NATS Inbound EP: " + message);
+            log.info("Message Received to NATS Inbound EP: " + message);
+            boolean isInjected = injectHandler.invoke(message.getBytes(), sequenceName, null, null);
+            // message is acknowledged only if the message is successfully injected to sequence (only for manual acks)
+            if (isInjected)
+                acknowledge(isManualAck, natsMessage);
+        }, subscriptionOptions.build());
     }
 
     /**
      * Check if manual acks is set to true and ack manually.
+     *
      * @param isManualAck boolean to enable manual ack.
      * @param natsMessage the NATS message
      */
@@ -174,7 +182,8 @@ public class StreamingListener implements NatsMessageListener {
             try {
                 natsMessage.ack();
             } catch (IOException e) {
-                log.error("An error occurred while sending manual ack. Message might get redelivered. Sequence number: " + natsMessage.getSequence(), e);
+                log.error("An error occurred while sending manual ack. Message might get redelivered. Sequence number: "
+                        + natsMessage.getSequence(), e);
             }
         }
     }
@@ -184,13 +193,13 @@ public class StreamingListener implements NatsMessageListener {
      */
     @Override public void closeConnection() {
         try {
-            if (connection != null) {
-                connection.close();
-            }
+            if (subscription != null) subscription.close();
+            if (connection != null) connection.close();
         } catch (Exception e) {
             log.error("An error occurred while closing the connection. ", e);
         }
         connection = null;
+        subscription = null;
     }
 
     /**

@@ -16,6 +16,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
 
 import io.nats.client.Connection;
+
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.inbound.InboundResponseSender;
 

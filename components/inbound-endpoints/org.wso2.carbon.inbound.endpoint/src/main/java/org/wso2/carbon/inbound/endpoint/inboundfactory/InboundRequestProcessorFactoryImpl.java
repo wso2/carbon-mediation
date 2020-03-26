@@ -32,7 +32,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.kafka.KAFKAProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.mqtt.MqttListener;
-import org.wso2.carbon.inbound.endpoint.protocol.nats.NatsProcessor;
+import org.wso2.carbon.inbound.endpoint.protocol.nats.InboundNatsListener;
 import org.wso2.carbon.inbound.endpoint.protocol.rabbitmq.RabbitMQListener;
 import org.wso2.carbon.inbound.endpoint.protocol.securewebsocket.InboundSecureWebsocketListener;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketListener;
@@ -76,7 +76,7 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
             }else if (Protocols.rabbitmq.toString().equals(protocol)) {
                 inboundRequestProcessor = new RabbitMQListener(params);
             } else if (Protocols.nats.toString().equals(protocol)) {
-                inboundRequestProcessor = new NatsProcessor(params);
+                inboundRequestProcessor = new InboundNatsListener(params);
             }
         } else if (params.getClassImpl() != null) {
             if (GenericInboundListener.isListeningInboundEndpoint(params)) {

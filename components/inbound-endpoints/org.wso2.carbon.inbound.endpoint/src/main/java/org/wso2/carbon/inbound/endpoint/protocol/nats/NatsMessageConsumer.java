@@ -20,38 +20,32 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
 /**
  * Polling consumer for NATS to initialize connection and poll messages.
  */
-public class NatsPollingConsumer {
+public class NatsMessageConsumer {
 
-    private static final Log log = LogFactory.getLog(NatsPollingConsumer.class.getName());
+    private static final Log log = LogFactory.getLog(NatsMessageConsumer.class.getName());
     private NatsInjectHandler injectHandler;
     private Properties natsProperties;
     private NatsMessageListener natsMessageListener;
     private String subject;
-    private long scanInterval;
-    private Long lastRanTime;
-    private String name;
+    private String injectingSequenceName;
 
-    NatsPollingConsumer(Properties natsProperties, long scanInterval, String name) {
+    public NatsMessageConsumer(Properties natsProperties, String injectingSequenceName) {
         this.natsProperties = natsProperties;
-        this.scanInterval = scanInterval;
-        this.name = name;
+        this.injectingSequenceName = injectingSequenceName;
         this.subject = natsProperties.getProperty(NatsConstants.SUBJECT);
         if (subject == null) throw new SynapseException("NATS subject cannot be null.");
     }
 
-    NatsPollingConsumer() {}
-
     /**
      * Initialize the message listener to use (Core NATS or NATS Streaming).
      */
-    void initializeMessageListener() {
+    public void initializeMessageListener() {
         printDebugLog("Create the NATS message listener.");
         if (Boolean.parseBoolean(natsProperties.getProperty(NatsConstants.NATS_STREAMING))) {
             natsMessageListener = new StreamingListener(subject, injectHandler, natsProperties);
@@ -61,37 +55,17 @@ public class NatsPollingConsumer {
     }
 
     /**
-     * Called at taskExecute to execute the NATS Task.
+     * Create the NATS connection and poll messages.
      */
-    public void execute() {
-        try {
-            printDebugLog("Executing : NATS Inbound EP : ");
-            // Check if the cycles are running in correct interval and start scan
-            long currentTime = (new Date()).getTime();
-            if (lastRanTime == null || ((lastRanTime + (scanInterval)) <= currentTime)) {
-                lastRanTime = currentTime;
-                poll();
-            } else {
-                printDebugLog("Skip cycle since concurrent rate is higher than the scan interval : NATS Inbound EP ");
-            }
-            printDebugLog("End : NATS Inbound EP : ");
-        } catch (IOException | InterruptedException e) {
-            log.error("An error occurred while connecting to NATS server or consuming the message. " + e);
-            natsMessageListener.closeConnection();
-        } catch (Exception e) {
-            log.error("Error while retrieving or injecting NATS message. " + e.getMessage(), e);
-            natsMessageListener.closeConnection();
+    public void consumeMessage() throws IOException, InterruptedException, TimeoutException {
+        if (natsMessageListener.createConnection() && injectHandler != null) {
+            natsMessageListener.consumeMessage(injectingSequenceName);
         }
     }
 
-    /**
-     * Create the NATS connection and poll messages.
-     */
-    public Object poll() throws IOException, InterruptedException, TimeoutException {
-        if (natsMessageListener.createConnection() && injectHandler != null) {
-            natsMessageListener.consumeMessage(name);
-        }
-        return null;
+    public void closeConnection() {
+        printDebugLog("Closing NATS connection");
+        natsMessageListener.closeConnection();
     }
 
     /**
@@ -100,16 +74,12 @@ public class NatsPollingConsumer {
      *
      * @param injectHandler the injectHandler
      */
-    void registerHandler(NatsInjectHandler injectHandler) {
+    public void registerHandler(NatsInjectHandler injectHandler) {
         this.injectHandler = injectHandler;
     }
 
     public Properties getInboundProperties() {
         return natsProperties;
-    }
-
-    public long getScanInterval() {
-        return scanInterval;
     }
 
     /**

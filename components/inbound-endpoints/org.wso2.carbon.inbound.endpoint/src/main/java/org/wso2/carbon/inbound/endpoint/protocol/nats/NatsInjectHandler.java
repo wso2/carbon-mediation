@@ -52,7 +52,7 @@ public class NatsInjectHandler {
     private SynapseEnvironment synapseEnvironment;
     private String contentType;
 
-    NatsInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
+    public NatsInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
             SynapseEnvironment synapseEnvironment, String contentType) {
         this.injectingSeq = injectingSeq;
         this.onErrorSeq = onErrorSeq;
