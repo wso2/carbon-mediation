@@ -30,6 +30,8 @@ import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
+import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format.utils.SwaggerProcessorConstants;
+import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format.utils.SwaggerUtils;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -46,10 +48,6 @@ import java.nio.charset.Charset;
  */
 public class SwaggerGenerator {
     private static final Log log = LogFactory.getLog(SwaggerGenerator.class);
-    /**
-     * Registry path prefixes
-     */
-    static final String CONFIG_REG_PREFIX = "conf:";
 
     /**
      * Update the response with provided response string.
@@ -124,14 +122,13 @@ public class SwaggerGenerator {
     /**
      * Function to extract swagger definition from the registry
      *
-     * @param api API object
-     * @param request CarbonHttpRequest which contains the request URI info
+     * @param api        API object
+     * @param requestURI request URI info
      * @return null if registry content unavailable or empty, otherwise relevant content
      * @throws RegistryException
      */
-    protected String retrieveFromRegistry(API api, CarbonHttpRequest request) throws RegistryException {
+    protected String retrieveAPISwaggerFromRegistry(API api, String requestURI) throws RegistryException {
 
-        boolean isSourceConfigReg = true;
         String resourcePath = api.getSwaggerResourcePath();
 
         if (resourcePath == null) {
@@ -142,47 +139,13 @@ public class SwaggerGenerator {
                 resourcePathBuilder.append(":v").append(api.getVersion());
             }
             resourcePathBuilder.append("/swagger.json");
-            resourcePath = resourcePathBuilder.toString();
+            resourcePath = SwaggerProcessorConstants.CONFIG_REG_PREFIX + resourcePathBuilder.toString();
 
-        } else {
-            if (resourcePath.startsWith(CONFIG_REG_PREFIX)) {
-                resourcePath = resourcePath.substring(5);
-            } else {
-                resourcePath = resourcePath.substring(4);
-                isSourceConfigReg = false;
-            }
         }
-
-        RegistryService registryService = RegistryServiceHolder.getInstance().getRegistryService();
-        String defString = null;
-        String tenantDomain = MultitenantUtils.getTenantDomainFromRequestURL(request.getRequestURI());
-        tenantDomain = (tenantDomain != null) ? tenantDomain : MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-        Registry registry;
-        if (isSourceConfigReg) {
-            registry = registryService.getConfigSystemRegistry(tenantId);
-        } else {
-            registry = registryService.getGovernanceSystemRegistry(tenantId);
-        }
-
-        Resource resource;
-        if (registry.resourceExists(resourcePath)) {
-            resource = registry.get(resourcePath);
-            if (resource.getContent() != null && (resource.getContent() instanceof byte[]) &&
-                    (((byte[])resource.getContent()).length > 0)) {
-                defString = new String((byte[]) resource.getContent(), Charset.defaultCharset());
-            }
-            if (log.isDebugEnabled()) {
-                log.debug("Retrieving swagger definition form registry path : " + resourcePath + " for api : " +
-                        api.getName() + " with definition: " + defString);
-            }
-        }
-
-        return defString;
+        return SwaggerUtils.fetchSwaggerFromRegistry(requestURI, resourcePath);
     }
+
+
 
     /**
      * Logs exceptions occured in formatters and throws.
