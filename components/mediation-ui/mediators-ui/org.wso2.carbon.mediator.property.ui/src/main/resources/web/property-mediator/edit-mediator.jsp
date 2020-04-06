@@ -27,6 +27,7 @@
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     boolean isExpression = false;
     String val = "";
+    String propertyName = "";
 
     if (!(mediator instanceof org.wso2.carbon.mediator.property.PropertyMediator)) {
         // todo : proper error handling
@@ -43,6 +44,10 @@
                 == propertyMediator.getAction()) {
             displayPatternAndGroup = false;
         }
+    }
+    if (propertyMediator.getName() != null) {
+        propertyName = propertyMediator.getName();
+        propertyName = propertyName.replace("\"","&quot;");//replace quote sign with &quot;
     }
     if (propertyMediator.getValue() != null) {
         isExpression = false;
@@ -88,7 +93,7 @@
                 <td>
                     <input type="text" id="mediator.property.name" name="mediator.property.name"
                            style="width:300px;"
-                           value='<%=propertyMediator.getName() != null ? propertyMediator.getName() : ""%>'/>
+                           value="<%=propertyMediator.getName() != null ? propertyName : ""%>"/>
                 </td>
                 <td></td>
             </tr>
