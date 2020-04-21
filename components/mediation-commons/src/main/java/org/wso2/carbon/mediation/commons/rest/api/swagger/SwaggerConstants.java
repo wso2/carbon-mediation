@@ -261,12 +261,12 @@ public class SwaggerConstants {
     public static String[] DEFAULT_PRODUCES = {CONTENT_TYPE_JSON, CONTENT_TYPE_XML};
 
     /**
-     * Default produce mime types
+     * Default host for Swagger API
      */
     public static String DEFAULT_HOST = "localhost";
 
     /**
-     * Default produce mime types
+     * Default port for Swagger API
      */
     public static int DEFAULT_PORT = 8290;
 
