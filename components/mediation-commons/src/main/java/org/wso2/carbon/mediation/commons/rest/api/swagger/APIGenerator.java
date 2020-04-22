@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SequenceType;
@@ -164,6 +165,10 @@ public class APIGenerator {
         if (existingAPI.getVersionStrategy() instanceof DefaultStrategy) {
             genAPI.setVersionStrategy(new DefaultStrategy(genAPI));
         }
+        // Copy the Swagger resource property if specified in the existing API
+        if (StringUtils.isNotBlank(existingAPI.getSwaggerResourcePath())) {
+            genAPI.setSwaggerResourcePath(existingAPI.getSwaggerResourcePath());
+        }
         updateImplChanges(genAPI, clonedAPI);
         return genAPI;
     }
@@ -217,7 +222,7 @@ public class APIGenerator {
         for (Resource resource : currentAPI.getResources()) {
 
             String resourceMapping = resource.getDispatcherHelper() != null ?
-                                                        resource.getDispatcherHelper().getString() : "/";
+                    resource.getDispatcherHelper().getString() : "/";
             ArrayList<Resource> resourceList;
             if (currentResourceList.get(resourceMapping) != null) {
                 resourceList = currentResourceList.get(resourceMapping);
@@ -231,7 +236,7 @@ public class APIGenerator {
         for (Resource resource : newAPI.getResources()) {
 
             String resourceMapping = resource.getDispatcherHelper() != null ?
-                                                        resource.getDispatcherHelper().getString() : "/";
+                    resource.getDispatcherHelper().getString() : "/";
             ArrayList<Resource> existingResources = currentResourceList.get(resourceMapping);
 
             if (existingResources != null) {
