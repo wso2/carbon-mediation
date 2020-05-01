@@ -40,6 +40,7 @@ import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.websocket.transport.utils.LogUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -131,6 +132,9 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 String headerSplits[] = propertyName.split(webSocketCustomHeaderPrefix);
                 if (headerSplits.length > 1) {
                     customHeaders.put(headerSplits[1], value);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Adding Custom Header " + headerSplits[1] + ":" + value);
+                    }
                 } else {
                     log.warn("A header identified with having only the websocket custom-header prefix"
                             + " as the key (without a unique postfix). Hence dropping the header.");
@@ -165,6 +169,9 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 }
                 if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                     clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+                    if (log.isDebugEnabled()) {
+                        LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                    }
                 }
             } else if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT) != null
                     && msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
@@ -175,6 +182,9 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 }
                 if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                     clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+                    if (log.isDebugEnabled()) {
+                        LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                    }
                 }
             } else {
                 if (!handshakePresent) {
@@ -194,6 +204,9 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                         clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+                        if (log.isDebugEnabled()) {
+                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                        }
                     }
                 } else {
                     clientHandler.acknowledgeHandshake();
