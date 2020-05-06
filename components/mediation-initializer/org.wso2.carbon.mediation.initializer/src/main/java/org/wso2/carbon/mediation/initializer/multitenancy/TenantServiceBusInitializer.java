@@ -101,7 +101,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         String tenantDomain =
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-        log.info("Intializing the ESB Configuration for the tenant domain : " + tenantDomain);
+        log.info("Initializing the ESB Configuration for the tenant domain : " + tenantDomain);
 
         try {
             // first check which configuration should be active
@@ -156,7 +156,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                     configurationContext,tenantDomain);
 
             if (contextInfo == null) {
-                handleFatal("Failed to intilize the ESB for tenent:" + tenantDomain);
+                handleFatal("Failed to initialize the ESB for tenant:" + tenantDomain);
             }
 
             initPersistence(manger.getTracker().getCurrentConfigurationName(),
@@ -498,13 +498,15 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                 faultSequence.setFileName(SynapseConstants.FAULT_SEQUENCE_KEY + ".xml");
                 serializer.serializeSequence(faultSequence, initialSynCfg, null);
             }
-            if (!new File(sequencesDir, "registry.xml").exists()) {
+            if (!new File(synapseConfigDir, SynapseConstants.REGISTRY_FILE).exists()) {
                 Registry registry = new WSO2Registry();
                 registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
                 initialSynCfg.setRegistry(registry);
                 serializer.serializeSynapseRegistry(registry, initialSynCfg, null);
             }
-            serializer.serializeSynapseXML(initialSynCfg);
+            if (!new File(synapseConfigDir, SynapseConstants.SYNAPSE_XML).exists()) {
+                serializer.serializeSynapseXML(initialSynCfg);
+            }
         } catch (Exception e) {
             handleException("Couldn't serialise the initial synapse configuration " +
                     "for the domain : " + tenantDomain, e);
