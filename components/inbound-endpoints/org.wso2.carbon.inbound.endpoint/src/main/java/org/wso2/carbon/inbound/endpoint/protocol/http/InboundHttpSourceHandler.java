@@ -88,6 +88,8 @@ public class InboundHttpSourceHandler extends SourceHandler {
             }
             workerPool.execute
                     (new InboundHttpServerWorker(port, tenantDomain, request, sourceConfiguration, os));
+            //increasing the input request metric
+            sourceConfiguration.getMetrics().requestReceived();
         } catch (HttpException e) {
             log.error("HttpException occurred when creating Source Request", e);
             informReaderError(conn);
