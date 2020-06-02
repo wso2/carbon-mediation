@@ -129,8 +129,7 @@ public class APIGenerator {
             JsonObject pathsObj = swaggerJson.getAsJsonObject(SwaggerConstants.PATHS);
             for (Map.Entry<String, JsonElement> pathEntry : pathsObj.entrySet()) {
                 if (pathEntry.getValue() instanceof JsonObject) {
-                    Resource resource = createResource(pathEntry.getKey(), pathEntry.getValue().getAsJsonObject());
-                    genAPI.addResource(resource);
+                    createResource(pathEntry.getKey(), pathEntry.getValue().getAsJsonObject(), genAPI);
                 }
             }
         }
@@ -174,41 +173,43 @@ public class APIGenerator {
     }
 
     /**
-     * Function to create resource from swagger definition
+     * Function to create resource from swagger definition.
      *
-     * @param path
-     * @param resourceObj
-     * @return
+     * @param path path of the resource
+     * @param resourceObj json representation of resource
+     * @param genAPI generated API
      */
-    private Resource createResource(String path, JsonObject resourceObj) throws APIGenException {
+    private void createResource(String path, JsonObject resourceObj, API genAPI) throws APIGenException {
 
-        if (log.isDebugEnabled()) {
-            log.info("Generating resource for path : " + path);
-        }
-        Resource resource = new Resource();
         for (Map.Entry<String, JsonElement> methodEntry : resourceObj.entrySet()) {
-            resource.addMethod(methodEntry.getKey().toUpperCase());
-        }
-
-        // Identify URL Mapping and template and create relevant helper
-        Matcher matcher = SwaggerConstants.PATH_PARAMETER_PATTERN.matcher(path);
-        ArrayList<String> pathParamList = new ArrayList<>();
-        while (matcher.find()) {
-            pathParamList.add(matcher.group(1));
-        }
-        if (pathParamList.isEmpty()) {
-            // if the path is '/' then it should have none URL style
-            if (!"/".equals(path)) {
-                resource.setDispatcherHelper(new URLMappingHelper(path));
+            if (log.isDebugEnabled()) {
+                log.info("Generating resource for path : " + path + ", method : " + methodEntry.getKey());
             }
-        } else {
-            resource.setDispatcherHelper(new URITemplateHelper(path));
+            
+            // Create a new resource for each method.
+            Resource resource = new Resource();
+            resource.addMethod(methodEntry.getKey().toUpperCase());
+
+            // Identify URL Mapping and template and create relevant helper
+            Matcher matcher = SwaggerConstants.PATH_PARAMETER_PATTERN.matcher(path);
+            ArrayList<String> pathParamList = new ArrayList<>();
+            while (matcher.find()) {
+                pathParamList.add(matcher.group(1));
+            }
+            if (pathParamList.isEmpty()) {
+                // if the path is '/' then it should have none URL style
+                if (!"/".equals(path)) {
+                    resource.setDispatcherHelper(new URLMappingHelper(path));
+                }
+            } else {
+                resource.setDispatcherHelper(new URITemplateHelper(path));
+            }
+
+            resource.setInSequence(APIGenerator.getDefaultInSequence(pathParamList));
+            resource.setOutSequence(APIGenerator.getDefaultOutSequence());
+            genAPI.addResource(resource);
         }
 
-        resource.setInSequence(APIGenerator.getDefaultInSequence(pathParamList));
-        resource.setOutSequence(APIGenerator.getDefaultOutSequence());
-
-        return resource;
     }
 
     private void updateImplChanges(API newAPI, API currentAPI) {
