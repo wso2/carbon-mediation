@@ -28,34 +28,54 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Set;
 
 public class RefreshAccessToken extends AbstractConnector {
-    CloseableHttpClient httpclient = HttpClients.createDefault();
+    private CloseableHttpClient httpClient = HttpClients.createDefault();
 
     @Override
     public void connect(MessageContext messageContext) throws ConnectException {
         SynapseLog synLog = getLog(messageContext);
+        Set propertyKeySet = messageContext.getPropertyKeySet();
+        propertyKeySet.remove("Accept-Encoding");
+
 
         if (synLog.isTraceOrDebugEnabled()) {
-            synLog.traceOrDebug("Start : Salesforce Refresh Access Token mediator");
+            synLog.traceOrDebug("Start : Salesforce Refresh Access Token mediator. If you want to observe refresh " +
+                    "access token header and wire logs please enable Apache HTTP Client logs in Log4j.properties");
 
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Message : " + messageContext.getEnvelope());
             }
         }
 
-        String tokenRefreshUrl = "";
-        tokenRefreshUrl += messageContext.getProperty("uri.var.hostName");
-        tokenRefreshUrl += "/services/oauth2/token?grant_type=refresh_token";
-        tokenRefreshUrl += "&client_id=" + messageContext.getProperty("uri.var.clientId");
-        tokenRefreshUrl += "&client_secret=" + messageContext.getProperty("uri.var.clientSecret");
-        tokenRefreshUrl += "&refresh_token=" + messageContext.getProperty("uri.var.refreshToken");
-        tokenRefreshUrl += "&format=json";
+        String refreshUrl;
+        String customRefreshUrl = (String) messageContext.getProperty("uri.var.customRefreshUrl");
 
-        HttpGet httpget = new HttpGet(tokenRefreshUrl);
+        if (customRefreshUrl != null && !customRefreshUrl.equals("")) {
+            refreshUrl = customRefreshUrl;
+        } else {
+            StringBuilder urlStringBuilder = new StringBuilder();
+            urlStringBuilder.append(messageContext.getProperty("uri.var.hostName"));
+            urlStringBuilder.append("/services/oauth2/token?grant_type=refresh_token");
+            String clientId = (String) messageContext.getProperty("uri.var.clientId");
+            if (clientId != null && !clientId.equals("")) {
+                urlStringBuilder.append("&client_id=").append(clientId);
+            }
+            String clientSecret = (String) messageContext.getProperty("uri.var.clientSecret");
+            if (clientSecret != null && !clientSecret.equals("")) {
+                urlStringBuilder.append("&client_id=").append(clientSecret);
+            }
+            urlStringBuilder.append("&refresh_token=").append(messageContext.getProperty("uri.var.refreshToken"));
+            urlStringBuilder.append("&format=json");
+            refreshUrl = urlStringBuilder.toString();
+        }
+
+        HttpGet httpget = new HttpGet(refreshUrl);
         CloseableHttpResponse httpResponse = null;
+
         try {
-            httpResponse = httpclient.execute(httpget);
+            httpResponse = httpClient.execute(httpget);
             Scanner scanner = new Scanner(httpResponse.getEntity().getContent());
             String jsonResponse = scanner.nextLine();
             JSONObject jsonObject = new JSONObject(jsonResponse);
@@ -83,8 +103,9 @@ public class RefreshAccessToken extends AbstractConnector {
             }
         } catch (IOException e) {
             e.printStackTrace();
-
         } finally {
+            propertyKeySet.remove("Cache-Control");
+            propertyKeySet.remove("Pragma");
             httpget.releaseConnection();
             if (httpResponse != null) {
                 try {
@@ -95,5 +116,4 @@ public class RefreshAccessToken extends AbstractConnector {
             }
         }
     }
-
 }
