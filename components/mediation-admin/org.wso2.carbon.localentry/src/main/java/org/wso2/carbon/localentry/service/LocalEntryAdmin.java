@@ -57,7 +57,8 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(LocalEntryAdmin.class);
     public static final int LOCAL_ENTRIES_PER_PAGE = 10;
-    private boolean skipLocalCopy = SynapsePropertiesLoader.getBooleanProperty("skipLocalCopy",false);
+    private boolean saveRuntimeArtifacts =
+            SynapsePropertiesLoader.getBooleanProperty("synapse.runtime_artifacts.save.local.file",true);
 
     public EntryData[] entryData() throws LocalEntryAdminException {
         final Lock lock = getLock();
@@ -218,7 +219,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                             getSynapseConfiguration().getProperties());
                     entry.setFileName(ServiceBusUtils.generateFileName(entry.getKey()));
                     getSynapseConfiguration().addEntry(entryKey, entry);
-                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && !skipLocalCopy) {
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                         MediationPersistenceManager pm
                                 = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
                         pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
@@ -305,7 +306,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                         entry.setIsEdited(true);
                     }
                     else {
-                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && !skipLocalCopy) {
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                             MediationPersistenceManager pm
                                     = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
                             pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
@@ -432,7 +433,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
             if (entry != null) {
                 synapseConfiguration.removeEntry(entryKey);
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && !skipLocalCopy) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm
                             = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
                     pm.deleteItem(entryKey, entry.getFileName(), ServiceBusConstants.ITEM_TYPE_ENTRY);
