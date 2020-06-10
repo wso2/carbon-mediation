@@ -80,7 +80,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(SequenceAdmin.class);
     private boolean saveRuntimeArtifacts =
-            SynapsePropertiesLoader.getBooleanProperty("synapse.runtime_artifacts.save.local.file",true);
+            SynapsePropertiesLoader.getBooleanProperty("synapse.runtime_artifacts.save.local.file", true);
 
     //TODO: Move WSO2_SEQUENCE_MEDIA_TYPE to registry
     public static final String WSO2_SEQUENCE_MEDIA_TYPE ="application/vnd.wso2.sequence";
@@ -874,7 +874,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
     }
 
     private void persistSequence(SequenceMediator sequence) throws SequenceEditorException {
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && !saveRuntimeArtifacts) {
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
             MediationPersistenceManager pm = getMediationPersistenceManager();
             if (pm == null) {
                 handleException("Cannot Persist sequence because persistence manager is null, " +
