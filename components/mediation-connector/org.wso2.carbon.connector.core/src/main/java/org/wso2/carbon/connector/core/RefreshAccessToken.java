@@ -41,6 +41,7 @@ import java.util.Set;
  */
 public class RefreshAccessToken extends AbstractConnector {
     private CloseableHttpClient httpClient = HttpClients.createDefault();
+    private final String PROPERTY_PREFIX = "uri.var.";
 
     @Override
     public void connect(MessageContext messageContext) throws ConnectException {
@@ -57,23 +58,23 @@ public class RefreshAccessToken extends AbstractConnector {
         }
 
         String refreshUrl;
-        String customRefreshUrl = (String) messageContext.getProperty("uri.var.customRefreshUrl");
+        String customRefreshUrl = (String) messageContext.getProperty(PROPERTY_PREFIX + "customRefreshUrl");
 
         if (StringUtils.isNotEmpty(customRefreshUrl)) {
             refreshUrl = customRefreshUrl;
         } else {
             StringBuilder urlStringBuilder = new StringBuilder();
-            urlStringBuilder.append(messageContext.getProperty("uri.var.hostName"));
+            urlStringBuilder.append(messageContext.getProperty(PROPERTY_PREFIX + "hostName"));
             urlStringBuilder.append("/services/oauth2/token?grant_type=refresh_token");
-            String clientId = (String) messageContext.getProperty("uri.var.clientId");
+            String clientId = (String) messageContext.getProperty(PROPERTY_PREFIX + "clientId");
             if (StringUtils.isNotEmpty(clientId)) {
                 urlStringBuilder.append("&client_id=").append(clientId);
             }
-            String clientSecret = (String) messageContext.getProperty("uri.var.clientSecret");
+            String clientSecret = (String) messageContext.getProperty(PROPERTY_PREFIX + "clientSecret");
             if (StringUtils.isNotEmpty(clientSecret)) {
                 urlStringBuilder.append("&client_secret=").append(clientSecret);
             }
-            urlStringBuilder.append("&refresh_token=").append(messageContext.getProperty("uri.var.refreshToken"));
+            urlStringBuilder.append("&refresh_token=").append(messageContext.getProperty(PROPERTY_PREFIX + "refreshToken"));
             urlStringBuilder.append("&format=json");
             refreshUrl = urlStringBuilder.toString();
         }
@@ -91,14 +92,15 @@ public class RefreshAccessToken extends AbstractConnector {
             JSONObject jsonObject = new JSONObject(jsonResponse);
 
             String accessToken = jsonObject.getString("access_token");
-            messageContext.setProperty("uri.var.accessToken", accessToken);
+            messageContext.setProperty(PROPERTY_PREFIX + "accessToken", accessToken);
 
             String instanceUrl = jsonObject.getString("instance_url");
-            messageContext.setProperty("uri.var.apiUrl", instanceUrl);
+            messageContext.setProperty(PROPERTY_PREFIX + "apiUrl", instanceUrl);
 
             String systemTime = Long.toString(System.currentTimeMillis());
-            String newAccessRegistryPath = (String) messageContext.getProperty("uri.var.accessTokenRegistryPath");
-            String newTimeRegistryPath = (String) messageContext.getProperty("uri.var.timeRegistryPath");
+            String newAccessRegistryPath = (String) messageContext.getProperty(PROPERTY_PREFIX +
+                    "accessTokenRegistryPath");
+            String newTimeRegistryPath = (String) messageContext.getProperty(PROPERTY_PREFIX + "timeRegistryPath");
             Registry registry = messageContext.getConfiguration().getRegistry();
 
             if(StringUtils.isNotEmpty(accessToken)) {
