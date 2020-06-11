@@ -86,7 +86,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     private static final String GOV_REG_PREFIX = "gov:";
     private static final String FILE_PREFIX = "file:";
     private boolean saveRuntimeArtifacts =
-            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.ARTIFACT_STORAGE_ENABLING_SYNAPSE_PROPERTY, true);
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
 	public boolean addApi(APIData apiData) throws APIException {
 		final Lock lock = getLock();

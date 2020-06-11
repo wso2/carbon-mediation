@@ -72,8 +72,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
     private static final Log log = LogFactory.getLog(EndpointAdmin.class);
     public static final String WSO2_ENDPOINT_MEDIA_TYPE = "application/vnd.wso2.esb.endpoint";
     private boolean saveRuntimeArtifacts =
-            SynapsePropertiesLoader.getBooleanProperty(
-                    SynapseConstants.ARTIFACT_STORAGE_ENABLING_SYNAPSE_PROPERTY, true);
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
     /**
      * Set Endpoint status to Active
