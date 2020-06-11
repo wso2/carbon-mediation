@@ -22,6 +22,7 @@ package org.wso2.carbon.mediator.publishevent;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -30,12 +31,12 @@ import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionExc
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.event.sink.EventSink;
 import org.wso2.carbon.event.sink.EventSinkService;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.QName;
 
 /**
  * Mediator that extracts data from current message payload/header according to the given configuration.
@@ -88,6 +89,16 @@ public class PublishEventMediator extends AbstractMediator {
 			tenantId = (Integer) messageContext.getProperty(TASK_EXECUTING_TENANT_ID);
 			PrivilegedCarbonContext.startTenantFlow();
 			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+		}
+
+		if (PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId() == -1 ){
+			PrivilegedCarbonContext.startTenantFlow();
+			Object tenantDomainObj = ((Axis2MessageContext) messageContext).
+					getAxis2MessageContext().getProperty("tenantDomain");
+			String tenantDomain = (tenantDomainObj != null) ?
+					(String)tenantDomainObj : MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+			tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 		}
 
 		// first "getEventSink() == null" check is done to avoid synchronized(this) block each time mediate()
