@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.connector.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -52,7 +53,7 @@ public class RefreshAccessToken extends AbstractConnector {
         String refreshUrl;
         String customRefreshUrl = (String) messageContext.getProperty("uri.var.customRefreshUrl");
 
-        if (customRefreshUrl != null && !customRefreshUrl.equals("")) {
+        if (customRefreshUrl != null && !StringUtils.isEmpty(customRefreshUrl)) {
             refreshUrl = customRefreshUrl;
         } else {
             StringBuilder urlStringBuilder = new StringBuilder();
@@ -63,7 +64,7 @@ public class RefreshAccessToken extends AbstractConnector {
                 urlStringBuilder.append("&client_id=").append(clientId);
             }
             String clientSecret = (String) messageContext.getProperty("uri.var.clientSecret");
-            if (clientSecret != null && !clientSecret.equals("")) {
+            if (clientSecret != null && !StringUtils.isEmpty(clientSecret)) {
                 urlStringBuilder.append("&client_id=").append(clientSecret);
             }
             urlStringBuilder.append("&refresh_token=").append(messageContext.getProperty("uri.var.refreshToken"));
@@ -90,7 +91,7 @@ public class RefreshAccessToken extends AbstractConnector {
             String newAccessRegistryPath = (String) messageContext.getProperty("uri.var.accessTokenRegistryPath");
             String newTimeRegistryPath = (String) messageContext.getProperty("uri.var.timeRegistryPath");
 
-            if((accessToken != null) && (!accessToken.equals(""))){
+            if((accessToken != null) && (!StringUtils.isEmpty(accessToken))) {
                 if (!messageContext.getConfiguration().getRegistry().isResourceExists(newAccessRegistryPath)) {
                     messageContext.getConfiguration().getRegistry().newResource(newAccessRegistryPath, false);
                     messageContext.getConfiguration().getRegistry().updateResource(newAccessRegistryPath, accessToken);
