@@ -31,6 +31,13 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * This class can be used by connectors to refresh OAuth 2.0 access tokens by setting the following mandatory
+ * properties in message context: uri.var.hostName, uri.var.refreshToken
+ *
+ * After refresh call this will set the uri.var.accessToken, and uri.var.apiUrl in the message context to be used by
+ * subsequent calls
+ */
 public class RefreshAccessToken extends AbstractConnector {
     private CloseableHttpClient httpClient = HttpClients.createDefault();
 
@@ -76,6 +83,9 @@ public class RefreshAccessToken extends AbstractConnector {
 
         try {
             httpResponse = httpClient.execute(httpget);
+            if (httpResponse.getEntity() == null) {
+                throw new ConnectException("Empty response received for refresh access token call");
+            }
             Scanner scanner = new Scanner(httpResponse.getEntity().getContent());
             String jsonResponse = scanner.nextLine();
             JSONObject jsonObject = new JSONObject(jsonResponse);
