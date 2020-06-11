@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.config.xml.rest.APISerializer;
@@ -84,6 +85,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     private static final String CONFIG_REG_PREFIX = "conf:";
     private static final String GOV_REG_PREFIX = "gov:";
     private static final String FILE_PREFIX = "file:";
+    private boolean saveRuntimeArtifacts =
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
 	public boolean addApi(APIData apiData) throws APIException {
 		final Lock lock = getLock();
@@ -165,7 +168,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setArtifactContainerName(oldAPI.getArtifactContainerName());
                 apiData.setIsEdited(true);
             } else {
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     String fileName = api.getFileName();
                     pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -213,7 +216,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setIsEdited(true);
                 getApiByName(api.getName()).setIsEdited(true);
             } else {
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     String fileName = api.getFileName();
                     pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -270,7 +273,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.destroy();
                 synapseConfiguration.removeAPI(apiName);
 
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     String fileName = api.getFileName();
                     pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -310,7 +313,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     api.destroy();
                     synapseConfiguration.removeAPI(apiName);
 
-                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                         MediationPersistenceManager pm = getMediationPersistenceManager();
                         String fileName = api.getFileName();
                         pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -904,7 +907,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 	
 	private void persistApi(API api) throws APIException {
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
             MediationPersistenceManager pm = getMediationPersistenceManager();
             if (pm != null) {
                 pm.saveItem(api.getName(), ServiceBusConstants.ITEM_TYPE_REST_API);
