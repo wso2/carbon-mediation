@@ -25,6 +25,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.registry.Registry;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -48,8 +49,7 @@ public class RefreshAccessToken extends AbstractConnector {
         propertyKeySet.remove("Accept-Encoding");
 
         if (synLog.isTraceOrDebugEnabled()) {
-            synLog.traceOrDebug("Start : Salesforce Refresh Access Token mediator. If you want to observe refresh " +
-                    "access token header and wire logs please enable Apache HTTP Client logs in Log4j.properties");
+            synLog.traceOrDebug("Start : Salesforce Refresh Access Token mediator.");
 
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Message : " + messageContext.getEnvelope());
@@ -71,7 +71,7 @@ public class RefreshAccessToken extends AbstractConnector {
             }
             String clientSecret = (String) messageContext.getProperty("uri.var.clientSecret");
             if (StringUtils.isNotEmpty(clientSecret)) {
-                urlStringBuilder.append("&client_id=").append(clientSecret);
+                urlStringBuilder.append("&client_secret=").append(clientSecret);
             }
             urlStringBuilder.append("&refresh_token=").append(messageContext.getProperty("uri.var.refreshToken"));
             urlStringBuilder.append("&format=json");
@@ -99,16 +99,17 @@ public class RefreshAccessToken extends AbstractConnector {
             String systemTime = Long.toString(System.currentTimeMillis());
             String newAccessRegistryPath = (String) messageContext.getProperty("uri.var.accessTokenRegistryPath");
             String newTimeRegistryPath = (String) messageContext.getProperty("uri.var.timeRegistryPath");
+            Registry registry = messageContext.getConfiguration().getRegistry();
 
             if(StringUtils.isNotEmpty(accessToken)) {
-                if (!messageContext.getConfiguration().getRegistry().isResourceExists(newAccessRegistryPath)) {
-                    messageContext.getConfiguration().getRegistry().newResource(newAccessRegistryPath, false);
-                    messageContext.getConfiguration().getRegistry().updateResource(newAccessRegistryPath, accessToken);
-                    messageContext.getConfiguration().getRegistry().newResource(newTimeRegistryPath, false);
-                    messageContext.getConfiguration().getRegistry().updateResource(newTimeRegistryPath, systemTime);
+                if (!registry.isResourceExists(newAccessRegistryPath)) {
+                    registry.newResource(newAccessRegistryPath, false);
+                    registry.updateResource(newAccessRegistryPath, accessToken);
+                    registry.newResource(newTimeRegistryPath, false);
+                    registry.updateResource(newTimeRegistryPath, systemTime);
                 } else {
-                    messageContext.getConfiguration().getRegistry().updateResource(newAccessRegistryPath, accessToken);
-                    messageContext.getConfiguration().getRegistry().updateResource(newTimeRegistryPath, systemTime);
+                    registry.updateResource(newAccessRegistryPath, accessToken);
+                    registry.updateResource(newTimeRegistryPath, systemTime);
                 }
             }
         } catch (IOException e) {
