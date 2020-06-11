@@ -9,6 +9,7 @@ import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.util.XMLPrettyPrinter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -71,7 +72,8 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
     private static final Log log = LogFactory.getLog(EndpointAdmin.class);
     public static final String WSO2_ENDPOINT_MEDIA_TYPE = "application/vnd.wso2.esb.endpoint";
     private boolean saveRuntimeArtifacts =
-            SynapsePropertiesLoader.getBooleanProperty("synapse.runtime_artifacts.save.local.file", true);
+            SynapsePropertiesLoader.getBooleanProperty(
+                    SynapseConstants.ARTIFACT_STORAGE_ENABLING_SYNAPSE_PROPERTY, true);
 
     /**
      * Set Endpoint status to Active

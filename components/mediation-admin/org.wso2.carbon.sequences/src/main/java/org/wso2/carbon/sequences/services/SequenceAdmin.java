@@ -80,7 +80,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(SequenceAdmin.class);
     private boolean saveRuntimeArtifacts =
-            SynapsePropertiesLoader.getBooleanProperty("synapse.runtime_artifacts.save.local.file", true);
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.ARTIFACT_STORAGE_ENABLING_SYNAPSE_PROPERTY, true);
 
     //TODO: Move WSO2_SEQUENCE_MEDIA_TYPE to registry
     public static final String WSO2_SEQUENCE_MEDIA_TYPE ="application/vnd.wso2.sequence";

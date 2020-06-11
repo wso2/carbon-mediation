@@ -58,7 +58,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
     private static final Log log = LogFactory.getLog(LocalEntryAdmin.class);
     public static final int LOCAL_ENTRIES_PER_PAGE = 10;
     private boolean saveRuntimeArtifacts =
-            SynapsePropertiesLoader.getBooleanProperty("synapse.runtime_artifacts.save.local.file", true);
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.ARTIFACT_STORAGE_ENABLING_SYNAPSE_PROPERTY, true);
 
     public EntryData[] entryData() throws LocalEntryAdminException {
         final Lock lock = getLock();
