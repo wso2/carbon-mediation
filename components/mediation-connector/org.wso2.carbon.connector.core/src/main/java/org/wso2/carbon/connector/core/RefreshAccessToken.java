@@ -40,7 +40,6 @@ public class RefreshAccessToken extends AbstractConnector {
         Set propertyKeySet = messageContext.getPropertyKeySet();
         propertyKeySet.remove("Accept-Encoding");
 
-
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("Start : Salesforce Refresh Access Token mediator. If you want to observe refresh " +
                     "access token header and wire logs please enable Apache HTTP Client logs in Log4j.properties");
@@ -53,18 +52,18 @@ public class RefreshAccessToken extends AbstractConnector {
         String refreshUrl;
         String customRefreshUrl = (String) messageContext.getProperty("uri.var.customRefreshUrl");
 
-        if (customRefreshUrl != null && !StringUtils.isEmpty(customRefreshUrl)) {
+        if (StringUtils.isNotEmpty(customRefreshUrl)) {
             refreshUrl = customRefreshUrl;
         } else {
             StringBuilder urlStringBuilder = new StringBuilder();
             urlStringBuilder.append(messageContext.getProperty("uri.var.hostName"));
             urlStringBuilder.append("/services/oauth2/token?grant_type=refresh_token");
             String clientId = (String) messageContext.getProperty("uri.var.clientId");
-            if (clientId != null && !clientId.equals("")) {
+            if (StringUtils.isNotEmpty(clientId)) {
                 urlStringBuilder.append("&client_id=").append(clientId);
             }
             String clientSecret = (String) messageContext.getProperty("uri.var.clientSecret");
-            if (clientSecret != null && !StringUtils.isEmpty(clientSecret)) {
+            if (StringUtils.isNotEmpty(clientSecret)) {
                 urlStringBuilder.append("&client_id=").append(clientSecret);
             }
             urlStringBuilder.append("&refresh_token=").append(messageContext.getProperty("uri.var.refreshToken"));
@@ -91,7 +90,7 @@ public class RefreshAccessToken extends AbstractConnector {
             String newAccessRegistryPath = (String) messageContext.getProperty("uri.var.accessTokenRegistryPath");
             String newTimeRegistryPath = (String) messageContext.getProperty("uri.var.timeRegistryPath");
 
-            if((accessToken != null) && (!StringUtils.isEmpty(accessToken))) {
+            if(StringUtils.isNotEmpty(accessToken)) {
                 if (!messageContext.getConfiguration().getRegistry().isResourceExists(newAccessRegistryPath)) {
                     messageContext.getConfiguration().getRegistry().newResource(newAccessRegistryPath, false);
                     messageContext.getConfiguration().getRegistry().updateResource(newAccessRegistryPath, accessToken);
@@ -103,7 +102,8 @@ public class RefreshAccessToken extends AbstractConnector {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            synLog.error(e);
+            throw new ConnectException(e, "Error while executing GET request to refresh the access token");
         } finally {
             propertyKeySet.remove("Cache-Control");
             propertyKeySet.remove("Pragma");
@@ -112,7 +112,7 @@ public class RefreshAccessToken extends AbstractConnector {
                 try {
                     httpResponse.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    synLog.error(e);
                 }
             }
         }
