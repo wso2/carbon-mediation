@@ -98,8 +98,8 @@ public class ConnectionHandler {
 
         Connection connection = null;
         String connectorCode = getCode(connector, connectionName);
-        if (connectionMap.get(connectorCode) != null) {
-            Object connectionObj = connectionMap.get(connectorCode);
+        Object connectionObj = connectionMap.get(connectorCode);
+        if (connectionObj != null) {
             if (connectionObj instanceof ConnectionPool) {
                 connection = (Connection) ((ConnectionPool) connectionObj).borrowObject();
             } else if (connectionObj instanceof Connection) {
@@ -121,10 +121,10 @@ public class ConnectionHandler {
     public void returnConnection(String connector, String connectionName) {
 
         String connectorCode = getCode(connector, connectionName);
-        if (connectionMap.get(connectorCode) != null) {
-            Object connectionObj = connectionMap.get(connectorCode);
-            if (connectionObj instanceof ConnectionPool) {
-                ((ConnectionPool) connectionObj).returnObject(connectionObj);
+        Object connection = connectionMap.get(connectorCode);
+        if (connection != null) {
+            if (connection instanceof ConnectionPool) {
+                ((ConnectionPool) connection).returnObject(connection);
             }
         }
     }
