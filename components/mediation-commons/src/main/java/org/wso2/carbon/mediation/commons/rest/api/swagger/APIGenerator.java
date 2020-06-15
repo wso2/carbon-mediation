@@ -180,7 +180,7 @@ public class APIGenerator {
      * @param genAPI generated API
      */
     private void createResource(String path, JsonObject resourceObj, API genAPI) throws APIGenException {
-
+        boolean noneURLStyleAdded = false;
         for (Map.Entry<String, JsonElement> methodEntry : resourceObj.entrySet()) {
             if (log.isDebugEnabled()) {
                 log.info("Generating resource for path : " + path + ", method : " + methodEntry.getKey());
@@ -198,8 +198,11 @@ public class APIGenerator {
             }
             if (pathParamList.isEmpty()) {
                 // if the path is '/' then it should have none URL style
-                if (!"/".equals(path)) {
+                if (!"/".equals(path) || noneURLStyleAdded) {
                     resource.setDispatcherHelper(new URLMappingHelper(path));
+                }
+                if ("/".equals(path)) {
+                    noneURLStyleAdded = true;
                 }
             } else {
                 resource.setDispatcherHelper(new URITemplateHelper(path));
