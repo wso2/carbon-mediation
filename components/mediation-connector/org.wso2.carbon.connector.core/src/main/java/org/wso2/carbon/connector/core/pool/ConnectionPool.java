@@ -101,7 +101,7 @@ public class ConnectionPool extends GenericObjectPool {
     }
 
     @Override
-    public synchronized Object borrowObject() throws ConnectException {
+    public Object borrowObject() throws ConnectException {
 
         try {
             log.debug("Borrowing object from the connection pool...");
@@ -112,7 +112,7 @@ public class ConnectionPool extends GenericObjectPool {
     }
 
     @Override
-    public synchronized void returnObject(Object obj) {
+    public void returnObject(Object obj) {
 
         try {
             log.debug("Returning object to the connection pool...");
@@ -123,7 +123,7 @@ public class ConnectionPool extends GenericObjectPool {
     }
 
     @Override
-    public synchronized void close() throws ConnectException {
+    public void close() throws ConnectException {
 
         try {
             super.close();

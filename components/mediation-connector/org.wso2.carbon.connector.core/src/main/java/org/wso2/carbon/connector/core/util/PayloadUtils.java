@@ -26,13 +26,12 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.protocol.HTTP;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.json.JsonUtil;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.passthru.util.RelayConstants;
 import org.apache.synapse.transport.passthru.util.StreamingOnRequestDataSource;
 import org.wso2.carbon.connector.core.exception.ContentBuilderException;
@@ -48,7 +47,7 @@ import javax.xml.stream.XMLStreamException;
 /**
  * Utils for setting content as the message payload in the message context
  */
-public final class ResponseHandler {
+public final class PayloadUtils {
 
     // Content Types
     private static final String APPLICATION_XML = "application/xml";
@@ -60,37 +59,35 @@ public final class ResponseHandler {
     private static final QName TEXT_ELEMENT = new QName("http://ws.apache.org/commons/ns/payload",
             "text");
 
-    private ResponseHandler() {
+    private PayloadUtils() {
 
     }
 
     /**
      * Builds content according to the content type and set in the message body
      *
-     * @param messageContext Current message content
+     * @param messageContext Axis2 Message Context
      * @param inputStream    Content to be built as an input stream
-     * @param contentType    Content Type of the content
+     * @param contentType    Content Type of the content to be set in the payload
      * @throws ContentBuilderException if failed to build the content
      */
     public static void setContent(MessageContext messageContext, InputStream inputStream, String contentType)
             throws ContentBuilderException {
 
-        org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext)
-                .getAxis2MessageContext();
         try {
             if (TEXT_XML.equalsIgnoreCase(contentType)
                     || APPLICATION_XML.equalsIgnoreCase(contentType)) {
-                setXMLContent(inputStream, axis2MessageContext);
-                handleSpecialProperties(APPLICATION_XML, axis2MessageContext);
+                setXMLContent(inputStream, messageContext);
+                handleSpecialProperties(APPLICATION_XML, messageContext);
             } else if (APPLICATION_JSON.equalsIgnoreCase(contentType)) {
-                setJSONPayload(inputStream, axis2MessageContext);
-                handleSpecialProperties(APPLICATION_JSON, axis2MessageContext);
+                setJSONPayload(inputStream, messageContext);
+                handleSpecialProperties(APPLICATION_JSON, messageContext);
             } else if (TEXT_PLAIN.equalsIgnoreCase(contentType)
                     || TEXT_CSV.equalsIgnoreCase(contentType)) {
-                setTextContent(inputStream, axis2MessageContext);
-                handleSpecialProperties(TEXT_PLAIN, axis2MessageContext);
+                setTextContent(inputStream, messageContext);
+                handleSpecialProperties(TEXT_PLAIN, messageContext);
             } else {
-                setBinaryContent(inputStream, axis2MessageContext);
+                setBinaryContent(inputStream, messageContext);
             }
         } catch (AxisFault e) {
             throw new ContentBuilderException("Failed to build content.", e);
@@ -100,26 +97,24 @@ public final class ResponseHandler {
     /**
      * Changes the content type and handles other headers
      *
-     * @param resultValue     Value to be set in header
+     * @param contentType     ContentType to be set in header
      * @param axis2MessageCtx Axis2 Message Context
      */
-    public static void handleSpecialProperties(Object resultValue,
-                                               org.apache.axis2.context.MessageContext axis2MessageCtx) {
+    public static void handleSpecialProperties(String contentType, MessageContext axis2MessageCtx) {
 
-        axis2MessageCtx.setProperty(Constants.Configuration.MESSAGE_TYPE, resultValue);
-        axis2MessageCtx.setProperty(Constants.Configuration.CONTENT_TYPE, resultValue);
+        axis2MessageCtx.setProperty(Constants.Configuration.MESSAGE_TYPE, contentType);
+        axis2MessageCtx.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
         Map headers = (Map) axis2MessageCtx.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         if (headers != null) {
-            headers.remove(HTTP.CONTENT_TYPE);
-            headers.put(HTTP.CONTENT_TYPE, resultValue);
+            headers.put(HTTP.CONTENT_TYPE, contentType);
         }
     }
 
     /**
      * Converts the XML String to XML Element and sets in message context
      *
-     * @param messageContext The message context that is processed
-     * @param xmlString      Output response
+     * @param messageContext Axis2 Message Context
+     * @param xmlString      XML String to be set in the body
      */
     public static void preparePayload(MessageContext messageContext, String xmlString) throws ContentBuilderException {
 
@@ -127,20 +122,20 @@ public final class ResponseHandler {
         OMElement element;
         try {
             element = AXIOMUtil.stringToOM(xmlString);
-            setPayloadInEnvelope(((Axis2MessageContext) messageContext).getAxis2MessageContext(), element);
+            setPayloadInEnvelope(messageContext, element);
         } catch (XMLStreamException e) {
             throw new ContentBuilderException(error, e);
         }
     }
 
     /**
-     * Overrides the payload in message body
+     * Sets the OMElement in the message context
      *
-     * @param axis2MsgCtx Axis2MessageContext
-     * @param payload     Payload to be set in the body
+     * @param axis2MsgCtx Axis2 Message Context
+     * @param payload     OMElement to be set in the body
      * @throws ContentBuilderException if failed to set payload
      */
-    public static void setPayloadInEnvelope(org.apache.axis2.context.MessageContext axis2MsgCtx, OMElement payload)
+    public static void setPayloadInEnvelope(MessageContext axis2MsgCtx, OMElement payload)
             throws ContentBuilderException {
 
         JsonUtil.removeJsonPayload(axis2MsgCtx);
@@ -157,8 +152,7 @@ public final class ResponseHandler {
      * @param inputStream         Content as an input stream
      * @param axis2MessageContext Axis2 Message Context
      */
-    private static void setBinaryContent(InputStream inputStream,
-                                         org.apache.axis2.context.MessageContext axis2MessageContext) throws AxisFault {
+    private static void setBinaryContent(InputStream inputStream, MessageContext axis2MessageContext) throws AxisFault {
 
         SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
         OMNamespace ns = factory.createOMNamespace(
@@ -182,8 +176,7 @@ public final class ResponseHandler {
      * @param axis2MessageContext Axis2 Message Context
      * @throws ContentBuilderException if failed to set text content
      */
-    private static void setTextContent(InputStream inputStream,
-                                       org.apache.axis2.context.MessageContext axis2MessageContext)
+    private static void setTextContent(InputStream inputStream, MessageContext axis2MessageContext)
             throws ContentBuilderException {
 
         try {
@@ -201,8 +194,7 @@ public final class ResponseHandler {
      * @param axis2MessageContext Axis2 Message Context
      * @throws ContentBuilderException if failed to set JSON content
      */
-    private static void setJSONPayload(InputStream inputStream,
-                                       org.apache.axis2.context.MessageContext axis2MessageContext)
+    private static void setJSONPayload(InputStream inputStream, MessageContext axis2MessageContext)
             throws ContentBuilderException {
 
         try {
@@ -220,8 +212,7 @@ public final class ResponseHandler {
      * @param axis2MessageContext Axis2 Message Context
      * @throws ContentBuilderException if failed to set XML content
      */
-    private static void setXMLContent(InputStream inputStream,
-                                      org.apache.axis2.context.MessageContext axis2MessageContext)
+    private static void setXMLContent(InputStream inputStream, MessageContext axis2MessageContext)
             throws ContentBuilderException {
 
         try {

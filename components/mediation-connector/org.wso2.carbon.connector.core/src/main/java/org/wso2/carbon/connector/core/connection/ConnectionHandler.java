@@ -24,7 +24,6 @@ import org.wso2.carbon.connector.core.pool.Configuration;
 import org.wso2.carbon.connector.core.pool.ConnectionFactory;
 import org.wso2.carbon.connector.core.pool.ConnectionPool;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,14 +35,18 @@ import static java.lang.String.format;
 public class ConnectionHandler {
 
     private static final Log log = LogFactory.getLog(ConnectionHandler.class);
-    private static ConnectionHandler handler;
+    private static final ConnectionHandler handler;
     // Stores connections/connection pools against connection code name
     // defined as <connector_name>:<connection_name>
-    private Map<String, Object> connectionMap;
+    private final Map<String, Object> connectionMap;
+
+    static {
+        handler = new ConnectionHandler();
+    }
 
     private ConnectionHandler() {
 
-        this.connectionMap = new ConcurrentHashMap<>(new HashMap<>());
+        this.connectionMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -51,11 +54,8 @@ public class ConnectionHandler {
      *
      * @return ConnectionHandler instance
      */
-    public static synchronized ConnectionHandler getConnectionHandler() {
+    public static ConnectionHandler getConnectionHandler() {
 
-        if (handler == null) {
-            handler = new ConnectionHandler();
-        }
         return handler;
     }
 
@@ -117,20 +117,19 @@ public class ConnectionHandler {
      *
      * @param connector      Name of the connector
      * @param connectionName Name of the connection
+     * @param connection     Connection to be returned to the pool
      */
-    public void returnConnection(String connector, String connectionName) {
+    public void returnConnection(String connector, String connectionName, Connection connection) {
 
-        String connectorCode = getCode(connector, connectionName);
-        Object connection = connectionMap.get(connectorCode);
-        if (connection != null) {
-            if (connection instanceof ConnectionPool) {
-                ((ConnectionPool) connection).returnObject(connection);
-            }
+        String connectorCode = this.getCode(connector, connectionName);
+        Object connectionObj = this.connectionMap.get(connectorCode);
+        if (connectionObj instanceof ConnectionPool) {
+            ((ConnectionPool) connectionObj).returnObject(connection);
         }
     }
 
     /**
-     * Shutdown the connection pools
+     * Shutdown all the connection pools
      */
     public void shutdownConnections() {
 
@@ -141,6 +140,27 @@ public class ConnectionHandler {
                     ((ConnectionPool) connectionObj).close();
                 } catch (ConnectException e) {
                     log.error("Failed to close connection pool. ", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Shutdown connection pools for a specified connector
+     *
+     * @param connector Name of the connector
+     */
+    public void shutdownConnections(String connector) {
+
+        for (Map.Entry<String, Object> connection : connectionMap.entrySet()) {
+            if (connection.getKey().split(":")[0].equals(connector)) {
+                Object connectionObj = connection.getValue();
+                if (connectionObj instanceof ConnectionPool) {
+                    try {
+                        ((ConnectionPool) connectionObj).close();
+                    } catch (ConnectException e) {
+                        log.error("Failed to close connection pool. ", e);
+                    }
                 }
             }
         }
