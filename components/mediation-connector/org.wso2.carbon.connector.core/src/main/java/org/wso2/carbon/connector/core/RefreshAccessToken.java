@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * This class can be used by connectors to refresh OAuth 2.0 access tokens by setting the following mandatory
@@ -48,92 +49,86 @@ import java.util.Set;
  */
 public class RefreshAccessToken extends AbstractConnector {
     private CloseableHttpClient httpClient = HttpClients.createDefault();
-    private final String PROPERTY_PREFIX = "uri.var.";
+    protected final String PROPERTY_PREFIX = "uri.var.";
 
     @Override
     public void connect(MessageContext messageContext) throws ConnectException {
         Registry registry = messageContext.getConfiguration().getRegistry();
-        boolean isRefreshNeeded = false;
         String accessTokenRegistryPath = (String) messageContext.getProperty(PROPERTY_PREFIX +
                 "accessTokenRegistryPath");
-        String lastRefreshedTimeString = registry.getResourceProperties(accessTokenRegistryPath).getProperty("timestamp");
-        if (StringUtils.isEmpty(lastRefreshedTimeString)) {
-            isRefreshNeeded = true;
-        } else {
-            String intervalTimeString = (String) messageContext.getProperty("uri.var.intervalTime");
-            if (StringUtils.isEmpty(intervalTimeString)) {
-                intervalTimeString = "300000"; // sets default interval time as 50 min
-            }
-            long expiryTimeInterval = Long.parseLong(intervalTimeString);
-            long lastRefreshedTime = Long.parseLong(lastRefreshedTimeString);
-            if (System.currentTimeMillis() - lastRefreshedTime > expiryTimeInterval) {
-                isRefreshNeeded = true;
-            }
-        }
+        handleRefresh(messageContext, registry, accessTokenRegistryPath);
+    }
 
-        if (!isRefreshNeeded) {
-            String savedAccessToken = null;
-            Entry propEntry = messageContext.getConfiguration().getEntryDefinition(accessTokenRegistryPath);
-            if (propEntry == null) {
-                propEntry = new Entry();
-                propEntry.setType(Entry.REMOTE_ENTRY);
-                propEntry.setKey(accessTokenRegistryPath);
-            }
-            registry.getResource(propEntry, new Properties());
-            if (propEntry.getValue() != null) {
-                if (propEntry.getValue() instanceof OMText) {
-                    savedAccessToken = ((OMText) propEntry.getValue()).getText();
-                } else {
-                    savedAccessToken = propEntry.getValue().toString();
-                }
-                messageContext.setProperty(PROPERTY_PREFIX + "accessToken", savedAccessToken);
+    protected boolean handleSavedCredentialReuse (MessageContext messageContext, Registry registry,
+                                                  String accessTokenRegistryPath) {
+        String savedAccessToken = null;
+        Entry propEntry = messageContext.getConfiguration().getEntryDefinition(accessTokenRegistryPath);
+        if (propEntry == null) {
+            propEntry = new Entry();
+            propEntry.setType(Entry.REMOTE_ENTRY);
+            propEntry.setKey(accessTokenRegistryPath);
+        }
+        registry.getResource(propEntry, new Properties());
+        if (propEntry.getValue() != null) {
+            if (propEntry.getValue() instanceof OMText) {
+                savedAccessToken = ((OMText) propEntry.getValue()).getText();
             } else {
-                isRefreshNeeded = true;
+                savedAccessToken = propEntry.getValue().toString();
+            }
+            messageContext.setProperty(PROPERTY_PREFIX + "accessToken", savedAccessToken);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    protected void handleRefresh (MessageContext messageContext, Registry registry, String accessTokenRegistryPath) throws ConnectException {
+        SynapseLog synLog = getLog(messageContext);
+        Set propertyKeySet = messageContext.getPropertyKeySet();
+        propertyKeySet.remove("Accept-Encoding");
+
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : Salesforce Refresh Access Token mediator.");
+
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + messageContext.getEnvelope());
             }
         }
 
-        if (isRefreshNeeded) {
-            SynapseLog synLog = getLog(messageContext);
-            Set propertyKeySet = messageContext.getPropertyKeySet();
-            propertyKeySet.remove("Accept-Encoding");
+        String refreshUrl = getRefreshUrl(messageContext);
+        HttpGet httpget = new HttpGet(refreshUrl);
+        CloseableHttpResponse httpResponse = null;
 
-            if (synLog.isTraceOrDebugEnabled()) {
-                synLog.traceOrDebug("Start : Salesforce Refresh Access Token mediator.");
-
-                if (synLog.isTraceTraceEnabled()) {
-                    synLog.traceTrace("Message : " + messageContext.getEnvelope());
-                }
+        try {
+            httpResponse = httpClient.execute(httpget);
+            if (Pattern.matches("4[0-9][0-9]", String.valueOf(httpResponse.getStatusLine().getStatusCode()))) {
+                throw new ConnectException("Refresh call returned HTTP Status code " +
+                        httpResponse.getStatusLine().getStatusCode() + ". " +
+                        httpResponse.getStatusLine().getReasonPhrase());
             }
-
-            String refreshUrl = getRefreshUrl(messageContext);
-            HttpGet httpget = new HttpGet(refreshUrl);
-            CloseableHttpResponse httpResponse = null;
-
-            try {
-                httpResponse = httpClient.execute(httpget);
-                if (httpResponse.getEntity() == null) {
-                    throw new ConnectException("Empty response received for refresh access token call");
-                }
-                extractAndSetPropertyAndRegistryResource(messageContext, httpResponse, registry);
-            } catch (IOException e) {
-                synLog.error(e);
-                throw new ConnectException(e, "Error while executing GET request to refresh the access token");
-            } finally {
-                propertyKeySet.remove("Cache-Control");
-                propertyKeySet.remove("Pragma");
-                httpget.releaseConnection();
-                if (httpResponse != null) {
-                    try {
-                        httpResponse.close();
-                    } catch (IOException e) {
-                        synLog.error(e);
-                    }
+            if (httpResponse.getEntity() == null) {
+                throw new ConnectException("Empty response received for refresh access token call");
+            }
+            synLog.auditLog("%%%%%%%%%%%% refresh call response : " + httpResponse.toString());
+            extractAndSetPropertyAndRegistryResource(messageContext, httpResponse, registry, accessTokenRegistryPath);
+        } catch (IOException e) {
+            synLog.error(e);
+            throw new ConnectException(e, "Error while executing GET request to refresh the access token");
+        } finally {
+            propertyKeySet.remove("Cache-Control");
+            propertyKeySet.remove("Pragma");
+            httpget.releaseConnection();
+            if (httpResponse != null) {
+                try {
+                    httpResponse.close();
+                } catch (IOException e) {
+                    synLog.error(e);
                 }
             }
         }
     }
 
-    private String getRefreshUrl (MessageContext messageContext) {
+    protected String getRefreshUrl (MessageContext messageContext) {
         String customRefreshUrl = (String) messageContext.getProperty(PROPERTY_PREFIX + "customRefreshUrl");
 
         if (StringUtils.isNotEmpty(customRefreshUrl)) {
@@ -157,9 +152,9 @@ public class RefreshAccessToken extends AbstractConnector {
         }
     }
 
-    private void extractAndSetPropertyAndRegistryResource (MessageContext messageContext,
-                                                           CloseableHttpResponse httpResponse,
-                                                           Registry registry) throws IOException {
+    protected void extractAndSetPropertyAndRegistryResource (MessageContext messageContext,
+                                                             CloseableHttpResponse httpResponse,
+                                                             Registry registry, String accessTokenRegistryPath) throws IOException {
         Scanner scanner = new Scanner(httpResponse.getEntity().getContent());
         String jsonResponse = scanner.nextLine();
         JSONObject jsonObject = new JSONObject(jsonResponse);
@@ -171,12 +166,10 @@ public class RefreshAccessToken extends AbstractConnector {
         messageContext.setProperty(PROPERTY_PREFIX + "apiUrl", instanceUrl);
 
         String systemTime = Long.toString(System.currentTimeMillis());
-        String newAccessRegistryPath = (String) messageContext.getProperty(PROPERTY_PREFIX +
-                "accessTokenRegistryPath");
 
         if(StringUtils.isNotEmpty(accessToken)) {
-                registry.newNonEmptyResource(newAccessRegistryPath, false, "text/plain", systemTime, "timestamp");
-                registry.updateResource(newAccessRegistryPath, accessToken);
+                registry.newNonEmptyResource(accessTokenRegistryPath, false, "text/plain", systemTime, "timestamp");
+                registry.updateResource(accessTokenRegistryPath, accessToken);
         }
     }
 }
