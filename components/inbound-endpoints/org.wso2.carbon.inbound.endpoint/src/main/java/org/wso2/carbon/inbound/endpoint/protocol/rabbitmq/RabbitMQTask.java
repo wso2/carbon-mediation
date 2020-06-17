@@ -23,20 +23,23 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerInboundTask;
 
+/**
+ * The task implementation to trigger the RabbitMQ consumer.
+ */
 public class RabbitMQTask extends OneTimeTriggerInboundTask {
 
     private static final Log log = LogFactory.getLog(RabbitMQTask.class.getName());
 
-    private RabbitMQConnectionConsumer rabbitMQConnectionConsumer;
+    private RabbitMQConsumer rabbitMQConsumer;
 
-    public RabbitMQTask(RabbitMQConnectionConsumer rabbitMQConnectionConsumer) {
+    public RabbitMQTask(RabbitMQConsumer rabbitMQConsumer) {
         log.debug("RabbitMQ Task initialize.");
-        this.rabbitMQConnectionConsumer = rabbitMQConnectionConsumer;
+        this.rabbitMQConsumer = rabbitMQConsumer;
     }
 
     protected void taskExecute() {
         log.debug("Executing RabbitMQ Task Execution.");
-        rabbitMQConnectionConsumer.execute();
+        rabbitMQConsumer.execute();
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {

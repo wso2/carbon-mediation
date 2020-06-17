@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.config.xml.rest.APISerializer;
@@ -84,6 +85,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     private static final String CONFIG_REG_PREFIX = "conf:";
     private static final String GOV_REG_PREFIX = "gov:";
     private static final String FILE_PREFIX = "file:";
+    private boolean saveRuntimeArtifacts =
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
 	public boolean addApi(APIData apiData) throws APIException {
 		final Lock lock = getLock();
@@ -165,7 +168,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setArtifactContainerName(oldAPI.getArtifactContainerName());
                 apiData.setIsEdited(true);
             } else {
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     String fileName = api.getFileName();
                     pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -213,7 +216,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setIsEdited(true);
                 getApiByName(api.getName()).setIsEdited(true);
             } else {
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     String fileName = api.getFileName();
                     pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -270,7 +273,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.destroy();
                 synapseConfiguration.removeAPI(apiName);
 
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     String fileName = api.getFileName();
                     pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -310,7 +313,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     api.destroy();
                     synapseConfiguration.removeAPI(apiName);
 
-                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                         MediationPersistenceManager pm = getMediationPersistenceManager();
                         String fileName = api.getFileName();
                         pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -904,7 +907,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 	
 	private void persistApi(API api) throws APIException {
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
             MediationPersistenceManager pm = getMediationPersistenceManager();
             if (pm != null) {
                 pm.saveItem(api.getName(), ServiceBusConstants.ITEM_TYPE_REST_API);
@@ -1097,14 +1100,29 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (log.isDebugEnabled()) {
                 log.debug("Generate swagger definition for the API : " + apiName);
             }
+            swaggerJsonString = generateSwaggerFromSynapseAPI(api);
+        }
+        return swaggerJsonString;
+    }
 
-            try {
-                ServerConfig serverConfig = new CarbonServerConfig();
-                JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
-                swaggerJsonString = jsonDefinition.toString();
-            } catch (AxisFault axisFault) {
-                handleException(log, "Error occurred while generating swagger definition", axisFault);
-            }
+    /**
+     * Function to generate API from swagger definition (from Synapse API)
+     *
+     * @param api existing synapse API
+     * @return generated swagger
+     * @throws APIException
+     */
+    public String generateSwaggerFromSynapseAPI(API api) throws APIException {
+        String swaggerJsonString = "";
+        if (log.isDebugEnabled()) {
+            log.debug("Generate swagger definition for the API : " + api.getAPIName());
+        }
+
+        try {
+            JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
+            swaggerJsonString = jsonDefinition.toString();
+        } catch (AxisFault axisFault) {
+            handleException(log, "Error occurred while generating swagger definition", axisFault);
         }
         return swaggerJsonString;
     }
@@ -1163,6 +1181,41 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
             try {
                 API api = apiGenerator.generateUpdatedSynapseAPI(getSynapseAPIByName(existingApiName));
+                return APISerializer.serializeAPI(api).toString();
+            } catch (APIGenException e) {
+                handleException(log, "Error occurred while generating API", e);
+            }
+        } else {
+            handleException(log, "Error in swagger definition format: should be a json object", null);
+        }
+        // Definitely will not reach here
+        return "";
+    }
+
+    /**
+     * Function to generate updated existing API by referring to swagger definition (from JSON representation)
+     *
+     * @param swaggerJsonString swagger definition
+     * @param existingApi existing synapse API
+     * @return generated synapse API
+     * @throws APIException
+     */
+    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, API existingApi) throws APIException {
+
+        if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
+            handleException(log, "Provided swagger definition is empty, hence unable to generate API", null);
+        }
+
+        if (existingApi == null) {
+            handleException(log, "Provided existing API name is empty, hence unable to generate API", null);
+        }
+
+        JsonParser jsonParser = new JsonParser();
+        JsonElement swaggerJson = jsonParser.parse(swaggerJsonString);
+        if (swaggerJson.isJsonObject()) {
+            APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
+            try {
+                API api = apiGenerator.generateUpdatedSynapseAPI(existingApi);
                 return APISerializer.serializeAPI(api).toString();
             } catch (APIGenException e) {
                 handleException(log, "Error occurred while generating API", e);

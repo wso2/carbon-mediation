@@ -24,6 +24,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.MediatorSerializerFinder;
 import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
@@ -78,6 +79,8 @@ import java.util.regex.Pattern;
 public class SequenceAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(SequenceAdmin.class);
+    private boolean saveRuntimeArtifacts =
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
     //TODO: Move WSO2_SEQUENCE_MEDIA_TYPE to registry
     public static final String WSO2_SEQUENCE_MEDIA_TYPE ="application/vnd.wso2.sequence";
@@ -217,7 +220,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
             if (sequence != null && sequence.getArtifactContainerName() == null) {
                 synCfg.removeSequence(sequenceName);
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     pm.deleteItem(sequenceName, sequence.getFileName(),
                             ServiceBusConstants.ITEM_TYPE_SEQUENCE);
@@ -276,7 +279,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                 SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
                 if (sequence != null && sequence.getArtifactContainerName() == null) {
                     synCfg.removeSequence(sequenceName);
-                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                         MediationPersistenceManager pm = getMediationPersistenceManager();
                         pm.deleteItem(sequenceName, sequence.getFileName(),
                                 ServiceBusConstants.ITEM_TYPE_SEQUENCE);
@@ -308,7 +311,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     if ((!sequence.getName().equals("main")) && (!sequence.getName().equals("fault"))
                             && sequence.getArtifactContainerName() == null) {
                         synCfg.removeSequence(sequence.getName());
-                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                             MediationPersistenceManager pm = getMediationPersistenceManager();
                             pm.deleteItem(sequence.getName(), sequence.getFileName(),
                                     ServiceBusConstants.ITEM_TYPE_SEQUENCE);
@@ -871,7 +874,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
     }
 
     private void persistSequence(SequenceMediator sequence) throws SequenceEditorException {
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
             MediationPersistenceManager pm = getMediationPersistenceManager();
             if (pm == null) {
                 handleException("Cannot Persist sequence because persistence manager is null, " +

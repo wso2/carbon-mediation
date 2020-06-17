@@ -116,7 +116,7 @@
 </h2>
 <div id="workArea">
     <form action="updatePages/wsdlEndpoint-update.jsp" id="endpoint-editor-form"
-          name="endpoint-editor-form">
+          name="endpoint-editor-form" method="post">
         <table class="styledLeft">
             <thead>
             <tr>

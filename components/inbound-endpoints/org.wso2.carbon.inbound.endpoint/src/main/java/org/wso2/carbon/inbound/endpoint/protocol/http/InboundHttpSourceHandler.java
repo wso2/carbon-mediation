@@ -72,15 +72,17 @@ public class InboundHttpSourceHandler extends SourceHandler {
             String tenantDomain = getTenantDomain(request);
 
             if (tenantDomain != null) {
-                WorkerPoolConfiguration workerPoolConfiguration =
-                           HTTPEndpointManager.getInstance().getWorkerPoolConfiguration(tenantDomain, port);
-                if (workerPoolConfiguration != null) {
-                    workerPool = sourceConfiguration.getWorkerPool(workerPoolConfiguration.getWorkerPoolCoreSize(),
-                                                                   workerPoolConfiguration.getWorkerPoolSizeMax(),
-                                                                   workerPoolConfiguration.getWorkerPoolThreadKeepAliveSec(),
-                                                                   workerPoolConfiguration.getWorkerPoolQueuLength(),
-                                                                   workerPoolConfiguration.getThreadGroupID(),
-                                                                   workerPoolConfiguration.getThreadID());
+                if (workerPool == null) {
+                    WorkerPoolConfiguration workerPoolConfiguration =
+                            HTTPEndpointManager.getInstance().getWorkerPoolConfiguration(tenantDomain, port);
+                    if (workerPoolConfiguration != null) {
+                        workerPool = sourceConfiguration.getWorkerPool(workerPoolConfiguration.getWorkerPoolCoreSize(),
+                                workerPoolConfiguration.getWorkerPoolSizeMax(),
+                                workerPoolConfiguration.getWorkerPoolThreadKeepAliveSec(),
+                                workerPoolConfiguration.getWorkerPoolQueuLength(),
+                                workerPoolConfiguration.getThreadGroupID(),
+                                workerPoolConfiguration.getThreadID());
+                    }
                 }
             }
             if (workerPool == null) {
@@ -88,6 +90,8 @@ public class InboundHttpSourceHandler extends SourceHandler {
             }
             workerPool.execute
                     (new InboundHttpServerWorker(port, tenantDomain, request, sourceConfiguration, os));
+            //increasing the input request metric
+            sourceConfiguration.getMetrics().requestReceived();
         } catch (HttpException e) {
             log.error("HttpException occurred when creating Source Request", e);
             informReaderError(conn);

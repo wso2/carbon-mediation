@@ -24,6 +24,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.config.xml.EntryFactory;
 import org.apache.synapse.config.xml.EntrySerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
@@ -56,6 +57,8 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(LocalEntryAdmin.class);
     public static final int LOCAL_ENTRIES_PER_PAGE = 10;
+    private boolean saveRuntimeArtifacts =
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
     public EntryData[] entryData() throws LocalEntryAdminException {
         final Lock lock = getLock();
@@ -216,7 +219,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                             getSynapseConfiguration().getProperties());
                     entry.setFileName(ServiceBusUtils.generateFileName(entry.getKey()));
                     getSynapseConfiguration().addEntry(entryKey, entry);
-                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                         MediationPersistenceManager pm
                                 = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
                         pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
@@ -303,7 +306,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                         entry.setIsEdited(true);
                     }
                     else {
-                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                             MediationPersistenceManager pm
                                     = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
                             pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
@@ -430,7 +433,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
             if (entry != null) {
                 synapseConfiguration.removeEntry(entryKey);
-                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                     MediationPersistenceManager pm
                             = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
                     pm.deleteItem(entryKey, entry.getFileName(), ServiceBusConstants.ITEM_TYPE_ENTRY);

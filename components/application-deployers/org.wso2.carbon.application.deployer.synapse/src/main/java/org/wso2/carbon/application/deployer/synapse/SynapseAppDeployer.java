@@ -253,7 +253,14 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     // In case of an API, there may have a version strategy and the name of the API will have that
                     // version in its name in the synapse config (ex: MyAPI:v1 instead of MyAPI)
                     if (SynapseAppDeployerConstants.API_TYPE.equals(artifact.getType())) {
-                        artifactName = extractApiNameFromArtifact(artifact, fileName);
+                        Properties properties = new Properties();
+                        SynapseArtifactDeploymentStore deploymentStore =
+                                getSynapseConfiguration(axisConfig).getArtifactDeploymentStore();
+                        if (deploymentStore != null) {
+                            properties.put(SynapseConstants.CLASS_MEDIATOR_LOADERS,
+                                    deploymentStore.getClassMediatorClassLoaders());
+                        }
+                        artifactName = extractApiNameFromArtifact(artifact, fileName, properties);
                     }
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
 
@@ -302,17 +309,18 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      *
      * @param artifact the artifact to be built
      * @param fileName the name of the file containing the API
+     * @param properties properties required to create the API
      * @return the actual name of the API
      * @throws IOException if an error occurs while reading the configuration file
      */
-    private String extractApiNameFromArtifact(Artifact artifact, String fileName) throws IOException {
+    private String extractApiNameFromArtifact(Artifact artifact, String fileName, Properties properties) throws IOException {
         String fullFilePath = Paths.get(artifact.getExtractedPath(), fileName).toString();
         try (InputStream in = new FileInputStream(fullFilePath)) {
             // To create the API, we must first read it's configuration from the artifact file
             OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);
             OMElement artifactConfig = builder.getDocumentElement();
             // Create the API to get the real name
-            API api = APIFactory.createAPI(artifactConfig, new Properties());
+            API api = APIFactory.createAPI(artifactConfig, properties);
             return api.getName();
         }
     }

@@ -26,7 +26,7 @@
     </parent>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>carbon-mediation</artifactId>
-    <version>4.7.33-SNAPSHOT</version>
+    <version>4.7.49-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -1850,11 +1850,6 @@
             </dependency>
             <!--12 Misc -->
             <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.transports.sap</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.securevault</groupId>
                 <artifactId>org.wso2.securevault</artifactId>
                 <version>${org.wso2.securevault.version}</version>
@@ -2379,12 +2374,52 @@
                 <artifactId>org.wso2.carbon.tenant.common</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.opensaml</groupId>
+                <artifactId>opensaml</artifactId>
+                <version>${opensaml.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.saml.common</groupId>
+                <artifactId>org.wso2.carbon.identity.saml.common.util</artifactId>
+                <version>${saml.common.util.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${io.swagger.models.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-core</artifactId>
+                <version>${io.swagger.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${io.swagger.annotation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${jackson.dataformat.yaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>${javax.validation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
         <!-- Carbon mediation version -->
         <carbon.mediation.import.feature.version>${carbon.mediation.version}</carbon.mediation.import.feature.version>
-        <carbon.mediation.version>4.7.33-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.7.49-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.7.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
@@ -2393,7 +2428,7 @@
         <carbon.kernel.imp.pkg.version>[4.5.3, 4.7.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.7.19</carbon.commons.version>
+        <carbon.commons.version>4.7.31</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.7.0, 5.0.0)</carbon.commons.imp.pkg.version>
         <!-- Carbon Deployment version-->
         <carbon.deployment.version>4.9.15</carbon.deployment.version>
@@ -2411,14 +2446,14 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v143</synapse.version>
+        <synapse.version>2.1.7-wso2v168</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.3.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.1.0</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[6.1.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1-wso2v40</orbit.version.axis2>
+        <orbit.version.axis2>1.6.1-wso2v50</orbit.version.axis2>
         <orbit.version.axis2.client>${orbit.version.axis2}</orbit.version.axis2.client>
         <axis2-transports.base.version>${orbit.version.axis2}</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
@@ -2524,7 +2559,7 @@
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
-        <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
+        <javax.xml.soap.imp.pkg.version>0.0.0</javax.xml.soap.imp.pkg.version>
         <javax.jsr311.api.version>1.1.1</javax.jsr311.api.version>
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
@@ -2569,6 +2604,14 @@
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v1</version.org.wso2.orbit.javax.activation>
         <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
+        <saml.common.util.version>1.0.3</saml.common.util.version>
+        <opensaml.orbit.version>3.3.1.wso2v1</opensaml.orbit.version>
+        <io.swagger.models.version>1.5.23</io.swagger.models.version>
+        <io.swagger.core.version>1.5.23</io.swagger.core.version>
+        <io.swagger.annotation.version>1.5.23</io.swagger.annotation.version>
+        <jackson.dataformat.yaml.version>2.9.9</jackson.dataformat.yaml.version>
+        <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <snakeyaml.version>1.25</snakeyaml.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>

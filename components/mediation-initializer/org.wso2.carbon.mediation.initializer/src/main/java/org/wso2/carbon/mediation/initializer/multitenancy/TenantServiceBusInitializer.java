@@ -101,7 +101,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         String tenantDomain =
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-        log.info("Intializing the ESB Configuration for the tenant domain : " + tenantDomain);
+        log.info("Initializing the ESB Configuration for the tenant domain : " + tenantDomain);
 
         try {
             // first check which configuration should be active
@@ -142,9 +142,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
 
             File synapseConfigDir = new File(synapseConfigsDir,
                     manger.getTracker().getCurrentConfigurationName());
-            if (!synapseConfigDir.exists()) {
-                createTenantSynapseConfigHierarchy(synapseConfigDir, tenantDomain);
-            }
+            createTenantSynapseConfigHierarchy(synapseConfigDir, tenantDomain);
 
             axisConfig.addParameter(SynapseConstants.Axis2Param.SYNAPSE_HOME,
                     tenantAxis2Repo.getAbsolutePath());
@@ -158,7 +156,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                     configurationContext,tenantDomain);
 
             if (contextInfo == null) {
-                handleFatal("Failed to intilize the ESB for tenent:" + tenantDomain);
+                handleFatal("Failed to initialize the ESB for tenant:" + tenantDomain);
             }
 
             initPersistence(manger.getTracker().getCurrentConfigurationName(),
@@ -437,10 +435,12 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
     private void createTenantSynapseConfigHierarchy(File synapseConfigDir, String tenantDomain) {
 
-        if (!synapseConfigDir.mkdir()) {
-            log.fatal("Couldn't create the synapse-config root on the file system " +
-                    "for the tenant domain : " + tenantDomain);
-            return;
+        if (!synapseConfigDir.exists()) {
+            if (!synapseConfigDir.mkdir()) {
+                log.fatal("Couldn't create the synapse-config root on the file system " +
+                        "for the tenant domain : " + tenantDomain);
+                return;
+            }
         }
 
         File sequencesDir = new File(
@@ -458,36 +458,29 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         File executorsDir = new File(
                 synapseConfigDir, MultiXMLConfigurationBuilder.EXECUTORS_DIR);
 
-        if(!sequencesDir.mkdir()) {
+        if (!sequencesDir.exists() && !sequencesDir.mkdir()) {
             log.warn("Could not create " + sequencesDir);
         }
-        if(!endpointsDir.mkdir()) {
+        if (!endpointsDir.exists() && !endpointsDir.mkdir()) {
             log.warn("Could not create " + endpointsDir);
         }
-        if(!entriesDir.mkdir()) {
+        if (!entriesDir.exists() && !entriesDir.mkdir()) {
             log.warn("Could not create " + entriesDir);
         }
-        if(!proxyServicesDir.mkdir()) {
+        if (!proxyServicesDir.exists() && !proxyServicesDir.mkdir()) {
             log.warn("Could not create " + proxyServicesDir);
         }
-        if(!eventSourcesDir.mkdir()) {
+        if (!eventSourcesDir.exists() && !eventSourcesDir.mkdir()) {
             log.warn("Could not create " + eventSourcesDir);
         }
-        if(!tasksDir.mkdir()) {
+        if (!tasksDir.exists() && !tasksDir.mkdir()) {
             log.warn("Could not create " + tasksDir);
         }
-        if(!executorsDir.mkdir()) {
+        if (!executorsDir.exists() && !executorsDir.mkdir()) {
             log.warn("Could not create " + executorsDir);
         }
 
         SynapseConfiguration initialSynCfg = SynapseConfigurationBuilder.getDefaultConfiguration();
-        SequenceMediator mainSequence = (SequenceMediator) initialSynCfg.getMainSequence();
-        SequenceMediator faultSequence = (SequenceMediator) initialSynCfg.getFaultSequence();
-        mainSequence.setFileName(SynapseConstants.MAIN_SEQUENCE_KEY + ".xml");
-        faultSequence.setFileName(SynapseConstants.FAULT_SEQUENCE_KEY + ".xml");
-        Registry registry = new WSO2Registry();
-        registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
-        initialSynCfg.setRegistry(registry);
         //Add the default NTask Manager to config
         TaskManager taskManager = new NTaskTaskManager();
         initialSynCfg.setTaskManager(taskManager);
@@ -495,10 +488,25 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         MultiXMLConfigurationSerializer serializer
                 = new MultiXMLConfigurationSerializer(synapseConfigDir.getAbsolutePath());
         try {
-            serializer.serializeSequence(mainSequence, initialSynCfg, null);
-            serializer.serializeSequence(faultSequence, initialSynCfg, null);
-            serializer.serializeSynapseRegistry(registry, initialSynCfg, null);
-            serializer.serializeSynapseXML(initialSynCfg);
+            if (!new File(sequencesDir, SynapseConstants.MAIN_SEQUENCE_KEY + ".xml").exists()) {
+                SequenceMediator mainSequence = (SequenceMediator) initialSynCfg.getMainSequence();
+                mainSequence.setFileName(SynapseConstants.MAIN_SEQUENCE_KEY + ".xml");
+                serializer.serializeSequence(mainSequence, initialSynCfg, null);
+            }
+            if (!new File(sequencesDir, SynapseConstants.FAULT_SEQUENCE_KEY + ".xml").exists()) {
+                SequenceMediator faultSequence = (SequenceMediator) initialSynCfg.getFaultSequence();
+                faultSequence.setFileName(SynapseConstants.FAULT_SEQUENCE_KEY + ".xml");
+                serializer.serializeSequence(faultSequence, initialSynCfg, null);
+            }
+            if (!new File(synapseConfigDir, SynapseConstants.REGISTRY_FILE).exists()) {
+                Registry registry = new WSO2Registry();
+                registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
+                initialSynCfg.setRegistry(registry);
+                serializer.serializeSynapseRegistry(registry, initialSynCfg, null);
+            }
+            if (!new File(synapseConfigDir, SynapseConstants.SYNAPSE_XML).exists()) {
+                serializer.serializeSynapseXML(initialSynCfg);
+            }
         } catch (Exception e) {
             handleException("Couldn't serialise the initial synapse configuration " +
                     "for the domain : " + tenantDomain, e);

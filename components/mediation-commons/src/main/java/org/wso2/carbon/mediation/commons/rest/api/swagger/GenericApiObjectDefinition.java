@@ -19,6 +19,7 @@
 package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.rest.API;
@@ -46,6 +47,10 @@ public class GenericApiObjectDefinition {
         this.serverConfig = serverConfiguration;
     }
 
+    public GenericApiObjectDefinition(API api) {
+        this.api = api;
+    }
+
     /**
      * Provides a map which represents the structure of swagger definition.
      *
@@ -60,7 +65,13 @@ public class GenericApiObjectDefinition {
         apiMap.put(SwaggerConstants.INFO, getInfoMap());
 
         //Host is mandatory for TryIt
-        apiMap.put(SwaggerConstants.HOST, serverConfig.getHost(api));
+        if (serverConfig != null) {
+            apiMap.put(SwaggerConstants.HOST, serverConfig.getHost(api));
+        } else if (StringUtils.isNotBlank(api.getHost()) && api.getPort() != -1) {
+            apiMap.put(SwaggerConstants.HOST, api.getHost() + ":" + api.getPort());
+        } else {
+            apiMap.put(SwaggerConstants.HOST, SwaggerConstants.DEFAULT_HOST + ":" + SwaggerConstants.DEFAULT_PORT);
+        }
 
         //Schemes
         apiMap.put(SwaggerConstants.SCHEMES, getSchemes());
@@ -109,7 +120,7 @@ public class GenericApiObjectDefinition {
     private Map<String, Object> getInfoMap() {
         Map<String, Object> infoMap = new LinkedHashMap<>();
         infoMap.put(SwaggerConstants.DESCRIPTION, (SwaggerConstants.API_DESC_PREFIX + api.getAPIName()));
-        infoMap.put(SwaggerConstants.TITLE, api.getName());
+        infoMap.put(SwaggerConstants.TITLE, api.getAPIName());
         infoMap.put(SwaggerConstants.VERSION, (api.getVersion() != null && !api.getVersion().equals(""))
                 ? api.getVersion() : SwaggerConstants.DEFAULT_API_VERSION);
         if(log.isDebugEnabled()){

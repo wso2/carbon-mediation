@@ -20,4 +20,5 @@ package org.wso2.carbon.inbound.endpoint.protocol.generic;
 public class GenericConstants {
 
     public static final int INBOUND_BUILD_ERROR = 600001;
+    public static final String INBOUND_ENDPOINT_NAME = "inbound.endpoint.name";
 }
