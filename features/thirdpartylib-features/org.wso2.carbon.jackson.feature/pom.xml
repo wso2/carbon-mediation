@@ -30,15 +30,15 @@
     <description>This feature contains the bundles for updated Jackson Version</description>
     <dependencies>
         <dependency>
-            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
     </dependencies>
@@ -65,9 +65,9 @@
                             </adviceFile>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
-                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.version}</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-annotations:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>com.fasterxml.jackson.core:jackson-annotations:${fasterxml.jackson.version}</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
