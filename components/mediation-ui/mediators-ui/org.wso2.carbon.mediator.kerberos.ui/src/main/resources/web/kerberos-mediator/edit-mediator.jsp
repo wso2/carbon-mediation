@@ -41,10 +41,11 @@
 
     try {
         Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
-        if (!(mediator instanceof KerberosMediator)) {
+        if (!(mediator instanceof org.wso2.carbon.mediator.kerberos.ui.KerberosMediator)) {
             throw new RuntimeException("Unable to update the mediator");
         }
-        KerberosMediator kerberosMediator = (KerberosMediator)mediator;
+        org.wso2.carbon.mediator.kerberos.ui.KerberosMediator kerberosMediator =
+                (org.wso2.carbon.mediator.kerberos.ui.KerberosMediator) mediator;
         loginContextName = kerberosMediator.getLoginContextName();
         loginConfig = kerberosMediator.getLoginConfig();
         krb5Config = kerberosMediator.getKrb5Config();
