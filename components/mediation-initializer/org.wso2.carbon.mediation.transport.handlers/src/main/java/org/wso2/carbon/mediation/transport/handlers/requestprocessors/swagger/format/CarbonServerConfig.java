@@ -60,57 +60,69 @@ public class CarbonServerConfig implements ServerConfig {
         if (api.getHost() != null) {
             return api.getHost();
         } else {
-            //Retrieve WSDLPrefix to retrieve host
-            //If transport is limited to https, https host will generate. Otherwise http will be generated
-            TransportInDescription transportIn = axisConfiguration.getTransportIn(
-                    api.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY ? "http" : "https");
+            String transport = api.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY ? "http" : "https";
+            return getHostNameFromTransport(transport);
+        }
 
-            if (transportIn != null) {
-                // Give priority to WSDLEPRPrefix
-                if (transportIn.getParameter(SwaggerConstants.WSDL_EPR_PREFIX) != null) {
-                    String wsdlPrefixParam = (String) transportIn.getParameter(SwaggerConstants.WSDL_EPR_PREFIX).getValue();
-                    if (!wsdlPrefixParam.isEmpty()) {
-                        //WSDLEPRPrefix available
-                        try {
-                            URI hostUri = new URI(wsdlPrefixParam);
-                            //Resolve port
-                            try {
-                                String protocol = transportIn.getName();
+    }
 
-                                if (("https".equals(protocol) && hostUri.getPort() == 443) ||
-                                        ("http".equals(protocol) && hostUri.getPort() == 80)) {
-                                    return hostUri.getHost();
-                                }
-                            } catch (NumberFormatException e) {
-                                throw new AxisFault("Error occurred while parsing the port", e);
-                            }
+    @Override
+    public String getHost(String transport) throws AxisFault {
+        return getHostNameFromTransport(transport);
+    }
 
-                            return hostUri.getHost() + ":" + hostUri.getPort();
-                        } catch (URISyntaxException e) {
-                            log.error("WSDLEPRPrefix is not a valid URI", e);
-                        }
-                    } else {
-                        log.error("\"WSDLEPRPrefix\" is empty. Please provide relevant URI or comment out parameter");
-                    }
-                }
+    private String getHostNameFromTransport(String transport) throws AxisFault {
+        //Retrieve WSDLPrefix to retrieve host
+        //If transport is limited to https, https host will generate. Otherwise http will be generated
+        TransportInDescription transportIn = axisConfiguration.getTransportIn(transport);
 
-                String portStr = (String) transportIn.getParameter("port").getValue();
-                String hostname = "localhost";
-
-                //Resolve hostname
-                if (axisConfiguration.getParameter("hostname") != null) {
-                    hostname = (String) axisConfiguration.getParameter("hostname").getValue();
-                } else {
+        if (transportIn != null) {
+            // Give priority to WSDLEPRPrefix
+            if (transportIn.getParameter(SwaggerConstants.WSDL_EPR_PREFIX) != null) {
+                String wsdlPrefixParam = (String) transportIn.getParameter(SwaggerConstants.WSDL_EPR_PREFIX).getValue();
+                if (!wsdlPrefixParam.isEmpty()) {
+                    //WSDLEPRPrefix available
                     try {
-                        hostname = NetworkUtils.getLocalHostname();
-                    } catch (SocketException e) {
-                        log.warn("SocketException occurred when trying to obtain IP address of local machine");
+                        URI hostUri = new URI(wsdlPrefixParam);
+                        //Resolve port
+                        try {
+                            String protocol = transportIn.getName();
+
+                            if (("https".equals(protocol) && hostUri.getPort() == 443) ||
+                                    ("http".equals(protocol) && hostUri.getPort() == 80)) {
+                                return hostUri.getHost();
+                            }
+                        } catch (NumberFormatException e) {
+                            throw new AxisFault("Error occurred while parsing the port", e);
+                        }
+
+                        return hostUri.getHost() + ":" + hostUri.getPort();
+                    } catch (URISyntaxException e) {
+                        log.error("WSDLEPRPrefix is not a valid URI", e);
                     }
+                } else {
+                    log.error("\"WSDLEPRPrefix\" is empty. Please provide relevant URI or comment out parameter");
                 }
-                return hostname + ':' + portStr;
             }
 
-            throw new AxisFault("http/https transport listeners are required in axis2.xml");
+            String portStr = (String) transportIn.getParameter("port").getValue();
+            String hostname = "localhost";
+
+            //Resolve hostname
+            if (axisConfiguration.getParameter("hostname") != null) {
+                hostname = (String) axisConfiguration.getParameter("hostname").getValue();
+            } else {
+                try {
+                    hostname = NetworkUtils.getLocalHostname();
+                } catch (SocketException e) {
+                    log.warn("SocketException occurred when trying to obtain IP address of local machine");
+                }
+            }
+            return hostname + ':' + portStr;
         }
+
+        throw new AxisFault("http/https transport listeners are required in axis2.xml");
     }
+
+
 }

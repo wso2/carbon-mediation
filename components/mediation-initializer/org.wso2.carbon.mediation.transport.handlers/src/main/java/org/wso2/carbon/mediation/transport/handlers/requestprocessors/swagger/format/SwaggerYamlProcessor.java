@@ -19,7 +19,6 @@ package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.f
 import com.google.gson.JsonParser;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.rest.API;
@@ -30,9 +29,11 @@ import org.wso2.carbon.integrator.core.json.utils.GSONUtils;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.ServerConfig;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
-import org.wso2.carbon.mediation.transport.handlers.DataHolder;
+import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format.utils.SwaggerProcessorConstants;
+import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format.utils.SwaggerUtils;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.yaml.snakeyaml.Yaml;
+
 
 /**
  * Provides Swagger definition for the API in YAML format.
@@ -53,30 +54,44 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
                         ConfigurationContext configurationContext) throws AxisFault {
 
         API api = getAPIFromSynapseConfig(request);
-        if (api == null) {
-            handleException(request.getRequestURI());
+        String responseString = null;
+        if (api != null) {
+            responseString = processAPI(request, api);
+        } else if (request.getContextPath().contains("/" + SwaggerProcessorConstants.SERVICES_PREFIX)) {
+            responseString = SwaggerUtils.getDataServiceSwagger(request.getRequestURI(), configurationContext, false);
         } else {
-            //Retrieve from registry
-            String responseString;
-            try {
-                Yaml yamlDefinition = new Yaml();
-                String defFromRegistry = retrieveFromRegistry(api, request);
-                if (defFromRegistry != null) {
-                    JsonParser jsonParser = new JsonParser();
-                    responseString =
-                            yamlDefinition.dumpAsMap(GSONUtils.gsonJsonObjectToMap(jsonParser.parse(defFromRegistry)));
-                } else {
-                    ServerConfig serverConfig = new CarbonServerConfig();
-                    responseString =
-                            yamlDefinition.dumpAsMap(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
-                }
-            } catch (RegistryException e) {
-                throw new AxisFault("Error occurred while retrieving swagger definition from registry", e);
-            }
+            handleException(request.getRequestURI());
+        }
 
+        if (responseString != null && !responseString.isEmpty()) {
             updateResponse(response, responseString, SwaggerConstants.CONTENT_TYPE_YAML);
+        } else {
+            handleException(request.getRequestURI());
         }
     }
+
+    // take the swagger definition as JSON and convert to yaml.
+    private String processAPI(CarbonHttpRequest request, API api) throws AxisFault {
+
+        String responseString;
+        try {
+            Yaml yamlDefinition = new Yaml();
+            String defFromRegistry = retrieveAPISwaggerFromRegistry(api, request.getRequestURI());
+            if (defFromRegistry != null) {
+                JsonParser jsonParser = new JsonParser();
+                responseString =
+                        yamlDefinition.dumpAsMap(GSONUtils.gsonJsonObjectToMap(jsonParser.parse(defFromRegistry)));
+            } else {
+                ServerConfig serverConfig = new CarbonServerConfig();
+                responseString =
+                        yamlDefinition.dumpAsMap(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
+            }
+        } catch (RegistryException e) {
+            throw new AxisFault("Error occurred while retrieving swagger definition from registry", e);
+        }
+        return responseString;
+    }
+
 
     /**
      * Function to convert from GSON object model to generic map model.

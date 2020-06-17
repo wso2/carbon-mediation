@@ -28,10 +28,19 @@ import org.apache.synapse.rest.API;
 public interface ServerConfig {
 
     /**
-     * Function to retrieve server host name for host entry in swagger definition
+     * Function to retrieve server host name for host entry in swagger definition (API).
      *
      * @return server host name
-     * @throws AxisFault
+     * @throws AxisFault error occurred while retrieving the host name.
      */
-    public String getHost(API api) throws AxisFault;
+    String getHost(API api) throws AxisFault;
+
+    /**
+     * Function to retrieve server host name by giving a transport.
+     *
+     * @param transport name of the transport. ex: HTTP/ HTTPS
+     * @return server host name
+     * @throws AxisFault error occurred while retrieving the host name.
+     */
+    String getHost(String transport) throws AxisFault;
 }

@@ -112,4 +112,10 @@ public class CarbonServerConfig implements ServerConfig {
             throw new AxisFault("http/https transport listeners are required in axis2.xml");
         }
     }
+
+    // method to get host from the given transport. Returning null since used only in data-services.
+    @Override
+    public String getHost(String transport) throws AxisFault {
+        return null;
+    }
 }

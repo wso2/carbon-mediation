@@ -20,13 +20,13 @@ package org.wso2.carbon.websocket.transport;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.OutTransportInfo;
@@ -36,13 +36,11 @@ import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -51,6 +49,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.xml.stream.XMLStreamException;
 
 public class WebsocketTransportSender extends AbstractTransportSender {
 
@@ -114,12 +113,28 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         * customHeaders map.
         */
         Iterator<String> propertyNames = msgCtx.getPropertyNames();
+        String webSocketCustomHeaderPrefix;
+        Parameter wsCustomHeaderParam =
+                msgCtx.getTransportOut().getParameter(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_CONFIG);
 
+        // avoid using org.apache.commons.lang.StringUtils due to osgi issue
+        if (wsCustomHeaderParam == null || wsCustomHeaderParam.getValue() == null || wsCustomHeaderParam.getValue()
+                .toString().isEmpty()) {
+            webSocketCustomHeaderPrefix = WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX;
+        } else {
+            webSocketCustomHeaderPrefix = wsCustomHeaderParam.getValue().toString();
+        }
         while (propertyNames.hasNext()) {
             String propertyName = propertyNames.next();
-            if (propertyName.startsWith(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)) {
+            if (propertyName.startsWith(webSocketCustomHeaderPrefix)) {
                 Object value = msgCtx.getProperty(propertyName);
-                customHeaders.put(propertyName.split(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)[1], value);
+                String headerSplits[] = propertyName.split(webSocketCustomHeaderPrefix);
+                if (headerSplits.length > 1) {
+                    customHeaders.put(headerSplits[1], value);
+                } else {
+                    log.warn("A header identified with having only the websocket custom-header prefix"
+                            + " as the key (without a unique postfix). Hence dropping the header.");
+                }
             }
         }
 

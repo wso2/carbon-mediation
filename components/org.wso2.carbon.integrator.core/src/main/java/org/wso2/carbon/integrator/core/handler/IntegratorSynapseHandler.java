@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.AbstractSynapseHandler;
+import org.apache.synapse.util.logging.LoggingUtils;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -140,7 +141,8 @@ public class IntegratorSynapseHandler extends AbstractSynapseHandler {
     }
 
     private void handleException(String msg, Exception e, MessageContext msgContext) {
-        log.error(msg, e);
+
+        log.error(LoggingUtils.getFormattedLog(msgContext, msg), e);
         if (msgContext.getServiceLog() != null) {
             msgContext.getServiceLog().error(msg, e);
         }

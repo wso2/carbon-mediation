@@ -9,9 +9,11 @@ import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.util.XMLPrettyPrinter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
@@ -69,6 +71,8 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(EndpointAdmin.class);
     public static final String WSO2_ENDPOINT_MEDIA_TYPE = "application/vnd.wso2.esb.endpoint";
+    private boolean saveRuntimeArtifacts =
+            SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
     /**
      * Set Endpoint status to Active
@@ -290,7 +294,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             if (endpoint instanceof AbstractEndpoint) {
                 fileName = endpoint.getFileName();
             }
-            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
             }
@@ -333,8 +337,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                     if (endpoint instanceof AbstractEndpoint) {
                         fileName = endpoint.getFileName();
                     }
-                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
-
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                         pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
                     }
                     if (log.isDebugEnabled()) {
@@ -378,7 +381,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                         if (endpoint instanceof AbstractEndpoint) {
                             fileName = endpoint.getFileName();
                         }
-                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                             MediationPersistenceManager pm = getMediationPersistenceManager();
                             pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
                         }
@@ -573,7 +576,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
     }
 
     private void persistEndpoint(Endpoint ep) throws EndpointAdminException {
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
 
             MediationPersistenceManager pm = getMediationPersistenceManager();
             pm.saveItem(ep.getName(), ServiceBusConstants.ITEM_TYPE_ENDPOINT);
