@@ -24,7 +24,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Polling consumer for NATS to initialize connection and poll messages.
+ * Message consumer for NATS to initialize connection and listen for messages.
  */
 public class NatsMessageConsumer {
 
