@@ -55,6 +55,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.service.ServiceReferenceHolder;
+import org.wso2.carbon.websocket.transport.utils.LogUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -117,6 +118,9 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     public void handleHandshake(ChannelHandlerContext ctx, FullHttpResponse msg) {
         if (!handshaker.isHandshakeComplete()) {
+            if (log.isDebugEnabled()) {
+                LogUtil.printHeaders(log, msg, ctx);
+            }
             handshaker.finishHandshake(ctx.channel(), (FullHttpResponse) msg);
             if (log.isDebugEnabled()) {
                 log.debug("WebSocket client connected to remote WS endpoint on context id : " + ctx.channel().toString());
@@ -162,7 +166,9 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     public void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) throws AxisFault {
 
         try {
-
+            if (log.isDebugEnabled()) {
+                LogUtil.printWebSocketFrame(log, frame, ctx, true);
+            }
             if (handshaker.isHandshakeComplete()) {
 
                 if (frame instanceof CloseWebSocketFrame) {
