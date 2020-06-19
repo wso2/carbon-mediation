@@ -129,7 +129,85 @@ public class APIGenerator {
             JsonObject pathsObj = swaggerJson.getAsJsonObject(SwaggerConstants.PATHS);
             for (Map.Entry<String, JsonElement> pathEntry : pathsObj.entrySet()) {
                 if (pathEntry.getValue() instanceof JsonObject) {
-                    createResource(pathEntry.getKey(), pathEntry.getValue().getAsJsonObject(), genAPI);
+                    createResource(pathEntry.getKey(), pathEntry.getValue().getAsJsonObject(), genAPI, null);
+                }
+            }
+        }
+
+        OMElement apiElement = APISerializer.serializeAPI(genAPI);
+        if (log.isDebugEnabled()) {
+            log.info("API generation completed : " + genAPI.getName() + " API: " + apiElement.toString());
+        }
+        return genAPI;
+    }
+
+    /**
+     * Generate API from provided swagger definition referring to the old API.
+     *
+     * @param existingAPI old API
+     * @return Generated API
+     * @throws APIGenException
+     */
+    public API generateSynapseAPI(API existingAPI) throws APIGenException {
+
+        if (swaggerJson.get(SwaggerConstants.BASE_PATH) == null ||
+                swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString().isEmpty()) {
+            throw new APIGenException("The \"basePath\" of the swagger definition is mandatory for API generation");
+        }
+        String apiContext = swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString();
+        //cleanup context : remove ending '/'
+        if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
+            apiContext = apiContext.substring(0, apiContext.length() - 1);
+        }
+
+        if (swaggerJson.get(SwaggerConstants.INFO) == null) {
+            throw new APIGenException("The \"info\" section of the swagger definition is mandatory for API generation");
+        }
+        JsonObject swaggerInfo = swaggerJson.getAsJsonObject(SwaggerConstants.INFO);
+        if (swaggerInfo.get(SwaggerConstants.TITLE) == null ||
+                swaggerInfo.get(SwaggerConstants.TITLE).getAsString().isEmpty()) {
+            throw new APIGenException("The title of the swagger definition is mandatory for API generation");
+        }
+
+        String apiName = swaggerInfo.get(SwaggerConstants.TITLE).getAsString();
+
+        // Extract version information
+        String versionType = VersionStrategyFactory.TYPE_NULL;
+        String version = "";
+        JsonElement swaggerVersionElement = swaggerInfo.get(SwaggerConstants.VERSION);
+        if (swaggerVersionElement != null && swaggerVersionElement.isJsonPrimitive() &&
+                swaggerVersionElement.getAsJsonPrimitive().isString()) {
+            version = swaggerVersionElement.getAsString();
+            if (apiContext.endsWith(version)) {
+                // If the base path ends with the version, then it will be considered as version-type=url
+                versionType = VersionStrategyFactory.TYPE_URL;
+                //cleanup api context path : remove version from base path
+                apiContext = apiContext.substring(0, apiContext.length() - version.length() - 1);
+            } else {
+                // otherwise context based version strategy
+                versionType = VersionStrategyFactory.TYPE_CONTEXT;
+            }
+        }
+
+        // Create API
+        API genAPI = new API(apiName, apiContext);
+
+        //Add version strategy
+        if (versionType.equals(VersionStrategyFactory.TYPE_URL)) {
+            // If the base path ends with the version, then it will be considered as version-type=url
+            genAPI.setVersionStrategy(new URLBasedVersionStrategy(genAPI, version, ""));
+        } else if (versionType.equals(VersionStrategyFactory.TYPE_CONTEXT)) {
+            // otherwise context based version strategy
+            genAPI.setVersionStrategy(new ContextVersionStrategy(genAPI, version, ""));
+        } else {
+            genAPI.setVersionStrategy(new DefaultStrategy(genAPI));
+        }
+
+        if (swaggerJson.get(SwaggerConstants.PATHS) != null) {
+            JsonObject pathsObj = swaggerJson.getAsJsonObject(SwaggerConstants.PATHS);
+            for (Map.Entry<String, JsonElement> pathEntry : pathsObj.entrySet()) {
+                if (pathEntry.getValue() instanceof JsonObject) {
+                    createResource(pathEntry.getKey(), pathEntry.getValue().getAsJsonObject(), genAPI, existingAPI);
                 }
             }
         }
@@ -151,7 +229,7 @@ public class APIGenerator {
         if (existingAPI == null) {
             throw new APIGenException("Provided existing API is null");
         }
-        API genAPI = generateSynapseAPI();
+        API genAPI = generateSynapseAPI(existingAPI);
         // clone existing API
         API clonedAPI;
         try {
@@ -178,17 +256,49 @@ public class APIGenerator {
      * @param path path of the resource
      * @param resourceObj json representation of resource
      * @param genAPI generated API
+     * @param existingAPI old API
      */
-    private void createResource(String path, JsonObject resourceObj, API genAPI) throws APIGenException {
+    private void createResource(String path, JsonObject resourceObj, API genAPI, API existingAPI) throws APIGenException {
         boolean noneURLStyleAdded = false;
+        List<Resource> resources = new ArrayList<>();
+        if (existingAPI != null) {
+            for (Resource resource : existingAPI.getResources()) {
+                String resourceMapping = resource.getDispatcherHelper() != null ?
+                        resource.getDispatcherHelper().getString() : "/";
+                // Getting all the resources whose path matches
+                if (path.equals(resourceMapping)) {
+                    resources.add(resource);
+                }
+            }
+        }
+        int i = 0;
+        // Same number is assigned to all the method in the same resource of the existing API
+        HashMap<String, Integer> methodMapping = new HashMap<>();
+        HashMap<Integer, Resource> createdResources = new HashMap<>();
+        for (Resource resource: resources) {
+            for (String method: resource.getMethods()) {
+                methodMapping.put(method, i);
+            }
+            i++;
+        }
         for (Map.Entry<String, JsonElement> methodEntry : resourceObj.entrySet()) {
             if (log.isDebugEnabled()) {
                 log.info("Generating resource for path : " + path + ", method : " + methodEntry.getKey());
             }
-            
+
+            String methodName = methodEntry.getKey().toUpperCase();
+            if (methodMapping.containsKey(methodName)) {
+                Resource createdResource = createdResources.get(methodMapping.get(methodName));
+                // Check if a resource was created for another method belongs to the same resource.
+                if (createdResource != null) {
+                    createdResource.addMethod(methodName);
+                    continue;
+                }
+            }
+
             // Create a new resource for each method.
             Resource resource = new Resource();
-            resource.addMethod(methodEntry.getKey().toUpperCase());
+            resource.addMethod(methodName);
 
             // Identify URL Mapping and template and create relevant helper
             Matcher matcher = SwaggerConstants.PATH_PARAMETER_PATTERN.matcher(path);
@@ -211,6 +321,10 @@ public class APIGenerator {
             resource.setInSequence(APIGenerator.getDefaultInSequence(pathParamList));
             resource.setOutSequence(APIGenerator.getDefaultOutSequence());
             genAPI.addResource(resource);
+
+            if (methodMapping.containsKey(methodName)) {
+                createdResources.put(methodMapping.get(methodName), resource);
+            }
         }
 
     }
@@ -221,31 +335,39 @@ public class APIGenerator {
         newAPI.setVersionStrategy(currentAPI.getVersionStrategy());
 
         // Map of resources against resource url mapping or template
-        HashMap<String, ArrayList<Resource>> currentResourceList = new HashMap<>();
+        HashMap<String, HashMap<String, Resource>> currentResourceList = new HashMap<>();
         // Extract all existing resources and categorize according URL mapping or template
         for (Resource resource : currentAPI.getResources()) {
 
             String resourceMapping = resource.getDispatcherHelper() != null ?
                     resource.getDispatcherHelper().getString() : "/";
-            ArrayList<Resource> resourceList;
+            HashMap<String, Resource> resourceMap;
             if (currentResourceList.get(resourceMapping) != null) {
-                resourceList = currentResourceList.get(resourceMapping);
+                resourceMap = currentResourceList.get(resourceMapping);
             } else {
-                resourceList = new ArrayList<>();
+                resourceMap = new HashMap<>();
             }
-            resourceList.add(resource);
-            currentResourceList.put(resourceMapping, resourceList);
+            for (String method: resource.getMethods()) {
+                resourceMap.put(method, resource);
+            }
+            currentResourceList.put(resourceMapping, resourceMap);
         }
 
         for (Resource resource : newAPI.getResources()) {
 
             String resourceMapping = resource.getDispatcherHelper() != null ?
                     resource.getDispatcherHelper().getString() : "/";
-            ArrayList<Resource> existingResources = currentResourceList.get(resourceMapping);
+            HashMap<String, Resource> existingResources = currentResourceList.get(resourceMapping);
 
             if (existingResources != null) {
                 // TODO handle multiple resources with same URL mapping or template with different methods
-                compareAndUpdateResource(existingResources.get(0), resource);
+                for (String method: resource.getMethods()) {
+                    // Check for a resource with matching method
+                    if (existingResources.containsKey(method)) {
+                        compareAndUpdateResource(existingResources.get(method), resource);
+                        break;
+                    }
+                }
             }
         }
     }
