@@ -88,8 +88,9 @@ public class GenericApiObjectDefinition {
         apiMap.put(SwaggerConstants.PRODUCES, SwaggerConstants.DEFAULT_PRODUCES);
 
         //Paths
-        if (getPathMap() != null && !getPathMap().isEmpty()) {
-            apiMap.put(SwaggerConstants.PATHS, getPathMap());
+        Map<String, Object> pathMap = getPathMap();
+        if (pathMap != null && !pathMap.isEmpty()) {
+            apiMap.put(SwaggerConstants.PATHS, pathMap);
         }
         return apiMap;
     }
@@ -137,9 +138,12 @@ public class GenericApiObjectDefinition {
     private Map<String, Object> getPathMap() {
         Map<String, Object> pathsMap = new LinkedHashMap<>();
         for (Resource resource : api.getResources()) {
-            Map<String, Object> methodMap = new LinkedHashMap<>();
             DispatcherHelper resourceDispatcherHelper = resource.getDispatcherHelper();
-
+            Map<String, Object> methodMap =
+                    (Map<String, Object>) pathsMap.get(getPathFromUrl(getUri(resourceDispatcherHelper)));
+            if (methodMap == null) {
+                methodMap = new LinkedHashMap<>();
+            }
             for (String method : resource.getMethods()) {
                 if (method != null) {
                     Map<String, Object> methodInfoMap = new LinkedHashMap<>();
@@ -153,13 +157,17 @@ public class GenericApiObjectDefinition {
                     methodMap.put(method.toLowerCase(), methodInfoMap);
                 }
             }
-            pathsMap.put(getPathFromUrl(resourceDispatcherHelper == null ? SwaggerConstants.PATH_SEPARATOR
-                    : resourceDispatcherHelper.getString()), methodMap);
+            pathsMap.put(getPathFromUrl(getUri(resourceDispatcherHelper)), methodMap);
         }
         if(log.isDebugEnabled()){
             log.debug("Paths map created with size " + pathsMap.size());
         }
         return pathsMap;
+    }
+
+    private String getUri(DispatcherHelper resourceDispatcherHelper) {
+        return resourceDispatcherHelper == null ? SwaggerConstants.PATH_SEPARATOR
+                : resourceDispatcherHelper.getString();
     }
 
     /**
