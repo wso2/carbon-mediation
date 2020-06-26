@@ -15,15 +15,19 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
+<%@ page import="org.apache.axiom.om.OMElement" %>
+<%@ page import="org.apache.axiom.om.impl.builder.StAXOMBuilder" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.CarbonError" %>
 <%@ page import="org.wso2.carbon.proxyadmin.ui.client.ProxyServiceAdminClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.io.InputStream" %>
 <%@ page import="java.io.ByteArrayInputStream" %>
+<%@ page import="javax.xml.stream.XMLStreamException" %>
 <%@ page import="org.wso2.carbon.utils.xml.XMLPrettyPrinter" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyData" %>
@@ -299,11 +303,32 @@
     // sets additional service params on load if the given proxy data contains any
     Entry[] entries;
     String givenParams = "";
+    OMElement omElement = null;
     if (pd != null && (entries = pd.getServiceParams()) != null && entries.length > 0 && entries[0] != null) {
-        givenParams = Encode.forHtmlContent(entries[0].getKey()) + "#" + Encode.forHtmlContent(entries[0].getValue().replace("\n",""));
+        if (entries[0].getKey().equals("transport.jms.ContentType") && entries[0].getValue().startsWith("<")) {
+            omElement = new StAXOMBuilder(new ByteArrayInputStream(entries[0].getValue().getBytes())).getDocumentElement();
+            if (omElement != null) {
+                omElement = encodeRuleSet(omElement);
+                givenParams = Encode.forHtmlContent(entries[0].getKey()) + "#" + omElement.toString().replace("\n","");
+            } else {
+                givenParams = Encode.forHtmlContent(entries[0].getKey()) + "#" + Encode.forHtmlContent(entries[0].getValue().replace("\n",""));
+            }
+        } else {
+            givenParams = Encode.forHtmlContent(entries[0].getKey()) + "#" + Encode.forHtmlContent(entries[0].getValue().replace("\n",""));
+        }
         for (int i = 1; i < entries.length; i++) {
             if (entries[i] != null) {
-                givenParams += "::" + Encode.forHtmlContent(entries[i].getKey()) + "#" + Encode.forHtmlContent(entries[i].getValue().replace("\n",""));
+                if (entries[i].getKey().equals("transport.jms.ContentType") && entries[i].getValue().startsWith("<")) {
+                    omElement = new StAXOMBuilder(new ByteArrayInputStream(entries[i].getValue().getBytes())).getDocumentElement();
+                    if (omElement != null) {
+                        omElement = encodeRuleSet(omElement);
+                        givenParams += "::" + Encode.forHtmlContent(entries[i].getKey()) + "#" + omElement.toString().replace("\n","");
+                    } else {
+                        givenParams += "::" + Encode.forHtmlContent(entries[i].getKey()) + "#" + Encode.forHtmlContent(entries[i].getValue().replace("\n",""));
+                    }
+                } else {
+                    givenParams += "::" + Encode.forHtmlContent(entries[i].getKey()) + "#" + Encode.forHtmlContent(entries[i].getValue().replace("\n",""));
+                }
             }
         }
     }
@@ -446,6 +471,23 @@
         if (session.getAttribute("epMode") != null) {
             session.removeAttribute("epMode");
         }
+    }
+
+    public OMElement encodeRuleSet(OMElement omElement) {
+        if (omElement.getLocalName().equals("rules")) {
+            if (omElement.getChildren() != null) {
+                Iterator<OMElement> itr = omElement.getChildElements();
+                while (itr.hasNext()) {
+                    OMElement child = itr.next();
+                    String childName = child.getLocalName();
+                    if (!(childName.equals("jmsProperty") || childName.equals("bytesMessage") || childName.equals("textMessage") || childName.equals("default"))) {
+                        break;
+                    }
+                    child.setText(Encode.forHtmlContent(child.getText()));
+                }
+		    }
+        }
+        return omElement;
     }
 %>
 <fmt:bundle basename="org.wso2.carbon.proxyadmin.ui.i18n.Resources">
