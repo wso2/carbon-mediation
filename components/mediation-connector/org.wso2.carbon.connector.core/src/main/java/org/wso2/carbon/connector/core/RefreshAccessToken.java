@@ -135,8 +135,8 @@ public class RefreshAccessToken extends AbstractConnector {
             return customRefreshUrl;
         } else {
             StringBuilder urlStringBuilder = new StringBuilder();
-            urlStringBuilder.append(messageContext.getProperty(PROPERTY_PREFIX + "hostName"));
-            urlStringBuilder.append("/services/oauth2/token?grant_type=refresh_token");
+            urlStringBuilder.append(messageContext.getProperty(PROPERTY_PREFIX + "tokenEndpointUrl"));
+            urlStringBuilder.append("?grant_type=refresh_token");
             String clientId = (String) messageContext.getProperty(PROPERTY_PREFIX + "clientId");
             if (StringUtils.isNotEmpty(clientId)) {
                 urlStringBuilder.append("&client_id=").append(clientId);
