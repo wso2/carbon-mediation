@@ -57,7 +57,7 @@ public class RefreshAccessTokenWithExpiry extends RefreshAccessToken {
         }
 
         if (!isRefreshNeeded) {
-            isRefreshNeeded = handleSavedCredentialReuse(messageContext, registry, accessTokenRegistryPath);
+            isRefreshNeeded = reuseSavedAccessToken(messageContext, registry, accessTokenRegistryPath);
         }
 
         if (isRefreshNeeded) {

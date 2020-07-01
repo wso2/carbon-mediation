@@ -49,18 +49,28 @@ import java.util.regex.Pattern;
  */
 public class RefreshAccessToken extends AbstractConnector {
     private CloseableHttpClient httpClient = HttpClients.createDefault();
-    protected final String PROPERTY_PREFIX = "uri.var.";
+    protected static final String PROPERTY_PREFIX = "uri.var.";
 
     @Override
     public void connect(MessageContext messageContext) throws ConnectException {
         Registry registry = messageContext.getConfiguration().getRegistry();
         String accessTokenRegistryPath = (String) messageContext.getProperty(PROPERTY_PREFIX +
                 "accessTokenRegistryPath");
+        if (StringUtils.isEmpty(accessTokenRegistryPath)) {
+            throw new ConnectException("Access token registry path not provided for access token storage and reuse.");
+        }
         handleRefresh(messageContext, registry, accessTokenRegistryPath);
     }
 
-    protected boolean handleSavedCredentialReuse (MessageContext messageContext, Registry registry,
-                                                  String accessTokenRegistryPath) {
+    /**
+     *
+     * @param messageContext
+     * @param registry
+     * @param accessTokenRegistryPath
+     * @return returns a boolean. true - token refresh is needed. false - token refresh is not needed
+     */
+    protected boolean reuseSavedAccessToken(MessageContext messageContext, Registry registry,
+                                            String accessTokenRegistryPath) {
         String savedAccessToken = null;
         Entry propEntry = messageContext.getConfiguration().getEntryDefinition(accessTokenRegistryPath);
         if (propEntry == null) {
@@ -109,7 +119,7 @@ public class RefreshAccessToken extends AbstractConnector {
             if (httpResponse.getEntity() == null) {
                 throw new ConnectException("Empty response received for refresh access token call");
             }
-            synLog.auditLog("%%%%%%%%%%%% refresh call response : " + httpResponse.toString());
+            synLog.auditLog("Refresh call response : " + httpResponse.toString());
             extractAndSetPropertyAndRegistryResource(messageContext, httpResponse, registry, accessTokenRegistryPath);
         } catch (IOException e) {
             synLog.error(e);
