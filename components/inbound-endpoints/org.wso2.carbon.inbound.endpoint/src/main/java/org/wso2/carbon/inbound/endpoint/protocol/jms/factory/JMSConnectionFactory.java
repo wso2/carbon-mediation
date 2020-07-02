@@ -289,8 +289,9 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 return connection;
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating connection through factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error(
+                    "JMS Exception while creating connection through factory '" + this.connectionFactoryString + "' "
+                            + e.getMessage(), e);
             // Need to close the connection in the case if durable subscriptions
             if (connection != null) {
                 try {
