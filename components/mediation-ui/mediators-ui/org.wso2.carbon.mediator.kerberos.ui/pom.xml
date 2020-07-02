@@ -44,8 +44,7 @@
                         <Bundle-Activator>org.wso2.carbon.mediator.kerberos.ui.internal.KerberosMediatorActivator</Bundle-Activator>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            !org.wso2.carbon.mediator.kerberos.ui.*
-                            org.wso2.carbon.mediator.kerberos.*,
+                            org.wso2.carbon.mediator.kerberos.ui.*,
                             !javax.servlet,
                             !javax.servlet.http,
                         </Export-Package>
