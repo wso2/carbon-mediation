@@ -585,11 +585,15 @@
                         <tr>
                             <td><fmt:message key="message.processor.failMessagesStore"/></td>
                             <td>
-                                <input name="FailMessagesStore" id="FailMessagesStore" type="hidden"
-                                       value="<%=processorData.getParams().get("message.processor.failMessagesStore")%>"/>
-                                <label id="FailMessagesStore_label" for="FailMessagesStore"><%=processorData.getParams()
-                                       .get("message.processor.failMessagesStore")%>
-                                </label>
+                                <%
+                                    String failMessagesStore = processorData.getParams().get("message.processor.failMessagesStore");
+                                %>
+                                <select id="FailMessagesStore" name="FailMessagesStore">
+                                    <%for (String msn : messageStores) {%>
+                                        <option value="<%=msn%>" <%=msn.equals(failMessagesStore) ? "selected=\"selected\"" : ""%>><%=msn%></option>
+                                    <%} %>
+                                    <option value="">- Deselect Fail Messages Store -</option>
+                                </select>
                                 <br/>
                             </td>
                         </tr>
@@ -598,9 +602,9 @@
                             <td><fmt:message key="message.processor.failMessagesStore"/></td>
                             <td>
                                 <select id="FailMessagesStore" name="FailMessagesStore">
+                                    <option value="">- Select Fail Messages Store -</option>
                                     <%for (String msn : messageStores) {%>
-                                    <option selected="true" value="<%=msn%>"><%=msn%>
-                                    </option>
+                                        <option value="<%=msn%>"><%=msn%></option>
                                     <%} %>
                                 </select>
                             </td>
