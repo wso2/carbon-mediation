@@ -24,6 +24,16 @@ public class JDBCConsumer implements MessageConsumer {
         return true;
     }
 
+
+    /**
+     * Set availability of connectivity with the message store
+     *
+     * @param isAlive connection availability.
+     */
+    @Override
+    public void setAlive(boolean isAlive) {
+    }
+
     @Override
     public void setId(int i) {
 
