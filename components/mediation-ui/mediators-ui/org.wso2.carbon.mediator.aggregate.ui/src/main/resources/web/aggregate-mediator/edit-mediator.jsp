@@ -95,6 +95,30 @@
                 </tr>
                 <tr>
                     <td>
+                        <fmt:message key="mediator.aggregate.element.type"/>
+                    </td>
+                    <td>
+                        <select name="aggregateElementType" id="aggregateElementType">
+                        <%
+                            if (aggregateMediator.getAggregateElementType() != null && aggregateMediator
+                            .getAggregateElementType().equals("child")) {
+                        %>
+                            <option value="child" selected="selected">child</option>
+                            <option value="root">root</option>
+                        <%
+                            } else {
+                        %>
+                            <option value="root" selected="selected">root</option>
+                            <option value="child">child</option>
+                        <%
+                            }
+                        %>
+                        </select>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
                         <fmt:message key="mediator.aggregate.timeout"/>
                     </td>
                     <td>
