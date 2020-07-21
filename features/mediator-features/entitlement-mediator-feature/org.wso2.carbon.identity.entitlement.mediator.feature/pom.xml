@@ -79,7 +79,7 @@
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
                                 </properties>
                             </adviceFile>
-                            <bundles><bundleDef>javax.annotation:javax.annotation-api</bundleDef>
+                            <bundles>
                                 <bundleDef>libthrift.wso2:libthrift</bundleDef>
                                 <bundleDef>org.wso2.carbon.identity.agent.entitlement.mediator:org.wso2.carbon.identity.entitlement.proxy</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.identity.entitlement.mediator</bundleDef>
