@@ -88,7 +88,6 @@
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.opensaml:opensaml</bundleDef>
                                 <bundleDef>org.wso2.carbon.identity.saml.common:org.wso2.carbon.identity.saml.common.util</bundleDef>
-                                <bundleDef>javax.annotation:javax.annotation-api</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <!--<importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.import.feature.version}</importFeatureDef>-->
