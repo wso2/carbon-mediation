@@ -254,6 +254,15 @@
             elemAction.style.display = 'block';
             elemAction.value = 'replace';
         }
+
+        // When action remove selected source should be custom && target should be body
+        var elmSource = document.getElementById('mediator.enrich.source.type');
+        if (selectedElmValueForAction == "remove") {
+            elmSource.value = 'custom';
+            elm.value = 'body';
+            changeSourceElements(document.getElementById('mediator.enrich.source.type'), document.getElementById
+            ('mediator.enrich.target.type'))
+        }
     }
 </script>
 
@@ -405,6 +414,9 @@
     <td>
         <select id="mediator.enrich.target.action" name="mediator.enrich.target.action"
                 style="width:150px;" onchange="validateAction(this)">
+            <option value="remove" <%=enrichMediator.getTargetAction() != null && enrichMediator.getTargetAction().equals("remove") ? "selected=\"selected\"" : ""%>>
+                <fmt:message key="mediator.enrich.target.action.remove"/>
+            </option>
             <option value="replace" <%=enrichMediator.getTargetAction() != null && enrichMediator.getTargetAction().equals("replace") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.target.action.replace"/>
             </option>
