@@ -35,6 +35,7 @@
     String complete_min = request.getParameter("complete_min");
     String correlate_exp = request.getParameter("correlate_expr");
     String sequenceOption = request.getParameter("sequenceOption");
+    String aggregateEleType = request.getParameter("aggregateElementType");
 
     AggregateMediator aggregateMediator = (AggregateMediator) mediator;
   
@@ -97,6 +98,10 @@
         } else {
             aggregateMediator.setAggregationExpression(xPathFactory.createSynapseXPath("aggregate_expr", request, session));
         }
+    }
+
+    if (!aggregateEleType.equals("")) {
+        aggregateMediator.setAggregateElementType(aggregateEleType);
     }
 
     if (!correlate_exp.isEmpty()) {

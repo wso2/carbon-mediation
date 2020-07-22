@@ -35,6 +35,13 @@ import org.jaxen.JaxenException;
 import javax.xml.namespace.QName;
 
 public class AggregateMediator extends AbstractListMediator {
+
+    /** Constant for the Aggregate Element Type: root */
+    public static final String AGGREGATE_ELEMENT_TYPE_ROOT = "root";
+
+    /** Constant for the Aggregate Element Type: child */
+    public static final String AGGREGATE_ELEMENT_TYPE_CHILD = "child";
+
     protected static final QName CORELATE_ON_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "correlateOn");
     protected static final QName COMPLETE_CONDITION_Q
@@ -56,7 +63,8 @@ public class AggregateMediator extends AbstractListMediator {
     private static final QName SEQUENCE_Q
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
     private static final QName ID_Q = new QName("id");
-
+    protected static final QName AGGREGATE_ELEMENT_TYPE_Q
+            = new QName(XMLConfigConstants.NULL_NAMESPACE, "aggregateElementType");
     private static final QName ENCLOSING_ELEMENT_PROPERTY
                     = new QName(XMLConfigConstants.NULL_NAMESPACE, "enclosingElementProperty");
 
@@ -69,6 +77,15 @@ public class AggregateMediator extends AbstractListMediator {
 
     private String onCompleteSequenceRef = null;
     private String id;
+    private String aggregateElementType = null;
+
+    public String getAggregateElementType() {
+        return aggregateElementType;
+    }
+
+    public void setAggregateElementType(String aggregateElementType) {
+        this.aggregateElementType = aggregateElementType;
+    }
 
     public String getEnclosingElementPropertyName() {
         return enclosingElementPropertyName;
@@ -170,6 +187,9 @@ public class AggregateMediator extends AbstractListMediator {
         aggregator.addChild(completeCond);
 
         OMElement onCompleteElem = fac.createOMElement("onComplete", synNS);
+        if (aggregateElementType != null) {
+            onCompleteElem.addAttribute("aggregateElementType", aggregateElementType, nullNS);
+        }
         if (aggregationExpression != null) {
             SynapsePathSerializer.serializePath(aggregationExpression, onCompleteElem, "expression");
         }
@@ -253,6 +273,17 @@ public class AggregateMediator extends AbstractListMediator {
 
         OMElement onComplete = elem.getFirstChildWithName(ON_COMPLETE_Q);
         if (onComplete != null) {
+
+            OMAttribute aggregateElementTypeAttr = onComplete.getAttribute(AGGREGATE_ELEMENT_TYPE_Q);
+            if (aggregateElementTypeAttr != null) {
+                String elementType = aggregateElementTypeAttr.getAttributeValue();
+                if (elementType.equals(AGGREGATE_ELEMENT_TYPE_ROOT) ||
+                        elementType.equals(AGGREGATE_ELEMENT_TYPE_CHILD)) {
+                    aggregateElementType = elementType;
+                } else {
+                    aggregateElementType = AGGREGATE_ELEMENT_TYPE_ROOT;
+                }
+            }
 
             OMAttribute aggregateExpr = onComplete.getAttribute(EXPRESSION_Q);
             if (aggregateExpr != null) {
