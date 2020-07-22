@@ -119,7 +119,6 @@ public class RefreshAccessToken extends AbstractConnector {
             if (httpResponse.getEntity() == null) {
                 throw new ConnectException("Empty response received for refresh access token call");
             }
-            synLog.auditLog("Refresh call response : " + httpResponse.toString());
             extractAndSetPropertyAndRegistryResource(messageContext, httpResponse, registry, accessTokenRegistryPath);
         } catch (IOException e) {
             synLog.error(e);
