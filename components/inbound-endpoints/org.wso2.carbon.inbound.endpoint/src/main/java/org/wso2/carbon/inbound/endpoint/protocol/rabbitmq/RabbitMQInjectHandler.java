@@ -19,6 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.rabbitmq;
 
 import com.rabbitmq.client.AMQP;
+import io.nats.streaming.protobuf.Ack;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
@@ -73,7 +74,7 @@ public class RabbitMQInjectHandler {
      * @param inboundName Inbound Name
      * @return delivery status of the message
      */
-    public boolean onMessage(AMQP.BasicProperties properties, byte[] body, String inboundName) {
+    public AcknowledgementMode onMessage(AMQP.BasicProperties properties, byte[] body, String inboundName) {
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
         try {
             MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
@@ -98,14 +99,20 @@ public class RabbitMQInjectHandler {
             Object rollbackProperty = msgCtx.getProperty(RabbitMQConstants.SET_ROLLBACK_ONLY);
             if ((rollbackProperty instanceof Boolean && ((Boolean) rollbackProperty)) ||
                     (rollbackProperty instanceof String && Boolean.parseBoolean((String) rollbackProperty))) {
-                return false;
+                return AcknowledgementMode.REQUEUE_FALSE;
+            }
+            Object requeueOnRollbackProperty = msgCtx.getProperty(RabbitMQConstants.SET_REQUEUE_ON_ROLLBACK);
+            if ((requeueOnRollbackProperty instanceof Boolean && ((Boolean) requeueOnRollbackProperty)) ||
+                    (requeueOnRollbackProperty instanceof String &&
+                            Boolean.parseBoolean((String) requeueOnRollbackProperty))) {
+                return AcknowledgementMode.REQUEUE_TRUE;
             }
 
         } catch (AxisFault axisFault) {
             log.error("Error when trying to read incoming message ...", axisFault);
-            return false;
+            return AcknowledgementMode.REQUEUE_FALSE;
         }
-        return true;
+        return AcknowledgementMode.ACKNOWLEDGE;
     }
 
     /**
