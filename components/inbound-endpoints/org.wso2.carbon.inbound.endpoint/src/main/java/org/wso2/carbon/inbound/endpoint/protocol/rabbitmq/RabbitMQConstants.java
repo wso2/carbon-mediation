@@ -25,6 +25,7 @@ public class RabbitMQConstants {
     public static final String AMQ_PREFIX = "amq.";
     public static final String RABBITMQ_REPLY_TO = "RABBITMQ_REPLY_TO";
     public static final String SET_ROLLBACK_ONLY = "SET_ROLLBACK_ONLY";
+    public static final String SET_REQUEUE_ON_ROLLBACK = "SET_REQUEUE_ON_ROLLBACK";
     public static final String RABBITMQ_CON_FAC = "rabbitmq.connection.factory";
 
     public static final String SERVER_HOST_NAME = "rabbitmq.server.host.name";
@@ -74,6 +75,7 @@ public class RabbitMQConstants {
     public static final String MESSAGE_MAX_DEAD_LETTERED_COUNT = "rabbitmq.message.max.dead.lettered.count";
     public static final String MESSAGE_ERROR_EXCHANGE_NAME = "rabbitmq.message.error.exchange.name";
     public static final String MESSAGE_ERROR_QUEUE_ROUTING_KEY = "rabbitmq.message.error.queue.routing.key";
+    public static final String MESSAGE_REQUEUE_DELAY = "rabbitmq.message.requeue.delay";
 
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
     public static final int DEFAULT_RETRY_INTERVAL = 30000;
