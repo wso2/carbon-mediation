@@ -35,6 +35,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
 /**
@@ -47,6 +49,7 @@ public class InboundHttpSourceHandler extends SourceHandler {
     private final SourceConfiguration sourceConfiguration;
     private int port;
     private WorkerPool workerPool;
+    private Lock lock = new ReentrantLock();
 
     public InboundHttpSourceHandler(int port, SourceConfiguration sourceConfiguration) {
         super(sourceConfiguration);
@@ -62,7 +65,8 @@ public class InboundHttpSourceHandler extends SourceHandler {
             if (request == null) {
                 return;
             }
-            String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
+            String method =
+                    request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
             //Get output Stream for write response for HTTP GET and HEAD methods
             OutputStream os = getOutputStream(method, request);
             // Handover Request to Worker Pool
@@ -73,15 +77,23 @@ public class InboundHttpSourceHandler extends SourceHandler {
 
             if (tenantDomain != null) {
                 if (workerPool == null) {
-                    WorkerPoolConfiguration workerPoolConfiguration =
-                            HTTPEndpointManager.getInstance().getWorkerPoolConfiguration(tenantDomain, port);
-                    if (workerPoolConfiguration != null) {
-                        workerPool = sourceConfiguration.getWorkerPool(workerPoolConfiguration.getWorkerPoolCoreSize(),
-                                workerPoolConfiguration.getWorkerPoolSizeMax(),
-                                workerPoolConfiguration.getWorkerPoolThreadKeepAliveSec(),
-                                workerPoolConfiguration.getWorkerPoolQueuLength(),
-                                workerPoolConfiguration.getThreadGroupID(),
-                                workerPoolConfiguration.getThreadID());
+                    lock.lock();
+                    try {
+                        if (workerPool == null) {
+                            WorkerPoolConfiguration workerPoolConfiguration =
+                                    HTTPEndpointManager.getInstance().getWorkerPoolConfiguration(tenantDomain, port);
+                            if (workerPoolConfiguration != null) {
+                                workerPool = sourceConfiguration
+                                        .getWorkerPool(workerPoolConfiguration.getWorkerPoolCoreSize(),
+                                                workerPoolConfiguration.getWorkerPoolSizeMax(),
+                                                workerPoolConfiguration.getWorkerPoolThreadKeepAliveSec(),
+                                                workerPoolConfiguration.getWorkerPoolQueuLength(),
+                                                workerPoolConfiguration.getThreadGroupID(),
+                                                workerPoolConfiguration.getThreadID());
+                            }
+                        }
+                    } finally {
+                        lock.unlock();
                     }
                 }
             }
