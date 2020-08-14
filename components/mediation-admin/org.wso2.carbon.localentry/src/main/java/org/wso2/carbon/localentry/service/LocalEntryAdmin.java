@@ -189,8 +189,6 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
 
             return getSynapseConfiguration().getLocalRegistry().containsKey(entryKey);
 
-        } catch (LocalEntryAdminException e) {
-            throw e;
         } finally {
             lock.unlock();
         }
