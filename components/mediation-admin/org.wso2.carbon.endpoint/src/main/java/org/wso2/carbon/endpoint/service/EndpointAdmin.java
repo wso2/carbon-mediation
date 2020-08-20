@@ -294,6 +294,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             if (endpoint instanceof AbstractEndpoint) {
                 fileName = endpoint.getFileName();
             }
+            endpoint.destroy();
             if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) && saveRuntimeArtifacts) {
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
