@@ -29,8 +29,11 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.base.api.ServerConfigurationService;
+import org.wso2.carbon.mediation.security.vault.external.ExternalVaultConfigLoader;
+import org.wso2.carbon.mediation.security.vault.external.ExternalVaultException;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 
 @Component(
         name = "mediation.security",
@@ -38,6 +41,8 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 public class SynapseSecurityerviceComponent {
 
     private static Log log = LogFactory.getLog(SynapseSecurityerviceComponent.class);
+
+    private static SecretCallbackHandlerService secretCallbackHandlerService;
 
     public SynapseSecurityerviceComponent() {
 
@@ -54,8 +59,11 @@ public class SynapseSecurityerviceComponent {
                 null);
         try {
             SecureVaultLookupHandlerImpl.getDefaultSecurityService();
+            ExternalVaultConfigLoader.loadExternalVaultConfigs(secretCallbackHandlerService);
         } catch (RegistryException e) {
             log.error("Error while activating secure vault registry component", e);
+        } catch (ExternalVaultException e) {
+            log.error("Error while loading external secure vault configurations", e);
         }
     }
 
@@ -100,5 +108,25 @@ public class SynapseSecurityerviceComponent {
     protected void unsetServerConfigurationService(ServerConfigurationService serverConfiguration) {
 
         SecurityServiceHolder.getInstance().setServerConfigurationService(null);
+    }
+
+    @Reference(
+            name = "secret.callback.handler.service",
+            service = org.wso2.carbon.securevault.SecretCallbackHandlerService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSecretCallbackHandlerService")
+    protected void setSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
+        if (log.isDebugEnabled()) {
+            log.debug("SecretCallbackHandlerService bound to the ESB initialization process");
+        }
+        this.secretCallbackHandlerService = secretCallbackHandlerService;
+    }
+
+    protected void unsetSecretCallbackHandlerService(SecretCallbackHandlerService secretCallbackHandlerService) {
+        if (log.isDebugEnabled()) {
+            log.debug("SecretCallbackHandlerService unbound from the ESB environment");
+        }
+        this.secretCallbackHandlerService = null;
     }
 }
