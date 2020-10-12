@@ -30,6 +30,8 @@ public class HashiCorpVaultConstant {
 
     static final String ADDRESS_PARAMETER = "address";
     static final String TOKEN_PARAMETER = "rootToken";
+    static final String ROLE_ID_PARAMETER = "roleId";
+    static final String SECRET_ID_PARAMETER = "secretId";
     static final String ENGINE_TYPE_PARAMETER = "engineVersion";
     static final String CACHEABLE_DURATION_PARAMETER = "cacheableDuration";
     static final String NAMESPACE_PARAMETER = "namespace";
@@ -37,4 +39,5 @@ public class HashiCorpVaultConstant {
     static final String KEY_STORE_PARAMETER = "keyStoreFile";
     static final String KEY_STORE_PASSWORD_PARAMETER = "keyStorePassword";
     static final String HTTPS_PARAMETER = "https";
+    static final long LEAST_TTL_VALUE = -2000L;
 }
