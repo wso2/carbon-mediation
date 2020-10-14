@@ -107,6 +107,7 @@ public class VFSProcessor extends InboundRequestProcessorImpl implements TaskSta
     public void destroy(boolean removeTask) {
         if (removeTask) {
             destroy();
+            fileScanner.destroy();
         }
     }
 }

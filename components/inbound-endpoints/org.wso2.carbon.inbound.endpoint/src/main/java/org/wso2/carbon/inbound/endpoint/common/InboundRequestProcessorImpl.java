@@ -171,6 +171,7 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
                 try {
                     thread.join();
                 } catch (InterruptedException e) {
+                    thread.interrupt();
                     log.error("Error while stopping the inbound thread.");
                 }
             }
