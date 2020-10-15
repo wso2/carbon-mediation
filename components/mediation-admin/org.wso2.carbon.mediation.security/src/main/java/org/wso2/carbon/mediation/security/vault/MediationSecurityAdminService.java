@@ -27,10 +27,14 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
+import org.wso2.carbon.mediation.security.vault.external.ExternalVaultException;
+import org.wso2.carbon.mediation.security.vault.external.hashicorp.HashiCorpVaultLookupHandlerImpl;
 
 public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 
 	private static Log log = LogFactory.getLog(MediationSecurityAdminService.class);
+
+	private static final String EXTERNAL_VAULTS = "[EI_HOME]/conf/security/external-vaults.xml";
 
 	/**
 	 * Operation to do the encryption ops by invoking secure vault api
@@ -85,4 +89,12 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 		}
 	}
 
+	public void setSecretIdForHashiCorpVault(String secretId) throws ExternalVaultException {
+		HashiCorpVaultLookupHandlerImpl instance = HashiCorpVaultLookupHandlerImpl.getDefaultSecurityService();
+		instance.setSecretId(secretId);
+
+		log.info("SecretId value is updated in HashiCorp vault runtime configurations");
+		log.warn("To persist the new SecretId in the next server startup, please update the " + EXTERNAL_VAULTS
+				+ " file" );
+	}
 }

@@ -44,16 +44,28 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 	private static Log log = LogFactory.getLog(HashiCorpVaultLookupHandlerImpl.class);
 
 	private static HashiCorpVaultLookupHandlerImpl instance = null;
-	
-	private Object decryptLockObj = new Object();
 
 	private Vault vaultConnection;
+
+	private VaultConfig vaultConfig;
 
 	private String cachableDuration = "15000";
 
 	private String engineVersion = "2";
 
 	private String vaultNamespace;
+
+	private String currentAuthToken;
+
+	private Calendar tokenExpiration;
+
+	private String secretId;
+
+	private String roleId;
+
+	private boolean isAppRolePullAuthentication = true;
+
+	private String currentAliasPassword;
 
 	private HashiCorpVaultLookupHandlerImpl() throws ExternalVaultException {
 		try {
@@ -63,7 +75,7 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 		}
 	}
 
-	static HashiCorpVaultLookupHandlerImpl getDefaultSecurityService() throws ExternalVaultException {
+	public static HashiCorpVaultLookupHandlerImpl getDefaultSecurityService() throws ExternalVaultException {
 		if (instance == null) {
 			instance = new HashiCorpVaultLookupHandlerImpl();
 		}
@@ -86,15 +98,23 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 		} else if (!parameters.containsKey(HashiCorpVaultConstant.ADDRESS_PARAMETER)) {
 			throw new ExternalVaultException(HashiCorpVaultConstant.ADDRESS_PARAMETER
 					+ " parameter can not found in " + name() + " secure vault configurations");
-		} else if (!parameters.containsKey(HashiCorpVaultConstant.TOKEN_PARAMETER)) {
-			throw new ExternalVaultException(HashiCorpVaultConstant.TOKEN_PARAMETER
-					+ " parameter can not found in " + name() + " secure vault configurations");
+		} else if (!parameters.containsKey(HashiCorpVaultConstant.TOKEN_PARAMETER)
+				&& (!parameters.containsKey(HashiCorpVaultConstant.ROLE_ID_PARAMETER) ||
+				!parameters.containsKey(HashiCorpVaultConstant.SECRET_ID_PARAMETER))) {
+			throw new ExternalVaultException("Static RootToken parameter or RoleID and SecretID parameters can not " +
+					"found in " + name() + " secure vault configurations");
 		}
 
 		processHashiCorpParameters(parameters);
 
 		try {
-			vaultConnection = new Vault(createHashiCorpVaultConfig(parameters));
+			vaultConfig = createHashiCorpVaultConfig(parameters);
+			vaultConnection = new Vault(vaultConfig);
+			if (!parameters.containsKey(HashiCorpVaultConstant.TOKEN_PARAMETER)
+					&& parameters.containsKey(HashiCorpVaultConstant.ROLE_ID_PARAMETER)
+					&& parameters.containsKey(HashiCorpVaultConstant.SECRET_ID_PARAMETER)) {
+				authenticateHashiCorpVault();
+			}
 		} catch (VaultException e) {
 			if (e.getCause() instanceof RestException) {
 				throw new ExternalVaultException("Error in connecting to HashiCorp vault. Vault address: "
@@ -103,6 +123,74 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 				throw new ExternalVaultException("Error while connecting the HashiCorp vault", e);
 			}
 		}
+	}
+
+	/**
+	 * Authenticate with the app-roll method.
+	 *
+	 * @return status of authenticated due to the token expiration or not
+	 */
+	private boolean authenticateHashiCorpVault() throws VaultException {
+
+		boolean isTokenExpired = false;
+		if (isTokenTTLExpired()) {
+			try {
+				currentAuthToken = vaultConnection.auth().loginByAppRole(roleId, secretId).getAuthClientToken();
+				vaultConfig.token(currentAuthToken).build();
+			} catch (VaultException e) {
+				throw new VaultException("Error while generating a new client token using the roleId and secretId. " +
+						"Please check the secret_id_num_uses parameter value for the troubleshooting purposes.");
+			}
+
+			log.debug("Login to Vault using AppRole/SecretID successful");
+			getTTLExpiryOfCurrentToken(vaultConnection);
+			isTokenExpired = true;
+		} else {
+			// make sure current auth token is set in config
+			vaultConfig.token(currentAuthToken).build();
+		}
+		return isTokenExpired;
+	}
+
+	/**
+	 * Check status of the current client token.
+	 *
+	 * @return current token status
+	 */
+	private boolean isTokenTTLExpired() {
+		if (tokenExpiration == null || currentAuthToken == null) {
+			return true;
+		}
+		boolean isTokenTTLExpired = true;
+		Calendar now = Calendar.getInstance();
+		long timeDiffInMillis = now.getTimeInMillis() - tokenExpiration.getTimeInMillis();
+		if (timeDiffInMillis < HashiCorpVaultConstant.LEAST_TTL_VALUE) {
+			// token will be valid for at least another 2s
+			isTokenTTLExpired = false;
+			log.debug("current client token is still valid.");
+		} else {
+			if (log.isDebugEnabled()) {
+				log.debug("Auth token has to be re-issued" + timeDiffInMillis);
+			}
+		}
+		return isTokenTTLExpired;
+	}
+
+	/**
+	 * Get current client token expiry time.
+	 *
+	 * @param vault vault configuration
+	 */
+	private void getTTLExpiryOfCurrentToken(Vault vault) {
+		int tokenTTL = 0;
+		try {
+			tokenTTL = (int) vault.auth().lookupSelf().getTTL();
+		} catch (VaultException e) {
+			log.warn("Could not determine token expiration. " +
+					"Check if token is allowed to access auth/token/lookup-self. Assuming token TTL is expired.", e);
+		}
+		tokenExpiration = Calendar.getInstance();
+		tokenExpiration.add(Calendar.SECOND, tokenTTL);
 	}
 
 	/**
@@ -150,6 +238,16 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 						CarbonUtils.getCarbonHome());
 				parameters.put(HashiCorpVaultConstant.KEY_STORE_PARAMETER, keyStoreFilePath);
 			}
+		}
+
+		// set current secretId
+		if (parameters.containsKey(HashiCorpVaultConstant.SECRET_ID_PARAMETER)) {
+			secretId = parameters.get(HashiCorpVaultConstant.SECRET_ID_PARAMETER);
+		}
+
+		// set current roleId
+		if (parameters.containsKey(HashiCorpVaultConstant.ROLE_ID_PARAMETER)) {
+			roleId = parameters.get(HashiCorpVaultConstant.ROLE_ID_PARAMETER);
 		}
 	}
 
@@ -200,10 +298,15 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 			// add the sslConfig configuration to the VaultConfig if the protocol is HTTPS
 			config = config.sslConfig(sslConfig);
 		}
-		config = config.token(parameters.get(HashiCorpVaultConstant.TOKEN_PARAMETER))
-				.engineVersion(Integer.parseInt(engineVersion)).build();
+		config = config.engineVersion(Integer.parseInt(engineVersion));
 
-		return config;
+		// check configuration contains static rootToken and set the static token for the vault configs
+		if (parameters.containsKey(HashiCorpVaultConstant.TOKEN_PARAMETER)) {
+			config = config.token(parameters.get(HashiCorpVaultConstant.TOKEN_PARAMETER));
+			isAppRolePullAuthentication = false;
+		}
+
+		return config.build();
 	}
 
 	@Override
@@ -256,49 +359,75 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 	 * @return resolved string
 	 * @throws ExternalVaultException when failed to resolve the text from the vault
 	 */
-	private String vaultLookup(String namespace, String pathParameter, String fieldParameter,
+	private synchronized String vaultLookup(String namespace, String pathParameter, String fieldParameter,
 							   Map<String, Object> decryptedCacheMap) throws ExternalVaultException {
-		String aliasPassword = pathParameter + "-" + fieldParameter;
-		synchronized (decryptLockObj) {
-			if (vaultConnection == null) {
-				initialize();
+
+		currentAliasPassword = pathParameter + "-" + fieldParameter;
+		String errorMsg = "Cannot read the vault secret from the HashiCorp vault. "
+				+ (namespace != null ? "Namespace: " + namespace + ", " : "")
+				+ "Path: " + pathParameter + ", Field: " + fieldParameter;
+		String decryptedValue = null;
+		try {
+			decryptedValue = resolveHashiCorpSecret(namespace, pathParameter, fieldParameter);
+		} catch (VaultException e) {
+			if (!isAppRolePullAuthentication) {
+				throw new ExternalVaultException(errorMsg, e);
 			}
-
-			String decryptedValue;
-			try {
-				Logical logical = vaultConnection.logical();
-
-				if (namespace != null) {
-					logical = logical.withNameSpace(namespace);
-					aliasPassword = namespace + "-" + aliasPassword;
-				}
-
-				decryptedValue = logical.read(pathParameter).getData().get(fieldParameter);
-
-			} catch (VaultException e) {
-				throw new ExternalVaultException("Cannot read the vault secret from the HashiCorp vault. "
-						+ (namespace != null ? "Namespace: " + namespace + ", " : "")
-						+ "Path: " + pathParameter + ", Field: " + fieldParameter, e);
-			}
-
-			if (decryptedCacheMap == null || decryptedValue == null) {
-				log.warn("Cannot find a vault secret from the HashiCorp vault for, "
-						+ (namespace != null ? "Namespace: " + namespace + ", " : "")
-						+ "Path: " + pathParameter + ", Field: " + fieldParameter);
-				return null;
-			}
-
-			if (decryptedValue.isEmpty()) {
-				SecureVaultCacheContext cacheContext =
-						(SecureVaultCacheContext) decryptedCacheMap.get(aliasPassword);
-				if (cacheContext != null) {
-					return cacheContext.getDecryptedValue();
-				}
-			}
-
-			decryptedCacheMap.put(aliasPassword,
-					new SecureVaultCacheContext(Calendar.getInstance().getTime(), decryptedValue));
-			return decryptedValue;
 		}
+
+		if (decryptedValue == null && isAppRolePullAuthentication) {
+			try {
+				// check the validity of current AppRole pull token.
+				if (authenticateHashiCorpVault()) {
+					log.warn("Generating a new client token since the current token is expired");
+					decryptedValue = resolveHashiCorpSecret(namespace, pathParameter, fieldParameter);
+				}
+			} catch (VaultException e) {
+				throw new ExternalVaultException(errorMsg, e);
+			}
+		}
+
+		if (decryptedCacheMap == null || decryptedValue == null) {
+			log.warn("Cannot find a vault secret from the HashiCorp vault for, "
+					+ (namespace != null ? "Namespace: " + namespace + ", " : "")
+					+ "Path: " + pathParameter + ", Field: " + fieldParameter);
+			return null;
+		}
+
+		if (decryptedValue.isEmpty()) {
+			SecureVaultCacheContext cacheContext =
+					(SecureVaultCacheContext) decryptedCacheMap.get(currentAliasPassword);
+			if (cacheContext != null) {
+				return cacheContext.getDecryptedValue();
+			}
+		}
+
+		decryptedCacheMap.put(currentAliasPassword,
+				new SecureVaultCacheContext(Calendar.getInstance().getTime(), decryptedValue));
+		return decryptedValue;
+	}
+
+	/**
+	 * Set namespace if exists and resolves the secret by fetching that secret from HashiCorp vault.
+	 *
+	 * @param namespace namespace of the secret
+	 * @param pathParameter pathParameter of the secret
+	 * @param fieldParameter fieldParameter of the secret
+	 * @return resolved string
+	 * @throws VaultException when failed to resolve the text from the vault
+	 */
+	private String resolveHashiCorpSecret(String namespace, String pathParameter, String fieldParameter)
+			throws VaultException {
+
+		Logical logical = vaultConnection.logical();
+		if (namespace != null) {
+			logical = logical.withNameSpace(namespace);
+			currentAliasPassword = namespace + "-" + currentAliasPassword;
+		}
+		return logical.read(pathParameter).getData().get(fieldParameter);
+	}
+
+	public void setSecretId(String secretId) {
+		this.secretId = secretId;
 	}
 }
