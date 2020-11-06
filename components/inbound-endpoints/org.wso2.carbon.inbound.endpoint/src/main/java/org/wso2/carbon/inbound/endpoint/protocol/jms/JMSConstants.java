@@ -210,14 +210,6 @@ public class JMSConstants {
      * A MessageContext property or client Option indicating the JMS message redelivered (boolean specified as String)
      */
     public static final String JMS_REDELIVERED = "JMS_REDELIVERED";
-    /**
-     * A MessageContext property or client Option indicating the JMS message destination
-     */
-    public static final String JMS_DESTINATION = "JMS_DESTINATION";
-    /**
-     * A MessageContext property or client Option indicating the JMS message reply to destination
-     */
-    public static final String JMS_REPLY_TO_DESTINATION = "JMS_REPLY_TO_DESTINATION";
 
     /**
      * Does the JMS broker support hyphen in JMS message property names.
