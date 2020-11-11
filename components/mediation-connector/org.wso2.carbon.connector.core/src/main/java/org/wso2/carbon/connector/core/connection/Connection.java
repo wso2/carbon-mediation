@@ -17,9 +17,24 @@
  */
 package org.wso2.carbon.connector.core.connection;
 
+import org.wso2.carbon.connector.core.ConnectException;
+
 /**
- * Represents a base connection that other connections should implement
+ * Represents a base connection that other
+ * connections should implement
  */
 public interface Connection {
+
+    /**
+     * Make the connection
+     * @throws ConnectException
+     */
+     void connect(ConnectionConfig config) throws ConnectException;
+
+    /**
+     * Close the connection and cleanup resources
+     * @throws ConnectException
+     */
+    void close() throws ConnectException;
 
 }
