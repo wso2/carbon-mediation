@@ -24,6 +24,7 @@ import org.wso2.carbon.connector.core.pool.Configuration;
 import org.wso2.carbon.connector.core.pool.ConnectionFactory;
 import org.wso2.carbon.connector.core.pool.ConnectionPool;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -130,38 +131,30 @@ public class ConnectionHandler {
 
     /**
      * Shutdown all the connection pools
+     * and unregister from the handler.
      */
     public void shutdownConnections() {
 
         for (Map.Entry<String, Object> connection : connectionMap.entrySet()) {
-            Object connectionObj = connection.getValue();
-            if (connectionObj instanceof ConnectionPool) {
-                try {
-                    ((ConnectionPool) connectionObj).close();
-                } catch (ConnectException e) {
-                    log.error("Failed to close connection pool. ", e);
-                }
-            }
+            closeConnection(connection.getKey(), connection.getValue());
         }
+        connectionMap.clear();
     }
 
     /**
      * Shutdown connection pools for a specified connector
+     * and unregister from the handler.
      *
      * @param connector Name of the connector
      */
     public void shutdownConnections(String connector) {
 
-        for (Map.Entry<String, Object> connection : connectionMap.entrySet()) {
+        Iterator<Map.Entry<String, Object>> it = connectionMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> connection = it.next();
             if (connection.getKey().split(":")[0].equals(connector)) {
-                Object connectionObj = connection.getValue();
-                if (connectionObj instanceof ConnectionPool) {
-                    try {
-                        ((ConnectionPool) connectionObj).close();
-                    } catch (ConnectException e) {
-                        log.error("Failed to close connection pool. ", e);
-                    }
-                }
+                closeConnection(connection.getKey(), connection.getValue());
+                it.remove();
             }
         }
     }
@@ -176,6 +169,28 @@ public class ConnectionHandler {
     public boolean checkIfConnectionExists(String connector, String connectionName) {
 
         return connectionMap.containsKey(getCode(connector, connectionName));
+    }
+
+    /**
+     * Closes the connection.
+     *
+     * @param conName       Name of connection entry
+     * @param connectionObj Connection Object
+     */
+    private void closeConnection(String conName, Object connectionObj) {
+        if (connectionObj instanceof ConnectionPool) {
+            try {
+                ((ConnectionPool) connectionObj).close();
+            } catch (ConnectException e) {
+                log.error("Failed to close connection pool. ", e);
+            }
+        } else if (connectionObj instanceof Connection) {
+            try {
+                ((Connection) connectionObj).close();
+            } catch (ConnectException e) {
+                log.error("Failed to close connection " + conName, e);
+            }
+        }
     }
 
     /**
