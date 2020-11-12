@@ -131,7 +131,6 @@ public class JMSInjectHandler {
             transportHeaders.put(JMSConstants.JMS_PRIORITY, msg.getJMSPriority());
             transportHeaders.put(JMSConstants.JMS_EXPIRATION, msg.getJMSExpiration());
             transportHeaders.put(JMSConstants.JMS_DELIVERY_MODE, msg.getJMSDeliveryMode());
-            transportHeaders.put(JMSConstants.JMS_DELIVERY_TIME, msg.getJMSDeliveryTime());
             transportHeaders.put(JMSConstants.JMS_REDELIVERED, msg.getJMSRedelivered());
             transportHeaders.put(JMSConstants.JMS_MESSAGE_TYPE, msg.getJMSType());
             transportHeaders.put(JMSConstants.JMS_COORELATION_ID, msg.getJMSCorrelationID());

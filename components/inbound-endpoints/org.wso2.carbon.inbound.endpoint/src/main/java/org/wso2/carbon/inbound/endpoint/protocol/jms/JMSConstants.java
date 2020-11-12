@@ -203,10 +203,6 @@ public class JMSConstants {
      */
     public static final String JMS_TIMESTAMP = "JMS_TIMESTAMP";
     /**
-     * A MessageContext property or client Option indicating the JMS delivery time (long specified as String)
-     */
-    public static final String JMS_DELIVERY_TIME = "JMS_DELIVERY_TIME";
-    /**
      * A MessageContext property or client Option indicating the JMS message redelivered (boolean specified as String)
      */
     public static final String JMS_REDELIVERED = "JMS_REDELIVERED";
