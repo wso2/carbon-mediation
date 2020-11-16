@@ -4,11 +4,20 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.template.TemplateContext;
+import org.wso2.carbon.connector.core.ConnectException;
 import org.wso2.carbon.connector.core.pool.Configuration;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 public class ConnectorUtils {
 
@@ -76,5 +85,45 @@ public class ConnectorUtils {
             configuration.setExhaustedAction(exhaustedAction);
         }
         return configuration;
+    }
+
+    public static String sendPost(String postData, Charset charset, MessageContext messageContext) throws IOException,
+            ConnectException {
+
+        String PROPERTY_PREFIX = "uri.var.";
+        byte[] byteData = postData.getBytes(charset);
+        String tokenEndpoint = messageContext.getProperty(PROPERTY_PREFIX + "tokenEndpointUrl").toString();
+        URL tokenEndpointUrl = new URL(tokenEndpoint);
+        HttpURLConnection connection = (HttpURLConnection) tokenEndpointUrl.openConnection();
+        try {
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                wr.write(byteData);
+            }
+            if (Pattern.matches("4[0-9][0-9]", String.valueOf(connection.getResponseCode()))) {
+                throw new ConnectException("Access token generation call returned HTTP Status code " +
+                        connection.getResponseCode() + ". " +
+                        connection.getResponseMessage());
+            }
+            if (connection.getResponseMessage() == null) {
+                throw new ConnectException("Empty response received for access token generation call");
+            } else {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder content;
+                    String line;
+                    content = new StringBuilder();
+                    while ((line = br.readLine()) != null) {
+                        content.append(line);
+                        content.append(System.lineSeparator());
+                    }
+                    return content.toString();
+                }
+            }
+        } finally {
+            connection.disconnect();
+        }
     }
 }
