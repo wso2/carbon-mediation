@@ -58,7 +58,10 @@ public class JSONInputReader implements InputReader {
         try {
             inputJSONMessage = readFromInputStream(input);
             messageBuilder.notifyWithResult(inputJSONMessage);
-        } catch (IOException | JSException | SchemaException e) {
+        } catch (JSException e) {
+            log.error("Error while executing the script.", e);
+            throw new ReaderException("Error while executing the script.");
+        } catch (IOException | SchemaException e) {
             throw new ReaderException("Error while reading input stream. " + e.getMessage());
         }
 
