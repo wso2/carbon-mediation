@@ -82,6 +82,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -178,7 +179,19 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                     ConfigurationHolder.getInstance().getBundleContext().registerService(
                         SynapseConfigurationService.class.getName(), synCfgSvc, null);
 
+            // Older SynapseConfiguration references created for a particular tenant are not getting cleaned.
+            // Hence, there can be an OOM issue when there are multiple accumulated SynapseConfiguration instances.
+            // To overcome the OOM issue, here, the localRegistry map in the older instance, which can bear the biggest
+            // object in the SynapseConfiguration instance is cleaned upon a new SynapseConfiguration is created.
+            SynapseConfiguration olderSynapseConfiguration = ConfigurationHolder.getInstance().getSynapseConfiguration(
+                    tenantId);
+            if (!Objects.isNull(olderSynapseConfiguration)) {
+                olderSynapseConfiguration.getLocalRegistry().clear();
+            }
+
             SynapseEnvironment synapseEnvironment = contextInfo.getSynapseEnvironment();
+            ConfigurationHolder.getInstance().addSynapseConfiguration(tenantId, synapseEnvironment.getSynapseConfiguration());
+
             //props = new Properties();
             SynapseEnvironmentService synEnvSvc
                         = new SynapseEnvironmentServiceImpl(synapseEnvironment,

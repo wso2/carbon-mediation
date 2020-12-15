@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.mediation.initializer.utils;
 
+import org.apache.synapse.config.SynapseConfiguration;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
@@ -31,7 +32,9 @@ public class ConfigurationHolder {
     private BundleContext bundleContext;
 
     private Map<Integer, ServiceRegistration> synapseRegistrations =
-            new HashMap<Integer, ServiceRegistration>(); 
+            new HashMap<Integer, ServiceRegistration>();
+
+    private Map<Integer, SynapseConfiguration> synapseConfigurationHashMap = new HashMap<>();
 
     public static ConfigurationHolder getInstance() {
         return ourInstance;
@@ -54,5 +57,13 @@ public class ConfigurationHolder {
 
     public ServiceRegistration getSynapseRegistration(int tenantId) {
         return synapseRegistrations.get(tenantId);
+    }
+
+    public SynapseConfiguration getSynapseConfiguration(int tenantId) {
+        return synapseConfigurationHashMap.get(tenantId);
+    }
+
+    public void addSynapseConfiguration(int tenanId, SynapseConfiguration synapseConfiguration) {
+        synapseConfigurationHashMap.put(tenanId, synapseConfiguration);
     }
 }
