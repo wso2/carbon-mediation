@@ -82,6 +82,8 @@ public class ScriptExecutor implements Executor {
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
             } else if (result instanceof String) {
+                // Fix: https://github.com/wso2/product-ei/issues/5290
+                result = ((String) result).replace(ENCODE_CHAR_HYPHEN, HYPHEN);
                 return new StringModel((String) result);
             } else if (result != null && result.getClass().toString()
                     .contains(MapOutputFormatter.RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME)) {
