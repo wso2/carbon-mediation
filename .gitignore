@@ -8,3 +8,6 @@ target
 *.ipr
 .idea
 components/business-adaptors/sap/lib
+
+# Ignore OS specific files
+.DS_Store

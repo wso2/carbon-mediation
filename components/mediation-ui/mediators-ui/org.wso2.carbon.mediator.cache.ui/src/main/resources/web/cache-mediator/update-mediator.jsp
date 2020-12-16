@@ -41,6 +41,7 @@
     String maxMsgSize = request.getParameter("maxMsgSize").trim();
     String methods = request.getParameter("methods");
     String headersToExclude = request.getParameter("headersToExclude");
+    String headersToInclude = request.getParameter("headersToInclude");
     String responseCodes = request.getParameter("responseCodes");
     String hashGen = request.getParameter("hashGen");
     String maxSize = request.getParameter("maxSize").trim();
@@ -92,6 +93,12 @@
         cacheMediator.setHeadersToExcludeInHash(headersToExclude);
     } else {
         cacheMediator.setHeadersToExcludeInHash("");
+    }
+    
+    if (notNullChecker(headersToInclude)) {
+        cacheMediator.setHeadersToIncludeInHash(headersToInclude);
+    } else {
+        cacheMediator.setHeadersToIncludeInHash("");
     }
 
     if (notNullChecker(responseCodes)) {

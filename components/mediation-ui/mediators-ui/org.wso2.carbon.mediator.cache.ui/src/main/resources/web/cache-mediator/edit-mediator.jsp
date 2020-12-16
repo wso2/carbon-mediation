@@ -151,6 +151,18 @@
                                 <td><input type="text" name="headersToExclude" value="" size="40" /></td>
                             </tr>
                             <%}%>
+                            <%if (cacheMediator.getHeadersToIncludeInHash() != null) {%>
+                            <tr>
+                                <td><fmt:message key="mediator.cache.headersToInclude" /></td>
+                                <td><input type="text" name="headersToExclude"
+                                           value="<%=cacheMediator.getHeadersToIncludeInHash()%>" size="40" /></td>
+                            </tr>
+                            <%} else {%>
+                            <tr>
+                                <td><fmt:message key="mediator.cache.headersToInclude" /></td>
+                                <td><input type="text" name="headersToExclude" value="" size="40" /></td>
+                            </tr>
+                            <%}%>
                             <%if (cacheMediator.getResponseCodes() != null) {%>
                             <tr>
                                 <td><fmt:message key="mediator.cache.responsecodes" /></td>

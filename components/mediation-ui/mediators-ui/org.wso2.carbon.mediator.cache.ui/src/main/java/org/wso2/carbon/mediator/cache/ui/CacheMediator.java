@@ -94,6 +94,14 @@ public class CacheMediator extends AbstractListMediator {
      */
     private static final QName HEADERS_TO_EXCLUDE_IN_HASH_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                                         CachingConstants.HEADERS_TO_EXCLUDE_STRING);
+
+    /**
+     * QName of the headersToIncludeInHash.
+     */
+    private static final QName HEADERS_TO_INCLUDE_IN_HASH_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
+            CachingConstants.HEADERS_TO_INCLUDE_STRING);
+
+
     /**
      * QName of the response codes to include when hashing.
      */
@@ -157,6 +165,11 @@ public class CacheMediator extends AbstractListMediator {
      * The headers to exclude when caching.
      */
     private String headersToExcludeInHash = "";
+
+    /**
+     * The headers to include when caching.
+     */
+    private String headersToIncludeInHash = "";
 
     /**
      * The protocol type used in caching.
@@ -368,6 +381,24 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
+     * This method gives array of headers that would be included when hashing.
+     *
+     * @return array of headers to include in hashing
+     */
+    public String getHeadersToIncludeInHash() {
+        return headersToIncludeInHash;
+    }
+
+    /**
+     * This method sets the array of headers that would be included when hashing.
+     *
+     * @param headersToIncludeInHash array of headers to include in hashing.
+     */
+    public void setHeadersToIncludeInHash(String headersToIncludeInHash) {
+        this.headersToIncludeInHash = headersToIncludeInHash;
+    }
+
+    /**
      * This method returns whether cache-control headers need to be honored when caching.
      *
      * @return cacheControlEnabled whether enable cache control or not.
@@ -449,6 +480,12 @@ public class CacheMediator extends AbstractListMediator {
                 if (headersToExcludeInHash != null) {
                     OMElement headerElem = fac.createOMElement(CachingConstants.HEADERS_TO_EXCLUDE_STRING, synNS);
                     headerElem.setText(headersToExcludeInHash);
+                    protocolElem.addChild(headerElem);
+                }
+
+                if (headersToIncludeInHash != null) {
+                    OMElement headerElem = fac.createOMElement(CachingConstants.HEADERS_TO_INCLUDE_STRING, synNS);
+                    headerElem.setText(headersToIncludeInHash);
                     protocolElem.addChild(headerElem);
                 }
 
@@ -534,6 +571,11 @@ public class CacheMediator extends AbstractListMediator {
                                 HEADERS_TO_EXCLUDE_IN_HASH_Q);
                         if (headersToExclude != null) {
                             headersToExcludeInHash = headersToExclude.getText();
+                        }
+                        OMElement headersToInclude = protocolElem.getFirstChildWithName(
+                                HEADERS_TO_INCLUDE_IN_HASH_Q);
+                        if (headersToInclude != null) {
+                            headersToIncludeInHash = headersToInclude.getText();
                         }
                         OMElement enableCacheControlElem = protocolElem.getFirstChildWithName(ENABLE_CACHE_CONTROL_Q);
                         if (enableCacheControlElem != null) {
