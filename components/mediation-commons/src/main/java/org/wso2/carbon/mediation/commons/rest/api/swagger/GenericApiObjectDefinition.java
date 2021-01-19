@@ -22,11 +22,11 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.rest.API;
-import org.apache.synapse.rest.Resource;
-import org.apache.synapse.rest.dispatch.DispatcherHelper;
-import org.apache.synapse.rest.dispatch.URLMappingBasedDispatcher;
-import org.apache.synapse.rest.version.URLBasedVersionStrategy;
+import org.apache.synapse.api.API;
+import org.apache.synapse.api.Resource;
+import org.apache.synapse.api.dispatch.DispatcherHelper;
+import org.apache.synapse.api.dispatch.URLMappingBasedDispatcher;
+import org.apache.synapse.api.version.URLBasedVersionStrategy;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -21,11 +21,11 @@ import org.apache.axis2.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.api.dispatch.DispatcherHelper;
+import org.apache.synapse.api.dispatch.URITemplateHelper;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.rest.RESTUtils;
-import org.apache.synapse.rest.dispatch.DispatcherHelper;
-import org.apache.synapse.rest.dispatch.URITemplateHelper;
 
 import java.util.HashMap;
 import java.util.List;
