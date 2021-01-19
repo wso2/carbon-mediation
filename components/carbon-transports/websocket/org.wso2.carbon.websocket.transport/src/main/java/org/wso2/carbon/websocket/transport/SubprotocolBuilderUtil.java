@@ -45,8 +45,12 @@ public class SubprotocolBuilderUtil {
     }
 
     public static String contentTypeToSyanapeSubprotocol(String contentType) {
-        return SYNAPSE_SUBPROTOCOL_PREFIX + SYNAPSE_CONTENT_TYPE + "'" + contentType +
-                "'" + SYNAPSE_SUBPROTOCOL_SUFFIX;
+        if (contentType.equals("graphql-ws")){
+            return contentType;
+        } else {
+            return SYNAPSE_SUBPROTOCOL_PREFIX + SYNAPSE_CONTENT_TYPE + "'" + contentType +
+                    "'" + SYNAPSE_SUBPROTOCOL_SUFFIX;
+        }
     }
 
 }
