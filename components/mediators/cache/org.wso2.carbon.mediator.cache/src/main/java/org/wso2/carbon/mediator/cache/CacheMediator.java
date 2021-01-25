@@ -482,6 +482,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                 	if (contentType != null) {
                     		contentType = contentType.split(";")[0];
                 	}
+>>>>>>> f7fb44f7de (Add a constant to seperate the property)
                 if (contentType != null && contentType.equals(jsonContentType)) {
                     byte[] responsePayload = JsonUtil.jsonPayloadToByteArray(msgCtx);
                     if (response.getMaxMessageSize() > -1 &&
