@@ -16,7 +16,6 @@
  */
 package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format;
 
-import net.minidev.json.JSONObject;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
@@ -25,7 +24,7 @@ import org.apache.synapse.api.API;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
 import org.wso2.carbon.core.transports.HttpGetRequestProcessor;
-import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.OpenAPIProcessor;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.ServerConfig;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format.utils.SwaggerProcessorConstants;
@@ -76,9 +75,8 @@ public class SwaggerJsonProcessor extends SwaggerGenerator implements HttpGetReq
                 if (log.isDebugEnabled()) {
                     log.debug("Generating swagger definition for: " + api.getName());
                 }
-                JSONObject jsonDefinition =
-                        new JSONObject(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
-                responseString = jsonDefinition.toString();
+                OpenAPIProcessor openAPIProcessor = new OpenAPIProcessor(api,serverConfig);
+                responseString = openAPIProcessor.getOpenAPISpecification(true);
             }
             return responseString;
         } catch (RegistryException e) {

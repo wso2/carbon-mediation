@@ -33,6 +33,7 @@ import org.apache.synapse.api.dispatch.URLMappingHelper;
 import org.apache.synapse.api.version.ContextVersionStrategy;
 import org.apache.synapse.api.version.DefaultStrategy;
 import org.apache.synapse.api.version.URLBasedVersionStrategy;
+import org.apache.synapse.api.version.VersionStrategy;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.config.xml.rest.APISerializer;
 import org.apache.synapse.config.xml.rest.VersionStrategyFactory;
@@ -42,9 +43,12 @@ import org.apache.synapse.mediators.builtin.LoopBackMediator;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.apache.synapse.mediators.builtin.RespondMediator;
 import org.apache.synapse.mediators.transform.PayloadFactoryMediator;
+import org.apache.synapse.mediators.transform.pfutils.RegexTemplateProcessor;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,13 +74,19 @@ public class APIGenerator {
      * @return Generated API
      * @throws APIGenException
      */
-    public API generateSynapseAPI() throws APIGenException {
+    public API generateSynapseAPI() throws APIGenException, MalformedURLException {
 
-        if (swaggerJson.get(SwaggerConstants.BASE_PATH) == null ||
-                swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString().isEmpty()) {
-            throw new APIGenException("The \"basePath\" of the swagger definition is mandatory for API generation");
+        if (swaggerJson.get(SwaggerConstants.SERVERS) == null ||
+                swaggerJson.get(SwaggerConstants.SERVERS).getAsJsonArray().size() == 0) {
+            throw new APIGenException("The \"servers\" section of the swagger definition is mandatory for API " +
+                    "generation");
         }
-        String apiContext = swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString();
+        // get the first path in the servers section
+        String serversString =
+                swaggerJson.getAsJsonArray(SwaggerConstants.SERVERS).get(0).getAsJsonObject().get(SwaggerConstants.URL)
+                        .getAsString();
+        URL url = new URL(serversString);
+        String apiContext = url.getPath();
         //cleanup context : remove ending '/'
         if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
             apiContext = apiContext.substring(0, apiContext.length() - 1);
@@ -150,11 +160,22 @@ public class APIGenerator {
      */
     public API generateSynapseAPI(API existingAPI) throws APIGenException {
 
-        if (swaggerJson.get(SwaggerConstants.BASE_PATH) == null ||
-                swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString().isEmpty()) {
-            throw new APIGenException("The \"basePath\" of the swagger definition is mandatory for API generation");
+        if (swaggerJson.get(SwaggerConstants.SERVERS) == null ||
+                swaggerJson.get(SwaggerConstants.SERVERS).getAsJsonArray().size() == 0) {
+            throw new APIGenException("The \"servers\" section of the swagger definition is mandatory for API " +
+                    "generation");
         }
-        String apiContext = swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString();
+        // get the first path in the servers section
+        String serversString =
+                swaggerJson.getAsJsonArray(SwaggerConstants.SERVERS).get(0).getAsJsonObject().get(SwaggerConstants.URL)
+                        .getAsString();
+        URL url = null;
+        try {
+            url = new URL(serversString);
+        } catch (MalformedURLException e) {
+            log.error("Error occurred while parsing the URL " + serversString, e);
+        }
+        String apiContext = url.getPath();
         //cleanup context : remove ending '/'
         if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
             apiContext = apiContext.substring(0, apiContext.length() - 1);
@@ -331,8 +352,16 @@ public class APIGenerator {
 
     private void updateImplChanges(API newAPI, API currentAPI) {
 
+        String newVersion = newAPI.getVersion();
         //Migrate version strategy
-        newAPI.setVersionStrategy(currentAPI.getVersionStrategy());
+        VersionStrategy strategy = currentAPI.getVersionStrategy();
+        if (strategy instanceof URLBasedVersionStrategy) {
+            newAPI.setVersionStrategy(new URLBasedVersionStrategy(newAPI, newVersion,
+                    currentAPI.getVersionStrategy().getVersionParam()));
+        } else if (strategy instanceof ContextVersionStrategy) {
+            newAPI.setVersionStrategy(
+                    new ContextVersionStrategy(newAPI, newVersion, currentAPI.getVersionStrategy().getVersionParam()));
+        }
 
         // Map of resources against resource url mapping or template
         HashMap<String, HashMap<String, Resource>> currentResourceList = new HashMap<>();
@@ -431,6 +460,7 @@ public class APIGenerator {
         defaultInSeq.addChild(logicGoesHereComment);
 
         PayloadFactoryMediator defaultPayload = new PayloadFactoryMediator();
+        defaultPayload.setTemplateProcessor(new RegexTemplateProcessor());
         defaultPayload.setType("json");
         defaultPayload.setFormat("{\"Response\" : \"Sample Response\"}");
         defaultInSeq.addChild(defaultPayload);

@@ -18,15 +18,15 @@
 
 package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
-import org.apache.axis2.AxisFault;
-import org.apache.commons.lang.StringUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.api.API;
 import org.apache.synapse.api.Resource;
 import org.apache.synapse.api.dispatch.DispatcherHelper;
 import org.apache.synapse.api.dispatch.URLMappingBasedDispatcher;
-import org.apache.synapse.api.version.URLBasedVersionStrategy;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -39,69 +39,13 @@ import java.util.regex.Matcher;
  */
 public class GenericApiObjectDefinition {
     private static final Log log = LogFactory.getLog(GenericApiObjectDefinition.class);
-    private API api;
-    private ServerConfig serverConfig;
-
-    public GenericApiObjectDefinition(API api, ServerConfig serverConfiguration) {
-        this.api = api;
-        this.serverConfig = serverConfiguration;
-    }
-
-    public GenericApiObjectDefinition(API api) {
-        this.api = api;
-    }
-
-    /**
-     * Provides a map which represents the structure of swagger definition.
-     *
-     * @return Map containing information for swagger definition
-     */
-    public Map<String, Object> getDefinitionMap() throws AxisFault {
-        Map<String, Object> apiMap = new LinkedHashMap<>();
-        //Swagger version
-        apiMap.put(SwaggerConstants.SWAGGER, SwaggerConstants.SWAGGER_VERSION);
-
-        //Info section
-        apiMap.put(SwaggerConstants.INFO, getInfoMap());
-
-        //Host is mandatory for TryIt
-        if (serverConfig != null) {
-            apiMap.put(SwaggerConstants.HOST, serverConfig.getHost(api));
-        } else if (StringUtils.isNotBlank(api.getHost()) && api.getPort() != -1) {
-            apiMap.put(SwaggerConstants.HOST, api.getHost() + ":" + api.getPort());
-        } else {
-            apiMap.put(SwaggerConstants.HOST, SwaggerConstants.DEFAULT_HOST + ":" + SwaggerConstants.DEFAULT_PORT);
-        }
-
-        //Schemes
-        apiMap.put(SwaggerConstants.SCHEMES, getSchemes());
-
-        //Base path
-        if (api.getVersionStrategy() instanceof URLBasedVersionStrategy) {
-            apiMap.put(SwaggerConstants.BASE_PATH, api.getContext() + "/" + api.getVersionStrategy().getVersion());
-        } else {
-            apiMap.put(SwaggerConstants.BASE_PATH, api.getContext());
-        }
-
-        //Default consume and produce MIME Types (Adding default once since API definition does not contain details)
-        apiMap.put(SwaggerConstants.CONSUMES, SwaggerConstants.DEFAULT_CONSUMES);
-        apiMap.put(SwaggerConstants.PRODUCES, SwaggerConstants.DEFAULT_PRODUCES);
-
-        //Paths
-        Map<String, Object> pathMap = getPathMap();
-        if (pathMap != null && !pathMap.isEmpty()) {
-            apiMap.put(SwaggerConstants.PATHS, pathMap);
-        }
-        return apiMap;
-    }
-
 
     /**
      * Provides structure for the "responses" element in swagger definition.
      *
      * @return Map containing information for responses element
      */
-    private Map<String, Object> getResponsesMap() {
+    private static Map<String, Object> getResponsesMap() {
         Map<String, Object> responsesMap = new LinkedHashMap<>();
         Map<String, Object> responseDetailsMap = new LinkedHashMap<>();
         //Use a default response since these information is not available in synapse configuration for APIs
@@ -114,28 +58,11 @@ public class GenericApiObjectDefinition {
     }
 
     /**
-     * Provides structure for the "info" element in swagger definition.
-     *
-     * @return Map containing information for info element
-     */
-    private Map<String, Object> getInfoMap() {
-        Map<String, Object> infoMap = new LinkedHashMap<>();
-        infoMap.put(SwaggerConstants.DESCRIPTION, (SwaggerConstants.API_DESC_PREFIX + api.getAPIName()));
-        infoMap.put(SwaggerConstants.TITLE, api.getAPIName());
-        infoMap.put(SwaggerConstants.VERSION, (api.getVersion() != null && !api.getVersion().equals(""))
-                ? api.getVersion() : SwaggerConstants.DEFAULT_API_VERSION);
-        if(log.isDebugEnabled()){
-            log.debug("Info map created with size " + infoMap.size());
-        }
-        return infoMap;
-    }
-
-    /**
      * Provides structure for the "paths" element in swagger definition.
      *
      * @return Map containing information for paths element
      */
-    private Map<String, Object> getPathMap() {
+    public static Map<String, Object> getPathMap(API api) {
         Map<String, Object> pathsMap = new LinkedHashMap<>();
         for (Resource resource : api.getResources()) {
             DispatcherHelper resourceDispatcherHelper = resource.getDispatcherHelper();
@@ -165,51 +92,9 @@ public class GenericApiObjectDefinition {
         return pathsMap;
     }
 
-    private String getUri(DispatcherHelper resourceDispatcherHelper) {
+    private static String getUri(DispatcherHelper resourceDispatcherHelper) {
         return resourceDispatcherHelper == null ? SwaggerConstants.PATH_SEPARATOR
                 : resourceDispatcherHelper.getString();
-    }
-
-    /**
-     * Provides list of schemas support by the API.
-     *
-     * @return Array of String containing schemas list
-     */
-    private String[] getSchemes() {
-        String[] protocols;
-        switch (api.getProtocol()) {
-            case SwaggerConstants.PROTOCOL_HTTP_ONLY:
-                protocols = new String[]{SwaggerConstants.PROTOCOL_HTTP};
-                break;
-            case SwaggerConstants.PROTOCOL_HTTPS_ONLY:
-                protocols = new String[]{SwaggerConstants.PROTOCOL_HTTPS};
-                break;
-            default:
-                protocols = new String[]{SwaggerConstants.PROTOCOL_HTTPS, SwaggerConstants.PROTOCOL_HTTP};
-                break;
-        }
-        return protocols;
-    }
-
-    /**
-     * Generate resource parameters for the given resource.
-     *
-     * @param resource instance of Resource in the API
-     * @return Array of parameter objects supported by the API
-     */
-    private Object[] getResourceParameters(Resource resource) {
-        ArrayList<Map<String, Object>> parameterList = new ArrayList<>();
-        String uri = resource.getDispatcherHelper().getString();
-
-        if (resource.getDispatcherHelper() instanceof URLMappingBasedDispatcher) {
-            generateParameterList(parameterList, uri, false);
-        } else {
-            generateParameterList(parameterList, uri, true);
-        }
-        if(log.isDebugEnabled()){
-            log.debug("Parameters processed for the URI + " + uri + " size " + parameterList.size());
-        }
-        return parameterList.toArray();
     }
 
     /**
@@ -218,7 +103,7 @@ public class GenericApiObjectDefinition {
      * @param resource instance of Resource in the API
      * @return Array of parameter objects supported by the API
      */
-    private Object[] getResourceParameters(Resource resource, String method) {
+    private static Object[] getResourceParameters(Resource resource, String method) {
         ArrayList<Map<String, Object>> parameterList = new ArrayList<>();
 
         String uri = resource.getDispatcherHelper().getString();
@@ -246,7 +131,7 @@ public class GenericApiObjectDefinition {
      * @param generateBothTypes Indicates whether to consider both query and uri parameters. True if both to be
      *                          considered.
      */
-    private void generateParameterList(ArrayList<Map<String, Object>> parameterList, String uriString, boolean
+    private static void generateParameterList(ArrayList<Map<String, Object>> parameterList, String uriString, boolean
             generateBothTypes) {
         if (uriString == null) {
             return;
@@ -268,7 +153,8 @@ public class GenericApiObjectDefinition {
         }
     }
 
-    private void generateBodyParameter(ArrayList<Map<String, Object>> parameterList, Resource resource, String method) {
+    private static void generateBodyParameter(ArrayList<Map<String, Object>> parameterList, Resource resource,
+                                        String method) {
         if (method.equalsIgnoreCase(SwaggerConstants.OPERATION_HTTP_POST) ||
                 method.equalsIgnoreCase(SwaggerConstants.OPERATION_HTTP_PUT) ||
                 method.equalsIgnoreCase(SwaggerConstants.OPERATION_HTTP_PATCH)) {
@@ -284,11 +170,11 @@ public class GenericApiObjectDefinition {
      * @param parameterType Type of the parameter
      * @return Map containing parameter properties
      */
-    private Map<String, Object> getParametersMap(String parameterName, String parameterType) {
+    private static Map<String, Object> getParametersMap(String parameterName, String parameterType) {
         return getParametersMap(parameterName, parameterType, parameterName, true);
     }
 
-    private Map<String, Object> getParametersMap(String parameterName, String parameterType, String description,
+    private static Map<String, Object> getParametersMap(String parameterName, String parameterType, String description,
                                                  boolean required) {
         Map<String, Object> parameterMap = new LinkedHashMap<>();
         parameterMap.put(SwaggerConstants.PARAMETER_DESCRIPTION, description);
@@ -330,7 +216,7 @@ public class GenericApiObjectDefinition {
      * @param uri String URI to be analysed
      * @return String containing the path portion of the URI
      */
-    private String getPathFromUrl(String uri) {
+    private static String getPathFromUrl(String uri) {
         int pos = uri.indexOf("?");
         if (pos > 0) {
             return uri.substring(0, pos);
@@ -344,11 +230,26 @@ public class GenericApiObjectDefinition {
      * @param uri String URI to be analysed
      * @return String containing the URI parameter portion of the URI
      */
-    private String getQueryStringFromUrl(String uri) {
+    private static String getQueryStringFromUrl(String uri) {
         int pos = uri.indexOf("?");
         if (pos > 0) {
             return uri.substring(pos + 1);
         }
         return "";
+    }
+
+    /**
+     * A util method to convert from YAML to JSON.
+     *
+     * @param yaml YAML input as string.
+     * @return converted JSON as string.
+     * @throws JsonProcessingException error occurred while parsing the JSON.
+     */
+    public static String convertYamlToJson(String yaml) throws JsonProcessingException {
+        ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
+        Object obj = yamlReader.readValue(yaml, Object.class);
+
+        ObjectMapper jsonWriter = new ObjectMapper();
+        return jsonWriter.writeValueAsString(obj);
     }
 }

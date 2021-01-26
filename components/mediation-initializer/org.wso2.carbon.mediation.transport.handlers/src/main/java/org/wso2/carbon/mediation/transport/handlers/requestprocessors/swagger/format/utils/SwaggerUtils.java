@@ -20,19 +20,27 @@ package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.f
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.swagger.models.Info;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.Operation;
-import io.swagger.models.Path;
-import io.swagger.models.Response;
-import io.swagger.models.Scheme;
-import io.swagger.models.Swagger;
-import io.swagger.models.parameters.BodyParameter;
-import io.swagger.models.parameters.PathParameter;
-import io.swagger.models.parameters.QueryParameter;
-import io.swagger.models.properties.*;
-import io.swagger.util.Json;
-import io.swagger.util.Yaml;
+import io.swagger.v3.core.util.Json;
+import io.swagger.v3.core.util.Yaml;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.BooleanSchema;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.NumberSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.PathParameter;
+import io.swagger.v3.oas.models.parameters.QueryParameter;
+import io.swagger.v3.oas.models.parameters.RequestBody;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.servers.Server;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisResource;
@@ -54,6 +62,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +72,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * Util class with methods to generate swagger definition and fetch them from the registry.
  */
 public final class SwaggerUtils {
+
+    static final String PROTOCOL_HTTP = "http";
+    static final String PROTOCOL_HTTPS = "https";
+    public static final String DATA_TYPE_INTEGER = "integer";
+    public static final String DATA_TYPE_NUMBER = "number";
+    public static final String DATA_TYPE_BOOLEAN = "boolean";
 
     private static Log logger = LogFactory.getLog(SwaggerUtils.class.getName());
 
@@ -134,122 +149,204 @@ public final class SwaggerUtils {
                                                       boolean isJSON)
             throws AxisFault {
 
-        Swagger swaggerDoc = new Swagger();
-        swaggerDoc.basePath("/" + SwaggerProcessorConstants.SERVICES_PREFIX + "/" + dataServiceName);
-
-        if (transports.contains("https")) {
-            swaggerDoc.addScheme(Scheme.HTTPS);
-            swaggerDoc.addScheme(Scheme.HTTP);
-            swaggerDoc.setHost(serverConfig.getHost("https"));
-        } else {
-            swaggerDoc.addScheme(Scheme.HTTP);
-            swaggerDoc.setHost(serverConfig.getHost("http"));
-        }
+        OpenAPI openAPI = new OpenAPI();
 
         Info info = new Info();
         info.title(dataServiceName);
         info.setVersion("1.0");
         info.description("API Definition of dataservice : " + dataServiceName);
-        swaggerDoc.setInfo(info);
+        openAPI.setInfo(info);
 
-        swaggerDoc.addConsumes("application/json");
-        swaggerDoc.addConsumes("application/xml");
+        addServersSection(dataServiceName, transports, serverConfig, openAPI);
 
-        swaggerDoc.addProduces("application/json");
-        swaggerDoc.addProduces("application/xml");
-
-        Map<String, Path> paths = new HashMap<>();
+        Paths paths = new Paths();
 
         for (Map.Entry<String, AxisResource> entry : axisResourceMap.getResources().entrySet()) {
-            Path path = new Path();
+            PathItem pathItem = new PathItem();
             for (String method : entry.getValue().getMethods()) {
                 Operation operation = new Operation();
                 List<AxisResourceParameter> parameterList = entry.getValue().getResourceParameterList(method);
-                if (!parameterList.isEmpty()) {
-                    for (AxisResourceParameter resourceParameter : parameterList) {
-                        AxisResourceParameter.ParameterType resourceParameterType =
-                                resourceParameter.getParameterType();
-                        if (resourceParameterType.equals(AxisResourceParameter.ParameterType.URL_PARAMETER)) {
-                            PathParameter pathParameter = new PathParameter();
-                            pathParameter.setName(resourceParameter.getParameterName());
-                            pathParameter.setType(resourceParameter.getParameterDataType());
-                            pathParameter.required(true);
-                            operation.addParameter(pathParameter);
-                        } else if (resourceParameterType
-                                .equals(AxisResourceParameter.ParameterType.QUERY_PARAMETER) && method.equals("GET")) {
-                            //  Currently handling query parameter only for GET requests.
-                            QueryParameter queryParameter = new QueryParameter();
-                            queryParameter.setName(resourceParameter.getParameterName());
-                            queryParameter.setType(resourceParameter.getParameterDataType());
-                            queryParameter.required(true);
-                            operation.addParameter(queryParameter);
-                        }
-                    }
-                }
-                // Adding a sample request payload for methods except GET.
-                if (!method.equals("GET")) {
-                    BodyParameter bodyParameter = new BodyParameter();
-                    bodyParameter.description("Sample Payload");
-                    bodyParameter.name("payload");
-                    bodyParameter.setRequired(false);
-
-                    ModelImpl modelschema = new ModelImpl();
-                    modelschema.setType("object");
-                    Map<String, Property> propertyMap = new HashMap<>(1);
-                    ObjectProperty objectProperty = new ObjectProperty();
-                    objectProperty.name("payload");
-
-                    Map<String, Property> payloadProperties = new HashMap<>();
-                    for (AxisResourceParameter resourceParameter : parameterList) {
-                        switch (resourceParameter.getParameterDataType()) {
-                            case SwaggerProcessorConstants.INTEGER:
-                                payloadProperties.put(resourceParameter.getParameterName(), new IntegerProperty());
-                                break;
-                            case SwaggerProcessorConstants.NUMBER:
-                                payloadProperties.put(resourceParameter.getParameterName(), new DoubleProperty());
-                                break;
-                            case SwaggerProcessorConstants.BOOLEAN:
-                                payloadProperties.put(resourceParameter.getParameterName(), new BooleanProperty());
-                                break;
-                            default:
-                                payloadProperties.put(resourceParameter.getParameterName(), new StringProperty());
-                        }
-                    }
-
-                    objectProperty.setProperties(payloadProperties);
-                    propertyMap.put("payload", objectProperty);
-                    modelschema.setProperties(propertyMap);
-                    bodyParameter.setSchema(modelschema);
-                    operation.addParameter(bodyParameter);
-                }
-                Response response = new Response();
-                response.description("this is the default response");
-                operation.addResponse("default", response);
-                switch (method) {
-                    case "GET":
-                        path.get(operation);
-                        break;
-                    case "POST":
-                        path.post(operation);
-                        break;
-                    case "DELETE":
-                        path.delete(operation);
-                        break;
-                    case "PUT":
-                        path.put(operation);
-                        break;
-                }
+                addPathAndQueryParameters(method, operation, parameterList);
+                // Adding a sample request payload for methods except GET and DELETE ( OAS3 onwards )
+                addSampleRequestBody(method, operation, parameterList);
+                addDefaultResponseAndPathItem(pathItem, method, operation);
             }
-            paths.put(entry.getKey(), path);
+            // adding the resource. all the paths should starts with "/"
+            paths.put(entry.getKey().startsWith("/") ? entry.getKey() : "/" + entry.getKey(), pathItem);
         }
-        swaggerDoc.setPaths(paths);
-        if (isJSON) return Json.pretty(swaggerDoc);
+        openAPI.setPaths(paths);
         try {
-            return Yaml.pretty().writeValueAsString(swaggerDoc);
+            if (isJSON) return Json.mapper().writeValueAsString(openAPI);
+            return Yaml.mapper().writeValueAsString(openAPI);
         } catch (JsonProcessingException e) {
             logger.error("Error occurred while creating the YAML configuration", e);
             return null;
         }
+    }
+
+    /**
+     * Add request body schema for methods except GET and DELETE.
+     *
+     * @param method        HTTP method.
+     * @param operation     Operation object.
+     * @param parameterList Body param list.
+     */
+    private static void addSampleRequestBody(String method, Operation operation,
+                                             List<AxisResourceParameter> parameterList) {
+
+        if (!method.equals("GET") && !method.equals("DELETE")) {
+            RequestBody requestBody = new RequestBody();
+            requestBody.description("Sample Payload");
+            requestBody.setRequired(false);
+
+            MediaType mediaType = new MediaType();
+            Schema bodySchema = new Schema();
+            bodySchema.setType("object");
+
+            Map<String, Schema> inputProperties = new HashMap<>();
+            ObjectSchema objectSchema = new ObjectSchema();
+            Map<String, Schema> payloadProperties = new HashMap<>();
+            for (AxisResourceParameter resourceParameter : parameterList) {
+                switch (resourceParameter.getParameterDataType()) {
+                    case SwaggerProcessorConstants.INTEGER:
+                        payloadProperties.put(resourceParameter.getParameterName(), new IntegerSchema());
+                        break;
+                    case SwaggerProcessorConstants.NUMBER:
+                        payloadProperties.put(resourceParameter.getParameterName(), new NumberSchema());
+                        break;
+                    case SwaggerProcessorConstants.BOOLEAN:
+                        payloadProperties.put(resourceParameter.getParameterName(), new BooleanSchema());
+                        break;
+                    default:
+                        payloadProperties.put(resourceParameter.getParameterName(), new StringSchema());
+                }
+            }
+            objectSchema.setProperties(payloadProperties);
+            bodySchema.setProperties(inputProperties);
+            inputProperties.put("payload", objectSchema);
+            mediaType.setSchema(bodySchema);
+            Content content = new Content();
+            content.addMediaType("application/json", mediaType);
+            requestBody.setContent(content);
+            operation.setRequestBody(requestBody);
+        }
+    }
+
+    /**
+     * Add path parameters and query parameters to the operation.
+     *
+     * @param method        HTTP method.
+     * @param operation     Operation object.
+     * @param parameterList Path and Query parameter list.
+     */
+    private static void addPathAndQueryParameters(String method, Operation operation,
+                                                  List<AxisResourceParameter> parameterList) {
+
+        if (!parameterList.isEmpty()) {
+            for (AxisResourceParameter resourceParameter : parameterList) {
+                AxisResourceParameter.ParameterType resourceParameterType =
+                        resourceParameter.getParameterType();
+                if (resourceParameterType.equals(AxisResourceParameter.ParameterType.URL_PARAMETER)) {
+                    PathParameter pathParameter = new PathParameter();
+                    pathParameter.setName(resourceParameter.getParameterName());
+                    switch (resourceParameter.getParameterDataType()) {
+                        case DATA_TYPE_INTEGER:
+                            pathParameter.setSchema(new IntegerSchema());
+                            break;
+                        case DATA_TYPE_NUMBER:
+                            pathParameter.setSchema(new NumberSchema());
+                            break;
+                        case DATA_TYPE_BOOLEAN:
+                            pathParameter.setSchema(new BooleanSchema());
+                            break;
+                        default:
+                            pathParameter.setSchema(new StringSchema());
+                            break;
+                    }
+                    pathParameter.required(true);
+                    operation.addParametersItem(pathParameter);
+                } else if (resourceParameterType
+                        .equals(AxisResourceParameter.ParameterType.QUERY_PARAMETER) && method.equals("GET")) {
+                    //  Currently handling query parameter only for GET requests.
+                    QueryParameter queryParameter = new QueryParameter();
+                    queryParameter.setName(resourceParameter.getParameterName());
+                    switch (resourceParameter.getParameterDataType()) {
+                        case DATA_TYPE_INTEGER:
+                            queryParameter.setSchema(new IntegerSchema());
+                            break;
+                        case DATA_TYPE_NUMBER:
+                            queryParameter.setSchema(new NumberSchema());
+                            break;
+                        case DATA_TYPE_BOOLEAN:
+                            queryParameter.setSchema(new BooleanSchema());
+                            break;
+                        default:
+                            queryParameter.setSchema(new StringSchema());
+                            break;
+                    }
+                    queryParameter.required(true);
+                    operation.addParametersItem(queryParameter);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add the default response ( since we cannot define it ) and pathItems to path map
+     * @param pathItem  PathItem object.
+     * @param method    HTTP method.
+     * @param operation Operation object.
+     */
+    private static void addDefaultResponseAndPathItem(PathItem pathItem, String method, Operation operation) {
+
+        ApiResponses apiResponses = new ApiResponses();
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setDescription("Default response");
+        apiResponses.addApiResponse("default", apiResponse);
+        operation.setResponses(apiResponses);
+
+        switch (method) {
+            case "GET":
+                pathItem.setGet(operation);
+                break;
+            case "POST":
+                pathItem.setPost(operation);
+                break;
+            case "DELETE":
+                pathItem.setDelete(operation);
+                break;
+            case "PUT":
+                pathItem.setPut(operation);
+                break;
+        }
+    }
+
+    /**
+     * Add servers section to the OpenApi definition.
+     *
+     * @param dataServiceName Name of the dataservice.
+     * @param transports      List of supported transports.
+     * @param serverConfig    Server config object.
+     * @param openAPI         OpenApi object.
+     * @throws AxisFault Error occurred while getting host details.
+     */
+    private static void addServersSection(String dataServiceName, List<String> transports, ServerConfig serverConfig,
+                                          OpenAPI openAPI) throws AxisFault {
+
+        String scheme;
+        String host;
+        if (transports.contains(PROTOCOL_HTTPS)) {
+            scheme = PROTOCOL_HTTPS;
+            host = serverConfig.getHost(PROTOCOL_HTTPS);
+        } else {
+            scheme = PROTOCOL_HTTP;
+            host = serverConfig.getHost(PROTOCOL_HTTP);
+        }
+        String basePath = "/" + SwaggerProcessorConstants.SERVICES_PREFIX + "/" + dataServiceName;
+
+        Server server = new Server();
+        server.setUrl(scheme + "://" + host + basePath);
+        openAPI.setServers(Arrays.asList(server));
     }
 
     /**
