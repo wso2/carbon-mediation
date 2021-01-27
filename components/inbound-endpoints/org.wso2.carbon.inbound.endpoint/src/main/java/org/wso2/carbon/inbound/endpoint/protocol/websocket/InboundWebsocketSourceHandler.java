@@ -101,6 +101,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
     private String defaultContentType;
     private int portOffset;
+    private String inboundEndpointName;
 
     private InboundApiHandler inboundApiHandler = new InboundApiHandler();
     private static final AttributeKey<Map<String, Object>> WSO2_PROPERTIES = AttributeKey.valueOf("WSO2_PROPERTIES");
@@ -147,13 +148,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        String endpointName = WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-        if (endpointName == null) {
-            handleException("Endpoint not found for port : " + port + "" + " tenant domain : " + tenantDomain);
-        }
-        WebsocketSubscriberPathManager.getInstance()
-                .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
-        MessageContext synCtx = getSynapseMessageContext(tenantDomain , ctx);
+        MessageContext synCtx = getSynapseMessageContext(tenantDomain, ctx);
+        String endpointName = getInboundEndpointName(synCtx);
+        WebsocketSubscriberPathManager.getInstance().addChannelContext(endpointName, subscriberPath.getPath(),
+                                                                       wrappedContext);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
         synCtx.setProperty(InboundWebsocketConstants.CONNECTION_TERMINATE, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(
@@ -195,17 +193,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         if (tenantDomain.equals(req.getUri())) {
             tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         }
-
-        String endpointName =
-                WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-        if (endpointName == null) {
-            handleException("Endpoint not found for port : " + port + "" +
-                    " tenant domain : " + tenantDomain);
-        }
-
+        MessageContext synCtx = getSynapseMessageContext(tenantDomain , ctx);
+        String endpointName = getInboundEndpointName(synCtx);
         WebsocketSubscriberPathManager.getInstance()
                 .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
-        MessageContext synCtx = getSynapseMessageContext(tenantDomain , ctx);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
         defaultContentType = endpoint.getParametersMap().get(InboundWebsocketConstants.INBOUND_DEFAULT_CONTENT_TYPE);
         if (endpoint == null) {
@@ -228,6 +219,23 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 ctx.channel().hashCode());
         injectForMediation(synCtx, endpoint);
 
+    }
+
+    private String getInboundEndpointName(MessageContext synCtx) {
+
+        if (inboundEndpointName != null) {
+            return inboundEndpointName;
+        }
+        Object inboundName = synCtx.getProperty(SynapseConstants.INBOUND_ENDPOINT_NAME);
+        if (inboundName != null) {
+            inboundEndpointName = inboundName.toString();
+            return inboundEndpointName;
+        }
+        inboundEndpointName = WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
+        if (inboundEndpointName == null) {
+            handleException("Endpoint not found for port : " + port + " tenant domain : " + tenantDomain);
+        }
+        return inboundEndpointName;
     }
 
     private String getWebSocketLocation(FullHttpRequest req) throws URISyntaxException {
@@ -265,9 +273,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
             if (handshakeFuture.isSuccess()) {
 
-                String endpointName =
-                        WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
                 MessageContext synCtx = getSynapseMessageContext(tenantDomain, ctx);
+                String endpointName = getInboundEndpointName(synCtx);
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                         ctx.channel().hashCode());
@@ -405,7 +412,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     public void handleClientWebsocketChannelTermination(WebSocketFrame frame) throws AxisFault {
 
         handshaker.close(wrappedContext.getChannelHandlerContext().channel(), (CloseWebSocketFrame) frame.retain());
-        String endpointName =
+        String endpointName = inboundEndpointName != null ?
+                inboundEndpointName :
                 WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
         WebsocketSubscriberPathManager.getInstance()
                 .removeChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
@@ -413,9 +421,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     }
 
     protected void handleWebsocketBinaryFrame(WebSocketFrame frame, MessageContext synCtx) throws AxisFault {
-        String endpointName =
-                WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-
+        String endpointName = getInboundEndpointName(synCtx);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
         if (endpoint == null) {
@@ -433,9 +439,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     }
 
     protected void handleWebsocketPassthroughTextFrame(WebSocketFrame frame, MessageContext synCtx) throws AxisFault {
-        String endpointName =
-                WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-
+        String endpointName = getInboundEndpointName(synCtx);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
         if (endpoint == null) {
