@@ -16,8 +16,6 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
 
-import javax.script.CompiledScript;
-
 /**
  * This class will hold the data mapper mapping configuration
  */
@@ -25,9 +23,6 @@ public class JSFunction {
 
     private String functionName;
     private String functionBody;
-    private CompiledScript compiledBody;
-    private CompiledScript compiledName;
-    private CompiledScript bindingHelperFunction;
 
     public JSFunction(String name, String body) {
         this.setFunctionName(name);
@@ -50,27 +45,4 @@ public class JSFunction {
         this.functionBody = functionBody;
     }
 
-    public CompiledScript getCompiledName() {
-        return compiledName;
-    }
-
-    public void setCompiledName(CompiledScript compiledName) {
-        this.compiledName = compiledName;
-    }
-
-    public CompiledScript getCompiledBody() {
-        return compiledBody;
-    }
-
-    public void setCompiledBody(CompiledScript compiledBody) {
-        this.compiledBody = compiledBody;
-    }
-
-    public CompiledScript getBindingHelperFunction() {
-        return bindingHelperFunction;
-    }
-
-    public void setBindingHelperFunction(CompiledScript bindingHelperFunction) {
-        this.bindingHelperFunction = bindingHelperFunction;
-    }
 }
