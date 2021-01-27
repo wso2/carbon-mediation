@@ -63,6 +63,9 @@ public class SwaggerConstants {
      */
     static final String BASE_PATH = "basePath";
 
+    static final String SERVERS = "servers";
+
+    static final String  URL = "url";
     /**
      * Swagger element "info" in http://swagger.io/specification/
      */
@@ -243,12 +246,13 @@ public class SwaggerConstants {
     /**
      * Swagger operations
      */
-    public static String OPERATION_HTTP_GET = "get";
-    public static String OPERATION_HTTP_POST = "post";
-    public static String OPERATION_HTTP_PUT = "put";
-    public static String OPERATION_HTTP_PATCH = "patch";
-    public static String OPERATION_HTTP_DELETE = "detele";
-    public static String OPERATION_HTTP_OPTIONS = "options";
+    public static final String OPERATION_HTTP_GET = "get";
+    public static final String OPERATION_HTTP_POST = "post";
+    public static final String OPERATION_HTTP_PUT = "put";
+    public static final String OPERATION_HTTP_PATCH = "patch";
+    public static final String OPERATION_HTTP_DELETE = "delete";
+    public static final String OPERATION_HTTP_OPTIONS = "options";
+    public static final String OPERATION_HTTP_HEAD = "head";
 
     /**
      * Default consume mime types

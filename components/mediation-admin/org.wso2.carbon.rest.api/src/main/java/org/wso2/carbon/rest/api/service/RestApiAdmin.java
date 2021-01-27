@@ -1,8 +1,8 @@
 package org.wso2.carbon.rest.api.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.minidev.json.JSONObject;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -35,7 +35,7 @@ import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.APIGenException;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.APIGenerator;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
-import org.wso2.carbon.mediation.commons.rest.api.swagger.ServerConfig;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.OpenAPIProcessor;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
@@ -48,7 +48,6 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.rest.api.APIData;
 import org.wso2.carbon.rest.api.APIDataSorter;
 import org.wso2.carbon.rest.api.APIException;
-import org.wso2.carbon.rest.api.CarbonServerConfig;
 import org.wso2.carbon.rest.api.ConfigHolder;
 import org.wso2.carbon.rest.api.ResourceData;
 import org.wso2.carbon.rest.api.RestApiAdminUtils;
@@ -104,7 +103,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             lock.unlock();
         }
 	}
-	
+
 	public boolean addApiFromString(String apiData) throws APIException {
 		final Lock lock = getLock();
         try {
@@ -1106,21 +1105,21 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 
     /**
-     * Function to generate API from swagger definition (from Synapse API)
+     * Function to generate API from swagger definition (from Synapse API).
      *
-     * @param api existing synapse API
-     * @return generated swagger
-     * @throws APIException
+     * @param api    api existing synapse API
+     * @param isJSON generate Swagger in YAML / JSON format.
+     * @return generated swagger.
+     * @throws APIException error occurred while retrieving host details.
      */
-    public String generateSwaggerFromSynapseAPI(API api) throws APIException {
+    public String generateSwaggerFromSynapseAPI(API api, boolean isJSON) throws APIException {
         String swaggerJsonString = "";
         if (log.isDebugEnabled()) {
             log.debug("Generate swagger definition for the API : " + api.getAPIName());
         }
 
         try {
-            JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
-            swaggerJsonString = jsonDefinition.toString();
+            return new OpenAPIProcessor(api).getOpenAPISpecification(isJSON);
         } catch (AxisFault axisFault) {
             handleException(log, "Error occurred while generating swagger definition", axisFault);
         }
@@ -1128,26 +1127,57 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 
     /**
+     * Function to generate API from swagger definition (from Synapse API)
+     *
+     * @param api existing synapse API
+     * @return generated swagger
+     * @throws APIException
+     */
+    public String generateSwaggerFromSynapseAPI(API api) throws APIException {
+        return generateSwaggerFromSynapseAPI(api,true);
+    }
+
+    /**
      * Function to generate API from swagger definition (from JSON representation)
      *
      * @param swaggerJsonString swagger definition
      * @return generated synapse API
-     * @throws APIException
+     * @throws APIException error occurred while retrieving host details.
      */
     public String generateAPIFromSwagger(String swaggerJsonString) throws APIException {
+        return generateAPIFromSwagger(swaggerJsonString,true);
+    }
 
-        if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
+    /**
+     * Function to generate API from swagger definition (from JSON representation)
+     *
+     * @param swaggerString swagger definition
+     * @param isJSON        input in YAML / JSON format.
+     * @return generated synapse API.
+     * @throws APIException error occurred while retrieving host details.
+     */
+    public String generateAPIFromSwagger(String swaggerString, boolean isJSON) throws APIException {
+
+        if (swaggerString == null || swaggerString.isEmpty()) {
             handleException(log, "Swagger provided is empty, hence unable to generate API", null);
         }
 
+        if (!isJSON) {
+            try {
+                swaggerString = GenericApiObjectDefinition.convertYamlToJson(swaggerString);
+            } catch (JsonProcessingException e) {
+                handleException(log, "Error occurred while converting the provided YAML to JSON", null);
+            }
+        }
+
         JsonParser jsonParser = new JsonParser();
-        JsonElement swaggerJson = jsonParser.parse(swaggerJsonString);
+        JsonElement swaggerJson = jsonParser.parse(swaggerString);
         if (swaggerJson.isJsonObject()) {
             APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
             try {
                 API api = apiGenerator.generateSynapseAPI();
                 return APISerializer.serializeAPI(api).toString();
-            } catch (APIGenException e) {
+            } catch (APIGenException | MalformedURLException e) {
                 handleException(log, "Error occurred while generating API", e);
             }
         } else {
@@ -1161,7 +1191,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * Function to generate updated existing API by referring to swagger definition (from JSON representation)
      *
      * @param swaggerJsonString swagger definition
-     * @param existingApiName name of the existing API
+     * @param existingApiName   name of the existing API
      * @return generated synapse API
      * @throws APIException
      */
@@ -1193,14 +1223,16 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 
     /**
-     * Function to generate updated existing API by referring to swagger definition (from JSON representation)
+     * Function to generate updated existing API by referring to swagger definition.
      *
-     * @param swaggerJsonString swagger definition
-     * @param existingApi existing synapse API
-     * @return generated synapse API
-     * @throws APIException
+     * @param swaggerJsonString swagger definition.
+     * @param isJSON            input in YAML / JSON format.
+     * @param existingApi       existing synapse API.
+     * @return generated synapse API.
+     * @throws APIException error occurred while retrieving host details.
      */
-    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, API existingApi) throws APIException {
+    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, boolean isJSON, API existingApi)
+            throws APIException {
 
         if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
             handleException(log, "Provided swagger definition is empty, hence unable to generate API", null);
@@ -1208,6 +1240,14 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
         if (existingApi == null) {
             handleException(log, "Provided existing API name is empty, hence unable to generate API", null);
+        }
+
+        if (!isJSON) {
+            try {
+                swaggerJsonString = GenericApiObjectDefinition.convertYamlToJson(swaggerJsonString);
+            } catch (JsonProcessingException e) {
+                handleException(log, "Error occurred while converting the provided YAML to JSON", null);
+            }
         }
 
         JsonParser jsonParser = new JsonParser();
@@ -1225,6 +1265,18 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
         // Definitely will not reach here
         return "";
+    }
+
+    /**
+     * Function to generate updated existing API by referring to swagger definition (from JSON representation)
+     *
+     * @param swaggerJsonString swagger definition
+     * @param existingApi       existing synapse API
+     * @return generated synapse API
+     * @throws APIException
+     */
+    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, API existingApi) throws APIException {
+        return generateUpdatedAPIFromSwagger(swaggerJsonString, true, existingApi);
     }
 
     /**
@@ -1306,5 +1358,22 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             }
             return strBuilder.toString();
         }
+    }
+
+    /**
+     * Generate updated OpenApi definition using an updated API.
+     *
+     * @param existingSwagger existing OpenApi definition of the API.
+     * @param isJSONIn        input data-type JSON / YAML.
+     * @param isJSONOut       output required in JSON / YAML.
+     * @param api             updated synapse API.
+     * @return OpenApi definition of the updated API.
+     * @throws APIGenException Error occurred while generating the updated definition.
+     */
+    public String generateUpdatedSwaggerFromAPI(String existingSwagger, boolean isJSONIn, boolean isJSONOut, API api)
+            throws APIGenException {
+
+        OpenAPIProcessor openAPIProcessor = new OpenAPIProcessor(api);
+        return openAPIProcessor.getUpdatedSwaggerFromApi(existingSwagger, isJSONIn, isJSONOut);
     }
 }
