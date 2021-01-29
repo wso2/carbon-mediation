@@ -29,13 +29,10 @@ import org.wso2.carbon.mediator.datamapper.engine.output.formatters.MapOutputFor
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineUtils;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.util.Map;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.EQUALS_SIGN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
 
@@ -45,8 +42,11 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
  */
 public class ScriptExecutor implements Executor {
 
+    public static final String PROPERTIES_IDENTIFIER = "properties";
+    public static final String INPUT_VARIABLE_IDENTIFIER = "inputVariables";
     private static final Log log = LogFactory.getLog(ScriptExecutor.class);
     private ScriptEngine scriptEngine;
+    Bindings bindings;
 
     /**
      * Create a script executor of the provided script executor type
@@ -55,18 +55,21 @@ public class ScriptExecutor implements Executor {
      */
     public ScriptExecutor(ScriptExecutorType scriptExecutorType) {
         switch (scriptExecutorType) {
-        case NASHORN:
-            scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
-            log.debug("Setting Nashorn as Script Engine");
-            break;
-        case RHINO:
-            scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-            log.debug("Setting Rhino as Script Engine");
-            break;
-        default:
-            scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-            log.debug("Setting default Rhino as Script Engine");
-            break;
+            case NASHORN:
+                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
+                bindings = scriptEngine.createBindings();
+                log.debug("Setting Nashorn as Script Engine");
+                break;
+            case RHINO:
+                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+                bindings = scriptEngine.createBindings();
+                log.debug("Setting Rhino as Script Engine");
+                break;
+            default:
+                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+                bindings = scriptEngine.createBindings();
+                log.debug("Setting default Rhino as Script Engine");
+                break;
         }
     }
 
@@ -75,10 +78,59 @@ public class ScriptExecutor implements Executor {
             throws JSException, SchemaException {
         try {
             JSFunction jsFunction = mappingResource.getFunction();
-            injectPropertiesToEngine(properties);
-            injectInputVariableToEngine(mappingResource.getInputSchema().getName(), inputVariable);
-            scriptEngine.eval(jsFunction.getFunctionBody());
-            Object result = scriptEngine.eval(jsFunction.getFunctionName());
+            // Compile Data-mapper JS function body
+            if (jsFunction.getCompiledBody() == null) {
+                if (scriptEngine instanceof Compilable) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Script engine supports Compilable interface, " +
+                                "compiling script code..");
+                    }
+                    jsFunction.setCompiledBody(((Compilable) scriptEngine).compile(jsFunction.getFunctionBody()));
+                }
+            }
+            // Compile Data-mapper JS function name
+            if (jsFunction.getCompiledName() == null) {
+                if (scriptEngine instanceof Compilable) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Script engine supports Compilable interface, " +
+                                "compiling script code..");
+                    }
+                    jsFunction.setCompiledName(((Compilable) scriptEngine).compile(jsFunction.getFunctionName()));
+                }
+            }
+
+            // Compile Data-mapper JS function binding helper
+            String helperJSFunction = "var " + PROPERTIES_OBJECT_NAME + " = JSON.parse(" + PROPERTIES_IDENTIFIER + ");\n" +
+                    "var " + getInputVariable(mappingResource.getInputSchema().getName()) + " = JSON.parse(" + INPUT_VARIABLE_IDENTIFIER + ");\n";
+            if (jsFunction.getBindingHelperFunction() == null) {
+                if (scriptEngine instanceof Compilable) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Script engine supports Compilable interface, " +
+                                "compiling script code..");
+                    }
+                    jsFunction.setBindingHelperFunction(((Compilable) scriptEngine).compile(helperJSFunction));
+                }
+            }
+
+            bindings.put(PROPERTIES_IDENTIFIER, properties);
+            bindings.put(INPUT_VARIABLE_IDENTIFIER, inputVariable);
+
+            if (jsFunction.getBindingHelperFunction() != null) {
+                jsFunction.getBindingHelperFunction().eval(bindings);
+            } else {
+                scriptEngine.eval(helperJSFunction, bindings);
+            }
+            if (jsFunction.getCompiledBody() != null) {
+                jsFunction.getCompiledBody().eval(bindings);
+            } else {
+                scriptEngine.eval(jsFunction.getFunctionBody(), bindings);
+            }
+            Object result;
+            if (jsFunction.getCompiledName() != null) {
+                result = jsFunction.getCompiledName().eval(bindings);
+            } else {
+                result = scriptEngine.eval(jsFunction.getFunctionName(), bindings);
+            }
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
             } else if (result instanceof String) {
@@ -95,12 +147,7 @@ public class ScriptExecutor implements Executor {
         throw new JSException("Failed to execute mapping function");
     }
 
-    private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
-        scriptEngine.eval("var input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_').replace(HYPHEN, ENCODE_CHAR_HYPHEN) + "="
-                + inputVariable);
-    }
-
-    private void injectPropertiesToEngine(String properties) throws ScriptException {
-        scriptEngine.eval("var " + PROPERTIES_OBJECT_NAME + EQUALS_SIGN + properties);
+    private String getInputVariable(String inputSchemaName) throws ScriptException {
+        return "input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_').replace(HYPHEN, ENCODE_CHAR_HYPHEN);
     }
 }
