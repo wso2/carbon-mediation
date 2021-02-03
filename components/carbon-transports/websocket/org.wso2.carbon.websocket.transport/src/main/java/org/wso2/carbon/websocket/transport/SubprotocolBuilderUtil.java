@@ -29,7 +29,6 @@ public class SubprotocolBuilderUtil {
     private static String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse(";
     private static String SYNAPSE_SUBPROTOCOL_SUFFIX = ")";
     private static String SYNAPSE_CONTENT_TYPE = "contentType=";
-    private static String SYNAPSE_CONTENT_TYPE_GRAPHQL_WS = "graphql-ws";
 
     private static final Log log = LogFactory.getLog(SubprotocolBuilderUtil.class);
 
@@ -46,12 +45,8 @@ public class SubprotocolBuilderUtil {
     }
 
     public static String contentTypeToSyanapeSubprotocol(String contentType) {
-        if (contentType.equals(SYNAPSE_CONTENT_TYPE_GRAPHQL_WS)) {
-            return contentType;
-        } else {
-            return SYNAPSE_SUBPROTOCOL_PREFIX + SYNAPSE_CONTENT_TYPE + "'" + contentType +
-                    "'" + SYNAPSE_SUBPROTOCOL_SUFFIX;
-        }
+        return SYNAPSE_SUBPROTOCOL_PREFIX + SYNAPSE_CONTENT_TYPE + "'" + contentType +
+                "'" + SYNAPSE_SUBPROTOCOL_SUFFIX;
     }
 
 }
