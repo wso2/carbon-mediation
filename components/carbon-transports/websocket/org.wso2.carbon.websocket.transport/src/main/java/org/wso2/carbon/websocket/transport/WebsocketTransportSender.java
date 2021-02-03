@@ -74,6 +74,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         String responceDispatchSequence = null;
         String responceErrorSequence = null;
         String messageType = null;
+        String wsSubProtocol = null;
         Map<String, Object> customHeaders = new HashMap<>();
 
         InboundResponseSender responseSender = null;
@@ -101,6 +102,10 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
         if (msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE) != null) {
             messageType = (String) msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE);
+        }
+
+        if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SUBPROTOCOL) != null) {
+            wsSubProtocol = (String) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SUBPROTOCOL);
         }
 
         /*
@@ -147,7 +152,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
-                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, customHeaders);
+                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, wsSubProtocol, customHeaders);
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
             if (tenantDomain != null) {
                 clientHandler.setTenantDomain(tenantDomain);

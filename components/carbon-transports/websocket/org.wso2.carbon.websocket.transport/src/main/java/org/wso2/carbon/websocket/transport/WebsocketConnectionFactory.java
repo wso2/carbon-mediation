@@ -90,16 +90,17 @@ public class WebsocketConnectionFactory {
                                                     final String dispatchSequence,
                                                     final String dispatchErrorSequence,
                                                     final String contentType,
+                                                    final String wsSubprotocol,
                                                     final Map<String, Object> headers) throws InterruptedException {
         WebSocketClientHandler channelHandler;
         if (handshakePresent) {
             channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
-                    contentType, headers);
+                    contentType, wsSubprotocol, headers);
         } else {
             channelHandler = getChannelHandlerFromPool(sourceIdentifier, getClientHandlerIdentifier(uri));
             if (channelHandler == null) {
                 channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
-                        contentType, headers);
+                        contentType, wsSubprotocol, headers);
             }
         }
         channelHandler.handshakeFuture().sync();
@@ -117,7 +118,8 @@ public class WebsocketConnectionFactory {
                                                      final String sourceIdentifier,
                                                      String dispatchSequence,
                                                      String dispatchErrorSequence,
-                                                     String contentType, Map<String, Object> headers) {
+                                                     String contentType,
+                                                     String wsSubprotocol, Map<String, Object> headers) {
         if (log.isDebugEnabled()) {
             log.debug("Creating a Connection for the specified WS endpoint.");
         }
@@ -197,7 +199,7 @@ public class WebsocketConnectionFactory {
             final EventLoopGroup group = new NioEventLoopGroup();
             handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
                     WebSocketVersion.V13,
-                    contentType != null ? SubprotocolBuilderUtil.contentTypeToSyanapeSubprotocol(contentType) : null,
+                    subprotocol(wsSubprotocol, contentType),
                     false, defaultHttpHeaders));
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioSocketChannel.class)
@@ -233,6 +235,19 @@ public class WebsocketConnectionFactory {
         }
 
         return null;
+    }
+
+    private static String subprotocol(String wsSubprotocol, String contentType){
+        String subprotocol = null;
+        if (wsSubprotocol != null) {
+            subprotocol = wsSubprotocol;
+        }
+        else {
+            if (contentType != null) {
+                subprotocol = SubprotocolBuilderUtil.contentTypeToSyanapeSubprotocol(contentType);
+            }
+        }
+        return subprotocol;
     }
 
     private static void handleWssTrustStoreParameterError(String errorMsg) throws AxisFault {
