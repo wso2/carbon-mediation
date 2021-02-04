@@ -62,12 +62,8 @@
             <artifactId>org.wso2.carbon.mediation.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-models</artifactId>
+            <groupId>org.wso2.orbit.io.swagger.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
         </dependency>
 
     </dependencies>
@@ -101,8 +97,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.registry</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.dependency.mgt</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.startup</bundleDef>
-                                <bundleDef>io.swagger.core.v3:swagger-core:${swagger.core.version}</bundleDef>
-                                <bundleDef>io.swagger.core.v3:swagger-models:${swagger.core.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.io.swagger.v3:swagger-parser:${swagger.parser.orbit.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>

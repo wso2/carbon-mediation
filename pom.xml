@@ -2365,18 +2365,8 @@
                 <version>${saml.common.util.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-core</artifactId>
-                <version>${swagger.core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-models</artifactId>
-                <version>${swagger.core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.io.swagger.parser.v3</groupId>
-                <artifactId>swagger-parser-v3</artifactId>
+                <groupId>org.wso2.orbit.io.swagger.v3</groupId>
+                <artifactId>swagger-parser</artifactId>
                 <version>${swagger.parser.orbit.version}</version>
             </dependency>
             <dependency>
@@ -2574,8 +2564,7 @@
         <opensaml.orbit.version>3.3.1.wso2v1</opensaml.orbit.version>
         <jackson.dataformat.yaml.version>2.10.3</jackson.dataformat.yaml.version>
         <!-- OAS3 Versions -->
-        <swagger.core.version>2.1.6</swagger.core.version>
-        <swagger.parser.orbit.version>2.0.24.wso2v1</swagger.parser.orbit.version>
+        <swagger.parser.orbit.version>2.0.20.wso2v1</swagger.parser.orbit.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
