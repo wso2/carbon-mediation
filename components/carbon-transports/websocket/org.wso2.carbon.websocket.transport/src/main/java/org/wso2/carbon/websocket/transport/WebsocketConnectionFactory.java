@@ -236,17 +236,11 @@ public class WebsocketConnectionFactory {
         return null;
     }
 
-    private static String deriveSubprotocol(String wsSubprotocol, String contentType){
-        String subprotocol = null;
+    private static String deriveSubprotocol(String wsSubprotocol, String contentType) {
         if (wsSubprotocol != null) {
-            subprotocol = wsSubprotocol;
+            return wsSubprotocol;
         }
-        else {
-            if (contentType != null) {
-                subprotocol = SubprotocolBuilderUtil.contentTypeToSyanapeSubprotocol(contentType);
-            }
-        }
-        return subprotocol;
+        return contentType != null ? SubprotocolBuilderUtil.contentTypeToSyanapeSubprotocol(contentType) : null;
     }
 
     private static void handleWssTrustStoreParameterError(String errorMsg) throws AxisFault {
