@@ -1,8 +1,7 @@
 package org.wso2.carbon.rest.api.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -54,6 +53,8 @@ import org.wso2.carbon.rest.api.RestApiAdminUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.NetworkUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -84,6 +85,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     private static final String CONFIG_REG_PREFIX = "conf:";
     private static final String GOV_REG_PREFIX = "gov:";
     private static final String FILE_PREFIX = "file:";
+    private static final String TITLE = "title";
     private boolean saveRuntimeArtifacts =
             SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
@@ -1375,5 +1377,45 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
         OpenAPIProcessor openAPIProcessor = new OpenAPIProcessor(api);
         return openAPIProcessor.getUpdatedSwaggerFromApi(existingSwagger, isJSONIn, isJSONOut);
+    }
+
+    /**
+     * Update the title of a given swagger document.
+     *
+     * @param newName new title which should be added.
+     * @param swagger swagger document.
+     * @return updated swagger.
+     * @throws APIException Error occurred while updating the title of the swagger.
+     */
+    public String updateNameInSwagger(String newName, String swagger) throws APIException {
+        JsonParser parser = new JsonParser();
+        JsonElement jsonElement;
+        try {
+            jsonElement = parser.parse(swagger);
+            Boolean openApi = jsonElement.getAsJsonObject().has("openapi");
+            if (!openApi) {
+                handleException(log, "Provided swagger is not OpenApi 3.0", null);
+            } else {
+                JsonObject infoObject = jsonElement.getAsJsonObject().get("info").getAsJsonObject();
+                infoObject.remove(TITLE);
+                infoObject.add(TITLE, new JsonPrimitive(newName));
+                return jsonElement.toString();
+            }
+        } catch (JsonSyntaxException ex) {
+            // neglect the error - treat as YAML
+            Yaml yaml = new Yaml();
+            Map<String, Object> obj = yaml.load(swagger);
+            Map<String, Object> infoMap = (Map<String, Object>) obj.get("info");
+            infoMap.remove(TITLE);
+            infoMap.put(TITLE, newName);
+
+            DumperOptions options = new DumperOptions();
+            options.setIndent(2);
+            options.setPrettyFlow(true);
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            Yaml output = new Yaml(options);
+            return output.dump(obj);
+        }
+        return null;
     }
 }
