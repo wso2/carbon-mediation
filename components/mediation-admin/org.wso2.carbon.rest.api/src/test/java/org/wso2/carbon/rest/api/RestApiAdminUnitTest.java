@@ -30,9 +30,11 @@ import org.apache.synapse.config.xml.rest.APIFactory;
 
 import org.wso2.carbon.mediation.commons.rest.api.swagger.APIGenException;
 import org.wso2.carbon.rest.api.service.RestApiAdmin;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -111,5 +113,22 @@ public class RestApiAdminUnitTest extends TestCase {
         JsonElement result = jsonParser.parse(newApiStr);
         JsonElement expected = jsonParser.parse(expectedResult);
         Assert.assertEquals("Did not received the expected swagger", expected.toString(), result.toString());
+    }
+
+    public void testUpdateNameInSwaggerJSON() throws IOException, APIException {
+        String fileContent = readResourceFile("ChangeApiSwagger.json");
+        String changed = restApiAdmin.updateNameInSwagger("firstApiChanged", fileContent);
+        JsonElement jsonElement = jsonParser.parse(changed);
+        String newName = jsonElement.getAsJsonObject().get("info").getAsJsonObject().get("title").getAsString();
+        Assert.assertEquals("Swagger name not changed", "firstApiChanged", newName);
+    }
+
+    public void testUpdateNameInSwaggerYAML() throws IOException, APIException {
+        String fileContent = readResourceFile("TestAllApiSwagger.yaml");
+        String changed = restApiAdmin.updateNameInSwagger("testAllApiChanged", fileContent);
+        Yaml yaml = new Yaml();
+        Map<String, Object> obj = yaml.load(changed);
+        Map<String, Object> infoMap = (Map<String, Object>) obj.get("info");
+        Assert.assertEquals("Swagger title not changed",infoMap.get("title"),"testAllApiChanged");
     }
 }
