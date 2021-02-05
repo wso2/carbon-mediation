@@ -236,7 +236,7 @@ public class WebsocketConnectionFactory {
         return null;
     }
 
-    private static String deriveSubprotocol(String wsSubprotocol, String contentType) {
+    private String deriveSubprotocol(String wsSubprotocol, String contentType) {
         if (wsSubprotocol != null) {
             return wsSubprotocol;
         }
