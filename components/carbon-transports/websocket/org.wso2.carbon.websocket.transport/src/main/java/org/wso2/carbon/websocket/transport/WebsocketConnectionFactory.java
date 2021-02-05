@@ -47,7 +47,6 @@ import org.wso2.carbon.websocket.transport.utils.SSLUtil;
 import javax.net.ssl.SSLException;
 import javax.xml.namespace.QName;
 import java.net.URI;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -199,7 +198,7 @@ public class WebsocketConnectionFactory {
             final EventLoopGroup group = new NioEventLoopGroup();
             handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
                     WebSocketVersion.V13,
-                    subprotocol(wsSubprotocol, contentType),
+                    deriveSubprotocol(wsSubprotocol, contentType),
                     false, defaultHttpHeaders));
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioSocketChannel.class)
@@ -237,7 +236,7 @@ public class WebsocketConnectionFactory {
         return null;
     }
 
-    private static String subprotocol(String wsSubprotocol, String contentType){
+    private static String deriveSubprotocol(String wsSubprotocol, String contentType){
         String subprotocol = null;
         if (wsSubprotocol != null) {
             subprotocol = wsSubprotocol;

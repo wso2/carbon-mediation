@@ -152,7 +152,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
-                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, wsSubProtocol, customHeaders);
+                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, wsSubProtocol,
+                    customHeaders);
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
             if (tenantDomain != null) {
                 clientHandler.setTenantDomain(tenantDomain);
