@@ -20,7 +20,6 @@ import org.apache.axiom.soap.SOAPEnvelope;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
