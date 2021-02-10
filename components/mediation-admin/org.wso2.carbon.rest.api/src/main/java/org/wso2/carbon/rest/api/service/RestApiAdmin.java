@@ -1179,7 +1179,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             try {
                 API api = apiGenerator.generateSynapseAPI();
                 return APISerializer.serializeAPI(api).toString();
-            } catch (APIGenException | MalformedURLException e) {
+            } catch (APIGenException e) {
                 handleException(log, "Error occurred while generating API", e);
             }
         } else {

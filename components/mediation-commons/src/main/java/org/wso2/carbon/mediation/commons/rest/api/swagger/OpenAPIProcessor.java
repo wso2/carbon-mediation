@@ -50,6 +50,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.api.API;
 import org.apache.synapse.api.version.URLBasedVersionStrategy;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -176,6 +178,45 @@ public class OpenAPIProcessor {
     }
 
     /**
+     * Update server details in the OpenApi definition.
+     *
+     * @param openAPI OpenApi object.
+     * @throws AxisFault Error occurred while getting host details.
+     */
+    private void updateServersSection(OpenAPI openAPI) throws AxisFault {
+        List<Server> servers = openAPI.getServers();
+        if (servers.size() > 0) {
+
+            String basePath;
+            if (api.getVersionStrategy() instanceof URLBasedVersionStrategy) {
+                basePath = api.getContext() + "/" + api.getVersionStrategy().getVersion();
+            } else {
+                basePath = api.getContext();
+            }
+
+            // When servers are already configured check for context change only
+            String urlString;
+            for (Server server : servers) {
+                urlString = server.getUrl();
+                try {
+                    URL url = new URL(urlString);
+                    String apiContext = url.getPath();
+                    if (!basePath.equals(apiContext)) {
+                        server.setUrl(urlString.replace(apiContext, basePath));
+                    }
+                } catch (MalformedURLException e) {
+                    // URL is relative to the host
+                    if (!basePath.equals(urlString)) {
+                        server.setUrl(basePath);
+                    }
+                }
+            }
+        } else {
+            addServersSection(openAPI);
+        }
+    }
+
+    /**
      * Add server details to the OpenApi definition.
      *
      * @param openAPI OpenApi object.
@@ -218,6 +259,22 @@ public class OpenAPIProcessor {
             server.setUrl(scheme + "://" + host + basePath);
             openAPI.setServers(Arrays.asList(server));
         }
+    }
+
+    /**
+     * Update info details of the OpenApi definition.
+     *
+     * @param openAPI OpenApi object.
+     */
+    private void updateInfoSection(OpenAPI openAPI) {
+        final Info info = openAPI.getInfo();
+        info.setTitle(api.getAPIName());
+        if (StringUtils.isEmpty(info.getDescription())) {
+            info.setDescription(api.getDescription() == null ? ("API Definition of " + api.getAPIName()) :
+                    api.getDescription());
+        }
+        info.setVersion((api.getVersion() != null && !api.getVersion().equals("")) ? api.getVersion() : "1.0.0");
+        openAPI.setInfo(info);
     }
 
     /**
@@ -431,9 +488,9 @@ public class OpenAPIProcessor {
         }
         // Adding the new path map
         openAPI.setPaths(newPaths);
-        addInfoSection(openAPI);
+        updateInfoSection(openAPI);
         try {
-            addServersSection(openAPI);
+            updateServersSection(openAPI);
         } catch (AxisFault axisFault) {
             throw new APIGenException("Error occurred while getting host details", axisFault);
         }
