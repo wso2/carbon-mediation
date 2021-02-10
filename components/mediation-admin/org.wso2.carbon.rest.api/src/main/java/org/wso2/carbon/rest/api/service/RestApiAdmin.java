@@ -1418,4 +1418,18 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
         return null;
     }
+
+    public OMElement getAPIContent(String apiName, String tenantDomain) {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            API api = getSynapseAPIByName(apiName);
+            if (api != null) {
+                return APISerializer.serializeAPI(api);
+            }
+            return null;
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
 }
