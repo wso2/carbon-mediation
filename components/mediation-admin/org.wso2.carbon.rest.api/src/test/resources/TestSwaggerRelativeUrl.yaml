@@ -1,0 +1,40 @@
+---
+openapi: 3.0.1
+info:
+  title: firstApi
+  description: API Definition of firstApi
+  version: 1.2.3
+servers:
+  - url: /firstRelative
+paths:
+  "/addUser":
+    post:
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+        required: false
+      responses:
+        default:
+          description: Default response
+  "/getUser/{userId}":
+    get:
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: Default response
+  "/":
+    get:
+      responses:
+        default:
+          description: Default response

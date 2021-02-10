@@ -52,10 +52,13 @@ public class RestApiAdminUnitTest extends TestCase {
         return IOUtils.toString(inputStream);
     }
 
-    public void testAPIFromSwagger() throws IOException, APIException {
+    public void testAPIFromSwagger() throws IOException, APIException, XMLStreamException {
         String fileContent = readResourceFile("TestSwagger.yaml");
         String result = restApiAdmin.generateAPIFromSwagger(fileContent, false);
-        System.out.println(result);
+        OMElement omElement = AXIOMUtil.stringToOM(result);
+        API api = APIFactory.createAPI(omElement);
+        assertEquals("Mismatch in the API context", "/first", api.getContext());
+        assertEquals("Resource count mismatch", 3, api.getResources().length);
     }
 
     // Test OpenApi definition generating from an API with context version strategy.
@@ -130,5 +133,27 @@ public class RestApiAdminUnitTest extends TestCase {
         Map<String, Object> obj = yaml.load(changed);
         Map<String, Object> infoMap = (Map<String, Object>) obj.get("info");
         Assert.assertEquals("Swagger title not changed",infoMap.get("title"),"testAllApiChanged");
+    }
+
+    public void testAPIFromSwaggerWithRelativeUrl() throws IOException, APIException, XMLStreamException {
+        String fileContent = readResourceFile("TestSwaggerRelativeUrl.yaml");
+        String result = restApiAdmin.generateAPIFromSwagger(fileContent, false);
+        OMElement omElement = AXIOMUtil.stringToOM(result);
+        API api = APIFactory.createAPI(omElement);
+        assertEquals("Mismatch in the API context", "/firstRelative", api.getContext());
+        assertEquals("Resource count mismatch", 3, api.getResources().length);
+    }
+
+    public void testGenerateUpdatedSwaggerFromApiWithRelativeUrl() throws IOException, XMLStreamException,
+            APIGenException {
+        String fileContent = readResourceFile("testAllApiChanged.xml");
+        OMElement omElement = AXIOMUtil.stringToOM(fileContent);
+        API newApi = APIFactory.createAPI(omElement);
+        fileContent = readResourceFile("TestAllApiSwaggerRelativeUrl.yaml");
+        String newApiStr = restApiAdmin.generateUpdatedSwaggerFromAPI(fileContent, false, true, newApi);
+        String expectedResult = readResourceFile("TestAllApiChangedSwaggerRelativePath.json");
+        JsonElement result = jsonParser.parse(newApiStr);
+        JsonElement expected = jsonParser.parse(expectedResult);
+        Assert.assertEquals("Did not received the expected swagger", expected.toString(), result.toString());
     }
 }

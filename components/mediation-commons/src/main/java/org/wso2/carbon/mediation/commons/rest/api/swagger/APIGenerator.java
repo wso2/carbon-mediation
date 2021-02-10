@@ -74,7 +74,7 @@ public class APIGenerator {
      * @return Generated API
      * @throws APIGenException
      */
-    public API generateSynapseAPI() throws APIGenException, MalformedURLException {
+    public API generateSynapseAPI() throws APIGenException {
 
         if (swaggerJson.get(SwaggerConstants.SERVERS) == null ||
                 swaggerJson.get(SwaggerConstants.SERVERS).getAsJsonArray().size() == 0) {
@@ -85,8 +85,15 @@ public class APIGenerator {
         String serversString =
                 swaggerJson.getAsJsonArray(SwaggerConstants.SERVERS).get(0).getAsJsonObject().get(SwaggerConstants.URL)
                         .getAsString();
-        URL url = new URL(serversString);
-        String apiContext = url.getPath();
+        URL url = null;
+        String apiContext;
+        try {
+            url = new URL(serversString);
+            apiContext = url.getPath();
+        } catch (MalformedURLException e) {
+            // url can be relative the place where the swagger is hosted.
+            apiContext = serversString;
+        }
         //cleanup context : remove ending '/'
         if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
             apiContext = apiContext.substring(0, apiContext.length() - 1);
