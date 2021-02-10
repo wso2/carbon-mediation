@@ -95,6 +95,8 @@ public class InboundHttpServerWorker extends ServerWorker {
     public void run() {
         if (request != null) {
             try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
                 //get already created axis2 context from ServerWorker
                 MessageContext axis2MsgContext = getRequestContext();
 
@@ -224,6 +226,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                 sendAck(axis2MsgContext);
             } catch (Exception e) {
                 log.error("Exception occurred when running " + InboundHttpServerWorker.class.getName(), e);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
             }
         } else {
             log.error("InboundSourceRequest cannot be null");
