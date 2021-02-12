@@ -52,4 +52,6 @@ public class WebsocketConstants {
 
     public static final String WEBSOCKET_CUSTOM_HEADER_PREFIX = "websocket.custom.header.";
     public static final String WEBSOCKET_CUSTOM_HEADER_CONFIG = "ws.custom.header";
+
+    public static final String WEBSOCKET_SUBPROTOCOL = "websocket.subprotocol";
 }
