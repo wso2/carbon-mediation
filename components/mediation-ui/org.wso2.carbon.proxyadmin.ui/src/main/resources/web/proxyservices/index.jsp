@@ -542,7 +542,7 @@
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'inline') {
             getElement('publishWsdlCombo').selectedIndex = 1;
-            var text = '<%=Encode.forHtmlContent(wsdlText)%>';
+            var text = '<%=Encode.forJavaScriptBlock(wsdlText)%>';
             text = text.replace(/^<br>/,"");
             text = text.replace(/<br>/g,"\r\n");
             getElement('wsdlInlineText').value = text;
@@ -550,17 +550,17 @@
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'reg') {
             getElement('publishWsdlCombo').selectedIndex = 3;
-            getElement('wsdlRegText').value = '<%=Encode.forHtmlContent(wsdlText)%>';
+            getElement('wsdlRegText').value = '<%=Encode.forJavaScriptBlock(wsdlText)%>';
             setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'uri') {
             getElement('publishWsdlCombo').selectedIndex = 2;
-            getElement('wsdlUriText').value = '<%=Encode.forHtmlContent(wsdlText)%>';
+            getElement('wsdlUriText').value = '<%=Encode.forJavaScriptBlock(wsdlText)%>';
             setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'ep') {
             getElement('publishWsdlCombo').selectedIndex = 4;
-            getElement('wsdlEPText').value = '<%=Encode.forHtmlContent(wsdlText)%>';
+            getElement('wsdlEPText').value = '<%=Encode.forJavaScriptBlock(wsdlText)%>';
             setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         }
