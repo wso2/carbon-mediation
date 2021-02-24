@@ -125,7 +125,9 @@
                                                 if(!isLiteral) {
                                                     if(synapseXPath == null) {
                                                         path = mp.getPathExpression();
-                                                        pathValue = path.toString();
+                                                        if (path != null) {
+                                                            pathValue = path.toString();
+                                                        }
                                                     } else {
                                                         path = synapseXPath;
                                                         pathValue = path.toString();
