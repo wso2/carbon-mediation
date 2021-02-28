@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -66,6 +67,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
     private static String FAILED = "failed";
     private static Log log = LogFactory.getLog(ProxyServiceAdmin.class);
     private static final String FILE_TYPE_EXTENSION_XML = ".xml";
+    public static final String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
 
     /**
      * Enables statistics for the specified proxy service
@@ -254,8 +256,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                         proxyName) != null) {
                     handleException(log, "A service named " + proxyName + " already exists", null);
                 } else {
-                    ProxyService proxy = ProxyServiceFactory.createProxy(proxyServiceElement,
-                            getSynapseConfiguration().getProperties());
+                    // Need to attach synapse configuration to properties to identify synapse imports (Connectors)
+                    // From Synapse level.
+                    Properties properties = getSynapseConfiguration().getProperties();
+                    properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
+                    ProxyService proxy = ProxyServiceFactory.createProxy(proxyServiceElement, properties);
 
                     if (updateMode) {
                         proxy.setFileName(fileName);

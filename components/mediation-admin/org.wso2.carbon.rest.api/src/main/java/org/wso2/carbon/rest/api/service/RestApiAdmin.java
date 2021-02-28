@@ -65,11 +65,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -79,6 +75,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     private static Log log = LogFactory.getLog(RestApiAdmin.class);
     private static final String TENANT_DELIMITER = "/t/";
     private static final String APPLICATION_JSON_TYPE = "application/json";
+    public static final String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
+
     /**
      * Registry path prefixes
      */
@@ -152,7 +150,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             assertNameNotEmpty(apiName);
             
             API oldAPI = null;
-            API api = APIFactory.createAPI(RestApiAdminUtils.retrieveAPIOMElement(apiData));
+            // Need to attach synapse configuration to properties to identify synapse imports (Connectors)
+            // From Synapse level.
+            Properties properties = new Properties();
+            properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
+            API api = APIFactory.createAPI(RestApiAdminUtils.retrieveAPIOMElement(apiData), properties);
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             
             oldAPI = synapseConfiguration.getAPI(apiName);
@@ -197,8 +199,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (nameAttribute == null || nameAttribute.getAttributeValue().trim().isEmpty()) {
             	apiElement.addAttribute("name", apiName, null);
             }
-            
-            API api = APIFactory.createAPI(apiElement);
+
+            // Need to attach synapse configuration to properties to identify synapse imports (Connectors)
+            // From Synapse level.
+            Properties properties = new Properties();
+            properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
+            API api = APIFactory.createAPI(apiElement, properties);
             
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 
@@ -843,9 +849,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 						apiName) != null) {
 					handleException(log, "A service named " + apiName + " already exists", null);
 				} else {
-					API api = APIFactory.createAPI(apiElement);
+                    Properties properties = new Properties();
+                    properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
+                    API api = APIFactory.createAPI(apiElement, properties);
 
-					try {
+                    try {
 						getSynapseConfiguration().addAPI(api.getName(), api);
 
 						//addParameterObserver(api.getName());
