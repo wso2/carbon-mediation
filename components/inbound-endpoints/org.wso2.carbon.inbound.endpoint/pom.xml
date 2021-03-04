@@ -119,6 +119,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
+                            org.wso2.carbon.inbound.endpoint.protocol.websocket,
                             org.wso2.carbon.inbound.endpoint.protocol.http.management,
                             org.wso2.carbon.inbound.endpoint.protocol.http.multitenancy,
                             org.wso2.carbon.inbound.endpoint.protocol.generic,
