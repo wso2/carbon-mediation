@@ -214,7 +214,7 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
                     fullLenthDone = true;
                 }
 
-                if (!fullLenthDone && (!Boolean.TRUE.equals(axis2MC.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED)))) {
+                if (!fullLenthDone && Boolean.TRUE.equals(axis2MC.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
                     RelayUtils.buildMessage(axis2MC, false, bufferedStream);
                 } else if (!fullLenthDone) {
                     IOUtils.write(_transformedOutMessage.toByteArray(), msgContextOutStream);
