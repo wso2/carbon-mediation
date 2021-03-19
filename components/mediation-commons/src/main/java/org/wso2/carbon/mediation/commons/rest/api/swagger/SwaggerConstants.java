@@ -65,6 +65,12 @@ public class SwaggerConstants {
 
     static final String SERVERS = "servers";
 
+    static final String VARIABLES = "variables";
+
+    static final String DEFAULT_CONTEXT = "/default";
+
+    static final String TEMPLATE_REGEX = "\\{(.*?)\\}";
+
     static final String  URL = "url";
     /**
      * Swagger element "info" in http://swagger.io/specification/

@@ -61,6 +61,14 @@ public class RestApiAdminUnitTest extends TestCase {
         assertEquals("Resource count mismatch", 3, api.getResources().length);
     }
 
+    public void testAPIFromSwaggerWithTemplatedServers() throws IOException, APIException, XMLStreamException {
+        String fileContent = readResourceFile("TestSwagger2.yaml");
+        String result = restApiAdmin.generateAPIFromSwagger(fileContent, false);
+        OMElement omElement = AXIOMUtil.stringToOM(result);
+        API api = APIFactory.createAPI(omElement);
+        assertEquals("Mismatch in the API context", "/v2/bla/test1/hello", api.getContext());
+    }
+
     // Test OpenApi definition generating from an API with context version strategy.
     public void testSwaggerFromAPIWithContextVersion() throws IOException, XMLStreamException, APIException {
         String fileContent = readResourceFile("firstApi.xml");
