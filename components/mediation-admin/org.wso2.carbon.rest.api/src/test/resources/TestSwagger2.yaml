@@ -1,0 +1,51 @@
+---
+openapi: 3.0.1
+info:
+  title: firstApi
+  description: API Definition of firstApi
+  version: 1.2.3
+servers:
+  - url: https://{customerId}.saas-app.com:{port}/v2/bla/{test}/hello
+    variables:
+      customerId:
+        default: demo
+        description: Customer ID assigned by the service provider
+      port:
+        enum:
+          - '443'
+          - '8443'
+        default: '443'
+      test:
+        default: test1
+paths:
+  "/addUser":
+    post:
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+        required: false
+      responses:
+        default:
+          description: Default response
+  "/getUser/{userId}":
+    get:
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: Default response
+  "/":
+    get:
+      responses:
+        default:
+          description: Default response
