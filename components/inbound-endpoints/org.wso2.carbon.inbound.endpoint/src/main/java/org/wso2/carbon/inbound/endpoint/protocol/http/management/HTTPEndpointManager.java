@@ -148,7 +148,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                 return false;
             }
         } else if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
-            if (epName.equalsIgnoreCase(name) ) {
+            if (epName.equalsIgnoreCase(name)) {
                 applyConfiguration(config, tenantDomain, port);
                 log.info(epName + " Endpoint is already started in port : " + port);
             }else{
