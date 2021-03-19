@@ -137,8 +137,18 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
         String epName = dataStore.getListeningEndpointName(port, tenantDomain);
 
-        if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
-            if(epName != null && epName.equalsIgnoreCase(name) ){
+        if (epName == null) {
+            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name,
+                    params);
+            boolean start = startSSLListener(port, name, sslConfiguration, params);
+            if (start) {
+                applyConfiguration(config, tenantDomain, port);
+            } else {
+                dataStore.unregisterListeningEndpoint(port, tenantDomain);
+                return false;
+            }
+        } else if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
+            if (epName.equalsIgnoreCase(name)) {
                 applyConfiguration(config, tenantDomain, port);
                 log.info(epName + " Endpoint is already started in port : " + port);
             }else{
@@ -147,7 +157,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                 throw new SynapseException(msg);
             }
         } else {
-            if(epName != null && epName.equalsIgnoreCase(name)){
+            if (epName.equalsIgnoreCase(name)) {
                 log.info(epName + " Endpoint is already registered in registry");
             }else{
                 dataStore.registerSSLListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name,
