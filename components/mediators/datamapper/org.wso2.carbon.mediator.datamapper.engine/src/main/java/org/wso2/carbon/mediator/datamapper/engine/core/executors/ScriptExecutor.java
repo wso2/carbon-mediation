@@ -77,43 +77,15 @@ public class ScriptExecutor implements Executor {
     public Model execute(MappingResource mappingResource, String inputVariable, String properties)
             throws JSException, SchemaException {
         try {
-            JSFunction jsFunction = mappingResource.getFunction();
-            // Compile Data-mapper JS function body
-            if (jsFunction.getCompiledBody() == null) {
-                if (scriptEngine instanceof Compilable) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Script engine supports Compilable interface, " +
-                                "compiling script code..");
-                    }
-                    jsFunction.setCompiledBody(((Compilable) scriptEngine).compile(jsFunction.getFunctionBody()));
-                }
-            }
-            // Compile Data-mapper JS function name
-            if (jsFunction.getCompiledName() == null) {
-                if (scriptEngine instanceof Compilable) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Script engine supports Compilable interface, " +
-                                "compiling script code..");
-                    }
-                    jsFunction.setCompiledName(((Compilable) scriptEngine).compile(jsFunction.getFunctionName()));
-                }
-            }
-
             // Compile Data-mapper JS function binding helper
             String helperJSFunction = "var " + PROPERTIES_OBJECT_NAME + " = JSON.parse(" + PROPERTIES_IDENTIFIER + ");\n" +
                     "var " + getInputVariable(mappingResource.getInputSchema().getName()) + " = JSON.parse(" + INPUT_VARIABLE_IDENTIFIER + ");\n";
-            if (jsFunction.getBindingHelperFunction() == null) {
-                if (scriptEngine instanceof Compilable) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Script engine supports Compilable interface, " +
-                                "compiling script code..");
-                    }
-                    jsFunction.setBindingHelperFunction(((Compilable) scriptEngine).compile(helperJSFunction));
-                }
-            }
 
             bindings.put(PROPERTIES_IDENTIFIER, properties);
             bindings.put(INPUT_VARIABLE_IDENTIFIER, inputVariable);
+
+            // Get the updated function
+            JSFunction jsFunction = mappingResource.getFunction();
 
             if (jsFunction.getBindingHelperFunction() != null) {
                 jsFunction.getBindingHelperFunction().eval(bindings);
