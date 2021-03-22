@@ -45,13 +45,20 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
+import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutor;
+import org.wso2.carbon.mediator.datamapper.engine.core.mapper.JSFunction;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.XSLTMappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.XSLTMappingResource;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.xml.sax.SAXException;
 
+import javax.script.Compilable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -60,6 +67,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +83,10 @@ import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorC
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_HEADERS;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
+import static org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutor.INPUT_VARIABLE_IDENTIFIER;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
 
 /**
  * By using the input schema, output schema and mapping configuration,
@@ -88,6 +100,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private static final String cSVToXMLClosingTag = "</text>";
     private static final int INDEX_OF_CONTEXT = 0;
     private static final int INDEX_OF_NAME = 1;
+    private static List<JSFunction> compiledFunctionList = new ArrayList<>();
     private Value mappingConfigurationKey = null;
     private Value inputSchemaKey = null;
     private Value outputSchemaKey = null;
@@ -380,6 +393,41 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
                 String dmExecutorPoolSize = SynapsePropertiesLoader
                         .getPropertyValue(ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
+                if (!compiledFunctionList.contains(mappingResource.getFunction())) {
+                    synchronized (this) {
+                        // Only the first thread inside the sync block should pre-compile the script.
+                        if (!compiledFunctionList.contains(mappingResource.getFunction())) {
+                            try {
+                                ScriptEngine scriptEngine = getScriptExecutor();
+                                JSFunction jsFunction = mappingResource.getFunction();
+                                String helperJSFunction = "var " + PROPERTIES_OBJECT_NAME + " = JSON.parse(" + ScriptExecutor.PROPERTIES_IDENTIFIER + ");\n" +
+                                        "var " + getInputVariable(mappingResource.getInputSchema().getName()) + " = JSON.parse(" + INPUT_VARIABLE_IDENTIFIER + ");\n";
+                                // Compile Data-mapper JS function body
+                                if (jsFunction.getCompiledBody() == null) {
+                                    if (scriptEngine instanceof Compilable) {
+                                        jsFunction.setCompiledBody(((Compilable) scriptEngine).compile(jsFunction.getFunctionBody()));
+                                    }
+                                }
+                                // Compile Data-mapper JS function name
+                                if (jsFunction.getCompiledName() == null) {
+                                    if (scriptEngine instanceof Compilable) {
+                                        jsFunction.setCompiledName(((Compilable) scriptEngine).compile(jsFunction.getFunctionName()));
+                                    }
+                                }
+                                if (jsFunction.getBindingHelperFunction() == null) {
+                                    if (scriptEngine instanceof Compilable) {
+                                        jsFunction.setBindingHelperFunction(((Compilable) scriptEngine).compile(helperJSFunction));
+                                    }
+                                }
+                                // setting the pre-compiled function from the first thread
+                                mappingResource.setFunction(jsFunction);
+                                compiledFunctionList.add(jsFunction);
+                            } catch (ScriptException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
 
                 MappingHandler mappingHandler = new MappingHandler(mappingResource, inputType, outputType,
                         dmExecutorPoolSize);
@@ -694,5 +742,19 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             propertiesMap.put(contextAndName[INDEX_OF_CONTEXT], insideMap);
         }
         insideMap.put(contextAndName[INDEX_OF_NAME], value);
+    }
+
+    private String getInputVariable(String inputSchemaName) throws ScriptException {
+        return "input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_')
+                .replace(HYPHEN, ENCODE_CHAR_HYPHEN);
+    }
+
+    private ScriptEngine getScriptExecutor() {
+
+        String javaVersion = System.getProperty("java.version");
+        if (javaVersion.startsWith("1.7") || javaVersion.startsWith("1.6")) {
+            return new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+        }
+        return new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
     }
 }

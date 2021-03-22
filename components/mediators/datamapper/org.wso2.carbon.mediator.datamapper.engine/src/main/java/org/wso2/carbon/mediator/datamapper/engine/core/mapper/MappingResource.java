@@ -85,6 +85,10 @@ public class MappingResource {
         return function;
     }
 
+    public void setFunction(JSFunction function) {
+        this.function = function;
+    }
+
     /**
      * propertiesList contains a list of WSO2 ESB Properties used in the Data Mapper Mapping configuration.
      * These will be extracted by processing the mapping configuration file and will be included as Strings
