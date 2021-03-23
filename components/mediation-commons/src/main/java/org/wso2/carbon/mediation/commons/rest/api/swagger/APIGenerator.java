@@ -203,25 +203,30 @@ public class APIGenerator {
      * @throws APIGenException
      */
     public API generateSynapseAPI(API existingAPI) throws APIGenException {
+        String apiContext;
         if (swaggerJson.get(SwaggerConstants.SERVERS) == null ||
                 swaggerJson.get(SwaggerConstants.SERVERS).getAsJsonArray().size() == 0) {
-            throw new APIGenException("The \"servers\" section of the swagger definition is mandatory for API " +
-                    "generation");
+            apiContext = SwaggerConstants.DEFAULT_CONTEXT;
+        } else {
+            // get the first path in the servers section
+            String serversString =
+                    swaggerJson.getAsJsonArray(SwaggerConstants.SERVERS).get(0).getAsJsonObject()
+                            .get(SwaggerConstants.URL).getAsString();
+            try {
+                URL url = new URL(serversString);
+                apiContext = url.getPath();
+            } catch (MalformedURLException e) {
+                // url can be relative the place where the swagger is hosted.
+                apiContext = serversString;
+            }
         }
-        // get the first path in the servers section
-        String serversString =
-                swaggerJson.getAsJsonArray(SwaggerConstants.SERVERS).get(0).getAsJsonObject().get(SwaggerConstants.URL)
-                        .getAsString();
-        URL url = null;
-        try {
-            url = new URL(serversString);
-        } catch (MalformedURLException e) {
-            log.error("Error occurred while parsing the URL " + serversString, e);
-        }
-        String apiContext = url.getPath();
         //cleanup context : remove ending '/'
         if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
             apiContext = apiContext.substring(0, apiContext.length() - 1);
+        }
+        // add leading / if not exists
+        if (!apiContext.startsWith("/")) {
+            apiContext = "/" + apiContext;
         }
 
         if (swaggerJson.get(SwaggerConstants.INFO) == null) {
