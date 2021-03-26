@@ -25,13 +25,12 @@ import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
-import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
+import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Collection;
-
 
 /**
  * Listener class for HttpInboundEndpoint which is trigger by inbound core and
@@ -46,11 +45,12 @@ public class InboundHttpListener implements InboundRequestProcessor {
     private InboundProcessorParams processorParams;
 
     public InboundHttpListener(InboundProcessorParams params) {
+
         processorParams = params;
         String portParam = params.getProperties().getProperty(
                 InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
         try {
-            port = Integer.parseInt(portParam);
+            port = Integer.parseInt(portParam) + PersistenceUtils.getPortOffset();
         } catch (NumberFormatException e) {
             handleException("Please provide port number as integer  instead of  port  " + portParam, e);
         }
@@ -59,9 +59,10 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     @Override
     public void init() {
+
         if (isPortUsedByAnotherApplication(port)) {
             log.warn("Port " + port + " used by inbound endpoint " + name + " is already used by another application " +
-                     "hence undeploying inbound endpoint");
+                    "hence undeploying inbound endpoint");
             throw new SynapseException("Port " + port + " used by inbound endpoint " + name + " is already used by " +
                     "another application.");
         } else {
@@ -71,19 +72,21 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     @Override
     public void destroy() {
+
         HTTPEndpointManager.getInstance().closeEndpoint(port);
     }
 
     protected void handleException(String msg, Exception e) {
+
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
 
-
     protected boolean isPortUsedByAnotherApplication(int port) {
-        if (PassThroughInboundEndpointHandler.isEndpointRunning(port) ){
+
+        if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             return false;
-        }  else {
+        } else {
             try {
                 ServerSocket srv = new ServerSocket(port);
                 srv.close();
@@ -95,15 +98,16 @@ public class InboundHttpListener implements InboundRequestProcessor {
         }
     }
 
-    protected void destoryInbound(){
+    protected void destoryInbound() {
+
         if (processorParams.getSynapseEnvironment() != null) {
             Collection<InboundEndpoint> inboundEndpoints = processorParams.getSynapseEnvironment().
-                       getSynapseConfiguration().getInboundEndpoints();
+                    getSynapseConfiguration().getInboundEndpoints();
             {
                 for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
                     if (inboundEndpoint.getName().equals(name)) {
                         processorParams.getSynapseEnvironment().
-                                   getSynapseConfiguration().removeInboundEndpoint(name);
+                                getSynapseConfiguration().removeInboundEndpoint(name);
                         break;
                     }
                 }
