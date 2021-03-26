@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.core.RegistryResources;
@@ -30,13 +31,13 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
 
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.xml.stream.XMLStreamException;
 
 public class InboundEndpointsDataStore {
 
@@ -47,12 +48,14 @@ public class InboundEndpointsDataStore {
     private Map<String,Set<String>> endpointPollingInfo;
     private Registry registry = null;
     private final String rootPath = RegistryResources.ROOT + "esb/inbound/inbound-endpoints/";
-
+    public static final String STORE_ARTIFACTS_IN_REGISTRY = "synapse.artifacts.registry.storage.enabled";
     private static InboundEndpointsDataStore instance = new InboundEndpointsDataStore();
 
     public static InboundEndpointsDataStore getInstance() {
         return instance;
     }
+    private boolean saveInboundEndpointInRegistry =
+            SynapsePropertiesLoader.getBooleanProperty(STORE_ARTIFACTS_IN_REGISTRY, false);
 
     private InboundEndpointsDataStore() {
         try {
@@ -60,7 +63,7 @@ public class InboundEndpointsDataStore {
         } catch (RegistryException e) {
             handleException("Error while obtaining a registry instance", e);
         }
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) || saveInboundEndpointInRegistry) {
             try {
                 Resource fetchedResource = registry.get(rootPath);
                 if (fetchedResource != null) {
@@ -126,7 +129,7 @@ public class InboundEndpointsDataStore {
             endpointListeningInfo.put(port, tenantList);
         }
         tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name, params));
-        if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) || saveInboundEndpointInRegistry) {
             updateRegistry();
         }
     }
@@ -145,7 +148,7 @@ public class InboundEndpointsDataStore {
         }
         lNames.add(name);
         endpointPollingInfo.put(tenantDomain, lNames);
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) || saveInboundEndpointInRegistry) {
             updateRegistry();
         }
     }
@@ -170,7 +173,7 @@ public class InboundEndpointsDataStore {
         InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, params);
         inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
         tenantList.add(inboundEndpointInfoDTO);
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) || saveInboundEndpointInRegistry) {
             updateRegistry();
         }
     }
@@ -213,7 +216,7 @@ public class InboundEndpointsDataStore {
         if (endpointListeningInfo.get(port) != null && endpointListeningInfo.get(port).size() == 0) {
       	  endpointListeningInfo.remove(port);
         }
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) || saveInboundEndpointInRegistry) {
             updateRegistry();
         }
     }
@@ -237,7 +240,7 @@ public class InboundEndpointsDataStore {
             	endpointPollingInfo.remove(tenantDomain);
             }
         }
-        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+        if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode")) || saveInboundEndpointInRegistry) {
             updateRegistry();
         }
     }    
