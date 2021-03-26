@@ -70,5 +70,4 @@ public class InboundHttpConstants {
     public static final String INTERNAL_HTTP_INBOUND_ENDPOINT_NAME = "EI_INTERNAL_HTTP_INBOUND_ENDPOINT";
     public static final String INTERNAL_HTTPS_INBOUND_ENDPOINT_NAME = "EI_INTERNAL_HTTPS_INBOUND_ENDPOINT";
 
-    public static final String INBOUND_ENDPOINT_PARAMETER_HTTP_USE_PORT_OFFSET = "inbound.http.use.port.offset";
 }

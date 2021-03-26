@@ -42,14 +42,9 @@ public class InboundHttpsListener extends InboundHttpListener {
         String portParam = params.getProperties().getProperty(
                 InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
         try {
-            port = Integer.parseInt(portParam);
+            port = Integer.parseInt(portParam) + PersistenceUtils.getPortOffset();
         } catch (NumberFormatException e) {
             handleException("Please provide port number as integer  instead of  port  " + portParam, e);
-        }
-        boolean portOffset = Boolean.parseBoolean(params.getProperties()
-                .getProperty(InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_USE_PORT_OFFSET));
-        if (portOffset) {
-            port += PersistenceUtils.getPortOffset();
         }
         name = params.getName();
         String keyStoreParam = params.getProperties().getProperty(InboundHttpConstants.KEY_STORE);
