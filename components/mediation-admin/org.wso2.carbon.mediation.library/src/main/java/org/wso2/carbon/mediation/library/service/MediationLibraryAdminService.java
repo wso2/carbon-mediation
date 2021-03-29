@@ -72,6 +72,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 	private static Log log = LogFactory.getLog(MediationLibraryAdminService.class);
 
 	public static final int MSGS_PER_PAGE = 10;
+	public static final String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
 
 	/**
 	 * Get an XML configuration element for a message processor from the FE and
@@ -97,6 +98,9 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 				                 getSynapseConfiguration().getSynapseLibraries()
 				                                          .get(synImportQualfiedName);
 				if (synLib != null) {
+					// Need to attach synapse configuration to properties to identify synapse imports (Connectors)
+					// From Synapse level.
+					synLib.getArtifacts().put(SYNAPSE_CONFIGURATION, synapseConfiguration);
 					LibDeployerUtils.loadLibArtifacts(synapseImport, synLib);
 				}
 				if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
@@ -447,11 +451,13 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 				if (ServiceBusConstants.ENABLED.equals(status)) {
 					synapseImport.setStatus(true);
 					synLib.setLibStatus(true);
+					synLib.getArtifacts().put(SYNAPSE_CONFIGURATION, configuration);
 					synLib.loadLibrary();
 					deployingLocalEntries(synLib, configuration);
 				} else {
 					synapseImport.setStatus(false);
 					synLib.setLibStatus(false);
+					synLib.getArtifacts().put(SYNAPSE_CONFIGURATION, configuration);
 					synLib.unLoadLibrary();
 					undeployingLocalEntries(synLib, configuration);
 				}

@@ -504,7 +504,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                 } else {
                     // we should first try to build the new sequence. if exception we return
                     Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(
-                            sequenceElement, getSynapseConfiguration().getProperties());
+                            sequenceElement, getSynapseConfiguration().getProperties(), getSynapseConfiguration());
 
                     boolean statisticsEnable = preSeq.isStatisticsEnable();
                     // if everything went successfully we remove the sequence
