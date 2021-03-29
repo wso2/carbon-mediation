@@ -19,28 +19,27 @@ package org.wso2.carbon.inbound.endpoint.protocol.websocket.management;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
-import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketSourceHandler;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConfiguration;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketEventExecutor;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketChannelInitializer;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.SubprotocolBuilderUtil;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketChannelInitializer;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConfiguration;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketEventExecutor;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketSourceHandler;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.PipelineHandlerBuilderUtil;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.SubprotocolBuilderUtil;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.configuration.NettyThreadPoolConfiguration;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -187,42 +186,40 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         return true;
     }
 
-    public void closeEndpoint(int port) {
+    public void broadcastShutDownToSubscriber(String endpointName, InboundProcessorParams processorParams) {
+
         if (sourceHandler != null) {
             WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-            String endpointName =
-                    WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
-                            sourceHandler.getTenantDomain());
-            Integer shutdownStatusCode;
-            String shutdownStatusMessage;
-            try {
-                MessageContext synCtx = sourceHandler.getSynapseMessageContext(sourceHandler.getTenantDomain());
-                InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
+            int shutdownStatusCode = 1001;
+            String shutdownStatusMessage = null;
+            String shutdownStatusCodeValue = null;
+            InboundEndpoint endpoint =
+                    processorParams.getSynapseEnvironment().getSynapseConfiguration().getInboundEndpoint(endpointName);
+            if (endpoint != null) {
                 shutdownStatusMessage = endpoint.getParametersMap().get("ws.shutdown.status.message");
-
-                String shutdownStatusCodeValue = endpoint.getParametersMap().get("ws.shutdown.status.code");
-                if (shutdownStatusCodeValue != null) {
-                    try {
-                        shutdownStatusCode = Integer.parseInt(shutdownStatusCodeValue);
-                    } catch (NumberFormatException ex) {
-                        log.warn("Please specify a valid Integer for \"ws.shutdown.status.code\" parameter. Assigning"
-                                + " the default value 1001");
-                        shutdownStatusCode = 1001;
-                    }
-                } else {
-                    shutdownStatusCode = 1001;
-                }
-
-                if (shutdownStatusMessage == null) {
-                    shutdownStatusMessage = "shutdown";
-                }
-            } catch (AxisFault fault) {
-                log.error("Error while getting synapse message context. "+ fault);
-                throw new SynapseException(fault);
+                shutdownStatusCodeValue = endpoint.getParametersMap().get("ws.shutdown.status.code");
             }
-            pathManager.broadcastOnSubscriberPath(new CloseWebSocketFrame(shutdownStatusCode, shutdownStatusMessage),
-                    endpointName, sourceHandler.getSubscriberPath());
+            if (shutdownStatusCodeValue != null) {
+                try {
+                    shutdownStatusCode = Integer.parseInt(shutdownStatusCodeValue);
+                } catch (NumberFormatException ex) {
+                    log.warn("Please specify a valid Integer for \"ws.shutdown.status.code\" parameter. Assigning"
+                                     + " the default value 1001");
+                }
+            }
+            if (shutdownStatusMessage == null) {
+                shutdownStatusMessage = "shutdown";
+            }
+            URI subscriber = sourceHandler.getSubscriber();
+            if (subscriber != null) {
+                pathManager.broadcastOnSubscriberPath(
+                        new CloseWebSocketFrame(shutdownStatusCode, shutdownStatusMessage), endpointName,
+                        sourceHandler.getSubscriberPath());
+            }
         }
+    }
+
+    public void closeEndpoint(int port) {
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
         dataStore.unregisterListeningEndpoint(port, tenantDomain);
@@ -233,7 +230,6 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         } else if (dataStore.isEndpointRegistryEmpty(port)) {
             WebsocketEventExecutorManager.getInstance().shutdownExecutor(port);
         }
-
     }
 
     public InboundWebsocketConfiguration buildConfiguration(int port, String name, InboundProcessorParams params) {
