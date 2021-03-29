@@ -41,7 +41,6 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketS
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -191,20 +190,11 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
 
         if (sourceHandler != null) {
             WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-            int shutdownStatusCode;
+            int shutdownStatusCode = 1001;
             String shutdownStatusMessage = null;
             String shutdownStatusCodeValue = null;
-            InboundEndpoint endpoint = null;
-            if (processorParams.getSynapseEnvironment() != null) {
-                Collection<InboundEndpoint> inboundEndpoints = processorParams.getSynapseEnvironment().
-                        getSynapseConfiguration().getInboundEndpoints();
-                for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
-                    if (inboundEndpoint.getName().equals(endpointName)) {
-                        endpoint = inboundEndpoint;
-                        break;
-                    }
-                }
-            }
+            InboundEndpoint endpoint =
+                    processorParams.getSynapseEnvironment().getSynapseConfiguration().getInboundEndpoint(endpointName);
             if (endpoint != null) {
                 shutdownStatusMessage = endpoint.getParametersMap().get("ws.shutdown.status.message");
                 shutdownStatusCodeValue = endpoint.getParametersMap().get("ws.shutdown.status.code");
@@ -215,10 +205,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                 } catch (NumberFormatException ex) {
                     log.warn("Please specify a valid Integer for \"ws.shutdown.status.code\" parameter. Assigning"
                                      + " the default value 1001");
-                    shutdownStatusCode = 1001;
                 }
-            } else {
-                shutdownStatusCode = 1001;
             }
             if (shutdownStatusMessage == null) {
                 shutdownStatusMessage = "shutdown";
