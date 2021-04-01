@@ -98,7 +98,7 @@ public class RestApiAdminUnitTest extends TestCase {
         OMElement omElement = AXIOMUtil.stringToOM(fileContent);
         API oldApi = APIFactory.createAPI(omElement);
         fileContent = readResourceFile("ChangeApiSwagger.json");
-        String newApiStr = restApiAdmin.generateUpdatedAPIFromSwagger(fileContent, oldApi);
+        String newApiStr = restApiAdmin.generateUpdatedAPIFromSwaggerForAPI(fileContent, oldApi);
         omElement = AXIOMUtil.stringToOM(newApiStr);
         API newApi = APIFactory.createAPI(omElement);
         Assert.assertEquals("Version update failed", newApi.getVersion(), "1.2.4");

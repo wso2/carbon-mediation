@@ -1122,7 +1122,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @return generated swagger.
      * @throws APIException error occurred while retrieving host details.
      */
-    public String generateSwaggerFromSynapseAPI(API api, boolean isJSON) throws APIException {
+    public String generateSwaggerFromSynapseAPIByFormat(API api, boolean isJSON) throws APIException {
         String swaggerJsonString = "";
         if (log.isDebugEnabled()) {
             log.debug("Generate swagger definition for the API : " + api.getAPIName());
@@ -1144,7 +1144,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @throws APIException
      */
     public String generateSwaggerFromSynapseAPI(API api) throws APIException {
-        return generateSwaggerFromSynapseAPI(api,true);
+        return generateSwaggerFromSynapseAPIByFormat(api,true);
     }
 
     /**
@@ -1155,7 +1155,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @throws APIException error occurred while retrieving host details.
      */
     public String generateAPIFromSwagger(String swaggerJsonString) throws APIException {
-        return generateAPIFromSwagger(swaggerJsonString,true);
+        return generateAPIFromSwaggerByFormat(swaggerJsonString,true);
     }
 
     /**
@@ -1166,7 +1166,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @return generated synapse API.
      * @throws APIException error occurred while retrieving host details.
      */
-    public String generateAPIFromSwagger(String swaggerString, boolean isJSON) throws APIException {
+    public String generateAPIFromSwaggerByFormat(String swaggerString, boolean isJSON) throws APIException {
 
         if (swaggerString == null || swaggerString.isEmpty()) {
             handleException(log, "Swagger provided is empty, hence unable to generate API", null);
@@ -1241,7 +1241,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @return generated synapse API.
      * @throws APIException error occurred while retrieving host details.
      */
-    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, boolean isJSON, API existingApi)
+    public String generateUpdatedAPIFromSwaggerByFormat(String swaggerJsonString, boolean isJSON, API existingApi)
             throws APIException {
 
         if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
@@ -1285,8 +1285,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @return generated synapse API
      * @throws APIException
      */
-    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, API existingApi) throws APIException {
-        return generateUpdatedAPIFromSwagger(swaggerJsonString, true, existingApi);
+    public String generateUpdatedAPIFromSwaggerForAPI(String swaggerJsonString, API existingApi) throws APIException {
+        return generateUpdatedAPIFromSwaggerByFormat(swaggerJsonString, true, existingApi);
     }
 
     /**
