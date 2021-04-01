@@ -72,7 +72,9 @@ public class ExternalVaultConfigLoader {
                 String configsFileAsString = FileUtils.readFileToString(externalVaultFile);
                 vaultConfig = AXIOMUtil.stringToOM(configsFileAsString);
             } else {
-                log.warn("No such file: " + EXTERNAL_VAULTS + " in location " + vaultConfigFilePath);
+                if (log.isDebugEnabled()) {
+                    log.debug("No such file: " + EXTERNAL_VAULTS + " in location " + vaultConfigFilePath);
+                }
             }
         } catch (IOException| XMLStreamException e) {
             log.error("Error while reading the " + EXTERNAL_VAULTS + " file in location + "
