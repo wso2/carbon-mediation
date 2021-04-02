@@ -54,7 +54,7 @@ public class RestApiAdminUnitTest extends TestCase {
 
     public void testAPIFromSwagger() throws IOException, APIException, XMLStreamException {
         String fileContent = readResourceFile("TestSwagger.yaml");
-        String result = restApiAdmin.generateAPIFromSwagger(fileContent, false);
+        String result = restApiAdmin.generateAPIFromSwaggerByFormat(fileContent, false);
         OMElement omElement = AXIOMUtil.stringToOM(result);
         API api = APIFactory.createAPI(omElement);
         assertEquals("Mismatch in the API context", "/first", api.getContext());
@@ -63,7 +63,7 @@ public class RestApiAdminUnitTest extends TestCase {
 
     public void testAPIFromSwaggerWithTemplatedServers() throws IOException, APIException, XMLStreamException {
         String fileContent = readResourceFile("TestSwagger2.yaml");
-        String result = restApiAdmin.generateAPIFromSwagger(fileContent, false);
+        String result = restApiAdmin.generateAPIFromSwaggerByFormat(fileContent, false);
         OMElement omElement = AXIOMUtil.stringToOM(result);
         API api = APIFactory.createAPI(omElement);
         assertEquals("Mismatch in the API context", "/v2/bla/test1/hello", api.getContext());
@@ -98,7 +98,7 @@ public class RestApiAdminUnitTest extends TestCase {
         OMElement omElement = AXIOMUtil.stringToOM(fileContent);
         API oldApi = APIFactory.createAPI(omElement);
         fileContent = readResourceFile("ChangeApiSwagger.json");
-        String newApiStr = restApiAdmin.generateUpdatedAPIFromSwagger(fileContent, oldApi);
+        String newApiStr = restApiAdmin.generateUpdatedAPIFromSwaggerForAPI(fileContent, oldApi);
         omElement = AXIOMUtil.stringToOM(newApiStr);
         API newApi = APIFactory.createAPI(omElement);
         Assert.assertEquals("Version update failed", newApi.getVersion(), "1.2.4");
@@ -145,7 +145,7 @@ public class RestApiAdminUnitTest extends TestCase {
 
     public void testAPIFromSwaggerWithRelativeUrl() throws IOException, APIException, XMLStreamException {
         String fileContent = readResourceFile("TestSwaggerRelativeUrl.yaml");
-        String result = restApiAdmin.generateAPIFromSwagger(fileContent, false);
+        String result = restApiAdmin.generateAPIFromSwaggerByFormat(fileContent, false);
         OMElement omElement = AXIOMUtil.stringToOM(result);
         API api = APIFactory.createAPI(omElement);
         assertEquals("Mismatch in the API context", "/firstRelative", api.getContext());
