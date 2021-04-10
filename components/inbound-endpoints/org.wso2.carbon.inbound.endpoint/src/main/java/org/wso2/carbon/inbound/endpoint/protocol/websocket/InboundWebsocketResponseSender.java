@@ -75,7 +75,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     if (log.isDebugEnabled()) {
                         String customErrorMessage = "errorCode:" + errorCode + " error message: "
                                 + errorMessage;
-                        WebsocketLogUtil.printWebSocketFrame((Logger) log, closeWebSocketFrame,
+                        WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
                                 sourceHandler.getChannelHandlerContext().getChannelHandlerContext(),
                                 customErrorMessage, false);
                     }
@@ -95,7 +95,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     ChannelHandlerContext targetCtx = (ChannelHandlerContext) msgContext
                             .getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDLER_CONTEXT);
                     if (log.isDebugEnabled()) {
-                        WebsocketLogUtil.printWebSocketFrame((Logger) log, new CloseWebSocketFrame(), targetCtx,
+                        WebsocketLogUtil.printWebSocketFrame(log, new CloseWebSocketFrame(), targetCtx,
                                 false);
                     }
                     sourceHandler.getChannelHandlerContext().addCloseListener(targetCtx);
@@ -122,7 +122,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                             String subscriberPath = sourceHandler.getSubscriberPath();
                             WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
                             if (log.isDebugEnabled()) {
-                                WebsocketLogUtil.printWebSocketFrame((Logger) log, frame,
+                                WebsocketLogUtil.printWebSocketFrame(log, frame,
                                         ctx.getChannelHandlerContext(), false);
                             }
                             handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
@@ -139,7 +139,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 String subscriberPath = sourceHandler.getSubscriberPath();
                 WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
                 if (log.isDebugEnabled()) {
-                    WebsocketLogUtil.printWebSocketFrame((Logger) log, frame, ctx.getChannelHandlerContext(),
+                    WebsocketLogUtil.printWebSocketFrame(log, frame, ctx.getChannelHandlerContext(),
                             false);
                 }
                 handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
@@ -165,7 +165,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                             String subscriberPath = sourceHandler.getSubscriberPath();
                             WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
                             if (log.isDebugEnabled()) {
-                                WebsocketLogUtil.printWebSocketFrame((Logger) log, frame,
+                                WebsocketLogUtil.printWebSocketFrame(log, frame,
                                         ctx.getChannelHandlerContext(), false);
                             }
                             handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
@@ -182,7 +182,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 String subscriberPath = sourceHandler.getSubscriberPath();
                 WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
                 if (log.isDebugEnabled()) {
-                    WebsocketLogUtil.printWebSocketFrame((Logger) log, frame, ctx.getChannelHandlerContext(),
+                    WebsocketLogUtil.printWebSocketFrame(log, frame, ctx.getChannelHandlerContext(),
                             false);
                 }
                 handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
@@ -204,7 +204,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                         CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(statusCode,
                                 wsCloseFrameReasonText);
                         if (log.isDebugEnabled()) {
-                            WebsocketLogUtil.printWebSocketFrame((Logger) log, closeWebSocketFrame,
+                            WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
                                     sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
                         }
                         sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
@@ -218,7 +218,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     String subscriberPath = sourceHandler.getSubscriberPath();
                     WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
                     if (log.isDebugEnabled()) {
-                        WebsocketLogUtil.printWebSocketFrame((Logger) log, frame,
+                        WebsocketLogUtil.printWebSocketFrame(log, frame,
                                 sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
                     }
                     handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
