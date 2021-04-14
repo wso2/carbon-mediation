@@ -23,10 +23,12 @@ import org.apache.http.HttpException;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.CorrelationConstants;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.SourceHandler;
 import org.apache.synapse.transport.passthru.SourceRequest;
+import org.apache.synapse.transport.passthru.TargetContext;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
@@ -60,6 +62,13 @@ public class InboundHttpSourceHandler extends SourceHandler {
     @Override
     public void requestReceived(NHttpServerConnection conn) {
         try {
+
+            setCorrelationId(conn);
+            if (sourceConfiguration.isCorrelationLoggingEnabled()) {
+                SourceContext sourceContext = (SourceContext) conn.getContext()
+                        .getAttribute(TargetContext.CONNECTION_INFORMATION);
+                sourceContext.updateLastStateUpdatedTime();
+            }
             //Create Source Request related to HTTP Request
             SourceRequest request = getSourceRequest(conn);
             if (request == null) {
@@ -76,20 +85,22 @@ public class InboundHttpSourceHandler extends SourceHandler {
             String tenantDomain = getTenantDomain(request);
 
             if (tenantDomain != null) {
+                // Need to initialize workerPool only once
                 if (workerPool == null) {
                     lock.lock();
                     try {
                         if (workerPool == null) {
-                            WorkerPoolConfiguration workerPoolConfiguration =
-                                    HTTPEndpointManager.getInstance().getWorkerPoolConfiguration(tenantDomain, port);
+                            WorkerPoolConfiguration workerPoolConfiguration = HTTPEndpointManager.getInstance()
+                                    .getWorkerPoolConfiguration(tenantDomain, port);
                             if (workerPoolConfiguration != null) {
-                                workerPool = sourceConfiguration
-                                        .getWorkerPool(workerPoolConfiguration.getWorkerPoolCoreSize(),
-                                                workerPoolConfiguration.getWorkerPoolSizeMax(),
-                                                workerPoolConfiguration.getWorkerPoolThreadKeepAliveSec(),
-                                                workerPoolConfiguration.getWorkerPoolQueuLength(),
-                                                workerPoolConfiguration.getThreadGroupID(),
-                                                workerPoolConfiguration.getThreadID());
+                                workerPool = sourceConfiguration.getWorkerPool(workerPoolConfiguration.getWorkerPoolCoreSize(),
+                                        workerPoolConfiguration.getWorkerPoolSizeMax(),
+                                        workerPoolConfiguration.getWorkerPoolThreadKeepAliveSec(),
+                                        workerPoolConfiguration.getWorkerPoolQueuLength(),
+                                        workerPoolConfiguration.getThreadGroupID(),
+                                        workerPoolConfiguration.getThreadID());
+                            } else {
+                                workerPool = sourceConfiguration.getWorkerPool();
                             }
                         }
                     } finally {
@@ -97,11 +108,17 @@ public class InboundHttpSourceHandler extends SourceHandler {
                     }
                 }
             }
-            if (workerPool == null) {
-                workerPool = sourceConfiguration.getWorkerPool();
+            Object correlationId = conn.getContext().getAttribute(CorrelationConstants.CORRELATION_ID);
+            if (sourceConfiguration.isCorrelationLoggingEnabled()) {
+                workerPool.execute(
+                        new InboundCorrelationEnabledHttpServerWorker(port, tenantDomain, request,
+                                sourceConfiguration, os,
+                                System.currentTimeMillis(),
+                                correlationId.toString()));
+            } else {
+                workerPool.execute(
+                        new InboundHttpServerWorker(port, tenantDomain, request, sourceConfiguration, os));
             }
-            workerPool.execute
-                    (new InboundHttpServerWorker(port, tenantDomain, request, sourceConfiguration, os));
             //increasing the input request metric
             sourceConfiguration.getMetrics().requestReceived();
         } catch (HttpException e) {
