@@ -61,7 +61,21 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="isTaskLocationKnown">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="processorName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="isActiveResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isTaskLocationKnownResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -305,6 +319,12 @@
     <wsdl:message name="isActiveResponse">
         <wsdl:part name="parameters" element="ns:isActiveResponse"/>
     </wsdl:message>
+    <wsdl:message name="isTaskLocationKnownRequest">
+        <wsdl:part name="parameters" element="ns:isTaskLocationKnown"/>
+    </wsdl:message>
+    <wsdl:message name="isTaskLocationKnownResponse">
+        <wsdl:part name="parameters" element="ns:isTaskLocationKnownResponse"/>
+    </wsdl:message>
     <wsdl:message name="deactivateRequest">
         <wsdl:part name="parameters" element="ns:deactivate"/>
     </wsdl:message>
@@ -406,6 +426,10 @@
         <wsdl:operation name="isActive">
             <wsdl:input message="tns:isActiveRequest" wsaw:Action="urn:isActive"/>
             <wsdl:output message="tns:isActiveResponse" wsaw:Action="urn:isActiveResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isTaskLocationKnown">
+            <wsdl:input message="tns:isTaskLocationKnownRequest" wsaw:Action="urn:isTaskLocationKnown"/>
+            <wsdl:output message="tns:isTaskLocationKnownResponse" wsaw:Action="urn:isTaskLocationKnownResponse"/>
         </wsdl:operation>
         <wsdl:operation name="deactivate">
             <wsdl:input message="tns:deactivateRequest" wsaw:Action="urn:deactivate"/>
@@ -516,6 +540,15 @@
         </wsdl:operation>
         <wsdl:operation name="isActive">
             <soap:operation soapAction="urn:isActive" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isTaskLocationKnown">
+            <soap:operation soapAction="urn:isTaskLocationKnown" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -709,6 +742,15 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="isTaskLocationKnown">
+            <soap12:operation soapAction="urn:isTaskLocationKnown" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="deactivate">
             <soap12:operation soapAction="urn:deactivate" style="document"/>
             <wsdl:input>
@@ -888,6 +930,15 @@
         </wsdl:operation>
         <wsdl:operation name="isActive">
             <http:operation location="isActive"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isTaskLocationKnown">
+            <http:operation location="isTaskLocationKnown"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>

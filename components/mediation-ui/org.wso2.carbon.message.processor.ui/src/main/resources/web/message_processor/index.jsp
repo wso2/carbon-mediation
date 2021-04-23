@@ -350,96 +350,118 @@
             } else if ("Scheduled Message Forwarding Processor".
                     equalsIgnoreCase(type)) {
             %>
-            <td>
-                <% if (mspData.getArtifactContainerName() != null) { %>
-               <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
-                  class="icon-link"
-                  style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                  key="edit"/></a>
-               <a href="#" onclick="#"
-                  id="delete_link" class="icon-link"
-                  style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
-                  key="delete"/></a>
+                <% if (client.isTaskLocationKnown(name)) {%>
+                    <td>
+                        <% if (mspData.getArtifactContainerName() != null) { %>
+                        <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                key="edit"/></a>
+                        <a href="#" onclick="#"
+                           id="delete_link" class="icon-link"
+                           style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                                key="delete"/></a>
+                        <% } else { %>
+                        <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                key="edit"/></a>
+                        <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
+                           id="delete_link" class="icon-link"
+                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                key="delete"/></a>
+                        <% } %>
 
+                        <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
+                            <fmt:message key="inactive"/>&nbsp;[</span>
+                            <a href="#" class="icon-link" id="activate_link"
+                               style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                               onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
+                            <span class="icon-text"
+                               style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">|</span>
+                            <a href="#" class="icon-link" id="activate_link"
+                               style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                               onclick="viewMessage('<%= mspData.getName()%>')">View Message</a>
+                        <span class="icon-text"
+                              style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
+                    </td>
                 <% } else { %>
-                <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
-                   class="icon-link"
-                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                        key="edit"/></a>
-                <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
-                   id="delete_link" class="icon-link"
-                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                        key="delete"/></a>
+                    <td>
+                        <span class="icon-text" style="background-image:url(../message_processor/images/warning.gif);">
+                            <fmt:message key="inconsistent"/>
+                        </span>
+                    </td>
                 <% } %>
-
-                <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
-                    <fmt:message key="inactive"/>&nbsp;[</span>
-                    <a href="#" class="icon-link" id="activate_link"
-                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
-                    <span class="icon-text"
-                      style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">|</span>
-                    <a href="#" class="icon-link" id="activate_link"
-                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                       onclick="viewMessage('<%= mspData.getName()%>')">View Message</a>
-                <span class="icon-text"
-                      style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
-
-            </td>
             <%
              } else if ("Scheduled Failover Message Forwarding Processor".
                                 equalsIgnoreCase(type)) {
              %>
-                <td><a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
-                        class="icon-link"
-                        style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                        key="edit"/></a>
-                    <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
-                       id="delete_link" class="icon-link"
-                       style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                       key="delete"/></a>
-                    <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
-                    <fmt:message key="inactive"/>&nbsp;[</span>
-                    <a href="#" class="icon-link" id="activate_link"
-                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
-                    <span class="icon-text"
-                          style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
-                </td>
-            <%
+                 <% if (client.isTaskLocationKnown(name)) {%>
+                     <td><a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
+                             class="icon-link"
+                             style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                             key="edit"/></a>
+                         <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
+                            id="delete_link" class="icon-link"
+                            style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                            key="delete"/></a>
+                         <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
+                         <fmt:message key="inactive"/>&nbsp;[</span>
+                         <a href="#" class="icon-link" id="activate_link"
+                            style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                            onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
+                         <span class="icon-text"
+                               style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
+                     </td>
+                 <% } else { %>
+                     <td>
+                         <span class="icon-text" style="background-image:url(../message_processor/images/warning.gif);">
+                             <fmt:message key="inconsistent"/>
+                         </span>
+                     </td>
+                 <% } %>
+             <%
             } else if ("Message Sampling Processor".
                     equalsIgnoreCase(type)) {
             %>
-            <td>
-                <% if (mspData.getArtifactContainerName() != null) { %>
-                <a onclick="editRow('<%= type%>', '<%= mspData.getName()%>')" href="#"
-                   class="icon-link"
-                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                        key="edit"/></a>
-                <a href="#" onclick="#"
-                   id="delete_link" class="icon-link"
-                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
-                        key="delete"/></a>
-                <% } else { %>
-                <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
-                   class="icon-link"
-                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                        key="edit"/></a>
-                <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
-                   id="delete_link" class="icon-link"
-                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                        key="delete"/></a>
-                <% } %>
-                <span class="icon-text"
-                       style="background-image:url(../message_processor/images/deactivate.gif);">
-                    <fmt:message key="inactive"/>&nbsp;[</span>
-                    <a href="#" class="icon-link" id="activate_link"
-                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
-                <span class="icon-text"
-                      style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
+                <% if (client.isTaskLocationKnown(name)) {%>
+                    <td>
+                        <% if (mspData.getArtifactContainerName() != null) { %>
+                        <a onclick="editRow('<%= type%>', '<%= mspData.getName()%>')" href="#"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                key="edit"/></a>
+                        <a href="#" onclick="#"
+                           id="delete_link" class="icon-link"
+                           style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                                key="delete"/></a>
+                        <% } else { %>
+                        <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                key="edit"/></a>
+                        <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
+                           id="delete_link" class="icon-link"
+                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                key="delete"/></a>
+                        <% } %>
+                        <span class="icon-text"
+                               style="background-image:url(../message_processor/images/deactivate.gif);">
+                            <fmt:message key="inactive"/>&nbsp;[</span>
+                            <a href="#" class="icon-link" id="activate_link"
+                               style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                               onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
+                        <span class="icon-text"
+                              style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
-            </td>
+                    </td>
+                <% } else { %>
+                    <td>
+                        <span class="icon-text" style="background-image:url(../message_processor/images/warning.gif);">
+                            <fmt:message key="inconsistent"/>
+                        </span>
+                    </td>
+                <% } %>
             <%} else { %>
             <td><a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
                    class="icon-link"
