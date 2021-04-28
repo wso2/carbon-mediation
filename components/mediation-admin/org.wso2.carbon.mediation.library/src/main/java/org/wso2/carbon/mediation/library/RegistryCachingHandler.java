@@ -96,7 +96,8 @@ public class RegistryCachingHandler extends Handler {
      * @param requestContext      path to the resource
      */
     private void resolveRegistryPathAndClear(RequestContext requestContext) {
-        String resourcePath = requestContext.getResourcePath().getPath();
+        String resourcePath = requestContext.getResourcePath() != null ?
+                requestContext.getResourcePath().getPath() : requestContext.getSourcePath();
         ConfigHolder configHolder = ConfigHolder.getInstance();
         if (configHolder.isSynapseConfigurationInitialized()) {
             try {
