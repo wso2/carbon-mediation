@@ -204,6 +204,12 @@
     String description = "";
     String properties = "";
 
+    String clientId = "";
+    String clientSecret = "";
+    String refreshToken = "";
+    String tokenURL = "";
+    String requestParametersMap = "";
+
     if (endpoint != null) {
         // Endpoint Name
         if (endpoint.getEndpointName() != null) {
@@ -317,6 +323,14 @@
         if (endpoint.getProperties() != null && endpoint.getProperties() != "") {
             properties = endpoint.getProperties();
         }
+
+        // oauth
+        clientId = endpoint.getClientId();
+        clientSecret = endpoint.getClientSecret();
+        refreshToken = endpoint.getRefreshToken();
+        tokenURL = endpoint.getTokenURL();
+        requestParametersMap = endpoint.getRequestParametersAsString();
+
     } else {
         if (isFromTemplateEditor) { // set default variables to template fields
             if (httpEpName.equals("")) {
@@ -656,7 +670,24 @@
                   cols="100" rows="3"><%=description%>
         </textarea>
     </td>
-</tr>
+    </tr>
+    <tr style="display:none;">
+        <td>
+            <input type="text" id="clientId" name="clientId" value="<%=clientId%>"></input>
+        </td>
+        <td>
+            <input type="text" id="clientSecret" name="clientSecret" value="<%=clientSecret%>"></input>
+        </td>
+        <td>
+            <input type="text" id="refreshToken" name="refreshToken" value="<%=refreshToken%>"></input>
+        </td>
+        <td>
+            <input type="text" id="tokenURL" name="tokenURL" value="<%=tokenURL%>"></input>
+        </td>
+        <td>
+            <input type="text" id="requestParametersMap" name="requestParametersMap" value="<%=requestParametersMap%>"></input>
+        </td>
+    </tr>
 </tr>
 </tbody>
 </table>
