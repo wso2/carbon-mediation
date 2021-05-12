@@ -545,7 +545,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
         axis2MsgCtx.setServiceContext(svcCtx);
         axis2MsgCtx.setOperationContext(opCtx);
-        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
             ConfigurationContext tenantConfigCtx =
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
                             axis2MsgCtx.getConfigurationContext());
