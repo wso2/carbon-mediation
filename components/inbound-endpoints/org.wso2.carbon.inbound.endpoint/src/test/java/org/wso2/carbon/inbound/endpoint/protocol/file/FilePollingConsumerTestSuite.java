@@ -24,5 +24,5 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({FilePollingConsumerTest.class, FilePollingConsumerParameterizedTest.class})
 public class FilePollingConsumerTestSuite {
-    //This will run all the tests related to the File Inbound
+    //This will run all the test classes related to the File Inbound
 }

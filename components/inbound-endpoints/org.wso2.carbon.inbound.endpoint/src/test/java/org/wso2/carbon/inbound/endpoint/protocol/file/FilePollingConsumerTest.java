@@ -35,9 +35,9 @@ import java.util.Properties;
 public class FilePollingConsumerTest {
 
     /**
-     * infileUri = plain
+     * transport.vfs.FileURI = <in_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testPollingFilesInParent() throws IOException {
@@ -50,25 +50,26 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
+     * transport.vfs.FileURI = <in_location>/*
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testPollingFilesInParentWithSubDirectorySupport() throws IOException {
 
         String path = getInFilePath("testFilesInParent");
         createFilesInPath(path);
-        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(path), ".*.txt", null, null, null, false);
+        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(path), ".*.txt", null, null,
+                                                       null, false);
         Assert.assertEquals(2, fileInjectHandler.getFileNames().size());
     }
 
     /**
-     * infileUri = plain
-     * action after process = move
-     * out file uri = plain
+     * transport.vfs.FileURI = <in_location>
+     * transport.vfs.ActionAfterProcess = MOVE
+     * transport.vfs.MoveAfterProcess = <out_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterPollingFilesInParent() throws IOException {
@@ -83,11 +84,11 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = plain
-     * action after failure = move
-     * fail file uri = plain
+     * transport.vfs.FileURI = <in_location>
+     * transport.vfs.ActionAfterFailure = MOVE
+     * transport.vfs.MoveAfterFailure = <fail_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterFailurePollingFilesInParent() throws IOException {
@@ -104,9 +105,9 @@ public class FilePollingConsumerTest {
 
 
     /**
-     * infileUri = /*
+     * transport.vfs.FileURI = <in_location>/*
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testPollingFilesInChild() throws IOException {
@@ -127,9 +128,9 @@ public class FilePollingConsumerTest {
 
     /**
      * This is written to test backward compatibility.
-     * in file uri = plain
+     * transport.vfs.FileURI = <in_location>
      *
-     * @throws IOException If an error occurs during reading files
+     * @throws IOException if an error occurs while creating the required directory structure If an error occurs during reading files
      */
     @Test
     public void testPollingFilesSkippingChildren() throws IOException {
@@ -148,11 +149,11 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
-     * action after process = move
-     * out file uri = plain
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterProcess = MOVE
+     * transport.vfs.MoveAfterProcess = <out_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterPollingFilesInChild() throws IOException {
@@ -167,7 +168,8 @@ public class FilePollingConsumerTest {
         Files.createDirectories(Paths.get(child2PathString));
         createFilesInPath(child2PathString);
         String outPath = getOutFilePath("testFilesInChildren");
-        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(inPath), ".*", outPath, null, null, false);
+        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(inPath), ".*", outPath, null,
+                                                       null, false);
         Assert.assertEquals(6, fileInjectHandler.getFileNames().size());
         Assert.assertTrue("a.txt has not been moved correctly.", (Files.exists(Paths.get(outPath + "/a.txt"))));
         Assert.assertTrue("b.txt has not been moved correctly.", (Files.exists(Paths.get(outPath + "/b.txt"))));
@@ -176,11 +178,11 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
-     * action after failure = move
-     * fail file uri = plain
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterFailure = MOVE
+     * transport.vfs.MoveAfterFailure = <fail_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterFailurePollingFilesInChild() throws IOException {
@@ -207,11 +209,11 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
-     * action after process = move
-     * out file uri = /*
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterProcess = MOVE
+     * transport.vfs.MoveAfterProcess = <out_location>/*
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterPollingFilesInChildWithWildCardForMove() throws IOException {
@@ -239,11 +241,11 @@ public class FilePollingConsumerTest {
 
 
     /**
-     * infileUri = /*
-     * action after failure = move
-     * fail file uri = /*
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterFailure = MOVE
+     * transport.vfs.MoveAfterFailure = <fail_location>/*
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterFailurePollingFilesInChildWithWildCardForMove() throws IOException {
@@ -272,10 +274,9 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
-     * action after process = delete
+     * transport.vfs.FileURI = <in_location>/*
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testPollingFilesInChainedChildren() throws IOException {
@@ -289,16 +290,17 @@ public class FilePollingConsumerTest {
         String child2PathString = child1PathString + "/child2/";
         Files.createDirectories(Paths.get(child2PathString));
         createFilesInPath(child2PathString);
-        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(inPath), ".*", null, null, null, false);
+        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(inPath), ".*", null, null,
+                                                       null, false);
         Assert.assertEquals(6, fileInjectHandler.getFileNames().size());
     }
 
     /**
-     * infileUri = /*
-     * action after process = move
-     * out file uri = plain
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterProcess = MOVE
+     * transport.vfs.MoveAfterProcess = <out_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterPollingFilesInChainedChildren() throws IOException {
@@ -314,7 +316,8 @@ public class FilePollingConsumerTest {
         createFilesInPath(child2PathString);
         String outPath = getOutFilePath("testFilesInChildrenRecursively");
 
-        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(inPath), ".*", outPath, null, null, false);
+        TestFileInjectHandler fileInjectHandler = poll(modifyUriToIncludeSubDirectories(inPath), ".*", outPath, null,
+                                                       null, false);
         Assert.assertEquals(6, fileInjectHandler.getFileNames().size());
         Assert.assertTrue("a.txt has not been moved correctly.", (Files.exists(Paths.get(outPath + "/a.txt"))));
         Assert.assertTrue("b.txt has not been moved correctly.", (Files.exists(Paths.get(outPath + "/b.txt"))));
@@ -324,11 +327,11 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
-     * action after failure = move
-     * fail file uri = plain
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterFailure = MOVE
+     * transport.vfs.MoveAfterFailure = <fail_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterFailurePollingFilesInChainedChildren() throws IOException {
@@ -356,11 +359,11 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
-     * action after process = move
-     * out file uri = /*
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterProcess = MOVE
+     * transport.vfs.MoveAfterProcess = <out_location>/*
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterPollingFilesInChainedChildrenWithWildCardForMove() throws IOException {
@@ -390,11 +393,11 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = /*
-     * action after failure = move
-     * fail file uri = /*
+     * transport.vfs.FileURI = <in_location>/*
+     * transport.vfs.ActionAfterFailure = MOVE
+     * transport.vfs.MoveAfterFailure = <fail_location>/*
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testMoveAfterFailurePollingFilesInChainedChildrenWithWildCardForMove() throws IOException {
@@ -424,9 +427,9 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = plain
+     * transport.vfs.FileURI = <in_location>
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test()
     public void testPollingEmptyDirectory() throws IOException {
@@ -439,9 +442,9 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = file
+     * transport.vfs.FileURI = <in_location>/a.txt
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test()
     public void testPollingFileAsUri() throws IOException {
@@ -451,7 +454,7 @@ public class FilePollingConsumerTest {
 
         inPath = inPath + File.separator + "a.txt";
         File textFile = new File(inPath);
-        textFile.createNewFile();
+        assert textFile.createNewFile();
 
         String outPath = getOutFilePath("testFileAsUri");
         TestFileInjectHandler fileInjectHandler = poll(inPath, null, outPath, null, null, false);
@@ -461,9 +464,10 @@ public class FilePollingConsumerTest {
     }
 
     /**
-     * infileUri = plain
+     * transport.vfs.FileURI = <in_location>
+     * transport.vfs.FileSizeLimit = 20
      *
-     * @throws IOException
+     * @throws IOException if an error occurs while creating the required directory structure
      */
     @Test
     public void testPollingFilesWithSizeLimit() throws IOException {
@@ -474,14 +478,14 @@ public class FilePollingConsumerTest {
         //Write content to the small file
         String smallFilePath = inPath + File.separator + "small.txt";
         File smallFile = new File(smallFilePath);
-        smallFile.createNewFile();
+        assert smallFile.createNewFile();
         String smallContent = "Hello World!!!";
         Files.write(smallFile.toPath(), smallContent.getBytes());
 
         //Write content to the small file
         String largeFilePath = inPath + File.separator + "large.txt";
         File largeFile = new File(largeFilePath);
-        smallFile.createNewFile();
+        assert largeFile.createNewFile();
         String largeContent = "Hello World!!!\n"
                               + "Please don't process me because I'm too large to be processed.\n"
                               + "I'm not vey big but they say I'm too much :D";
@@ -495,7 +499,8 @@ public class FilePollingConsumerTest {
         Assert.assertTrue("File exceeding size limit is processed.", (Files.exists(Paths.get(inPath + "/large.txt"))));
     }
 
-    private TestFileInjectHandler poll(String inPath, String fileNamePattern, String moveAfterProcess, String moveAfterFailure, Properties additionalProperties, boolean mockFailure) {
+    private TestFileInjectHandler poll(String inPath, String fileNamePattern, String moveAfterProcess,
+                                       String moveAfterFailure, Properties additionalProperties, boolean mockFailure) {
         Properties vfsProperties = getVfsProperties(inPath, fileNamePattern, moveAfterProcess, moveAfterFailure);
         if (Objects.nonNull(additionalProperties)) {
             vfsProperties.putAll(additionalProperties);
@@ -509,7 +514,8 @@ public class FilePollingConsumerTest {
         return fileInjectHandler;
     }
 
-    private Properties getVfsProperties(String inPath, String fileNamePattern, String moveAfterProcess, String moveAfterFailure) {
+    private Properties getVfsProperties(String inPath, String fileNamePattern, String moveAfterProcess,
+                                        String moveAfterFailure) {
         Properties vfsProperties = new Properties();
         vfsProperties.put(VFSConstants.TRANSPORT_FILE_FILE_URI, inPath);
         if (Objects.nonNull(fileNamePattern)) {
@@ -529,9 +535,9 @@ public class FilePollingConsumerTest {
     private void createFilesInPath(String path) throws IOException {
 
         File textFile = new File(path + File.separator + "a.txt");
-        textFile.createNewFile();
+        assert textFile.createNewFile();
         File textFile2 = new File(path + File.separator + "b.txt");
-        textFile2.createNewFile();
+        assert textFile2.createNewFile();
     }
 
 
@@ -569,7 +575,7 @@ public class FilePollingConsumerTest {
 
     private String getBaseFilePath(String srcPath) {
         ClassLoader classLoader = getClass().getClassLoader();
-        return new File(classLoader.getResource("fileInbound/" + srcPath).getFile()).getAbsolutePath();
+        return new File(Objects.requireNonNull(classLoader.getResource("fileInbound/" + srcPath)).getFile()).getAbsolutePath();
     }
 
     private String modifyUriToIncludeSubDirectories(String inPath) {
