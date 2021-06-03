@@ -16,17 +16,23 @@
 package org.wso2.carbon.endpoint.ui.endpoints.http;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.config.xml.endpoints.DefinitionFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.endpoints.HTTPEndpoint;
+import org.apache.synapse.endpoints.OAuthConfiguredHTTPEndpoint;
 import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.endpoints.oauth.AuthorizationCodeHandler;
+import org.apache.synapse.endpoints.oauth.ClientCredentialsHandler;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.util.EndpointConfigurationHelper;
 
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class HttpEndpoint extends Endpoint {
-	
+
 	private String uriTemplate; 
     private String method;
     
@@ -56,7 +62,14 @@ public class HttpEndpoint extends Endpoint {
     private String retryDelay;
     private String timeoutAction;
     private String timeoutActionDuration;
-    
+
+    // oauth related configs
+    private String clientId;
+    private String clientSecret;
+    private String refreshToken;
+    private String tokenURL;
+    private Map<String, String> requestParametersMap;
+
     private String description = "";
     private String properties;
 
@@ -66,6 +79,55 @@ public class HttpEndpoint extends Endpoint {
 
     public String getUriTemplate() {
     	return uriTemplate; 
+    }
+
+    public Map<String, String> getRequestParametersMap() {
+        return requestParametersMap;
+    }
+
+    public void setRequestParametersMap(Map<String, String> requestParametersMap) {
+        this.requestParametersMap = requestParametersMap;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public String getTokenURL() {
+        return tokenURL;
+    }
+
+    public void setTokenURL(String tokenURL) {
+        this.tokenURL = tokenURL;
+    }
+
+    public String getRequestParametersAsString() {
+        if (requestParametersMap != null && requestParametersMap.size() > 0) {
+            return requestParametersMap.keySet().stream()
+                    .map(key -> key + "=" + requestParametersMap.get(key))
+                    .collect(Collectors.joining(",", "{", "}"));
+        }
+        return null;
     }
     
     public void setUriTemplate(String template) {
@@ -320,6 +382,62 @@ public class HttpEndpoint extends Endpoint {
             httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "options"));
         }
 
+        if (!StringUtils.isEmpty(getClientId())) {
+            // oauth configuration
+            OMElement authentication = fac.createOMElement("authentication", synNS);
+            OMElement oauth = fac.createOMElement("oauth", synNS);
+            authentication.addChild(oauth);
+            if (StringUtils.isEmpty(refreshToken) || "null".equals(refreshToken)) {
+                OMElement clientCredentials = fac.createOMElement("clientCredentials", synNS);
+                OMElement clientId = fac.createOMElement("clientId", synNS);
+                clientId.setText(getClientId());
+                clientCredentials.addChild(clientId);
+                OMElement clientSecret = fac.createOMElement("clientSecret", synNS);
+                clientSecret.setText(getClientSecret());
+                clientCredentials.addChild(clientSecret);
+                OMElement tokenUrl = fac.createOMElement("tokenUrl", synNS);
+                tokenUrl.setText(getTokenURL());
+                clientCredentials.addChild(tokenUrl);
+                if (requestParametersMap != null && requestParametersMap.size() > 0) {
+                    OMElement requestParameters = fac.createOMElement("requestParameters", synNS);
+                    for (Map.Entry<String, String> entry : getRequestParametersMap().entrySet()) {
+                        OMElement parameter = fac.createOMElement("parameter", synNS);
+                        parameter.addAttribute("name", entry.getKey(), nullNS);
+                        parameter.setText(entry.getValue());
+                        requestParameters.addChild(parameter);
+                    }
+                    clientCredentials.addChild(requestParameters);
+                }
+                oauth.addChild(clientCredentials);
+            } else {
+                OMElement authCode = fac.createOMElement("authorizationCode", synNS);
+                OMElement clientId = fac.createOMElement("clientId", synNS);
+                clientId.setText(getClientId());
+                authCode.addChild(clientId);
+                OMElement clientSecret = fac.createOMElement("clientSecret", synNS);
+                clientSecret.setText(getClientSecret());
+                authCode.addChild(clientSecret);
+                OMElement tokenUrl = fac.createOMElement("tokenUrl", synNS);
+                tokenUrl.setText(getTokenURL());
+                authCode.addChild(tokenUrl);
+                OMElement refreshToken = fac.createOMElement("refreshToken", synNS);
+                refreshToken.setText(getRefreshToken());
+                authCode.addChild(refreshToken);
+                if (requestParametersMap != null && requestParametersMap.size() > 0) {
+                    OMElement requestParameters = fac.createOMElement("requestParameters", synNS);
+                    for (Map.Entry<String, String> entry : getRequestParametersMap().entrySet()) {
+                        OMElement parameter = fac.createOMElement("parameter", synNS);
+                        parameter.addAttribute("name", entry.getKey(), nullNS);
+                        parameter.setText(entry.getValue());
+                        requestParameters.addChild(parameter);
+                    }
+                    authCode.addChild(requestParameters);
+                }
+                oauth.addChild(authCode);
+            }
+            httpElement.addChild(authentication);
+        }
+
         // Suspend configuration
         if ((errorCodes != null && !"".equals(errorCodes)) ||
             (suspendDurationOnFailure != null && !"".equals(suspendDurationOnFailure)) ||
@@ -479,6 +597,26 @@ public class HttpEndpoint extends Endpoint {
         setRetryTimeout(String.valueOf(httpEndpoint.getDefinition().getRetriesOnTimeoutBeforeSuspend()));
         setRetryDelay(String.valueOf(httpEndpoint.getDefinition().getRetryDurationOnTimeout()));
         setProperties(EndpointConfigurationHelper.buildPropertyString(httpEndpoint));
+
+        if (httpEndpoint instanceof OAuthConfiguredHTTPEndpoint) {
+            if (((OAuthConfiguredHTTPEndpoint) httpEndpoint).getOauthHandler() instanceof AuthorizationCodeHandler) {
+                AuthorizationCodeHandler handler =
+                        (AuthorizationCodeHandler) ((OAuthConfiguredHTTPEndpoint) httpEndpoint).getOauthHandler();
+                setClientId(handler.getClientId());
+                setClientSecret(handler.getClientSecret());
+                setRefreshToken(handler.getRefreshToken());
+                setTokenURL(handler.getTokenUrl());
+                setRequestParametersMap(handler.getRequestParametersMap());
+            } else if (((OAuthConfiguredHTTPEndpoint) httpEndpoint)
+                    .getOauthHandler() instanceof ClientCredentialsHandler) {
+                ClientCredentialsHandler handler =
+                        (ClientCredentialsHandler) ((OAuthConfiguredHTTPEndpoint) httpEndpoint).getOauthHandler();
+                setClientId(handler.getClientId());
+                setClientSecret(handler.getClientSecret());
+                setTokenURL(handler.getTokenUrl());
+                setRequestParametersMap(handler.getRequestParametersMap());
+            }
+        }
     }
 
 }

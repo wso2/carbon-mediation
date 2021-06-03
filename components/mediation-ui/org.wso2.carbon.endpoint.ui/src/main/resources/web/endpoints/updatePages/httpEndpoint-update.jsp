@@ -15,6 +15,9 @@
 --%>
 
 <%@ page import="org.apache.axiom.om.OMElement" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.apache.synapse.config.xml.endpoints.TemplateSerializer" %>
 <%@ page import="org.apache.synapse.endpoints.Template" %>
 <%@ page import="org.wso2.carbon.endpoint.ui.endpoints.http.HttpEndpoint" %>
@@ -39,6 +42,13 @@
     String disabledErrorCodes = request.getParameter("disabledErrorCodes");
     String action = request.getParameter("actionSelect");
     String actionDuration = null;
+
+    String clientId = request.getParameter("clientId");
+    String clientSecret = request.getParameter("clientSecret");
+    String refreshToken = request.getParameter("refreshToken");
+    String tokenURL = request.getParameter("tokenURL");
+    String requestParametersMap = request.getParameter("requestParametersMap");
+
     if (action != null && !action.equals("neverTimeout")) {
         actionDuration = request.getParameter("actionDuration");
     }
@@ -126,6 +136,27 @@
     	httpEndpoint.setProperties(properties);
     } else {
     	httpEndpoint.setProperties(null);
+    }
+
+    if (clientId != null) {
+        httpEndpoint.setClientId(clientId);
+    }
+    if (clientSecret != null) {
+        httpEndpoint.setClientSecret(clientSecret);
+    }
+    if (refreshToken != null) {
+        httpEndpoint.setRefreshToken(refreshToken);
+    }
+    if (tokenURL != null) {
+        httpEndpoint.setTokenURL(tokenURL);
+    }
+    if (requestParametersMap !=null && !requestParametersMap.equals("null")) {
+       // remove enclosing braces
+       requestParametersMap = requestParametersMap.substring( 1, requestParametersMap.length() - 1 );
+       Map<String, String> map = Arrays.stream(requestParametersMap.split(","))
+          .map(entry -> entry.split("="))
+          .collect(Collectors.toMap(entry -> entry[0], entry -> entry[1]));
+       httpEndpoint.setRequestParametersMap(map);
     }
 
     OMElement endpointElement = httpEndpoint.serialize(null);
