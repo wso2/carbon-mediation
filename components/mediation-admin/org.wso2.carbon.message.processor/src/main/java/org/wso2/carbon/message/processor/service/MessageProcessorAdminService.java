@@ -563,6 +563,40 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         return active;
     }
 
+    public boolean isTaskLocationKnown(String processorName) throws AxisFault {
+
+        SynapseConfiguration configuration = getSynapseConfiguration();
+        boolean taskLocationKnown = false;
+        try {
+            assert configuration != null;
+            if (configuration.getMessageProcessors().containsKey(processorName)) {
+                MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
+
+                if (processor instanceof ScheduledMessageForwardingProcessor) {
+                    MessageForwardingProcessorView view = ((ScheduledMessageForwardingProcessor) processor).getView();
+                    if (view != null) {
+                        taskLocationKnown = view.isTaskLocationKnown();
+                    }
+                } else if (processor instanceof SamplingProcessor) {
+                    SamplingProcessorView view = ((SamplingProcessor) processor).getView();
+                    if (view != null) {
+                        taskLocationKnown = view.isTaskLocationKnown();
+                    }
+                } else if (processor instanceof FailoverScheduledMessageForwardingProcessor) {
+                    FailoverMessageForwardingProcessorView view =
+                            ((FailoverScheduledMessageForwardingProcessor) processor).getView();
+                    if (view != null) {
+                        taskLocationKnown = view.isTaskLocationKnown();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error While accessing MessageProcessor view ", e);
+            throw new AxisFault(e.getMessage());
+        }
+        return taskLocationKnown;
+    }
+
     public void activate(String processorName) throws AxisFault {
         SynapseConfiguration configuration = getSynapseConfiguration();
         try {
