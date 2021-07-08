@@ -525,6 +525,11 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT, wrappedContext.getChannelHandlerContext());
         ((Axis2MessageContext) synCtx).getAxis2MessageContext()
                 .setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT, wrappedContext.getChannelHandlerContext());
+        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER,
+                wrappedContext.getChannelIdentifier());
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                .setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER,
+                        wrappedContext.getChannelIdentifier());
         if (outflowDispatchSequence != null) {
             synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE, outflowDispatchSequence);
             ((Axis2MessageContext) synCtx).getAxis2MessageContext()
