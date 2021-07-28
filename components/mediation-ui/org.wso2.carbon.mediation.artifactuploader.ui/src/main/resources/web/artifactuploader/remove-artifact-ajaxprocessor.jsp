@@ -3,6 +3,7 @@
 <%@ page import="org.wso2.carbon.mediation.artifactuploader.ui.SynapseArtifactUploaderClient" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
+<%@ page import="java.util.Arrays" %>
 <%
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
@@ -16,6 +17,10 @@
                     CarbonConstants.CONFIGURATION_CONTEXT);
     SynapseArtifactUploaderClient client = new SynapseArtifactUploaderClient(
             cookie, serverURL, configContext, request.getLocale());
-    client.removeArtifact(request.getParameter("artifactName"));
+    String[] artifacts = client.getArtifacts();
+    String removingArtifact = request.getParameter("artifactName");
+    if (Arrays.asList(artifacts).contains(removingArtifact)) {
+        client.removeArtifact(removingArtifact);
+    }
 
 %>
