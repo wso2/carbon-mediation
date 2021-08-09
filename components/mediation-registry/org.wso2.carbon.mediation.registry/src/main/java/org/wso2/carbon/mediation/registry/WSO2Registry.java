@@ -625,7 +625,9 @@ public class WSO2Registry extends AbstractRegistry {
                     Object value = resourceProperties.get(key);
                     if (value instanceof List) {
                         if (((List) value).size() > 0) {
-                            properties.put(key, ((List) value).get(0));
+                            if (((List) value).get(0) != null) {
+                                properties.put(key, ((List) value).get(0));
+                            }
                         }
                     } else {
                         properties.put(key, value);
