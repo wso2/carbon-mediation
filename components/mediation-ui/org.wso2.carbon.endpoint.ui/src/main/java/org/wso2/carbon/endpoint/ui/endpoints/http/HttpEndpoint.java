@@ -24,6 +24,8 @@ import org.apache.synapse.endpoints.OAuthConfiguredHTTPEndpoint;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.endpoints.oauth.AuthorizationCodeHandler;
 import org.apache.synapse.endpoints.oauth.ClientCredentialsHandler;
+import org.apache.synapse.endpoints.oauth.OAuthConstants;
+import org.apache.synapse.endpoints.oauth.PasswordCredentialsHandler;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.util.EndpointConfigurationHelper;
 
@@ -68,6 +70,8 @@ public class HttpEndpoint extends Endpoint {
     private String clientSecret;
     private String refreshToken;
     private String tokenURL;
+    private String username;
+    private String password;
     private Map<String, String> requestParametersMap;
 
     private String description = "";
@@ -129,7 +133,27 @@ public class HttpEndpoint extends Endpoint {
         }
         return null;
     }
-    
+
+    public String getUsername() {
+
+        return username;
+    }
+
+    public void setUsername(String username) {
+
+        this.username = username;
+    }
+
+    public String getPassword() {
+
+        return password;
+    }
+
+    public void setPassword(String password) {
+
+        this.password = password;
+    }
+
     public void setUriTemplate(String template) {
     	this.uriTemplate = template.replaceAll("&amp;","&"); 
     }
@@ -384,56 +408,33 @@ public class HttpEndpoint extends Endpoint {
 
         if (!StringUtils.isEmpty(getClientId())) {
             // oauth configuration
-            OMElement authentication = fac.createOMElement("authentication", synNS);
-            OMElement oauth = fac.createOMElement("oauth", synNS);
+            OMElement authentication = fac.createOMElement(OAuthConstants.AUTHENTICATION, synNS);
+            OMElement oauth = fac.createOMElement(OAuthConstants.OAUTH, synNS);
             authentication.addChild(oauth);
-            if (StringUtils.isEmpty(refreshToken) || "null".equals(refreshToken)) {
-                OMElement clientCredentials = fac.createOMElement("clientCredentials", synNS);
-                OMElement clientId = fac.createOMElement("clientId", synNS);
-                clientId.setText(getClientId());
-                clientCredentials.addChild(clientId);
-                OMElement clientSecret = fac.createOMElement("clientSecret", synNS);
-                clientSecret.setText(getClientSecret());
-                clientCredentials.addChild(clientSecret);
-                OMElement tokenUrl = fac.createOMElement("tokenUrl", synNS);
-                tokenUrl.setText(getTokenURL());
-                clientCredentials.addChild(tokenUrl);
-                if (requestParametersMap != null && requestParametersMap.size() > 0) {
-                    OMElement requestParameters = fac.createOMElement("requestParameters", synNS);
-                    for (Map.Entry<String, String> entry : getRequestParametersMap().entrySet()) {
-                        OMElement parameter = fac.createOMElement("parameter", synNS);
-                        parameter.addAttribute("name", entry.getKey(), nullNS);
-                        parameter.setText(entry.getValue());
-                        requestParameters.addChild(parameter);
-                    }
-                    clientCredentials.addChild(requestParameters);
-                }
-                oauth.addChild(clientCredentials);
-            } else {
-                OMElement authCode = fac.createOMElement("authorizationCode", synNS);
-                OMElement clientId = fac.createOMElement("clientId", synNS);
-                clientId.setText(getClientId());
-                authCode.addChild(clientId);
-                OMElement clientSecret = fac.createOMElement("clientSecret", synNS);
-                clientSecret.setText(getClientSecret());
-                authCode.addChild(clientSecret);
-                OMElement tokenUrl = fac.createOMElement("tokenUrl", synNS);
-                tokenUrl.setText(getTokenURL());
-                authCode.addChild(tokenUrl);
-                OMElement refreshToken = fac.createOMElement("refreshToken", synNS);
+            if (isPasswordGrant()) {
+                OMElement passwordCredentials = fac.createOMElement(OAuthConstants.PASSWORD_CREDENTIALS, synNS);
+                serializeOAuthCommonParameters(passwordCredentials, getClientId(), getClientSecret(), getTokenURL());
+                OMElement username = fac.createOMElement(OAuthConstants.OAUTH_USERNAME, synNS);
+                username.setText(getUsername());
+                passwordCredentials.addChild(username);
+                OMElement password = fac.createOMElement(OAuthConstants.OAUTH_PASSWORD, synNS);
+                password.setText(getPassword());
+                passwordCredentials.addChild(password);
+                serializeOAuthRequestParameters(passwordCredentials, getRequestParametersMap());
+                oauth.addChild(passwordCredentials);
+            } else if (isAuthorizationCodeGrant()) {
+                OMElement authCode = fac.createOMElement(OAuthConstants.AUTHORIZATION_CODE, synNS);
+                serializeOAuthCommonParameters(authCode, getClientId(), getClientSecret(), getTokenURL());
+                OMElement refreshToken = fac.createOMElement(OAuthConstants.OAUTH_REFRESH_TOKEN, synNS);
                 refreshToken.setText(getRefreshToken());
                 authCode.addChild(refreshToken);
-                if (requestParametersMap != null && requestParametersMap.size() > 0) {
-                    OMElement requestParameters = fac.createOMElement("requestParameters", synNS);
-                    for (Map.Entry<String, String> entry : getRequestParametersMap().entrySet()) {
-                        OMElement parameter = fac.createOMElement("parameter", synNS);
-                        parameter.addAttribute("name", entry.getKey(), nullNS);
-                        parameter.setText(entry.getValue());
-                        requestParameters.addChild(parameter);
-                    }
-                    authCode.addChild(requestParameters);
-                }
+                serializeOAuthRequestParameters(authCode, getRequestParametersMap());
                 oauth.addChild(authCode);
+            } else {
+                OMElement clientCredentials = fac.createOMElement(OAuthConstants.CLIENT_CREDENTIALS, synNS);
+                serializeOAuthCommonParameters(clientCredentials, getClientId(), getClientSecret(), getTokenURL());
+                serializeOAuthRequestParameters(clientCredentials, getRequestParametersMap());
+                oauth.addChild(clientCredentials);
             }
             httpElement.addChild(authentication);
         }
@@ -615,8 +616,80 @@ public class HttpEndpoint extends Endpoint {
                 setClientSecret(handler.getClientSecret());
                 setTokenURL(handler.getTokenUrl());
                 setRequestParametersMap(handler.getRequestParametersMap());
+            } else if (((OAuthConfiguredHTTPEndpoint) httpEndpoint)
+                    .getOauthHandler() instanceof PasswordCredentialsHandler) {
+                PasswordCredentialsHandler handler =
+                        (PasswordCredentialsHandler) ((OAuthConfiguredHTTPEndpoint) httpEndpoint).getOauthHandler();
+                setClientId(handler.getClientId());
+                setClientSecret(handler.getClientSecret());
+                setPassword(handler.getPassword());
+                setUsername(handler.getUsername());
+                setTokenURL(handler.getTokenUrl());
+                setRequestParametersMap(handler.getRequestParametersMap());
             }
         }
     }
 
+    /**
+     * Method to serialize additional request parameters used in OAuth configs
+     *
+     * @param oauthCredentials     OAuth element the request parameters needs to be added
+     * @param requestParametersMap Map containing the request parameters as key value pairs
+     */
+    private static void serializeOAuthRequestParameters(OMElement oauthCredentials,
+                                                        Map<String, String> requestParametersMap) {
+
+        if (requestParametersMap != null && requestParametersMap.size() > 0) {
+            OMElement requestParameters = fac.createOMElement(OAuthConstants.REQUEST_PARAMETERS, synNS);
+            for (Map.Entry<String, String> entry : requestParametersMap.entrySet()) {
+                OMElement parameter = fac.createOMElement(OAuthConstants.REQUEST_PARAMETER, synNS);
+                parameter.addAttribute("name", entry.getKey(), nullNS);
+                parameter.setText(entry.getValue());
+                requestParameters.addChild(parameter);
+            }
+            oauthCredentials.addChild(requestParameters);
+        }
+    }
+
+    /**
+     * Method to serialize common parameters used in OAuth configs
+     *
+     * @param oauthCredentials OAuth element the parameters needs to be added
+     * @param clientId         clientId used in OAuth config
+     * @param clientSecret     clientSecret used in OAuth config
+     * @param tokenURL         tokenURL used in OAuth config
+     */
+    private static void serializeOAuthCommonParameters(OMElement oauthCredentials, String clientId,
+                                                       String clientSecret, String tokenURL) {
+
+        OMElement clientIdElement = fac.createOMElement(OAuthConstants.OAUTH_CLIENT_ID, synNS);
+        clientIdElement.setText(clientId);
+        oauthCredentials.addChild(clientIdElement);
+        OMElement clientSecretElement = fac.createOMElement(OAuthConstants.OAUTH_CLIENT_SECRET, synNS);
+        clientSecretElement.setText(clientSecret);
+        oauthCredentials.addChild(clientSecretElement);
+        OMElement tokenUrlElement = fac.createOMElement(OAuthConstants.TOKEN_API_URL, synNS);
+        tokenUrlElement.setText(tokenURL);
+        oauthCredentials.addChild(tokenUrlElement);
+    }
+
+    /**
+     * Method to check whether Password Credentials Grant type is configured
+     *
+     * @return true if Password Credentials Grant is configured
+     */
+    private boolean isPasswordGrant() {
+
+        return StringUtils.isNotBlank(username) && !"null".equals(username);
+    }
+
+    /**
+     * Method to check whether Authorization Code Grant type is configured
+     *
+     * @return true if Authorization Code Grant is configured
+     */
+    private boolean isAuthorizationCodeGrant() {
+
+        return StringUtils.isNotBlank(refreshToken) && !"null".equals(refreshToken);
+    }
 }
