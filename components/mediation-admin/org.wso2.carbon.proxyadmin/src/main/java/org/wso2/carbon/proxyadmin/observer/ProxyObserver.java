@@ -138,6 +138,11 @@ public class ProxyObserver implements AxisObserver {
             }
         }
 
+        ProxyService proxy = getSynapseConfiguration().getProxyService(axisService.getName());
+        if (proxy != null && proxy.getTransports() != null) {
+            proxy.setRunning(axisService.isActive());
+        }
+
         if (AxisEvent.SERVICE_REMOVE == event.getEventType()) {
 
             Parameter keepServiceHistoryParam = axisService.getParameter(
