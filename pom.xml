@@ -2487,7 +2487,7 @@
         <spring.version>3.0.7.RELEASE</spring.version>
         <aopalliance.version>1.0</aopalliance.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
-        <xmlsec.version>1.5.5</xmlsec.version>
+        <xmlsec.version>2.1.7</xmlsec.version>
         <xml.resolver.version>1.2</xml.resolver.version>
         <stax2.version>3.1.4</stax2.version>
         <woodstox.core.version>4.2.0</woodstox.core.version>
