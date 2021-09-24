@@ -24,5 +24,6 @@ package org.wso2.carbon.mediation.security.vault;
 public enum VaultType {
     REG,
     FILE,
+    PROPERTY,
     DOCKER
 }

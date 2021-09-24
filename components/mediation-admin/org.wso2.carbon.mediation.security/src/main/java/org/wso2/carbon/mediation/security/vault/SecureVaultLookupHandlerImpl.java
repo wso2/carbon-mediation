@@ -66,6 +66,10 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 		return instance;
 	}
 
+	private static String getDecryptedCacheId(String aliasPassword, SecretSrcData ssd){
+		return aliasPassword + "\u0000" +ssd.getCacheId();
+	}
+
 	private void init() throws RegistryException {
 		try {
 			registry = registryService.getConfigSystemRegistry();
@@ -120,9 +124,11 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	public String evaluate(String aliasPasword, SecretSrcData secretSrcData, MessageContext synCtx) throws RegistryException {
 		SynapseConfiguration synapseConfiguration = synCtx.getConfiguration();
 		Map<String, Object> decryptedCacheMap = synapseConfiguration.getDecryptedCacheMap();
-		if (decryptedCacheMap.containsKey(aliasPasword)) {
-			SecureVaultCacheContext cacheContext =
-			                                       (SecureVaultCacheContext) decryptedCacheMap.get(aliasPasword);
+		String cacheId = getDecryptedCacheId(aliasPasword, secretSrcData);
+		if (decryptedCacheMap.containsKey(cacheId) &&
+				decryptedCacheMap.get(cacheId) instanceof SecureVaultCacheContext)
+		{
+			SecureVaultCacheContext cacheContext = (SecureVaultCacheContext) decryptedCacheMap.get(cacheId);
 			if (cacheContext != null) {
 				String cacheDurable = synCtx.getConfiguration().getRegistry().getConfigurationProperties().getProperty
 						("cachableDuration");
@@ -132,7 +138,7 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 					// which means the given value between the cachable limit
 					return cacheContext.getDecryptedValue();
 				} else {
-					decryptedCacheMap.remove(aliasPasword);
+					decryptedCacheMap.remove(cacheId);
 					return vaultLookup(aliasPasword, secretSrcData, synCtx, decryptedCacheMap);
 				}
 			} else {
@@ -153,19 +159,20 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 		synchronized (decryptlockObj) {
 			SecretCipherHander secretManager = new SecretCipherHander(synCtx);
 			String decryptedValue = secretManager.getSecret(aliasPasword, secretSrcData);
+			String cacheId = getDecryptedCacheId(aliasPasword, secretSrcData);
 			if (decryptedCacheMap == null) {
 				return null;
 			}
 
 			if (decryptedValue.isEmpty()) {
 				SecureVaultCacheContext cacheContext =
-						(SecureVaultCacheContext) decryptedCacheMap.get(aliasPasword);
+						(SecureVaultCacheContext) decryptedCacheMap.get(cacheId);
 				if (cacheContext != null) {
 					return cacheContext.getDecryptedValue();
 				}
 			}
 
-			decryptedCacheMap.put(aliasPasword, new SecureVaultCacheContext(Calendar.getInstance()
+			decryptedCacheMap.put(cacheId, new SecureVaultCacheContext(Calendar.getInstance()
 					.getTime(),
 					decryptedValue));
 			return decryptedValue;

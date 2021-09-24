@@ -64,6 +64,7 @@ public class SecretCipherHander {
 	/* Root Secret Repository */
 	private RegistrySecretRepository parentRepository = new RegistrySecretRepository();
 	private FileSecretRepository fileSecretRepository = new FileSecretRepository();
+	private PropertySecretRepository propertySecretRepository = new PropertySecretRepository();
 
 	private org.apache.synapse.MessageContext synCtx;
 
@@ -105,6 +106,15 @@ public class SecretCipherHander {
 					return fileSecretRepository.getSecret(resolvedFileAlias);
 				}
 				return fileSecretRepository.getPlainTextSecret(resolvedFileAlias);
+
+			case PROPERTY:
+				// resolve path and alias
+				String resolvedPropertyAlias = FILE_SECRET_ROOT + alias;
+				// For file type we support plaintext as well
+				if (secretSrcData.isEncrypted()) {
+					return propertySecretRepository.getSecret(resolvedPropertyAlias);
+				}
+				return propertySecretRepository.getPlainTextSecret(resolvedPropertyAlias);
 			case REG:
 				// For registry type we only support plain text
 				return parentRepository.getSecret(alias);

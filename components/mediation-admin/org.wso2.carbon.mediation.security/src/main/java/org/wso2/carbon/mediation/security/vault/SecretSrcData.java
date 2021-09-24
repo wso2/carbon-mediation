@@ -44,4 +44,8 @@ public class SecretSrcData {
     public boolean isEncrypted() {
         return isEncrypted;
     }
+
+    public String getCacheId(){
+        return vaultType.name() + "\u0000" + isEncrypted;
+    }
 }

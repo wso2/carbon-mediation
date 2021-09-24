@@ -106,6 +106,8 @@ public class VaultLookupFunction implements Function {
 				return new SecretSrcData(VaultType.DOCKER, isEncrypted);
 			} else if (VaultType.FILE.toString().equalsIgnoreCase(secretType)) {
 				return new SecretSrcData(VaultType.FILE, isEncrypted);
+			} else if (VaultType.PROPERTY.toString().equalsIgnoreCase(secretType)) {
+				return new SecretSrcData(VaultType.PROPERTY, isEncrypted);
 			}
 		}
 		return new SecretSrcData();
