@@ -19,14 +19,19 @@
 
 package org.wso2.carbon.mediation.initializer.multitenancy;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.ServerConfigurationInformation;
 import org.apache.synapse.ServerConfigurationInformationFactory;
 import org.apache.synapse.ServerContextInformation;
@@ -34,8 +39,11 @@ import org.apache.synapse.ServerManager;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
+import org.apache.synapse.config.SynapsePropertiesLoader;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
+import org.apache.synapse.config.xml.RegistryFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.debug.SynapseDebugInterface;
 import org.apache.synapse.debug.SynapseDebugManager;
@@ -49,6 +57,8 @@ import org.apache.synapse.task.TaskConstants;
 import org.apache.synapse.task.TaskDescriptionRepository;
 import org.apache.synapse.task.TaskManager;
 import org.apache.synapse.task.TaskScheduler;
+import org.apache.synapse.util.AXIOMUtils;
+import org.jetbrains.annotations.Nullable;
 import org.osgi.framework.ServiceRegistration;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -81,11 +91,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * This creates the {@link org.apache.synapse.config.SynapseConfiguration}
@@ -502,19 +514,46 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                 = new MultiXMLConfigurationSerializer(synapseConfigDir.getAbsolutePath());
         try {
             if (!new File(sequencesDir, SynapseConstants.MAIN_SEQUENCE_KEY + ".xml").exists()) {
-                SequenceMediator mainSequence = (SequenceMediator) initialSynCfg.getMainSequence();
+                String mainXmlLocation =
+                        SynapsePropertiesLoader.getPropertyValue(ServiceBusConstants.MAIN_XML_LOCATION, null);
+                SequenceMediator mainSequence;
+                if (StringUtils.isNotEmpty(mainXmlLocation)) {
+                    OMElement artifactConfig = getArtifactContent(mainXmlLocation);
+                    mainSequence = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(
+                            artifactConfig, new Properties(), initialSynCfg);
+
+                } else {
+                    mainSequence = (SequenceMediator) initialSynCfg.getMainSequence();
+                }
                 mainSequence.setFileName(SynapseConstants.MAIN_SEQUENCE_KEY + ".xml");
                 serializer.serializeSequence(mainSequence, initialSynCfg, null);
             }
             if (!new File(sequencesDir, SynapseConstants.FAULT_SEQUENCE_KEY + ".xml").exists()) {
-                SequenceMediator faultSequence = (SequenceMediator) initialSynCfg.getFaultSequence();
+                String faultXmlLocation =
+                        SynapsePropertiesLoader.getPropertyValue(ServiceBusConstants.FAULT_XML_LOCATION, null);
+                SequenceMediator faultSequence;
+                if (StringUtils.isNotEmpty(faultXmlLocation)) {
+                    OMElement artifactConfig = getArtifactContent(faultXmlLocation);
+                    faultSequence = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(
+                            artifactConfig, new Properties(), initialSynCfg);
+                } else {
+                    faultSequence = (SequenceMediator) initialSynCfg.getFaultSequence();
+                }
                 faultSequence.setFileName(SynapseConstants.FAULT_SEQUENCE_KEY + ".xml");
                 serializer.serializeSequence(faultSequence, initialSynCfg, null);
             }
             if (!new File(synapseConfigDir, SynapseConstants.REGISTRY_FILE).exists()) {
-                Registry registry = new WSO2Registry();
-                registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
-                initialSynCfg.setRegistry(registry);
+                String registryXmlLocation =
+                        SynapsePropertiesLoader.getPropertyValue(ServiceBusConstants.REGISTRY_XML_LOCATION, null);
+                Registry registry;
+                if (StringUtils.isNotEmpty(registryXmlLocation)) {
+                    OMElement artifactConfig = getArtifactContent(registryXmlLocation);
+                    registry = RegistryFactory.createRegistry(artifactConfig, new Properties());
+                } else {
+                    registry = new WSO2Registry();
+                    registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
+                    initialSynCfg.setRegistry(registry);
+                }
                 serializer.serializeSynapseRegistry(registry, initialSynCfg, null);
             }
             if (!new File(synapseConfigDir, SynapseConstants.SYNAPSE_XML).exists()) {
@@ -524,6 +563,13 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             handleException("Couldn't serialise the initial synapse configuration " +
                     "for the domain : " + tenantDomain, e);
         }
+    }
+
+    private OMElement getArtifactContent(String location) throws IOException, XMLStreamException {
+
+        Path path = Paths.get(CarbonUtils.getCarbonHome(), location);
+        String content = IOUtils.toString(new FileInputStream(path.toFile()));
+        return AXIOMUtil.stringToOM(content);
     }
 
     private void addDeployers(ConfigurationContext configurationContext,ServerContextInformation contextInfo) {
@@ -553,13 +599,10 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
     public void createSynapseDebugEnvironment(ServerContextInformation contextInfo) {
 
         try {
-            File synapseProperties = Paths.get(CarbonUtils.getCarbonConfigDirPath(), "synapse.properties").toFile();
-            Properties properties = new Properties();
-            InputStream inputStream = new FileInputStream(synapseProperties);
-            properties.load(inputStream);
-            inputStream.close();
-            int event_port = Integer.parseInt(properties.getProperty(ServiceBusConstants.ESB_DEBUG_EVENT_PORT));
-            int command_port = Integer.parseInt(properties.getProperty(ServiceBusConstants.ESB_DEBUG_COMMAND_PORT));
+            int event_port =
+                    Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(ServiceBusConstants.ESB_DEBUG_EVENT_PORT, null));
+            int command_port =
+                    Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(ServiceBusConstants.ESB_DEBUG_COMMAND_PORT, null));
             SynapseDebugInterface debugInterface = SynapseDebugInterface.getInstance();
             debugInterface.init(command_port, event_port);
             contextInfo.setServerDebugModeEnabled(true);

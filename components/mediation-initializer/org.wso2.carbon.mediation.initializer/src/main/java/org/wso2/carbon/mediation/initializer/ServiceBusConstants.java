@@ -89,6 +89,9 @@ public final class ServiceBusConstants {
     public static final String TASK_TYPE = "synapse/task";
     public static final String MESSAGE_STORE_TYPE = "synapse/message-store";
     public static final String MESSAGE_PROCESSOR_TYPE = "synapse/message-processors";
+    public static final String MAIN_XML_LOCATION = "synapse.main.xml.location";
+    public static final String FAULT_XML_LOCATION = "synapse.fault.xml.location";
+    public static final String REGISTRY_XML_LOCATION = "synapse.registry.xml.location";
 
     public static final class RegistryStore {
         public static final String SEQUENCE_REGISTRY = "sequences";
