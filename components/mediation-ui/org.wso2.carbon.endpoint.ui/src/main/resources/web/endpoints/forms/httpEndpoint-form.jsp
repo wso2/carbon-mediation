@@ -210,6 +210,9 @@
     String tokenURL = "";
     String requestParametersMap = "";
 
+    String basicAuthUsername = "";
+    String basicAuthPassword = "";
+
     if (endpoint != null) {
         // Endpoint Name
         if (endpoint.getEndpointName() != null) {
@@ -330,6 +333,10 @@
         refreshToken = endpoint.getRefreshToken();
         tokenURL = endpoint.getTokenURL();
         requestParametersMap = endpoint.getRequestParametersAsString();
+
+        // basic auth
+        basicAuthUsername = endpoint.getBasicAuthUsername();
+        basicAuthPassword = endpoint.getBasicAuthPassword();
 
     } else {
         if (isFromTemplateEditor) { // set default variables to template fields
@@ -686,6 +693,14 @@
         </td>
         <td>
             <input type="text" id="requestParametersMap" name="requestParametersMap" value="<%=requestParametersMap%>"></input>
+        </td>
+    </tr>
+    <tr style="display:none;">
+        <td>
+            <input type="text" id="basicAuthUsername" name="basicAuthUsername" value="<%=basicAuthUsername%>"></input>
+        </td>
+        <td>
+            <input type="text" id="basicAuthPassword" name="basicAuthPassword" value="<%=basicAuthPassword%>"></input>
         </td>
     </tr>
 </tr>
