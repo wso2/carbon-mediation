@@ -206,6 +206,7 @@
 
     String clientId = "";
     String clientSecret = "";
+    String authMode = "";
     String refreshToken = "";
     String tokenURL = "";
     String requestParametersMap = "";
@@ -327,6 +328,7 @@
         // oauth
         clientId = endpoint.getClientId();
         clientSecret = endpoint.getClientSecret();
+        authMode = endpoint.getAuthMode();
         refreshToken = endpoint.getRefreshToken();
         tokenURL = endpoint.getTokenURL();
         requestParametersMap = endpoint.getRequestParametersAsString();
@@ -677,6 +679,9 @@
         </td>
         <td>
             <input type="text" id="clientSecret" name="clientSecret" value="<%=clientSecret%>"></input>
+        </td>
+        <td>
+            <input type="text" id="authMode" name="authMode" value="<%=authMode%>"></input>
         </td>
         <td>
             <input type="text" id="refreshToken" name="refreshToken" value="<%=refreshToken%>"></input>

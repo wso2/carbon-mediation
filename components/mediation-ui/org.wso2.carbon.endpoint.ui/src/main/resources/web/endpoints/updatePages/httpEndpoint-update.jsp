@@ -45,6 +45,7 @@
 
     String clientId = request.getParameter("clientId");
     String clientSecret = request.getParameter("clientSecret");
+    String authMode = request.getParameter("authMode");
     String refreshToken = request.getParameter("refreshToken");
     String tokenURL = request.getParameter("tokenURL");
     String requestParametersMap = request.getParameter("requestParametersMap");
@@ -143,6 +144,9 @@
     }
     if (clientSecret != null) {
         httpEndpoint.setClientSecret(clientSecret);
+    }
+    if (authMode != null && !authMode.equals("null")) {
+        httpEndpoint.setAuthMode(authMode);
     }
     if (refreshToken != null) {
         httpEndpoint.setRefreshToken(refreshToken);

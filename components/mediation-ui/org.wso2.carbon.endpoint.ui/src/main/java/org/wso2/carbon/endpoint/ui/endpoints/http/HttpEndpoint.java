@@ -66,6 +66,7 @@ public class HttpEndpoint extends Endpoint {
     // oauth related configs
     private String clientId;
     private String clientSecret;
+    private String authMode;
     private String refreshToken;
     private String tokenURL;
     private Map<String, String> requestParametersMap;
@@ -119,6 +120,14 @@ public class HttpEndpoint extends Endpoint {
 
     public void setTokenURL(String tokenURL) {
         this.tokenURL = tokenURL;
+    }
+
+    public String getAuthMode() {
+        return authMode;
+    }
+
+    public void setAuthMode(String authMode) {
+        this.authMode = authMode;
     }
 
     public String getRequestParametersAsString() {
@@ -408,6 +417,11 @@ public class HttpEndpoint extends Endpoint {
                     }
                     clientCredentials.addChild(requestParameters);
                 }
+                if (!StringUtils.isEmpty(authMode)) {
+                    OMElement authModeElement = fac.createOMElement("authMode", synNS);
+                    authModeElement.setText(authMode);
+                    clientCredentials.addChild(authModeElement);
+                }
                 oauth.addChild(clientCredentials);
             } else {
                 OMElement authCode = fac.createOMElement("authorizationCode", synNS);
@@ -432,6 +446,11 @@ public class HttpEndpoint extends Endpoint {
                         requestParameters.addChild(parameter);
                     }
                     authCode.addChild(requestParameters);
+                }
+                if (!StringUtils.isEmpty(authMode)) {
+                    OMElement authModeElement = fac.createOMElement("authMode", synNS);
+                    authModeElement.setText(authMode);
+                    authCode.addChild(authModeElement);
                 }
                 oauth.addChild(authCode);
             }
@@ -606,6 +625,7 @@ public class HttpEndpoint extends Endpoint {
                 setClientSecret(handler.getClientSecret());
                 setRefreshToken(handler.getRefreshToken());
                 setTokenURL(handler.getTokenUrl());
+                setAuthMode(handler.getAuthMode());
                 setRequestParametersMap(handler.getRequestParametersMap());
             } else if (((OAuthConfiguredHTTPEndpoint) httpEndpoint)
                     .getOauthHandler() instanceof ClientCredentialsHandler) {
@@ -614,6 +634,7 @@ public class HttpEndpoint extends Endpoint {
                 setClientId(handler.getClientId());
                 setClientSecret(handler.getClientSecret());
                 setTokenURL(handler.getTokenUrl());
+                setAuthMode(handler.getAuthMode());
                 setRequestParametersMap(handler.getRequestParametersMap());
             }
         }
