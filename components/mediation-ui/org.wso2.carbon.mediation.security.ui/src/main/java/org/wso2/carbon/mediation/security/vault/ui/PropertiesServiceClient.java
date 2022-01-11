@@ -43,6 +43,7 @@ import org.wso2.carbon.registry.properties.stub.beans.xsd.RetentionBean;
 import org.wso2.carbon.registry.properties.stub.utils.xsd.Property;
 import org.wso2.carbon.ui.CarbonUIUtil;
 import org.wso2.carbon.utils.ServerConstants;
+import org.owasp.encoder.Encode;
 
 public class PropertiesServiceClient {
 
@@ -265,6 +266,7 @@ public class PropertiesServiceClient {
 		}
 		if (!value.matches(regEx)) {
 			String message = "Password value for " + name + " does not match with the configured regular expression.";
+			message = Encode.forJavaScript(message);
 			log.error(message);
 			throw new Exception(message);
 		}
