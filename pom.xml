@@ -2385,6 +2385,12 @@
                 <artifactId>vault-java-driver</artifactId>
                 <version>${hashicorp.vault.version}</version>
             </dependency>
+            <!-- transport-http -->
+            <dependency>
+                <groupId>org.wso2.transport.http</groupId>
+                <artifactId>org.wso2.transport.http.netty</artifactId>
+                <version>${transport.http.netty}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
@@ -2578,6 +2584,7 @@
         <jackson.dataformat.yaml.version>2.10.3</jackson.dataformat.yaml.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.0.20.wso2v1</swagger.parser.orbit.version>
+        <transport.http.netty>6.3.32</transport.http.netty>
     </properties>
     <pluginRepositories>
         <pluginRepository>
