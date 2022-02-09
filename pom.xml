@@ -2122,6 +2122,11 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-classes</artifactId>
+                <version>${netty.tcnative.version}</version>
+            </dependency>
             <!-- Cache mediator dependencies -->
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
@@ -2517,6 +2522,7 @@
         <json.smart.version>2.4.7</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
         <netty.version>4.1.73.Final</netty.version>
+        <netty.tcnative.version>2.0.48.Final</netty.tcnative.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
         <javax.activation.version>0.0</javax.activation.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
