@@ -2553,11 +2553,7 @@
         <json.smart.version>2.4.7</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
         <netty.version>4.1.73.Final</netty.version>
-<<<<<<< HEAD
-        <netty.tcnative.version>2.0.48.Final</netty.tcnative.version>
-=======
         <netty.tcnative.version>2.0.47.Final</netty.tcnative.version>
->>>>>>> fee5aba3d3 (Add new Inbound Endpoint that will start Netty based Http transport)
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
         <javax.activation.version>0.0</javax.activation.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
@@ -2613,7 +2609,7 @@
         <jackson.dataformat.yaml.version>2.10.3</jackson.dataformat.yaml.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.0.20.wso2v1</swagger.parser.orbit.version>
-        <transport.http.netty>6.3.32</transport.http.netty>
+        <transport.http.netty>6.3.35</transport.http.netty>
     </properties>
     <pluginRepositories>
         <pluginRepository>
