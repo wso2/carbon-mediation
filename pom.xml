@@ -2448,7 +2448,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v252</synapse.version>
+        <synapse.version>2.1.7-wso2v253</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.3.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2564,10 +2564,10 @@
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
-        <fge.json.schema.validator.version>2.2.6.wso2v7</fge.json.schema.validator.version>
+        <fge.json.schema.validator.version>2.2.6.wso2v8</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
         <joda-time.version>2.9.4.wso2v1</joda-time.version>
-        <google.guava.version>27.0-jre</google.guava.version>
+        <google.guava.version>31.0.1-jre</google.guava.version>
         <!-- publishEvent mediator versions -->
         <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
         <org.apache.axiom.om.version>0.0.0</org.apache.axiom.om.version>
