@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
@@ -42,6 +43,8 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private boolean dispatchToCustomSequence;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
     private int portOffset;
+    private int inflowIdleTime;
+    private int outflowIdleTime;
 
     public InboundWebsocketChannelInitializer() {
     }
@@ -74,6 +77,14 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         this.subprotocolHandlers = subprotocolHandlers;
     }
 
+    public void setInflowIdleTime(int inflowIdleTime) {
+        this.inflowIdleTime = inflowIdleTime;
+    }
+
+    public void setOutflowIdleTime(int outflowIdleTime) {
+        this.outflowIdleTime = outflowIdleTime;
+    }
+
     @Override
     protected void initChannel(SocketChannel websocketChannel) throws Exception {
 
@@ -86,6 +97,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         p.addLast("codec", new HttpServerCodec());
         p.addLast("aggregator", new HttpObjectAggregator(65536));
         p.addLast("frameAggregator", new WebSocketFrameAggregator(Integer.MAX_VALUE));
+        p.addLast("idleStateHandler", new IdleStateHandler(inflowIdleTime, outflowIdleTime, 0));
         InboundWebsocketSourceHandler sourceHandler = new InboundWebsocketSourceHandler();
         sourceHandler.setClientBroadcastLevel(clientBroadcastLevel);
         sourceHandler.setDispatchToCustomSequence(dispatchToCustomSequence);

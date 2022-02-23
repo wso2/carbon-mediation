@@ -141,6 +141,8 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setPipelineHandler(PipelineHandlerBuilderUtil.stringToPipelineHandlers(config.getPipelineHandler()));
         handler.setDispatchToCustomSequence(config.getDispatchToCustomSequence());
         handler.setPortOffset(PersistenceUtils.getPortOffset(params.getProperties()));
+        handler.setInflowIdleTime(config.getInflowIdleTime());
+        handler.setOutflowIdleTime(config.getOutflowIdleTime());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -176,6 +178,8 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setPipelineHandler(PipelineHandlerBuilderUtil.stringToPipelineHandlers(config.getPipelineHandler()));
         handler.setDispatchToCustomSequence(config.getDispatchToCustomSequence());
         handler.setPortOffset(PersistenceUtils.getPortOffset(params.getProperties()));
+        handler.setInflowIdleTime(config.getInflowIdleTime());
+        handler.setOutflowIdleTime(config.getOutflowIdleTime());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -254,6 +258,10 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                         InboundWebsocketConstants.CUSTOM_SEQUENCE))
                 .usePortOffset(Boolean.valueOf(params.getProperties().getProperty(
                         InboundWebsocketConstants.WEBSOCKET_USE_PORT_OFFSET)))
+                .inflowIdleTime(Integer.valueOf(params.getProperties()
+                        .getProperty(InboundWebsocketConstants.WEBSOCKET_DISPATCH_IDLETIME)))
+                .outflowIdleTime(Integer.valueOf(params.getProperties()
+                        .getProperty(InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME)))
                 .build();
     }
 
