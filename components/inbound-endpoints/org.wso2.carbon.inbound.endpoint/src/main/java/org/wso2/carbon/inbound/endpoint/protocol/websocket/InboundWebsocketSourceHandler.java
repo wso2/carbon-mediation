@@ -168,10 +168,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 InboundWebsocketConstants.CONNECTION_TERMINATE, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                 ctx.channel().hashCode());
-        if (StringUtils.isNotBlank(handshaker.selectedSubprotocol())) {
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext()
-                    .setProperty(InboundWebsocketConstants.WEBSOCKET_SUBPROTOCOL, handshaker.selectedSubprotocol());
-        }
         injectForMediation(synCtx, endpoint);
     }
 
@@ -238,6 +234,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                 ctx.channel().hashCode());
+        if (StringUtils.isNotBlank(handshaker.selectedSubprotocol())) {
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                    .setProperty(InboundWebsocketConstants.WEBSOCKET_SUBPROTOCOL, handshaker.selectedSubprotocol());
+        }
         injectForMediation(synCtx, endpoint);
 
     }
