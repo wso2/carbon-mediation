@@ -258,10 +258,10 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                         InboundWebsocketConstants.CUSTOM_SEQUENCE))
                 .usePortOffset(Boolean.valueOf(params.getProperties().getProperty(
                         InboundWebsocketConstants.WEBSOCKET_USE_PORT_OFFSET)))
-                .inflowIdleTime(Integer.valueOf(params.getProperties()
-                        .getProperty(InboundWebsocketConstants.WEBSOCKET_DISPATCH_IDLETIME)))
-                .outflowIdleTime(Integer.valueOf(params.getProperties()
-                        .getProperty(InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME)))
+                .inflowIdleTime(Integer.parseInt(params.getProperties()
+                        .getProperty(InboundWebsocketConstants.WEBSOCKET_DISPATCH_IDLETIME, "0")))
+                .outflowIdleTime(Integer.parseInt(params.getProperties()
+                        .getProperty(InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME, "0")))
                 .build();
     }
 
