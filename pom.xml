@@ -81,6 +81,8 @@
                 <module>features/mediation-cg-features</module>
                 <module>features/org.wso2.carbon.integrator.server.feature</module>
                 <module>components/mediation-message-processor</module>
+                <module>features/message-processors</module>
+                <module>features/org.wso2.carbon.proxy.admin.feature</module>
             </modules>
         </profile>
     </profiles>
