@@ -2604,8 +2604,8 @@
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v1</version.org.wso2.orbit.javax.activation>
         <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
-        <saml.common.util.version>1.0.3</saml.common.util.version>
-        <opensaml.orbit.version>3.3.1.wso2v1</opensaml.orbit.version>
+        <saml.common.util.version>1.0.10</saml.common.util.version>
+        <opensaml.orbit.version>3.3.1.wso2v4</opensaml.orbit.version>
         <jackson.dataformat.yaml.version>2.10.3</jackson.dataformat.yaml.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.0.20.wso2v1</swagger.parser.orbit.version>
