@@ -371,7 +371,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity</artifactId>
+                <artifactId>velocity-engine-core</artifactId>
                 <version>${org.apache.velocity.version}</version>
             </dependency>
             <dependency>
@@ -2427,12 +2427,12 @@
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.7.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.6.2</carbon.kernel.version>
+        <carbon.kernel.version>4.6.3-beta</carbon.kernel.version>
         <carbon.kernel.feature.version>${carbon.kernel.version}</carbon.kernel.feature.version>
         <carbon.kernel.imp.pkg.version>[4.5.3, 4.7.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.7.31</carbon.commons.version>
+        <carbon.commons.version>4.7.45</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.7.0, 5.0.0)</carbon.commons.imp.pkg.version>
         <!-- Carbon Deployment version-->
         <carbon.deployment.version>4.9.15</carbon.deployment.version>
@@ -2450,20 +2450,20 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v253</synapse.version>
+        <synapse.version>2.1.7-wso2v262</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.3.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.1.0</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[6.1.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1-wso2v76</orbit.version.axis2>
+        <orbit.version.axis2>1.6.1-wso2v79</orbit.version.axis2>
         <orbit.version.axis2.client>${orbit.version.axis2}</orbit.version.axis2.client>
         <axis2-transports.base.version>${orbit.version.axis2}</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>${orbit.version.axis2}</axis2.json.version>
         <!-- Axiom Version -->
-        <axiom.version>1.2.11-wso2v21</axiom.version>
+        <axiom.version>1.2.11-wso2v22</axiom.version>
         <axiom.api.wso2.version>${axiom.version}</axiom.api.wso2.version>
         <orbit.version.axiom>${axiom.version}</orbit.version.axiom>
         <axiom.wso2.version>${axiom.version}</axiom.wso2.version>
@@ -2473,11 +2473,11 @@
         <rampart.mar.version>${rampart.version}</rampart.mar.version>
         <neethi.version>3.0.2</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
-        <wss4j.version>1.5.11-wso2v20</wss4j.version>
+        <wss4j.version>1.6.0-wso2v2</wss4j.version>
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>${rampart.version}</rampart.wso2.version>
-        <commons.vfs.version>2.2-wso2v10</commons.vfs.version>
+        <commons.vfs.version>2.2.0-wso2v12</commons.vfs.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpasyncclient.version>4.0-beta3</httpasyncclient.version>
         <!--Misc-->
@@ -2526,7 +2526,7 @@
         <orbit.version.woden>1.0.0.M8-wso2v1</orbit.version.woden>
         <libthrift.wso2.version>${libthrift.version}</libthrift.wso2.version>
         <org.apache.bsf.wso2.version>3.0.0.wso2v5</org.apache.bsf.wso2.version>
-        <org.apache.velocity.version>1.7</org.apache.velocity.version>
+        <org.apache.velocity.version>2.3</org.apache.velocity.version>
         <rhino.wso2.js.version>1.7.0.R4.wso2v1</rhino.wso2.js.version>
         <spring.version>3.0.7.RELEASE</spring.version>
         <aopalliance.version>1.0</aopalliance.version>
