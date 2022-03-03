@@ -77,4 +77,7 @@ public class InboundWebsocketConstants {
 
     public static final String INBOUND_PIPELINE_HANDLER_CLASS = "ws.pipeline.handler.class";
     public static final String CUSTOM_SEQUENCE = "dispatch.custom.sequence";
+
+    public static final String WEBSOCKET_DISPATCH_IDLETIME = "ws.dispatch.idleTime";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME = "ws.outflow.dispatch.idleTime";
 }
