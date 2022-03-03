@@ -207,6 +207,8 @@
     String clientId = "";
     String clientSecret = "";
     String refreshToken = "";
+    String username = "";
+    String password = "";
     String tokenURL = "";
     String requestParametersMap = "";
 
@@ -328,6 +330,8 @@
         clientId = endpoint.getClientId();
         clientSecret = endpoint.getClientSecret();
         refreshToken = endpoint.getRefreshToken();
+        username = endpoint.getUsername();
+        password = endpoint.getPassword();
         tokenURL = endpoint.getTokenURL();
         requestParametersMap = endpoint.getRequestParametersAsString();
 
@@ -680,6 +684,12 @@
         </td>
         <td>
             <input type="text" id="refreshToken" name="refreshToken" value="<%=refreshToken%>"></input>
+        </td>
+        <td>
+            <input type="text" id="username" name="username" value="<%=username%>"></input>
+        </td>
+        <td>
+            <input type="text" id="password" name="password" value="<%=password%>"></input>
         </td>
         <td>
             <input type="text" id="tokenURL" name="tokenURL" value="<%=tokenURL%>"></input>

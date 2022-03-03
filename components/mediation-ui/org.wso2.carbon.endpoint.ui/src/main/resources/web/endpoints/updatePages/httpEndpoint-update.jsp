@@ -46,6 +46,8 @@
     String clientId = request.getParameter("clientId");
     String clientSecret = request.getParameter("clientSecret");
     String refreshToken = request.getParameter("refreshToken");
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
     String tokenURL = request.getParameter("tokenURL");
     String requestParametersMap = request.getParameter("requestParametersMap");
 
@@ -146,6 +148,12 @@
     }
     if (refreshToken != null) {
         httpEndpoint.setRefreshToken(refreshToken);
+    }
+    if (username != null) {
+        httpEndpoint.setUsername(username);
+    }
+    if (password != null) {
+        httpEndpoint.setPassword(password);
     }
     if (tokenURL != null) {
         httpEndpoint.setTokenURL(tokenURL);
