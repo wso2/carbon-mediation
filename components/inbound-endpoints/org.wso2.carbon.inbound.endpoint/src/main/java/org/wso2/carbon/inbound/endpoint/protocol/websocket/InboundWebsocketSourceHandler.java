@@ -52,7 +52,6 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
@@ -116,11 +115,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         contentTypes.add("application/xml");
         contentTypes.add("application/json");
         contentTypes.add("text/xml");
-    }
-
-    static {
-        otherSubprotocols.add("graphql-ws");
-        otherSubprotocols.add("graphql-transport-ws");
     }
 
     public InboundWebsocketSourceHandler() throws Exception {
@@ -252,10 +246,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                 ctx.channel().hashCode());
-        if (StringUtils.isNotBlank(handshaker.selectedSubprotocol())) {
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext()
-                    .setProperty(InboundWebsocketConstants.WEBSOCKET_SUBPROTOCOL, handshaker.selectedSubprotocol());
-        }
         injectForMediation(synCtx, endpoint);
 
     }
