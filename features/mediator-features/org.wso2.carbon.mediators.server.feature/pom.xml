@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
+            <artifactId>velocity-engine</artifactId>
         </dependency>
         <dependency>
             <groupId>rhino.wso2</groupId>
@@ -89,7 +89,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.router.impl</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.fastXSLT</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.event</bundleDef>
-                                <bundleDef>org.apache.velocity:velocity-engine-core</bundleDef>
+                                <bundleDef>org.apache.velocity:velocity-engine</bundleDef>
                             </bundles>
                             <importBundles>
                                 <importBundleDef>org.apache.bsf.wso2:bsf-all</importBundleDef>
