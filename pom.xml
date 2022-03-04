@@ -371,7 +371,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity-engine-core</artifactId>
+                <artifactId>velocity-engine</artifactId>
                 <version>${org.apache.velocity.version}</version>
             </dependency>
             <dependency>
@@ -2526,7 +2526,7 @@
         <orbit.version.woden>1.0.0.M8-wso2v1</orbit.version.woden>
         <libthrift.wso2.version>${libthrift.version}</libthrift.wso2.version>
         <org.apache.bsf.wso2.version>3.0.0.wso2v5</org.apache.bsf.wso2.version>
-        <org.apache.velocity.version>2.3</org.apache.velocity.version>
+        <org.apache.velocity.version>1.7</org.apache.velocity.version>
         <rhino.wso2.js.version>1.7.0.R4.wso2v1</rhino.wso2.js.version>
         <spring.version>3.0.7.RELEASE</spring.version>
         <aopalliance.version>1.0</aopalliance.version>
