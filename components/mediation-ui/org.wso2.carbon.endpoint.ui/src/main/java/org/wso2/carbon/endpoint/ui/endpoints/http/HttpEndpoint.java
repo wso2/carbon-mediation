@@ -439,31 +439,31 @@ public class HttpEndpoint extends Endpoint {
 
         if (!StringUtils.isEmpty(getClientId()) && !"null".equals(getClientId())) {
             // oauth configuration
-            OMElement authentication = fac.createOMElement(OAuthConstants.AUTHENTICATION, synNS);
-            OMElement oauth = fac.createOMElement(OAuthConstants.OAUTH, synNS);
+            OMElement authentication = fac.createOMElement(AuthConstants.AUTHENTICATION, synNS);
+            OMElement oauth = fac.createOMElement(AuthConstants.OAUTH, synNS);
             authentication.addChild(oauth);
             if (isPasswordGrant()) {
-                OMElement passwordCredentials = fac.createOMElement(OAuthConstants.PASSWORD_CREDENTIALS, synNS);
+                OMElement passwordCredentials = fac.createOMElement(AuthConstants.PASSWORD_CREDENTIALS, synNS);
                 serializeOAuthCommonParameters(passwordCredentials, getClientId(), getClientSecret(), getTokenURL(),
                         getAuthMode());
-                OMElement username = fac.createOMElement(OAuthConstants.OAUTH_USERNAME, synNS);
+                OMElement username = fac.createOMElement(AuthConstants.OAUTH_USERNAME, synNS);
                 username.setText(getUsername());
                 passwordCredentials.addChild(username);
-                OMElement password = fac.createOMElement(OAuthConstants.OAUTH_PASSWORD, synNS);
+                OMElement password = fac.createOMElement(AuthConstants.OAUTH_PASSWORD, synNS);
                 password.setText(getPassword());
                 passwordCredentials.addChild(password);
                 serializeOAuthRequestParameters(passwordCredentials, getRequestParametersMap());
                 oauth.addChild(passwordCredentials);
             } else if (isAuthorizationCodeGrant()) {
-                OMElement authCode = fac.createOMElement(OAuthConstants.AUTHORIZATION_CODE, synNS);
+                OMElement authCode = fac.createOMElement(AuthConstants.AUTHORIZATION_CODE, synNS);
                 serializeOAuthCommonParameters(authCode, getClientId(), getClientSecret(), getTokenURL(), getAuthMode());
-                OMElement refreshToken = fac.createOMElement(OAuthConstants.OAUTH_REFRESH_TOKEN, synNS);
+                OMElement refreshToken = fac.createOMElement(AuthConstants.OAUTH_REFRESH_TOKEN, synNS);
                 refreshToken.setText(getRefreshToken());
                 authCode.addChild(refreshToken);
                 serializeOAuthRequestParameters(authCode, getRequestParametersMap());
                 oauth.addChild(authCode);
             } else {
-                OMElement clientCredentials = fac.createOMElement(OAuthConstants.CLIENT_CREDENTIALS, synNS);
+                OMElement clientCredentials = fac.createOMElement(AuthConstants.CLIENT_CREDENTIALS, synNS);
                 serializeOAuthCommonParameters(clientCredentials, getClientId(), getClientSecret(), getTokenURL(),
                         getAuthMode());
                 serializeOAuthRequestParameters(clientCredentials, getRequestParametersMap());
@@ -692,9 +692,9 @@ public class HttpEndpoint extends Endpoint {
                                                         Map<String, String> requestParametersMap) {
 
         if (requestParametersMap != null && requestParametersMap.size() > 0) {
-            OMElement requestParameters = fac.createOMElement(OAuthConstants.REQUEST_PARAMETERS, synNS);
+            OMElement requestParameters = fac.createOMElement(AuthConstants.REQUEST_PARAMETERS, synNS);
             for (Map.Entry<String, String> entry : requestParametersMap.entrySet()) {
-                OMElement parameter = fac.createOMElement(OAuthConstants.REQUEST_PARAMETER, synNS);
+                OMElement parameter = fac.createOMElement(AuthConstants.REQUEST_PARAMETER, synNS);
                 parameter.addAttribute("name", entry.getKey(), nullNS);
                 parameter.setText(entry.getValue());
                 requestParameters.addChild(parameter);
@@ -714,17 +714,17 @@ public class HttpEndpoint extends Endpoint {
     private static void serializeOAuthCommonParameters(OMElement oauthCredentials, String clientId,
                                                        String clientSecret, String tokenURL, String authMode) {
 
-        OMElement clientIdElement = fac.createOMElement(OAuthConstants.OAUTH_CLIENT_ID, synNS);
+        OMElement clientIdElement = fac.createOMElement(AuthConstants.OAUTH_CLIENT_ID, synNS);
         clientIdElement.setText(clientId);
         oauthCredentials.addChild(clientIdElement);
-        OMElement clientSecretElement = fac.createOMElement(OAuthConstants.OAUTH_CLIENT_SECRET, synNS);
+        OMElement clientSecretElement = fac.createOMElement(AuthConstants.OAUTH_CLIENT_SECRET, synNS);
         clientSecretElement.setText(clientSecret);
         oauthCredentials.addChild(clientSecretElement);
-        OMElement tokenUrlElement = fac.createOMElement(OAuthConstants.TOKEN_API_URL, synNS);
+        OMElement tokenUrlElement = fac.createOMElement(AuthConstants.TOKEN_API_URL, synNS);
         tokenUrlElement.setText(tokenURL);
         oauthCredentials.addChild(tokenUrlElement);
         if (!StringUtils.isEmpty(authMode)) {
-            OMElement authModeElement = fac.createOMElement(OAuthConstants.OAUTH_AUTHENTICATION_MODE, synNS);
+            OMElement authModeElement = fac.createOMElement(AuthConstants.OAUTH_AUTHENTICATION_MODE, synNS);
             authModeElement.setText(authMode);
             oauthCredentials.addChild(authModeElement);
         }
