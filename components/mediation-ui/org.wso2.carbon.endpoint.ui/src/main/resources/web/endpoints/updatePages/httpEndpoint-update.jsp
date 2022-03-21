@@ -52,6 +52,9 @@
     String tokenURL = request.getParameter("tokenURL");
     String requestParametersMap = request.getParameter("requestParametersMap");
 
+    String basicAuthUsername = request.getParameter("basicAuthUsername");
+    String basicAuthPassword = request.getParameter("basicAuthPassword");
+
     if (action != null && !action.equals("neverTimeout")) {
         actionDuration = request.getParameter("actionDuration");
     }
@@ -162,13 +165,20 @@
     if (tokenURL != null) {
         httpEndpoint.setTokenURL(tokenURL);
     }
-    if (requestParametersMap !=null && !requestParametersMap.equals("null")) {
+    if (requestParametersMap !=null && requestParametersMap.length() != 0 && !requestParametersMap.equals("null")) {
        // remove enclosing braces
        requestParametersMap = requestParametersMap.substring( 1, requestParametersMap.length() - 1 );
        Map<String, String> map = Arrays.stream(requestParametersMap.split(","))
           .map(entry -> entry.split("="))
           .collect(Collectors.toMap(entry -> entry[0], entry -> entry[1]));
        httpEndpoint.setRequestParametersMap(map);
+    }
+
+    if (basicAuthUsername != null) {
+        httpEndpoint.setBasicAuthUsername(basicAuthUsername);
+    }
+    if (basicAuthPassword != null) {
+        httpEndpoint.setBasicAuthPassword(basicAuthPassword);
     }
 
     OMElement endpointElement = httpEndpoint.serialize(null);

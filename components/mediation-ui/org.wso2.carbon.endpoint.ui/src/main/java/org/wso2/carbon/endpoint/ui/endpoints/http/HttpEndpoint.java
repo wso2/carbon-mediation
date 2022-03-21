@@ -19,13 +19,15 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.config.xml.endpoints.DefinitionFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.endpoints.BasicAuthConfiguredHTTPEndpoint;
 import org.apache.synapse.endpoints.HTTPEndpoint;
 import org.apache.synapse.endpoints.OAuthConfiguredHTTPEndpoint;
 import org.apache.synapse.endpoints.Template;
-import org.apache.synapse.endpoints.oauth.AuthorizationCodeHandler;
-import org.apache.synapse.endpoints.oauth.ClientCredentialsHandler;
-import org.apache.synapse.endpoints.oauth.OAuthConstants;
-import org.apache.synapse.endpoints.oauth.PasswordCredentialsHandler;
+import org.apache.synapse.endpoints.auth.basicauth.BasicAuthHandler;
+import org.apache.synapse.endpoints.auth.oauth.AuthorizationCodeHandler;
+import org.apache.synapse.endpoints.auth.oauth.ClientCredentialsHandler;
+import org.apache.synapse.endpoints.auth.AuthConstants;
+import org.apache.synapse.endpoints.auth.oauth.PasswordCredentialsHandler;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.util.EndpointConfigurationHelper;
 
@@ -74,6 +76,10 @@ public class HttpEndpoint extends Endpoint {
     private String username;
     private String password;
     private Map<String, String> requestParametersMap;
+
+    // basic auth related configs
+    private String basicAuthUsername;
+    private String basicAuthPassword;
 
     private String description = "";
     private String properties;
@@ -161,6 +167,22 @@ public class HttpEndpoint extends Endpoint {
     public void setPassword(String password) {
 
         this.password = password;
+    }
+
+    public String getBasicAuthUsername() {
+        return basicAuthUsername;
+    }
+
+    public String getBasicAuthPassword() {
+        return basicAuthPassword;
+    }
+
+    public void setBasicAuthUsername(String basicAuthUsername) {
+        this.basicAuthUsername = basicAuthUsername;
+    }
+
+    public void setBasicAuthPassword(String basicAuthPassword) {
+        this.basicAuthPassword = basicAuthPassword;
     }
 
     public void setUriTemplate(String template) {
@@ -415,7 +437,7 @@ public class HttpEndpoint extends Endpoint {
             httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "options"));
         }
 
-        if (!StringUtils.isEmpty(getClientId())) {
+        if (!StringUtils.isEmpty(getClientId()) && !"null".equals(getClientId())) {
             // oauth configuration
             OMElement authentication = fac.createOMElement(OAuthConstants.AUTHENTICATION, synNS);
             OMElement oauth = fac.createOMElement(OAuthConstants.OAUTH, synNS);
@@ -447,6 +469,18 @@ public class HttpEndpoint extends Endpoint {
                 serializeOAuthRequestParameters(clientCredentials, getRequestParametersMap());
                 oauth.addChild(clientCredentials);
             }
+            httpElement.addChild(authentication);
+        } else if (isBasicAuthentication()) {
+            // basic auth configuration
+            OMElement authentication = fac.createOMElement(AuthConstants.AUTHENTICATION, synNS);
+            OMElement basicAuth = fac.createOMElement(AuthConstants.BASIC_AUTH, synNS);
+            authentication.addChild(basicAuth);
+            OMElement username = fac.createOMElement(AuthConstants.BASIC_AUTH_USERNAME, synNS);
+            username.setText(getBasicAuthUsername());
+            basicAuth.addChild(username);
+            OMElement password = fac.createOMElement(AuthConstants.BASIC_AUTH_PASSWORD, synNS);
+            password.setText(getBasicAuthPassword());
+            basicAuth.addChild(password);
             httpElement.addChild(authentication);
         }
 
@@ -641,6 +675,10 @@ public class HttpEndpoint extends Endpoint {
                 setAuthMode(handler.getAuthMode());
                 setRequestParametersMap(handler.getRequestParametersMap());
             }
+        } else if (httpEndpoint instanceof BasicAuthConfiguredHTTPEndpoint) {
+            BasicAuthHandler handler = ((BasicAuthConfiguredHTTPEndpoint) httpEndpoint).getBasicAuthHandler();
+            setBasicAuthUsername(handler.getUsername());
+            setBasicAuthPassword(handler.getPassword());
         }
     }
 
@@ -710,5 +748,10 @@ public class HttpEndpoint extends Endpoint {
     private boolean isAuthorizationCodeGrant() {
 
         return StringUtils.isNotBlank(refreshToken) && !"null".equals(refreshToken);
+    }
+
+    private boolean isBasicAuthentication() {
+        return !StringUtils.isEmpty(getBasicAuthUsername()) && !"null".equals(getBasicAuthUsername())
+                && !StringUtils.isEmpty(getBasicAuthPassword()) && !"null".equals(getBasicAuthPassword());
     }
 }
