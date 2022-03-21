@@ -22,7 +22,11 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -48,8 +52,10 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
@@ -102,7 +108,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
     private String defaultContentType;
     private int portOffset;
-
+    private boolean isHealthCheckCall = false;
     private InboundApiHandler inboundApiHandler = new InboundApiHandler();
     private static final AttributeKey<Map<String, Object>> WSO2_PROPERTIES = AttributeKey.valueOf("WSO2_PROPERTIES");
 
@@ -110,6 +116,11 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         contentTypes.add("application/xml");
         contentTypes.add("application/json");
         contentTypes.add("text/xml");
+    }
+
+    static {
+        otherSubprotocols.add("graphql-ws");
+        otherSubprotocols.add("graphql-transport-ws");
     }
 
     public InboundWebsocketSourceHandler() throws Exception {
@@ -148,6 +159,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        if (isHealthCheckCall) {
+            return;
+        }
         String endpointName = WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
         if (endpointName == null) {
             int portWithOffset = port + portOffset;
@@ -169,6 +183,16 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         if (log.isDebugEnabled()) {
             WebsocketLogUtil.printHeaders(log, req, ctx);
         }
+
+        // This block is for the health check of the ports 8099 and 9099
+        if (!req.headers().contains(HttpHeaders.UPGRADE) && req.uri().equals("/health")) {
+            isHealthCheckCall = true;
+            FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+            httpResponse.headers().set("content-length", httpResponse.content().readableBytes());
+            ctx.writeAndFlush(httpResponse);
+            return;
+        }
+
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
                 getWebSocketLocation(req), SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true);
         handshaker = wsFactory.newHandshaker(req);
@@ -228,6 +252,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                 ctx.channel().hashCode());
+        if (StringUtils.isNotBlank(handshaker.selectedSubprotocol())) {
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                    .setProperty(InboundWebsocketConstants.WEBSOCKET_SUBPROTOCOL, handshaker.selectedSubprotocol());
+        }
         injectForMediation(synCtx, endpoint);
 
     }

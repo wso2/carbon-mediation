@@ -56,6 +56,7 @@ public class InboundWebsocketConstants {
 
     public static final String INBOUND_SUBPROTOCOL_HANDLER_CLASS = "ws.subprotocol.handler.class";
     public static final String INBOUND_DEFAULT_CONTENT_TYPE = "ws.default.content.type";
+    public static final String WEBSOCKET_SUBPROTOCOL = "websocket.subprotocol";
 
     public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
     public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";
@@ -76,4 +77,7 @@ public class InboundWebsocketConstants {
 
     public static final String INBOUND_PIPELINE_HANDLER_CLASS = "ws.pipeline.handler.class";
     public static final String CUSTOM_SEQUENCE = "dispatch.custom.sequence";
+
+    public static final String WEBSOCKET_DISPATCH_IDLETIME = "ws.dispatch.idleTime";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME = "ws.outflow.dispatch.idleTime";
 }

@@ -69,7 +69,8 @@ public class Input {
             if (type == SmooksMediator.TYPES.TEXT) {
                 OMElement element = PayloadHelper.getXMLPayload(synCtx.getEnvelope());
                 if (element != null) {
-                  return new StreamSource(ElementHelper.getTextAsStream(element,false));
+                    byte[] bytes = element.getText().getBytes();
+                    return new StreamSource(new ByteArrayInputStream(bytes));
                 }
             } else if (type == SmooksMediator.TYPES.XML) {
             	IOElementPipe pipe = null;

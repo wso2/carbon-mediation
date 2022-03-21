@@ -16,17 +16,12 @@
 
 package org.wso2.carbon.mediation.transport.handlers;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.util.JavaUtils;
-import org.apache.axis2.util.XMLUtils;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpInetConnection;
@@ -36,85 +31,31 @@ import org.apache.http.HttpStatus;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.nhttp.NHttpConfiguration;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.HttpGetRequestProcessor;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.SourceHandler;
-import org.jaxen.SimpleNamespaceContext;
-import org.jaxen.XPath;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
 import org.wso2.carbon.mediation.transport.handlers.utils.RequestProcessorDispatcherUtil;
-import org.wso2.carbon.utils.ServerConstants;
 
-import javax.servlet.ServletException;
-import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
  * Get Processor implementation for PassThrough Transport.
  */
-public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
+public class PassThroughNHttpGetProcessor extends AbstractHttpGetRequestProcessor implements HttpGetRequestProcessor {
 
-	
-    private Map<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor> getRequestProcessors =
-            new LinkedHashMap<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor>();
-
-    private ConfigurationContext cfgCtx;
     private SourceHandler sourceHandler;
-    private static final QName ITEM_QN = new QName(ServerConstants.CARBON_SERVER_XML_NAMESPACE, "Item");
-    private static final QName CLASS_QN = new QName(ServerConstants.CARBON_SERVER_XML_NAMESPACE, "Class");
-
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String TEXT_HTML = "text/html";
 
     private static final Log log = LogFactory.getLog(PassThroughNHttpGetProcessor.class);
-
-    private void populateGetRequestProcessors() throws AxisFault {
-        try {
-            OMElement docEle = XMLUtils.toOM(ServerConfiguration.getInstance().getDocumentElement());
-            if (docEle != null) {
-                SimpleNamespaceContext nsCtx = new SimpleNamespaceContext();
-                nsCtx.addNamespace("wsas", ServerConstants.CARBON_SERVER_XML_NAMESPACE);
-                XPath xp = new AXIOMXPath("//wsas:HttpGetRequestProcessors/wsas:Processor");
-                xp.setNamespaceContext(nsCtx);
-                List nodeList = xp.selectNodes(docEle);
-                for (Object aNodeList : nodeList) {
-                    OMElement processorEle = (OMElement) aNodeList;
-                    OMElement itemEle = processorEle.getFirstChildWithName(ITEM_QN);
-                    if (itemEle == null) {
-                        throw new ServletException("Required element, 'Item' not found!");
-                    }
-                    OMElement classEle = processorEle.getFirstChildWithName(CLASS_QN);
-                    org.wso2.carbon.core.transports.HttpGetRequestProcessor processor;
-                    if (classEle == null) {
-                        throw new ServletException("Required element, 'Class' not found!");
-                    } else {
-                        processor =
-                                (org.wso2.carbon.core.transports.HttpGetRequestProcessor)
-                                        Class.forName(classEle.getText().trim()).newInstance();
-                    }
-                    getRequestProcessors.put(itemEle.getText().trim(), processor);
-                }
-            }
-        } catch (Exception e) {
-            handleException("Error populating GetRequestProcessors", e);
-        }
-    }
 
     private void processWithGetProcessor(HttpRequest request,
                                          HttpResponse response,
@@ -185,7 +126,7 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
             }
 
             if (carbonHttpResponse.isRedirect()) {
-                response.addHeader("Location", carbonHttpResponse.getRedirect());
+                response.addHeader(HTTPConstants.HEADER_LOCATION, carbonHttpResponse.getRedirect());
                 response.setStatusLine(response.getProtocolVersion(), 302);
             }
 
@@ -211,22 +152,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 
     public void init(ConfigurationContext configurationContext, SourceHandler sourceHandler)
             throws AxisFault {
-        
-        //super.init(configurationContext, sourceHandler);
-    	this.cfgCtx  =  configurationContext;
-    	this.sourceHandler =  sourceHandler;
-    	DataHolder.getInstance().setAxisConfigurationContext(configurationContext);
 
-        if (cfgCtx.getProperty("GETRequestProcessorMap") != null) {
-            getRequestProcessors = (Map<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor>)
-                    cfgCtx.getProperty("GETRequestProcessorMap");
-        } else {
-            populateGetRequestProcessors();
-        }
-
+        super.init(configurationContext);
+        this.sourceHandler =  sourceHandler;
     }
-    
-
 
     public void process(HttpRequest request, HttpResponse response,
                         MessageContext messageContext,
@@ -238,17 +167,14 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 
         String uri = request.getRequestLine().getUri();
 
-        String servicePath = cfgCtx.getServiceContextPath();
-        if (!servicePath.startsWith("/")) {
-            servicePath = "/" + servicePath;
-        }
-        String serviceName = getServiceName(request);
+        String servicePath = getServicePath();
+        String serviceName = getServiceName(uri);
 
-        boolean loadBalancer = Boolean.parseBoolean(System.getProperty("wso2.loadbalancer", "false"));
+        boolean loadBalancer = Boolean.parseBoolean(System.getProperty(WSO2_LOADBALANCER_SYS_PROPERTY, "false"));
         // Handle browser request to get favicon while requesting for wsdl
-        if (uri.equals("/favicon.ico")) {
+        if (uri.equals(FAVICON_ICO)) {
             response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
-            response.addHeader("Location", "http://wso2.org/favicon.ico");
+            response.addHeader(HTTPConstants.HEADER_LOCATION, FAVICON_ICO_URL);
             SourceContext.updateState(conn, ProtocolState.WSDL_RESPONSE_DONE);
             try {
                 outputStream.flush();
@@ -285,10 +211,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                 if (requestUri.indexOf("://") == -1) {
                     HttpInetConnection inetConn = (HttpInetConnection) conn;
 
-                    String hostName = "localhost";
+                    String hostName = LOCALHOST;
                     ServerConfiguration serverConfig = ServerConfiguration.getInstance();
-                    if (serverConfig.getFirstProperty("HostName") != null) {
-                        hostName = serverConfig.getFirstProperty("HostName");
+                    if (serverConfig.getFirstProperty(HOST_NAME) != null) {
+                        hostName = serverConfig.getFirstProperty(HOST_NAME);
                     }
 
                     requestUrl = "http://" +
@@ -400,82 +326,6 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
     }
 
     /**
-     * Returns the HTML text for the list of services deployed.
-     * This can be delegated to another Class as well
-     * where it will handle more options of GET messages.
-     *
-     * @param prefix to be used for the Service names
-     * @return the HTML to be displayed as a String
-     */
-    protected String getServicesHTML(String prefix) {
-
-        Map services = cfgCtx.getAxisConfiguration().getServices();
-        Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
-        boolean servicesFound = false;
-
-        StringBuffer resultBuf = new StringBuffer();
-        resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
-
-        if ((services != null) && !services.isEmpty()) {
-
-            servicesFound = true;
-            resultBuf.append("<h2>" + "Deployed services" + "</h2>");
-
-            for (Object service : services.values()) {
-
-                AxisService axisService = (AxisService) service;
-                Parameter isHiddenService = axisService.getParameter(
-                        NhttpConstants.HIDDEN_SERVICE_PARAM_NAME);
-                Parameter isAdminService = axisService.getParameter("adminService");
-                boolean isClientSide = axisService.isClientSide();
-
-                boolean isSkippedService = (isHiddenService != null &&
-                        JavaUtils.isTrueExplicitly(isHiddenService.getValue())) || (isAdminService != null &&
-                        JavaUtils.isTrueExplicitly(isAdminService.getValue())) || isClientSide;
-                if (axisService.getName().startsWith("__") || isSkippedService) {
-                    continue;    // skip private services
-                }
-
-                Iterator iterator = axisService.getOperations();
-                resultBuf.append("<h3><a href=\"").append(prefix).append(axisService.getName()).append(
-                        "?wsdl\">").append(axisService.getName()).append("</a></h3>");
-
-                if (iterator.hasNext()) {
-                    resultBuf.append("Available operations <ul>");
-
-                    for (; iterator.hasNext();) {
-                        AxisOperation axisOperation = (AxisOperation) iterator.next();
-                        resultBuf.append("<li>").append(
-                                axisOperation.getName().getLocalPart()).append("</li>");
-                    }
-                    resultBuf.append("</ul>");
-                } else {
-                    resultBuf.append("No operations specified for this service");
-                }
-            }
-        }
-
-        if ((erroneousServices != null) && !erroneousServices.isEmpty()) {
-            servicesFound = true;
-            resultBuf.append("<hr><h2><font color=\"blue\">Faulty Services</font></h2>");
-            Enumeration faultyservices = erroneousServices.keys();
-
-            while (faultyservices.hasMoreElements()) {
-                String faultyserviceName = (String) faultyservices.nextElement();
-                resultBuf.append("<h3><font color=\"blue\">").append(
-                        faultyserviceName).append("</font></h3>");
-            }
-        }
-
-        if (!servicesFound) {
-            resultBuf.append("<h2>There are no services deployed</h2>");
-        }
-
-        resultBuf.append("</body></html>");
-        return resultBuf.toString();
-    }
-
-    /**
      * Is the incoming URI is requesting service list and http.block_service_list=true in
      * nhttp.properties
      * @param incomingURI incoming URI
@@ -527,57 +377,5 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
             } catch (IOException ignore) {
             }
         }
-    }
-    
-    /**
-     * Returns the service name.
-     *
-     * @param request HttpRequest
-     * @return service name as a String
-     */
-    protected String getServiceName(HttpRequest request) {
-        String uri = request.getRequestLine().getUri();
-
-        String servicePath = cfgCtx.getServiceContextPath();
-        if (!servicePath.startsWith("/")) {
-            servicePath = "/" + servicePath;
-        }
-
-        String serviceName = null;
-        if (uri.startsWith(servicePath)) {
-            serviceName = uri.substring(servicePath.length());
-            if (serviceName.startsWith("/")) {
-                serviceName = serviceName.substring(1);
-            }
-            if (serviceName.indexOf("?") != -1) {
-                serviceName = serviceName.substring(0, serviceName.indexOf("?"));
-            }
-        } else {
-            // this may be a custom URI
-            String incomingURI = request.getRequestLine().getUri();
-
-            Map serviceURIMap = (Map) cfgCtx.getProperty(NhttpConstants.EPR_TO_SERVICE_NAME_MAP);
-            if (serviceURIMap != null) {
-                Set keySet = serviceURIMap.keySet();
-                for (Object key : keySet) {
-                    if (incomingURI.toLowerCase().contains(((String) key).toLowerCase())) {
-                        return (String) serviceURIMap.get(key);
-                    }
-                }
-            }
-        }
-
-        if (serviceName != null) {
-            int opnStart = serviceName.indexOf("/");
-            if (opnStart != -1) {
-                serviceName = serviceName.substring(0, opnStart);
-            }
-        }
-        return serviceName;
-    }
-
-    public void handleException(String msg, Exception e) throws AxisFault {
-        log.error(msg, e);
-        throw new AxisFault(msg, e);
     }
 }

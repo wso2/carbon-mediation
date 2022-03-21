@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
-        <version>4.7.103-SNAPSHOT</version>
+        <version>4.7.129-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.task</artifactId>
-    <version>4.7.103-SNAPSHOT</version>
+    <version>4.7.129-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Task BE</name>
     <description>This is a core module of the project.</description>
@@ -90,7 +90,6 @@
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
-                            org.apache.log4j.*,
                             org.apache.commons.collections.*,
                             org.apache.synapse.commons.*,
                             org.apache.synapse.task.*,
