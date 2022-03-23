@@ -296,6 +296,24 @@ public class ConfigurationLoader {
         return isEnabled;
     }
 
+    public static int getMaxFramePayloadLength() {
+        File synapseProperties = Paths.get(CarbonUtils.getCarbonConfigDirPath(), "synapse.properties").toFile();
+        Properties properties = new Properties();
+        try (InputStream inputStream = new FileInputStream(synapseProperties)) {
+            properties.load(inputStream);
+        } catch (FileNotFoundException e) {
+            handleException("synapse.properties file not found", e);
+        } catch (IOException e) {
+            handleException("Error while reading synapse.properties file", e);
+        }
+
+        String maxPayloadValue = properties.getProperty(Constants.WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH);
+        if (maxPayloadValue != null) {
+            return Integer.parseInt(maxPayloadValue);
+        }
+        return 0;
+    }
+
     private static SSLConfiguration setSslConfig(OMElement sslConfig) {
 
         Iterator iterator = sslConfig.getChildElements();

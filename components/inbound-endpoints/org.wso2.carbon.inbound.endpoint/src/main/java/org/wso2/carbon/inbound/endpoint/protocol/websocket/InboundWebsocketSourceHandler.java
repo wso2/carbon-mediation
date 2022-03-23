@@ -69,6 +69,7 @@ import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.ConfigurationLoader;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketSubscriberPathManager;
@@ -193,8 +194,16 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             return;
         }
 
-        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                getWebSocketLocation(req), SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true);
+        WebSocketServerHandshakerFactory wsFactory;
+        int maxPayloadLength = ConfigurationLoader.getMaxFramePayloadLength();
+        if (maxPayloadLength != 0) {
+            wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
+                    SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true,
+                    maxPayloadLength);
+        } else {
+            wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
+                    SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true);
+        }
         handshaker = wsFactory.newHandshaker(req);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());

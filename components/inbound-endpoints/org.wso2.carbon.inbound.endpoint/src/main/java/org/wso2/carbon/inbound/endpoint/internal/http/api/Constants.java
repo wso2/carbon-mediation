@@ -24,6 +24,7 @@ public class Constants {
 
     static final String INTERNAL_HTTP_API_PORT = "internal.http.api.port";
     static final String INTERNAL_HTTPS_API_PORT = "internal.https.api.port";
+    static final String WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH = "ws.transport.max.frame.payload.length";
     static final int DEFAULT_INTERNAL_HTTP_API_PORT = 9191;
     static final int DEFAULT_INTERNAL_HTTPS_API_PORT = 9154;
     static final String INTERNAL_HTTP_API_ENABLED = "internal.http.api.enabled";
