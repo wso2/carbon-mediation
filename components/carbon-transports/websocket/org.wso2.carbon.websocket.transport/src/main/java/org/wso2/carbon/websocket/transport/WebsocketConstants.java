@@ -47,6 +47,7 @@ public class WebsocketConstants {
     public static final String TRUST_STORE_LOCATION = "ws.trust.store.location";
     public static final String TRUST_STORE_PASSWORD = "ws.trust.store.Password";
     public static final String TRUST_STORE_CONFIG_ELEMENT = "ws.trust.store";
+    public static final String WEBSOCKET_MAX_FRAME_PAYLOAD_LENGTH = "wsMaxFrameLength";
 
     public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
     public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";

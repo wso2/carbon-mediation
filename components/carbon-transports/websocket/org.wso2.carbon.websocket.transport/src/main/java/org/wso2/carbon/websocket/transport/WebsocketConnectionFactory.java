@@ -196,10 +196,20 @@ public class WebsocketConnectionFactory {
             }
 
             final EventLoopGroup group = new NioEventLoopGroup();
-            handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
-                    WebSocketVersion.V13,
-                    deriveSubprotocol(wsSubprotocol, contentType),
-                    false, defaultHttpHeaders));
+            Parameter maxPayloadParam = transportOut
+                    .getParameter(WebsocketConstants.WEBSOCKET_MAX_FRAME_PAYLOAD_LENGTH);
+            if (maxPayloadParam != null) {
+                int maxLength = Integer.parseInt(maxPayloadParam.getParameterElement().getText());
+                handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
+                        WebSocketVersion.V13,
+                        deriveSubprotocol(wsSubprotocol, contentType),
+                        false, defaultHttpHeaders, maxLength));
+            } else {
+                handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
+                        WebSocketVersion.V13,
+                        deriveSubprotocol(wsSubprotocol, contentType),
+                        false, defaultHttpHeaders));
+            }
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {

@@ -278,9 +278,9 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         axis2MsgCtx.setServiceContext(svcCtx);
         axis2MsgCtx.setOperationContext(opCtx);
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-            ConfigurationContext tenantConfigCtx = TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
-                                                                                                 axis2MsgCtx
-                                                                                                         .getConfigurationContext());
+            ConfigurationContext tenantConfigCtx =
+                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+                            axis2MsgCtx.getConfigurationContext());
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
             axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
         } else {
