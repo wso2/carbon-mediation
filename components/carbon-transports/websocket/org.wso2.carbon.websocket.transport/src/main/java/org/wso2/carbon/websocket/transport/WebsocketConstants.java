@@ -58,4 +58,6 @@ public class WebsocketConstants {
     public static final String WEBSOCKET_SUBPROTOCOL = "websocket.subprotocol";
 
     public static final String CONNECTION_TERMINATE = "connection.terminate";
+
+    public static final int WEBSOCKET_UPSTREAM_ERROR_SC = 1014;
 }
