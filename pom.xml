@@ -2645,7 +2645,7 @@
         <org.apache.bsf.wso2.version>3.0.0.wso2v5</org.apache.bsf.wso2.version>
         <org.apache.velocity.version>1.7</org.apache.velocity.version>
         <rhino.wso2.js.version>1.7.0.R4.wso2v1</rhino.wso2.js.version>
-        <spring.version>3.0.7.RELEASE</spring.version>
+        <spring.version>5.3.18</spring.version>
         <aopalliance.version>1.0</aopalliance.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xmlsec.version>1.5.5</xmlsec.version>
