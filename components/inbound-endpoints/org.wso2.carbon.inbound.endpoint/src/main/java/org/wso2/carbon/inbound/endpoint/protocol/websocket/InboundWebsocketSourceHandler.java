@@ -70,7 +70,6 @@ import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketSubscriberPathManager;
@@ -196,8 +195,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         }
 
         WebSocketServerHandshakerFactory wsFactory;
-        int maxPayloadLength = Integer.parseInt(
-                SynapsePropertiesLoader.getPropertyValue(Constants.WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH, "0"));
+        int maxPayloadLength = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                org.wso2.carbon.inbound.endpoint.internal.http.api.Constants.WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH,
+                "0"));
         if (maxPayloadLength != 0) {
             wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
                     SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true,
