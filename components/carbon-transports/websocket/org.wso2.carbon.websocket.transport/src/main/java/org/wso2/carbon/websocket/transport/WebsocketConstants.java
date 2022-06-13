@@ -27,6 +27,7 @@ public class WebsocketConstants {
     public static final int WEBSOCKET_DEFAULT_WSS_PORT = 443;
 
     public static final String UNIVERSAL_SOURCE_IDENTIFIER = "universal.source.identifier";
+    public static final String WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER = "websocket.source.channel.identifier";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
     public static final String CONTENT_TYPE = "websocket.accept.contenType";
@@ -46,10 +47,17 @@ public class WebsocketConstants {
     public static final String TRUST_STORE_LOCATION = "ws.trust.store.location";
     public static final String TRUST_STORE_PASSWORD = "ws.trust.store.Password";
     public static final String TRUST_STORE_CONFIG_ELEMENT = "ws.trust.store";
+    public static final String WEBSOCKET_MAX_FRAME_PAYLOAD_LENGTH = "wsMaxFrameLength";
 
     public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
     public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";
 
     public static final String WEBSOCKET_CUSTOM_HEADER_PREFIX = "websocket.custom.header.";
     public static final String WEBSOCKET_CUSTOM_HEADER_CONFIG = "ws.custom.header";
+
+    public static final String WEBSOCKET_SUBPROTOCOL = "websocket.subprotocol";
+
+    public static final String CONNECTION_TERMINATE = "connection.terminate";
+
+    public static final int WEBSOCKET_UPSTREAM_ERROR_SC = 1014;
 }

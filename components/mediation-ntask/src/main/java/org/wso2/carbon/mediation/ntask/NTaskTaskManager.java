@@ -34,6 +34,7 @@ import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
 import org.apache.synapse.task.TaskManagerObserver;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.ntask.common.TaskException;
@@ -47,6 +48,8 @@ import com.hazelcast.core.IExecutorService;
 
 public class NTaskTaskManager implements TaskManager, TaskServiceObserver, ServerStartupHandler {
     private final Object lock = new Object();
+
+    private int tenantId = -1234;
 
     private static final Log logger = LogFactory.getLog(NTaskTaskManager.class.getName());
 
@@ -338,6 +341,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             try {
                 TaskService taskService = NtaskService.getTaskService();
                 if (taskService == null || NtaskService.getCcServiceInstance() == null) {
+                    tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
                     NtaskService.addObserver(this);
                     return false;
                 }
@@ -420,8 +424,18 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     @Override
     public boolean update(Map<String, Object> parameters) {
-        return init(parameters == null || !parameters.containsKey("init.properties") ? null
-                : (Properties) parameters.get("init.properties"));
+        try {
+            if (tenantId > 0) {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            }
+            return init(parameters == null || !parameters.containsKey("init.properties") ? null
+                    : (Properties) parameters.get("init.properties"));
+        } finally {
+            if (tenantId > 0) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
     }
 
     @Override

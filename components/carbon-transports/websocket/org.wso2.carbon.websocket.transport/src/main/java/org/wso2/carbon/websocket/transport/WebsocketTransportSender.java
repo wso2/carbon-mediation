@@ -20,6 +20,7 @@ package org.wso2.carbon.websocket.transport;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.apache.axiom.om.OMOutputFormat;
@@ -39,12 +40,15 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketResponseSender;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketSourceHandler;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.utils.LogUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -74,14 +78,22 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         String responceDispatchSequence = null;
         String responceErrorSequence = null;
         String messageType = null;
+        String wsSubProtocol = null;
         Map<String, Object> customHeaders = new HashMap<>();
 
+        if (log.isDebugEnabled()) {
+            log.debug("Endpoint url: " + targetEPR);
+        }
         InboundResponseSender responseSender = null;
         if (msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER) != null) {
             responseSender = (InboundResponseSender)
                     msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER);
-            sourceIdentier = ((ChannelHandlerContext) msgCtx.
-                    getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT)).channel().toString();
+            if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER) != null) {
+                sourceIdentier = msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER).toString();
+            } else {
+                sourceIdentier = ((ChannelHandlerContext) msgCtx.
+                        getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT)).channel().toString();
+            }
         } else {
             sourceIdentier = WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER;
         }
@@ -101,6 +113,10 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
         if (msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE) != null) {
             messageType = (String) msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE);
+        }
+
+        if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SUBPROTOCOL) != null) {
+            wsSubProtocol = (String) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SUBPROTOCOL);
         }
 
         /*
@@ -147,7 +163,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
-                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, customHeaders);
+                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, wsSubProtocol,
+                    customHeaders);
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
             if (tenantDomain != null) {
                 clientHandler.setTenantDomain(tenantDomain);
@@ -186,6 +203,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                         LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
                     }
                 }
+            } else if (Boolean.valueOf(true).equals(msgCtx.getProperty(WebsocketConstants.CONNECTION_TERMINATE))) {
+                clientHandler.getChannelHandlerContext().channel().flush();
             } else {
                 if (!handshakePresent) {
                     RelayUtils.buildMessage(msgCtx, false);
@@ -214,12 +233,28 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             }
         } catch (URISyntaxException e) {
             log.error("Error parsing the WS endpoint url", e);
+        } catch (ConnectException e) {
+            handleClientConnectionError(responseSender, e);
         } catch (IOException e) {
-            log.error("Error writting to the websocket channel", e);
+            log.error("Error writing to the websocket channel", e);
         } catch (InterruptedException e) {
-            log.error("Error writting to the websocket channel", e);
+            log.error("Error writing to the websocket channel", e);
         } catch (XMLStreamException e) {
             handleException("Error while building message", e);
+        }
+    }
+
+    private void handleClientConnectionError(InboundResponseSender responseSender, Exception e) {
+
+        log.error("Error writing to the websocket channel", e);
+        // we will close the client connection and notify with close frame
+        InboundWebsocketSourceHandler sourceHandler = ((InboundWebsocketResponseSender) responseSender).getSourceHandler();
+        CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(WebsocketConstants.WEBSOCKET_UPSTREAM_ERROR_SC,
+                e.getMessage());
+        try {
+            sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
+        } catch (AxisFault fault) {
+            log.error("Error occurred while sending close frames", fault);
         }
     }
 }

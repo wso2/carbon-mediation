@@ -340,16 +340,26 @@ public class WSO2Registry extends AbstractRegistry {
 
         Registry registry = getRegistry(key);
         String resolvedKey = resolvePath(key);
+        Resource resource = null;
         try {
-            Resource resource;
+            resource = registry.get(resolvedKey);
+        } catch (RegistryException ex) {
+            // resource not already exists - create new
+            // ignore the error
+        }
+        try {
             if (isDirectory) {
-                resource = registry.newCollection();
+                if (resource == null) {
+                    resource = registry.newCollection();
+                }
 
                 if (!propertyName.equals("")) {
                     resource.setProperty(propertyName, content);
                 }
             } else {
-                resource = registry.newResource();
+                if (resource == null) {
+                    resource = registry.newResource();
+                }
 
                 if (propertyName.equals("")){
                     resource.setMediaType(mediaType);
@@ -625,7 +635,10 @@ public class WSO2Registry extends AbstractRegistry {
                     Object value = resourceProperties.get(key);
                     if (value instanceof List) {
                         if (((List) value).size() > 0) {
-                            properties.put(key, ((List) value).get(0));
+                            Object propertyValue = ((List) value).get(0);
+                            if (propertyValue != null) {
+                                properties.put(key, propertyValue);
+                            }
                         }
                     } else {
                         properties.put(key, value);

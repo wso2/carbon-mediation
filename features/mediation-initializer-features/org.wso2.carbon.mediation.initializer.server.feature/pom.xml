@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer-features</artifactId>
-        <version>4.7.65-SNAPSHOT</version>
+        <version>4.7.134-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.7.65-SNAPSHOT</version>
+    <version>4.7.134-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.initializer.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Server Feature</name>
@@ -62,28 +62,8 @@
             <artifactId>org.wso2.carbon.mediation.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-models</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
+            <groupId>org.wso2.orbit.io.swagger.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
         </dependency>
 
     </dependencies>
@@ -117,13 +97,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.registry</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.dependency.mgt</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.startup</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.yaml:snakeyaml:${orbit.version.snakeyaml}</bundleDef>
-                                <bundleDef>io.swagger:swagger-models:${io.swagger.models.version}</bundleDef>
-                                <bundleDef>io.swagger:swagger-core:${io.swagger.core.version}</bundleDef>
-                                <bundleDef>io.swagger:swagger-annotations:${io.swagger.annotation.version}</bundleDef>
-                                <bundleDef>com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jackson.dataformat.yaml.version}</bundleDef>
-                                <bundleDef>javax.validation:validation-api:${javax.validation.version}</bundleDef>
-                                <bundleDef>org.yaml:snakeyaml:${snakeyaml.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.io.swagger.v3:swagger-parser:${swagger.parser.orbit.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>

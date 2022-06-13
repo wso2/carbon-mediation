@@ -1,8 +1,7 @@
 package org.wso2.carbon.rest.api.service;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import net.minidev.json.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.gson.*;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -16,6 +15,11 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.api.API;
+import org.apache.synapse.api.Resource;
+import org.apache.synapse.api.dispatch.DispatcherHelper;
+import org.apache.synapse.api.dispatch.URITemplateHelper;
+import org.apache.synapse.api.dispatch.URLMappingHelper;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapsePropertiesLoader;
@@ -23,19 +27,14 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.config.xml.rest.APISerializer;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.rest.API;
 import org.apache.synapse.rest.RESTConstants;
-import org.apache.synapse.rest.Resource;
-import org.apache.synapse.rest.dispatch.DispatcherHelper;
-import org.apache.synapse.rest.dispatch.URITemplateHelper;
-import org.apache.synapse.rest.dispatch.URLMappingHelper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.CarbonConfigurationContextFactory;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.APIGenException;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.APIGenerator;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
-import org.wso2.carbon.mediation.commons.rest.api.swagger.ServerConfig;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.OpenAPIProcessor;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
@@ -48,13 +47,14 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.rest.api.APIData;
 import org.wso2.carbon.rest.api.APIDataSorter;
 import org.wso2.carbon.rest.api.APIException;
-import org.wso2.carbon.rest.api.CarbonServerConfig;
 import org.wso2.carbon.rest.api.ConfigHolder;
 import org.wso2.carbon.rest.api.ResourceData;
 import org.wso2.carbon.rest.api.RestApiAdminUtils;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.NetworkUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,11 +65,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -79,12 +75,15 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     private static Log log = LogFactory.getLog(RestApiAdmin.class);
     private static final String TENANT_DELIMITER = "/t/";
     private static final String APPLICATION_JSON_TYPE = "application/json";
+    public static final String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
+
     /**
      * Registry path prefixes
      */
     private static final String CONFIG_REG_PREFIX = "conf:";
     private static final String GOV_REG_PREFIX = "gov:";
     private static final String FILE_PREFIX = "file:";
+    private static final String TITLE = "title";
     private boolean saveRuntimeArtifacts =
             SynapsePropertiesLoader.getBooleanProperty(SynapseConstants.STORE_ARTIFACTS_LOCALLY, true);
 
@@ -104,7 +103,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             lock.unlock();
         }
 	}
-	
+
 	public boolean addApiFromString(String apiData) throws APIException {
 		final Lock lock = getLock();
         try {
@@ -151,7 +150,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             assertNameNotEmpty(apiName);
             
             API oldAPI = null;
-            API api = APIFactory.createAPI(RestApiAdminUtils.retrieveAPIOMElement(apiData));
+            // Need to attach synapse configuration to properties to identify synapse imports (Connectors)
+            // From Synapse level.
+            Properties properties = new Properties();
+            properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
+            API api = APIFactory.createAPI(RestApiAdminUtils.retrieveAPIOMElement(apiData), properties);
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             
             oldAPI = synapseConfiguration.getAPI(apiName);
@@ -196,8 +199,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (nameAttribute == null || nameAttribute.getAttributeValue().trim().isEmpty()) {
             	apiElement.addAttribute("name", apiName, null);
             }
-            
-            API api = APIFactory.createAPI(apiElement);
+
+            // Need to attach synapse configuration to properties to identify synapse imports (Connectors)
+            // From Synapse level.
+            Properties properties = new Properties();
+            properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
+            API api = APIFactory.createAPI(apiElement, properties);
             
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 
@@ -842,9 +849,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 						apiName) != null) {
 					handleException(log, "A service named " + apiName + " already exists", null);
 				} else {
-					API api = APIFactory.createAPI(apiElement);
+                    Properties properties = new Properties();
+                    properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
+                    API api = APIFactory.createAPI(apiElement, properties);
 
-					try {
+                    try {
 						getSynapseConfiguration().addAPI(api.getName(), api);
 
 						//addParameterObserver(api.getName());
@@ -1106,21 +1115,21 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 
     /**
-     * Function to generate API from swagger definition (from Synapse API)
+     * Function to generate API from swagger definition (from Synapse API).
      *
-     * @param api existing synapse API
-     * @return generated swagger
-     * @throws APIException
+     * @param api    api existing synapse API
+     * @param isJSON generate Swagger in YAML / JSON format.
+     * @return generated swagger.
+     * @throws APIException error occurred while retrieving host details.
      */
-    public String generateSwaggerFromSynapseAPI(API api) throws APIException {
+    public String generateSwaggerFromSynapseAPIByFormat(API api, boolean isJSON) throws APIException {
         String swaggerJsonString = "";
         if (log.isDebugEnabled()) {
             log.debug("Generate swagger definition for the API : " + api.getAPIName());
         }
 
         try {
-            JSONObject jsonDefinition = new JSONObject(new GenericApiObjectDefinition(api).getDefinitionMap());
-            swaggerJsonString = jsonDefinition.toString();
+            return new OpenAPIProcessor(api).getOpenAPISpecification(isJSON);
         } catch (AxisFault axisFault) {
             handleException(log, "Error occurred while generating swagger definition", axisFault);
         }
@@ -1128,20 +1137,51 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 
     /**
+     * Function to generate API from swagger definition (from Synapse API)
+     *
+     * @param api existing synapse API
+     * @return generated swagger
+     * @throws APIException
+     */
+    public String generateSwaggerFromSynapseAPI(API api) throws APIException {
+        return generateSwaggerFromSynapseAPIByFormat(api,true);
+    }
+
+    /**
      * Function to generate API from swagger definition (from JSON representation)
      *
      * @param swaggerJsonString swagger definition
      * @return generated synapse API
-     * @throws APIException
+     * @throws APIException error occurred while retrieving host details.
      */
     public String generateAPIFromSwagger(String swaggerJsonString) throws APIException {
+        return generateAPIFromSwaggerByFormat(swaggerJsonString,true);
+    }
 
-        if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
+    /**
+     * Function to generate API from swagger definition (from JSON representation)
+     *
+     * @param swaggerString swagger definition
+     * @param isJSON        input in YAML / JSON format.
+     * @return generated synapse API.
+     * @throws APIException error occurred while retrieving host details.
+     */
+    public String generateAPIFromSwaggerByFormat(String swaggerString, boolean isJSON) throws APIException {
+
+        if (swaggerString == null || swaggerString.isEmpty()) {
             handleException(log, "Swagger provided is empty, hence unable to generate API", null);
         }
 
+        if (!isJSON) {
+            try {
+                swaggerString = GenericApiObjectDefinition.convertYamlToJson(swaggerString);
+            } catch (JsonProcessingException e) {
+                handleException(log, "Error occurred while converting the provided YAML to JSON", null);
+            }
+        }
+
         JsonParser jsonParser = new JsonParser();
-        JsonElement swaggerJson = jsonParser.parse(swaggerJsonString);
+        JsonElement swaggerJson = jsonParser.parse(swaggerString);
         if (swaggerJson.isJsonObject()) {
             APIGenerator apiGenerator = new APIGenerator(swaggerJson.getAsJsonObject());
             try {
@@ -1161,7 +1201,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * Function to generate updated existing API by referring to swagger definition (from JSON representation)
      *
      * @param swaggerJsonString swagger definition
-     * @param existingApiName name of the existing API
+     * @param existingApiName   name of the existing API
      * @return generated synapse API
      * @throws APIException
      */
@@ -1193,14 +1233,16 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 
     /**
-     * Function to generate updated existing API by referring to swagger definition (from JSON representation)
+     * Function to generate updated existing API by referring to swagger definition.
      *
-     * @param swaggerJsonString swagger definition
-     * @param existingApi existing synapse API
-     * @return generated synapse API
-     * @throws APIException
+     * @param swaggerJsonString swagger definition.
+     * @param isJSON            input in YAML / JSON format.
+     * @param existingApi       existing synapse API.
+     * @return generated synapse API.
+     * @throws APIException error occurred while retrieving host details.
      */
-    public String generateUpdatedAPIFromSwagger(String swaggerJsonString, API existingApi) throws APIException {
+    public String generateUpdatedAPIFromSwaggerByFormat(String swaggerJsonString, boolean isJSON, API existingApi)
+            throws APIException {
 
         if (swaggerJsonString == null || swaggerJsonString.isEmpty()) {
             handleException(log, "Provided swagger definition is empty, hence unable to generate API", null);
@@ -1208,6 +1250,14 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
         if (existingApi == null) {
             handleException(log, "Provided existing API name is empty, hence unable to generate API", null);
+        }
+
+        if (!isJSON) {
+            try {
+                swaggerJsonString = GenericApiObjectDefinition.convertYamlToJson(swaggerJsonString);
+            } catch (JsonProcessingException e) {
+                handleException(log, "Error occurred while converting the provided YAML to JSON", null);
+            }
         }
 
         JsonParser jsonParser = new JsonParser();
@@ -1225,6 +1275,18 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
         // Definitely will not reach here
         return "";
+    }
+
+    /**
+     * Function to generate updated existing API by referring to swagger definition (from JSON representation)
+     *
+     * @param swaggerJsonString swagger definition
+     * @param existingApi       existing synapse API
+     * @return generated synapse API
+     * @throws APIException
+     */
+    public String generateUpdatedAPIFromSwaggerForAPI(String swaggerJsonString, API existingApi) throws APIException {
+        return generateUpdatedAPIFromSwaggerByFormat(swaggerJsonString, true, existingApi);
     }
 
     /**
@@ -1305,6 +1367,77 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 }
             }
             return strBuilder.toString();
+        }
+    }
+
+    /**
+     * Generate updated OpenApi definition using an updated API.
+     *
+     * @param existingSwagger existing OpenApi definition of the API.
+     * @param isJSONIn        input data-type JSON / YAML.
+     * @param isJSONOut       output required in JSON / YAML.
+     * @param api             updated synapse API.
+     * @return OpenApi definition of the updated API.
+     * @throws APIGenException Error occurred while generating the updated definition.
+     */
+    public String generateUpdatedSwaggerFromAPI(String existingSwagger, boolean isJSONIn, boolean isJSONOut, API api)
+            throws APIGenException {
+
+        OpenAPIProcessor openAPIProcessor = new OpenAPIProcessor(api);
+        return openAPIProcessor.getUpdatedSwaggerFromApi(existingSwagger, isJSONIn, isJSONOut);
+    }
+
+    /**
+     * Update the title of a given swagger document.
+     *
+     * @param newName new title which should be added.
+     * @param swagger swagger document.
+     * @return updated swagger.
+     * @throws APIException Error occurred while updating the title of the swagger.
+     */
+    public String updateNameInSwagger(String newName, String swagger) throws APIException {
+        JsonParser parser = new JsonParser();
+        JsonElement jsonElement;
+        try {
+            jsonElement = parser.parse(swagger);
+            Boolean openApi = jsonElement.getAsJsonObject().has("openapi");
+            if (!openApi) {
+                handleException(log, "Provided swagger is not OpenApi 3.0", null);
+            } else {
+                JsonObject infoObject = jsonElement.getAsJsonObject().get("info").getAsJsonObject();
+                infoObject.remove(TITLE);
+                infoObject.add(TITLE, new JsonPrimitive(newName));
+                return jsonElement.toString();
+            }
+        } catch (JsonSyntaxException ex) {
+            // neglect the error - treat as YAML
+            Yaml yaml = new Yaml();
+            Map<String, Object> obj = yaml.load(swagger);
+            Map<String, Object> infoMap = (Map<String, Object>) obj.get("info");
+            infoMap.remove(TITLE);
+            infoMap.put(TITLE, newName);
+
+            DumperOptions options = new DumperOptions();
+            options.setIndent(2);
+            options.setPrettyFlow(true);
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            Yaml output = new Yaml(options);
+            return output.dump(obj);
+        }
+        return null;
+    }
+
+    public OMElement getAPIContent(String apiName, String tenantDomain) {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            API api = getSynapseAPIByName(apiName);
+            if (api != null) {
+                return APISerializer.serializeAPI(api);
+            }
+            return null;
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
         }
     }
 }

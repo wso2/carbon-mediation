@@ -21,12 +21,12 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.rest.API;
+import org.apache.synapse.api.API;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
 import org.wso2.carbon.core.transports.HttpGetRequestProcessor;
 import org.wso2.carbon.integrator.core.json.utils.GSONUtils;
-import org.wso2.carbon.mediation.commons.rest.api.swagger.GenericApiObjectDefinition;
+import org.wso2.carbon.mediation.commons.rest.api.swagger.OpenAPIProcessor;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.ServerConfig;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger.format.utils.SwaggerProcessorConstants;
@@ -75,6 +75,7 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
 
         String responseString;
         try {
+
             Yaml yamlDefinition = new Yaml();
             String defFromRegistry = retrieveAPISwaggerFromRegistry(api, request.getRequestURI());
             if (defFromRegistry != null) {
@@ -83,8 +84,8 @@ public class SwaggerYamlProcessor extends SwaggerGenerator implements HttpGetReq
                         yamlDefinition.dumpAsMap(GSONUtils.gsonJsonObjectToMap(jsonParser.parse(defFromRegistry)));
             } else {
                 ServerConfig serverConfig = new CarbonServerConfig();
-                responseString =
-                        yamlDefinition.dumpAsMap(new GenericApiObjectDefinition(api, serverConfig).getDefinitionMap());
+                OpenAPIProcessor openAPIProcessor = new OpenAPIProcessor(api,serverConfig);
+                responseString = openAPIProcessor.getOpenAPISpecification(false);
             }
         } catch (RegistryException e) {
             throw new AxisFault("Error occurred while retrieving swagger definition from registry", e);

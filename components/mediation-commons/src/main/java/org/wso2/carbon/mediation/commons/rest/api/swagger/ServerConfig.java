@@ -20,7 +20,7 @@
 package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 import org.apache.axis2.AxisFault;
-import org.apache.synapse.rest.API;
+import org.apache.synapse.api.API;
 
 /**
  * This interface should be implemented

@@ -18,10 +18,10 @@ package org.wso2.carbon.mediation.transport.handlers.requestprocessors.swagger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.rest.API;
-import org.apache.synapse.rest.Resource;
-import org.apache.synapse.rest.dispatch.DispatcherHelper;
-import org.apache.synapse.rest.dispatch.URLMappingBasedDispatcher;
+import org.apache.synapse.api.API;
+import org.apache.synapse.api.Resource;
+import org.apache.synapse.api.dispatch.DispatcherHelper;
+import org.apache.synapse.api.dispatch.URLMappingBasedDispatcher;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

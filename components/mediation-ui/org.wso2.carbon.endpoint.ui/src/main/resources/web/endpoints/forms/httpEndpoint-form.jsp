@@ -204,6 +204,18 @@
     String description = "";
     String properties = "";
 
+    String clientId = "";
+    String clientSecret = "";
+    String authMode = "";
+    String refreshToken = "";
+    String username = "";
+    String password = "";
+    String tokenURL = "";
+    String requestParametersMap = "";
+
+    String basicAuthUsername = "";
+    String basicAuthPassword = "";
+
     if (endpoint != null) {
         // Endpoint Name
         if (endpoint.getEndpointName() != null) {
@@ -317,6 +329,21 @@
         if (endpoint.getProperties() != null && endpoint.getProperties() != "") {
             properties = endpoint.getProperties();
         }
+
+        // oauth
+        clientId = endpoint.getClientId();
+        clientSecret = endpoint.getClientSecret();
+        authMode = endpoint.getAuthMode();
+        refreshToken = endpoint.getRefreshToken();
+        username = endpoint.getUsername();
+        password = endpoint.getPassword();
+        tokenURL = endpoint.getTokenURL();
+        requestParametersMap = endpoint.getRequestParametersAsString();
+
+        // basic auth
+        basicAuthUsername = endpoint.getBasicAuthUsername();
+        basicAuthPassword = endpoint.getBasicAuthPassword();
+
     } else {
         if (isFromTemplateEditor) { // set default variables to template fields
             if (httpEpName.equals("")) {
@@ -656,7 +683,41 @@
                   cols="100" rows="3"><%=description%>
         </textarea>
     </td>
-</tr>
+    </tr>
+    <tr style="display:none;">
+        <td>
+            <input type="text" id="clientId" name="clientId" value="<%=clientId%>"></input>
+        </td>
+        <td>
+            <input type="text" id="clientSecret" name="clientSecret" value="<%=clientSecret%>"></input>
+        </td>
+        <td>
+            <input type="text" id="authMode" name="authMode" value="<%=authMode%>"></input>
+        </td>
+        <td>
+            <input type="text" id="refreshToken" name="refreshToken" value="<%=refreshToken%>"></input>
+        </td>
+        <td>
+            <input type="text" id="username" name="username" value="<%=username%>"></input>
+        </td>
+        <td>
+            <input type="text" id="password" name="password" value="<%=password%>"></input>
+        </td>
+        <td>
+            <input type="text" id="tokenURL" name="tokenURL" value="<%=tokenURL%>"></input>
+        </td>
+        <td>
+            <input type="text" id="requestParametersMap" name="requestParametersMap" value="<%=requestParametersMap%>"></input>
+        </td>
+    </tr>
+    <tr style="display:none;">
+        <td>
+            <input type="text" id="basicAuthUsername" name="basicAuthUsername" value="<%=basicAuthUsername%>"></input>
+        </td>
+        <td>
+            <input type="text" id="basicAuthPassword" name="basicAuthPassword" value="<%=basicAuthPassword%>"></input>
+        </td>
+    </tr>
 </tr>
 </tbody>
 </table>

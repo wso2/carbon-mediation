@@ -367,6 +367,19 @@ public class MessageProcessorAdminServiceClient {
         return active;
     }
 
+    public boolean isTaskLocationKnown(String name) throws Exception {
+
+        boolean knownTaskLocation = false;
+        try {
+            if (name != null) {
+                knownTaskLocation = stub.isTaskLocationKnown(name);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return knownTaskLocation;
+    }
+
     public void deactivate(String name) throws Exception {
         try {
             if (name != null) {

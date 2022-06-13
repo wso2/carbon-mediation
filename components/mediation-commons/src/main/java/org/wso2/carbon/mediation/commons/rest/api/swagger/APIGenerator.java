@@ -20,12 +20,21 @@ package org.wso2.carbon.mediation.commons.rest.api.swagger;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.swagger.util.Json;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SequenceType;
+import org.apache.synapse.api.API;
+import org.apache.synapse.api.Resource;
+import org.apache.synapse.api.dispatch.URITemplateHelper;
+import org.apache.synapse.api.dispatch.URLMappingHelper;
+import org.apache.synapse.api.version.ContextVersionStrategy;
+import org.apache.synapse.api.version.DefaultStrategy;
+import org.apache.synapse.api.version.URLBasedVersionStrategy;
+import org.apache.synapse.api.version.VersionStrategy;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.config.xml.rest.APISerializer;
 import org.apache.synapse.config.xml.rest.VersionStrategyFactory;
@@ -35,21 +44,18 @@ import org.apache.synapse.mediators.builtin.LoopBackMediator;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.apache.synapse.mediators.builtin.RespondMediator;
 import org.apache.synapse.mediators.transform.PayloadFactoryMediator;
-import org.apache.synapse.rest.API;
-import org.apache.synapse.rest.Resource;
-import org.apache.synapse.rest.dispatch.URITemplateHelper;
-import org.apache.synapse.rest.dispatch.URLMappingHelper;
-import org.apache.synapse.rest.version.ContextVersionStrategy;
-import org.apache.synapse.rest.version.DefaultStrategy;
-import org.apache.synapse.rest.version.URLBasedVersionStrategy;
+import org.apache.synapse.mediators.transform.pfutils.RegexTemplateProcessor;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -71,15 +77,41 @@ public class APIGenerator {
      * @throws APIGenException
      */
     public API generateSynapseAPI() throws APIGenException {
-
-        if (swaggerJson.get(SwaggerConstants.BASE_PATH) == null ||
-                swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString().isEmpty()) {
-            throw new APIGenException("The \"basePath\" of the swagger definition is mandatory for API generation");
-        }
-        String apiContext = swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString();
-        //cleanup context : remove ending '/'
-        if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
-            apiContext = apiContext.substring(0, apiContext.length() - 1);
+        String apiContext;
+        if (swaggerJson.get(SwaggerConstants.SERVERS) == null ||
+                swaggerJson.get(SwaggerConstants.SERVERS).getAsJsonArray().size() == 0) {
+            apiContext = SwaggerConstants.DEFAULT_CONTEXT;
+        } else {
+            JsonObject firstServer = swaggerJson.getAsJsonArray(SwaggerConstants.SERVERS).get(0).getAsJsonObject();
+            // get the first path in the servers section
+            String serversString = firstServer.get(SwaggerConstants.URL).getAsString();
+            if (serversString.contains("{") && serversString.contains("}")) {
+                // url is templated, need to resolve
+                if (firstServer.has(SwaggerConstants.VARIABLES)) {
+                    JsonObject variables = firstServer.get(SwaggerConstants.VARIABLES).getAsJsonObject();
+                    serversString = replaceTemplates(serversString,variables);
+                } else {
+                    throw new APIGenException("Server url is templated, but variables cannot be found");
+                }
+            }
+            try {
+                URL url = new URL(serversString);
+                apiContext = url.getPath();
+            } catch (MalformedURLException e) {
+                // url can be relative the place where the swagger is hosted.
+                apiContext = serversString;
+            }
+            if (apiContext.equals("/")) {
+                apiContext = SwaggerConstants.DEFAULT_CONTEXT;
+            }
+            //cleanup context : remove ending '/'
+            if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
+                apiContext = apiContext.substring(0, apiContext.length() - 1);
+            }
+            // add leading / if not exists
+            if (!apiContext.startsWith("/")) {
+                apiContext = "/" + apiContext;
+            }
         }
 
         if (swaggerJson.get(SwaggerConstants.INFO) == null) {
@@ -142,6 +174,28 @@ public class APIGenerator {
     }
 
     /**
+     * Resolve templated URLs. Ex: https://{customerId}.saas-app.com:{port}/v2/gggg
+     * @param input     Input template URL.
+     * @param variables OpenAPI variables definition.
+     * @return Resolved URL.
+     * @throws APIGenException Error occurred while replacing the template values.
+     */
+    private String replaceTemplates(String input, JsonObject variables) throws APIGenException {
+        Matcher m = Pattern.compile(SwaggerConstants.TEMPLATE_REGEX).matcher(input);
+        while (m.find()) {
+            String temp = m.group(1);
+            if (variables.has(temp) && variables.get(temp).getAsJsonObject().has(SwaggerConstants.DEFAULT_VALUE)) {
+                String realValue =
+                        variables.get(temp).getAsJsonObject().get(SwaggerConstants.DEFAULT_VALUE).getAsString();
+                input = input.replace("{" + temp + "}", realValue);
+            } else {
+                throw new APIGenException("Variables cannot be found to replace the value " + "{" + temp + "}");
+            }
+        }
+        return input;
+    }
+
+    /**
      * Generate API from provided swagger definition referring to the old API.
      *
      * @param existingAPI old API
@@ -149,15 +203,30 @@ public class APIGenerator {
      * @throws APIGenException
      */
     public API generateSynapseAPI(API existingAPI) throws APIGenException {
-
-        if (swaggerJson.get(SwaggerConstants.BASE_PATH) == null ||
-                swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString().isEmpty()) {
-            throw new APIGenException("The \"basePath\" of the swagger definition is mandatory for API generation");
+        String apiContext;
+        if (swaggerJson.get(SwaggerConstants.SERVERS) == null ||
+                swaggerJson.get(SwaggerConstants.SERVERS).getAsJsonArray().size() == 0) {
+            apiContext = SwaggerConstants.DEFAULT_CONTEXT;
+        } else {
+            // get the first path in the servers section
+            String serversString =
+                    swaggerJson.getAsJsonArray(SwaggerConstants.SERVERS).get(0).getAsJsonObject()
+                            .get(SwaggerConstants.URL).getAsString();
+            try {
+                URL url = new URL(serversString);
+                apiContext = url.getPath();
+            } catch (MalformedURLException e) {
+                // url can be relative the place where the swagger is hosted.
+                apiContext = serversString;
+            }
         }
-        String apiContext = swaggerJson.get(SwaggerConstants.BASE_PATH).getAsString();
         //cleanup context : remove ending '/'
         if (apiContext.lastIndexOf('/') == (apiContext.length() - 1)) {
             apiContext = apiContext.substring(0, apiContext.length() - 1);
+        }
+        // add leading / if not exists
+        if (!apiContext.startsWith("/")) {
+            apiContext = "/" + apiContext;
         }
 
         if (swaggerJson.get(SwaggerConstants.INFO) == null) {
@@ -253,12 +322,13 @@ public class APIGenerator {
     /**
      * Function to create resource from swagger definition.
      *
-     * @param path path of the resource
+     * @param path        path of the resource
      * @param resourceObj json representation of resource
-     * @param genAPI generated API
+     * @param genAPI      generated API
      * @param existingAPI old API
      */
-    private void createResource(String path, JsonObject resourceObj, API genAPI, API existingAPI) throws APIGenException {
+    private void createResource(String path, JsonObject resourceObj, API genAPI, API existingAPI)
+            throws APIGenException {
         boolean noneURLStyleAdded = false;
         List<Resource> resources = new ArrayList<>();
         if (existingAPI != null) {
@@ -275,8 +345,8 @@ public class APIGenerator {
         // Same number is assigned to all the method in the same resource of the existing API
         HashMap<String, Integer> methodMapping = new HashMap<>();
         HashMap<Integer, Resource> createdResources = new HashMap<>();
-        for (Resource resource: resources) {
-            for (String method: resource.getMethods()) {
+        for (Resource resource : resources) {
+            for (String method : resource.getMethods()) {
                 methodMapping.put(method, i);
             }
             i++;
@@ -330,9 +400,16 @@ public class APIGenerator {
     }
 
     private void updateImplChanges(API newAPI, API currentAPI) {
-
+        String newVersion = newAPI.getVersion();
         //Migrate version strategy
-        newAPI.setVersionStrategy(currentAPI.getVersionStrategy());
+        VersionStrategy strategy = currentAPI.getVersionStrategy();
+        if (strategy instanceof URLBasedVersionStrategy) {
+            newAPI.setVersionStrategy(new URLBasedVersionStrategy(newAPI, newVersion,
+                    currentAPI.getVersionStrategy().getVersionParam()));
+        } else if (strategy instanceof ContextVersionStrategy) {
+            newAPI.setVersionStrategy(
+                    new ContextVersionStrategy(newAPI, newVersion, currentAPI.getVersionStrategy().getVersionParam()));
+        }
 
         // Map of resources against resource url mapping or template
         HashMap<String, HashMap<String, Resource>> currentResourceList = new HashMap<>();
@@ -347,7 +424,7 @@ public class APIGenerator {
             } else {
                 resourceMap = new HashMap<>();
             }
-            for (String method: resource.getMethods()) {
+            for (String method : resource.getMethods()) {
                 resourceMap.put(method, resource);
             }
             currentResourceList.put(resourceMapping, resourceMap);
@@ -361,7 +438,7 @@ public class APIGenerator {
 
             if (existingResources != null) {
                 // TODO handle multiple resources with same URL mapping or template with different methods
-                for (String method: resource.getMethods()) {
+                for (String method : resource.getMethods()) {
                     // Check for a resource with matching method
                     if (existingResources.containsKey(method)) {
                         compareAndUpdateResource(existingResources.get(method), resource);
@@ -431,6 +508,7 @@ public class APIGenerator {
         defaultInSeq.addChild(logicGoesHereComment);
 
         PayloadFactoryMediator defaultPayload = new PayloadFactoryMediator();
+        defaultPayload.setTemplateProcessor(new RegexTemplateProcessor());
         defaultPayload.setType("json");
         defaultPayload.setFormat("{\"Response\" : \"Sample Response\"}");
         defaultInSeq.addChild(defaultPayload);

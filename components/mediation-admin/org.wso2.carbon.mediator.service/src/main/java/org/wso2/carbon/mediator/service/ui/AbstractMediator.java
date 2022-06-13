@@ -110,6 +110,10 @@ public abstract class AbstractMediator implements Mediator {
     }
 
     public static List<MediatorProperty> getMediatorProperties(OMElement elem) {
+        return getMediatorProperties(elem, false);
+    }
+
+    public static List<MediatorProperty> getMediatorProperties(OMElement elem, boolean allowEmptyValues) {
 
         List<MediatorProperty> propertyList = new ArrayList<MediatorProperty>();
 
@@ -135,11 +139,9 @@ public abstract class AbstractMediator implements Mediator {
             // if a value is specified, use it, else look for an expression
             if (attValue != null) {
 
-                if (attValue.getAttributeValue() == null ||
-                    attValue.getAttributeValue().trim().length() == 0) {
-
-                    String msg = "Entry attribute value (if specified) " +
-                        "is required for a Log property";
+                if ((attValue.getAttributeValue() == null ||
+                        attValue.getAttributeValue().trim().length() == 0) && !allowEmptyValues) {
+                    String msg = "Entry attribute value (if specified) is required for a Log property";
                     throw new MediatorException(msg);
 
                 } else {

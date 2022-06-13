@@ -17,6 +17,8 @@
 package org.wso2.carbon.mediation.dependency.mgt;
 
 import org.apache.synapse.Mediator;
+import org.apache.synapse.api.API;
+import org.apache.synapse.api.version.DefaultStrategy;
 import org.apache.synapse.config.AbstractSynapseObserver;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.ProxyService;
@@ -26,8 +28,6 @@ import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.eventing.SynapseEventSource;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.rest.API;
-import org.apache.synapse.rest.version.DefaultStrategy;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.commons.rest.api.swagger.SwaggerConstants;
 import org.wso2.carbon.mediation.registry.RegistryServiceHolder;

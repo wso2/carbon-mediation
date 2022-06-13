@@ -18,13 +18,13 @@
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.7.65-SNAPSHOT</version>
+        <version>4.7.134-SNAPSHOT</version>
  	<artifactId>mediation-admin</artifactId>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.artifactuploader</artifactId>
-    <version>4.7.65-SNAPSHOT</version>
+    <version>4.7.134-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Synapse Artifact Uploader BE</name>
     <url>http://wso2.org</url>
@@ -105,7 +105,7 @@
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
+            <groupId>org.wso2.org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-api</artifactId>
         </dependency>
         <dependency>

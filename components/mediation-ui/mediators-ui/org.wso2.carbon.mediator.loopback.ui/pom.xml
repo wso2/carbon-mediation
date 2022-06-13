@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediators-ui</artifactId>
-        <version>4.7.65-SNAPSHOT</version>
+        <version>4.7.134-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -69,7 +69,7 @@
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
+            <groupId>org.wso2.org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-api</artifactId>
         </dependency>
     </dependencies>

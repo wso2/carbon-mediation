@@ -1,0 +1,101 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "firstApi",
+    "description": "API Definition of firstApi",
+    "version": "1.2.4"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:8253/first"
+    }
+  ],
+  "paths": {
+    "/addUser": {
+      "post": {
+        "requestBody": {
+          "description": "Sample Payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payload": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    },
+    "/getUser/{userId}/{userName}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    },
+    "/newPath": {
+      "post": {
+        "requestBody": {
+          "description": "Sample Payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payload": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    },
+    "/": {
+      "put": {
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    }
+  }
+}

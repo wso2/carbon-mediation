@@ -32,6 +32,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.api.ApiConstants;
+import org.apache.synapse.api.inbound.InboundApiHandler;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
@@ -54,6 +56,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,9 +68,10 @@ public class InboundHttpServerWorker extends ServerWorker {
 
     private static final Log log = LogFactory.getLog(InboundHttpServerWorker.class);
 
-    private SourceRequest request = null;
+    private SourceRequest request;
     private int port;
     private String tenantDomain;
+    private InboundApiHandler inboundApiHandler;
     private RESTRequestHandler restHandler;
     private Pattern dispatchPattern;
     private Matcher patternMatcher;
@@ -82,6 +86,7 @@ public class InboundHttpServerWorker extends ServerWorker {
         this.request = sourceRequest;
         this.port = port;
         this.tenantDomain = tenantDomain;
+        inboundApiHandler = new InboundApiHandler();
         restHandler = new RESTRequestHandler();
         isInternalHttpInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundHttpPort() == port);
         isInternalHttpsInboundEndpoint = (HTTPEndpointManager.getInstance().getInternalInboundHttpsPort() == port);
@@ -90,6 +95,8 @@ public class InboundHttpServerWorker extends ServerWorker {
     public void run() {
         if (request != null) {
             try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
                 //get already created axis2 context from ServerWorker
                 MessageContext axis2MsgContext = getRequestContext();
 
@@ -123,7 +130,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                         HTTPEndpointManager.getInstance().getEndpointName(port, tenantDomain);
                 if (endpointName == null) {
                     handleException("Endpoint not found for port : " + port + "" +
-                                    " tenant domain : " + tenantDomain);
+                            " tenant domain : " + tenantDomain);
                 }
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
@@ -132,75 +139,84 @@ public class InboundHttpServerWorker extends ServerWorker {
                     return;
                 }
 
-//                OpenEventCollector.reportEntryEvent(synCtx, endpointName, endpoint.getAspectConfiguration(),
-//                                                    ComponentType.INBOUNDENDPOINT);
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
                 doPreInjectTasks(axis2MsgContext, (Axis2MessageContext) synCtx, method);
 
-                dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
+                synCtx.setProperty(ApiConstants.API_CALLER, endpoint.getName());
+                boolean isProcessed = inboundApiHandler.process(synCtx);
 
-                boolean continueDispatch = true;
-                if (dispatchPattern != null) {
-                    patternMatcher = dispatchPattern.matcher(request.getUri());
-                    if (!patternMatcher.matches()) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Requested URI does not match given dispatch regular expression.");
+                if (!isProcessed) {
+                    dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
+
+                    boolean continueDispatch = true;
+                    if (dispatchPattern != null) {
+                        patternMatcher = dispatchPattern.matcher(request.getUri());
+                        if (!patternMatcher.matches()) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Requested URI does not match given dispatch regular expression.");
+                            }
+                            continueDispatch = false;
                         }
-                        continueDispatch = false;
-                    }
-                }
-
-                if (continueDispatch && dispatchPattern != null) {
-
-                    boolean processedByAPI = false;
-
-                    // Trying to dispatch to an API
-                    processedByAPI = restHandler.process(synCtx);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Dispatch to API state : enabled, Message is "
-                                  + (!processedByAPI ? "NOT" : "") + "processed by an API");
                     }
 
-                    if (!processedByAPI) {
-                        //check the validity of message routing to axis2 path
-                        boolean isAxis2Path = isAllowedAxis2Path(synCtx);
+                    if (continueDispatch && dispatchPattern != null) {
 
-                        if (isAxis2Path) {
-                            //create axis2 message context again to avoid settings updated above
-                            axis2MsgContext = createMessageContext(null, request);
+                        boolean processedByAPI = false;
 
-                            processHttpRequestUri(axis2MsgContext, method);
+                        // Trying to dispatch to an API
 
-                            //set inbound properties for axis2 context
-                            setInboundProperties(axis2MsgContext);
+                        // Remove the API_CALLER property from the Synapse Context
+                        Set properties = synCtx.getPropertyKeySet();
+                        if (properties != null) {
+                            properties.remove(ApiConstants.API_CALLER);
+                        }
+                        processedByAPI = restHandler.process(synCtx);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Dispatch to API state : enabled, Message is "
+                                    + (!processedByAPI ? "NOT" : "") + "processed by an API");
+                        }
 
-                            if (!isRESTRequest(axis2MsgContext, method)) {
-                                if (request.isEntityEnclosing()) {
-                                    processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
+                        if (!processedByAPI) {
+                            //check the validity of message routing to axis2 path
+                            boolean isAxis2Path = isAllowedAxis2Path(synCtx);
+
+                            if (isAxis2Path) {
+                                //create axis2 message context again to avoid settings updated above
+                                axis2MsgContext = createMessageContext(null, request);
+
+                                processHttpRequestUri(axis2MsgContext, method);
+
+                                //set inbound properties for axis2 context
+                                setInboundProperties(axis2MsgContext);
+
+                                if (!isRESTRequest(axis2MsgContext, method)) {
+                                    if (request.isEntityEnclosing()) {
+                                        processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
+                                    } else {
+                                        processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
+                                    }
                                 } else {
-                                    processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
+                                    String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                                    SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
+                                    processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
                                 }
                             } else {
-                                String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-                                SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
-                                processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
+                                //this case can only happen regex exists and it DOES match
+                                //BUT there is no api or proxy found message to be injected
+                                //should be routed to the main sequence instead inbound defined sequence
+                                injectToMainSequence(synCtx, endpoint);
                             }
-                        } else {
-                            //this case can only happen regex exists and it DOES match
-                            //BUT there is no api or proxy found message to be injected
-                            //should be routed to the main sequence instead inbound defined sequence
-                            injectToMainSequence(synCtx, endpoint);
                         }
+                    } else if (continueDispatch && dispatchPattern == null) {
+                        // else if for clarity compiler will optimize
+                        injectToSequence(synCtx, endpoint);
+                    } else {
+                        //this case can only happen regex exists and it DOES NOT match
+                        //should be routed to the main sequence instead inbound defined sequence
+                        injectToMainSequence(synCtx, endpoint);
                     }
-                } else if (continueDispatch && dispatchPattern == null) {
-                    // else if for clarity compiler will optimize
-                    injectToSequence(synCtx, endpoint);
-                } else {
-                    //this case can only happen regex exists and it DOES NOT match
-                    //should be routed to the main sequence instead inbound defined sequence
-                    injectToMainSequence(synCtx, endpoint);
                 }
 
                 SynapseMessageReceiver.doPostInjectUpdates(synCtx);
@@ -208,6 +224,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                 sendAck(axis2MsgContext);
             } catch (Exception e) {
                 log.error("Exception occurred when running " + InboundHttpServerWorker.class.getName(), e);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
             }
         } else {
             log.error("InboundSourceRequest cannot be null");

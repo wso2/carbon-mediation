@@ -30,6 +30,8 @@ public class InboundWebsocketConfiguration {
     private String pipelineHandler;
     private String dispatchToCustomSequence;
     private final boolean usePortOffset;
+    private int inflowIdleTime;
+    private int outflowIdleTime;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -44,6 +46,8 @@ public class InboundWebsocketConfiguration {
         this.pipelineHandler = builder.pipelineHandler;
         this.dispatchToCustomSequence = builder.dispatchToCustomSequence;
         this.usePortOffset = builder.usePortOffset;
+        this.inflowIdleTime = builder.inflowIdleTime;
+        this.outflowIdleTime = builder.outflowIdleTime;
     }
 
     public int getPort() {
@@ -94,6 +98,14 @@ public class InboundWebsocketConfiguration {
         return usePortOffset;
     }
 
+    public int getInflowIdleTime() {
+        return inflowIdleTime;
+    }
+
+    public int getOutflowIdleTime() {
+        return outflowIdleTime;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -107,6 +119,8 @@ public class InboundWebsocketConfiguration {
         private String pipelineHandler;
         private String dispatchToCustomSequence;
         private boolean usePortOffset = false;
+        private int inflowIdleTime;
+        private int outflowIdleTime;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -164,6 +178,16 @@ public class InboundWebsocketConfiguration {
 
         public InboundWebsocketConfigurationBuilder usePortOffset(boolean usePortOffset) {
             this.usePortOffset = usePortOffset;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder inflowIdleTime(int inflowIdleTime) {
+            this.inflowIdleTime = inflowIdleTime;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder outflowIdleTime(int outflowIdleTime) {
+            this.outflowIdleTime = outflowIdleTime;
             return this;
         }
     }

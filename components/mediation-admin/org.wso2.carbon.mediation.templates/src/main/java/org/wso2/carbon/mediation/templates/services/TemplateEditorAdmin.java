@@ -68,6 +68,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
     //TODO: Move WSO2_TEMPLATE_MEDIA_TYPE to registry
     public static final String WSO2_TEMPLATE_MEDIA_TYPE = "application/vnd.wso2.template";
+    public static final String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
 
 
     public TemplateInfo[] getTemplates(int pageNumber, int templatePerPage)
@@ -333,9 +334,13 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 if (preSeq == null) {
                     handleException("Unable to save template " + templateName + ". Does not exist");
                 } else {
+                    // Need to attach synapse configuration to properties to identify synapse imports (Connectors)
+                    // From Synapse level.
+                    Properties properties = getSynapseConfiguration().getProperties();
+                    properties.put(SYNAPSE_CONFIGURATION, getSynapseConfiguration());
                     // we should first try to build the new sequence. if exception we return
                     Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(
-                            templateElement, getSynapseConfiguration().getProperties());
+                            templateElement, properties, getSynapseConfiguration());
 
                     boolean statisticsEnable = preSeq.isStatisticsEnable();
                     // if everything went successfully we remove the sequence

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/hello2" name="testAllApiChanged" version="2.0.0" version-type="url" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="DELETE GET" url-mapping="/addUser">
+        <inSequence>
+            <log>
+                <property name="test" value="this is add user post first api"/>
+            </log>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+    <resource methods="POST PUT" url-mapping="/updateUser">
+        <inSequence>
+            <log>
+                <property name="test" value="this is add user post first api"/>
+            </log>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+    <resource methods="POST GET" uri-template="/getUser/{userId}/{age}">
+        <inSequence>
+            <!--This is generated API skeleton.-->
+            <property expression="get-property('uri.var.userId')" name="userId" scope="default" type="STRING"/>
+            <property expression="get-property('uri.var.userName')" name="userName" scope="default" type="STRING"/>
+            <!--Business Logic Goes Here-->
+            <payloadFactory media-type="json">
+                <format>{"Response" : "Sample Response"}</format>
+                <args/>
+            </payloadFactory>
+            <loopback/>
+        </inSequence>
+        <outSequence>
+            <respond/>
+        </outSequence>
+        <faultSequence/>
+    </resource>
+    <resource methods="POST GET" uri-template="/getUser/{userId}?address={address}&amp;age={age}">
+        <inSequence>
+            <!--This is generated API skeleton.-->
+            <property expression="get-property('uri.var.userId')" name="userId" scope="default" type="STRING"/>
+            <property expression="get-property('uri.var.userName')" name="userName" scope="default" type="STRING"/>
+            <!--Business Logic Goes Here-->
+            <payloadFactory media-type="json">
+                <format>{"Response" : "Sample Response"}</format>
+                <args/>
+            </payloadFactory>
+            <loopback/>
+        </inSequence>
+        <outSequence>
+            <respond/>
+        </outSequence>
+        <faultSequence/>
+    </resource>
+    <resource methods="PUT">
+        <inSequence>
+            <log>
+                <property name="test" value="this is the default resource 1st api"/>
+            </log>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+    <resource methods="PUT DELETE" uri-template="/newResource">
+        <inSequence/>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+</api>

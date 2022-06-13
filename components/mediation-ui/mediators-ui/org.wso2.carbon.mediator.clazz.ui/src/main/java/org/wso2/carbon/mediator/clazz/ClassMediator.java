@@ -76,7 +76,8 @@ public class ClassMediator extends AbstractMediator {
         }
         this.mediator = name.getAttributeValue();
 
-        addAllProperties(getMediatorProperties(elem));
+        // Class mediator can have properties with empty values
+        addAllProperties(getMediatorProperties(elem, true));
 
         processAuditStatus(this, elem);        
     }

@@ -48,8 +48,11 @@ import org.wso2.carbon.mediator.cache.util.HttpCachingFilter;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -76,6 +79,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      * The value of json content type as it appears in HTTP Content-Type header.
      */
     private final String jsonContentType = "application/json";
+
+    private static final String CONTENT_TYPE = "Content-Type";
 
     /**
      * Cache configuration ID.
@@ -374,6 +379,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                     headerProperties);
             msgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
                     headerProperties.get(Constants.Configuration.MESSAGE_TYPE));
+            msgCtx.setProperty(Constants.Configuration.CONTENT_TYPE,
+                    headerProperties.get(CONTENT_TYPE));
         }
 
         // take specified action on cache hit
@@ -524,7 +531,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                         (Map<String, String>) msgCtx.getProperty(
                                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
                 String messageType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
-                ConcurrentHashMap<String, Object> headerProperties = new ConcurrentHashMap<>();
+                Map<String, Object> headerProperties = Collections.synchronizedMap(
+                        new TreeMap<>(new Comparator<String>() {
+                            public int compare(String o1, String o2) {
+                                return o1.compareToIgnoreCase(o2);
+                            }
+                        })
+                );
 
                 //Store the response fetched time.
                 if (response.isCacheControlEnabled() || response.isAddAgeHeaderEnabled()) {
