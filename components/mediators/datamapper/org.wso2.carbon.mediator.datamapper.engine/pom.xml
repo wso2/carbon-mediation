@@ -49,6 +49,7 @@
                             org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.osgi.framework,
                             *;resolution:=optional,
+                            org.openjdk.nashorn.*
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Fragment-Host>synapse-core</Fragment-Host>
@@ -97,6 +98,10 @@
         <dependency>
             <groupId>net.sf.saxon.wso2</groupId>
             <artifactId>saxon</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.openjdk.nashorn</groupId>
+            <artifactId>openjdk-nashorn</artifactId>
         </dependency>
     </dependencies>
 </project>
