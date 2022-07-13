@@ -2707,7 +2707,7 @@
         <maven.surefire.plugin.version>2.12.4</maven.surefire.plugin.version>
         <maven.jacoco.plugin.version>0.8.2</maven.jacoco.plugin.version>
         <jacoco.agent.version>0.8.2</jacoco.agent.version>
-        <activemq.version>5.2.0</activemq.version>
+        <activemq.version>5.6.0</activemq.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v3</version.org.wso2.orbit.javax.activation>
         <wso2.commons.text.orbit.version>1.6.wso2v1</wso2.commons.text.orbit.version>
