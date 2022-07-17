@@ -23,6 +23,8 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.channel.Channel;
+import io.netty.util.ReferenceCountUtil;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
@@ -79,6 +81,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         String responceErrorSequence = null;
         String messageType = null;
         String wsSubProtocol = null;
+        boolean isConnectionTerminate = false;
         Map<String, Object> customHeaders = new HashMap<>();
 
         if (log.isDebugEnabled()) {
@@ -117,6 +120,14 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
         if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SUBPROTOCOL) != null) {
             wsSubProtocol = (String) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SUBPROTOCOL);
+        }
+        if (Boolean.valueOf(true).equals(msgCtx.getProperty(WebsocketConstants.CONNECTION_TERMINATE))) {
+            isConnectionTerminate = true;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("sendMessage triggered with sourceChannel: " + sourceIdentier + ", websocket sub protocol: "
+                              + wsSubProtocol + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                              + Thread.currentThread().getId());
         }
 
         /*
@@ -160,51 +171,80 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
+                log.debug("Fetching a Connection from the WS(WSS) Connection Factory with sourceChannel : "
+                                  + sourceIdentier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                  + Thread.currentThread().getId());
             }
-            WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
-                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, wsSubProtocol,
-                    customHeaders);
+            WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR),
+                                                                                       sourceIdentier, handshakePresent,
+                                                                                       responceDispatchSequence,
+                                                                                       responceErrorSequence,
+                                                                                       messageType, wsSubProtocol,
+                                                                                       isConnectionTerminate,
+                                                                                       customHeaders, responseSender,
+                                                                                       responceDispatchSequence,
+                                                                                       responceErrorSequence);
+            if (clientHandler == null && isConnectionTerminate) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Backend connection does not exist. No need to send close frame to backend "
+                                      + "with sourceChannel : " + sourceIdentier + ", in the Thread,ID: "
+                                      + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                }
+                return;
+            }
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
             if (tenantDomain != null) {
                 clientHandler.setTenantDomain(tenantDomain);
             } else {
                 clientHandler.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
             }
-            if (!sourceIdentier.equals(WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER)) {
-                clientHandler.registerWebsocketResponseSender(responseSender);
-                clientHandler.setDispatchSequence(responceDispatchSequence);
-                clientHandler.setDispatchErrorSequence(responceErrorSequence);
-            }
 
             if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT) != null
                     && msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT).equals(true)) {
                 WebSocketFrame frame = (BinaryWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME);
-                if (log.isDebugEnabled()) {
-                    log.debug("Sending the binary frame to the WS server on context id : "
-                            + clientHandler.getChannelHandlerContext().channel().toString());
-                }
-                if (clientHandler.getChannelHandlerContext().channel().isActive()) {
-                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+                try {
                     if (log.isDebugEnabled()) {
-                        LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                        log.debug("Sending the binary frame to the WS server on context id : "
+                                          + clientHandler.getChannelHandlerContext().channel().toString());
                     }
+                    if (clientHandler.getChannelHandlerContext().channel().isActive()) {
+                        clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+                        if (log.isDebugEnabled()) {
+                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                        }
+                    }
+                } finally {
+                    ReferenceCountUtil.release(frame);
                 }
             } else if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT) != null
                     && msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
                 WebSocketFrame frame = (TextWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME);
-                if (log.isDebugEnabled()) {
-                    log.debug("Sending the passthrough text frame to the WS server on context id : "
-                            + clientHandler.getChannelHandlerContext().channel().toString());
-                }
-                if (clientHandler.getChannelHandlerContext().channel().isActive()) {
-                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+                try {
                     if (log.isDebugEnabled()) {
-                        LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                        log.debug("Sending the passthrough text frame to the WS server on context id: "
+                                          + clientHandler.getChannelHandlerContext().channel().toString() + ", "
+                                          + ", sourceIdentifier: " + sourceIdentier + ", in the Thread,ID: "
+                                          + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
                     }
+                    if (clientHandler.getChannelHandlerContext().channel().isActive()) {
+                        clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+                        if (log.isDebugEnabled()) {
+                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                        }
+                    }
+                } finally {
+                    ReferenceCountUtil.release(frame);
                 }
-            } else if (Boolean.valueOf(true).equals(msgCtx.getProperty(WebsocketConstants.CONNECTION_TERMINATE))) {
-                clientHandler.getChannelHandlerContext().channel().flush();
+            } else if (isConnectionTerminate) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending CloseWebsocketFrame to WS server on context id: "
+                                      + clientHandler.getChannelHandlerContext().channel().toString() + ", "
+                                      + ", sourceIdentifier: " + sourceIdentier + ", in the Thread,ID: "
+                                      + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                }
+                Channel channel = clientHandler.getChannelHandlerContext().channel();
+                channel.writeAndFlush(new CloseWebSocketFrame());
+                channel.close();
             } else {
                 if (!handshakePresent) {
                     RelayUtils.buildMessage(msgCtx, false);
@@ -228,6 +268,12 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                         }
                     }
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("AcknowledgeHandshake to WS server on context id: "
+                                          + clientHandler.getChannelHandlerContext().channel().toString() + ", "
+                                          + ", sourceIdentifier: " + sourceIdentier + ", in the Thread,ID: "
+                                          + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                    }
                     clientHandler.acknowledgeHandshake();
                 }
             }
