@@ -18,6 +18,8 @@ package org.wso2.carbon.inbound.endpoint.protocol.websocket.management;
 
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketChannelContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebsocketSubscriberPathManager {
 
     private static WebsocketSubscriberPathManager instance = null;
+    private static final Log log = LogFactory.getLog(WebsocketSubscriberPathManager.class);
 
     private ConcurrentHashMap<String, ConcurrentHashMap<String, List<InboundWebsocketChannelContext>>>
             inboundSubscriberPathMap = new ConcurrentHashMap<String, ConcurrentHashMap<String, List<InboundWebsocketChannelContext>>>();
@@ -42,6 +45,10 @@ public class WebsocketSubscriberPathManager {
     public void addChannelContext(String inboundName,
                                   String subscriberPath,
                                   InboundWebsocketChannelContext ctx) {
+        if (log.isDebugEnabled()) {
+            log.debug("Adding Channel Context with channelID: " + ctx.getChannelIdentifier() + ", in the Thread,ID: "
+                              + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+        }
         ConcurrentHashMap<String, List<InboundWebsocketChannelContext>> subscriberPathMap =
                 inboundSubscriberPathMap.get(inboundName);
         if (subscriberPathMap == null) {
@@ -71,6 +78,11 @@ public class WebsocketSubscriberPathManager {
         for (Object context : listContext.toArray()) {
             if (((InboundWebsocketChannelContext) context).getChannelIdentifier()
                     .equals(ctx.getChannelIdentifier())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Removing Channel Context with channelID: " + ctx.getChannelIdentifier()
+                                      + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                      + Thread.currentThread().getId());
+                }
                 listContext.remove(context);
                 break;
             }
@@ -97,7 +109,7 @@ public class WebsocketSubscriberPathManager {
                 getSubscriberPathChannelContextList(inboundName, subscriberPath);
         for (InboundWebsocketChannelContext context : contextList) {
             WebSocketFrame duplicatedFrame = frame.duplicate();
-            context.writeToChannel(duplicatedFrame);
+            context.writeToChannel(duplicatedFrame.retain());
         }
     }
 
@@ -110,7 +122,7 @@ public class WebsocketSubscriberPathManager {
         for (InboundWebsocketChannelContext context : contextList) {
             if (!context.getChannelIdentifier().equals(ctx.getChannelIdentifier())) {
                 WebSocketFrame duplicatedFrame = frame.duplicate();
-                context.writeToChannel(duplicatedFrame);
+                context.writeToChannel(duplicatedFrame.retain());
             }
         }
     }

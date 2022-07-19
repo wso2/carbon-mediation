@@ -27,6 +27,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -152,14 +153,27 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
+            if (log.isDebugEnabled()) {
+                log.debug("Connection upgrade request received on channel: " + ctx.channel().toString()
+                                  + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                  + Thread.currentThread().getId());
+            }
             handleHandshake(ctx, (FullHttpRequest) msg);
         } else if (msg instanceof WebSocketFrame) {
+            if (log.isDebugEnabled()) {
+                log.debug("Websocket frame received on channel: " + ctx.channel().toString() + ", in the  Thread: "
+                                  + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+            }
             handleWebSocketFrame(ctx, (WebSocketFrame) msg);
         }
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("ChannelInactive triggered with sourceIdentifier: " + ctx.channel().toString() + ", on Thread: "
+                              + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+        }
         if (isHealthCheckCall) {
             return;
         }
@@ -181,94 +195,110 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     }
 
     private void handleHandshake(ChannelHandlerContext ctx, FullHttpRequest req) throws URISyntaxException, AxisFault {
-        if (log.isDebugEnabled()) {
-            WebsocketLogUtil.printHeaders(log, req, ctx);
-        }
-
-        // This block is for the health check of the ports 8099 and 9099
-        if (!req.headers().contains(HttpHeaders.UPGRADE) && req.uri().equals("/health")) {
-            isHealthCheckCall = true;
-            FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-            httpResponse.headers().set("content-length", httpResponse.content().readableBytes());
-            ctx.writeAndFlush(httpResponse);
-            return;
-        }
-
-        WebSocketServerHandshakerFactory wsFactory;
-        int maxPayloadLength = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
-                org.wso2.carbon.inbound.endpoint.internal.http.api.Constants.WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH,
-                "0"));
-        if (maxPayloadLength != 0) {
-            wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
-                    SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true,
-                    maxPayloadLength);
-        } else {
-            wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
-                    SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true);
-        }
-        handshaker = wsFactory.newHandshaker(req);
-        if (handshaker == null) {
-            WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+        try {
             if (log.isDebugEnabled()) {
-                WebsocketLogUtil.printSpecificLog(log, ctx, "Unsupported websocket version.");
+                WebsocketLogUtil.printHeaders(log, req, ctx);
             }
-        } else {
-            ChannelFuture future = handshaker.handshake(ctx.channel(), req);
-            future.addListener(new ChannelFutureListener() {
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (future.isSuccess()) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Websocket Handshake is completed successfully");
-                        }
-                        handshakeFuture.setSuccess();
-                    }
+
+            // This block is for the health check of the ports 8099 and 9099
+            if (!req.headers().contains(HttpHeaders.UPGRADE) && req.uri().equals("/health")) {
+                isHealthCheckCall = true;
+                FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                                                                            HttpResponseStatus.OK);
+                httpResponse.headers().set("content-length", httpResponse.content().readableBytes());
+                ctx.writeAndFlush(httpResponse);
+                return;
+            }
+
+            WebSocketServerHandshakerFactory wsFactory;
+            int maxPayloadLength = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                    org.wso2.carbon.inbound.endpoint.internal.http.api.Constants.WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH,
+                    "0"));
+            if (maxPayloadLength != 0) {
+                wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
+                                                                 SubprotocolBuilderUtil.buildSubprotocolString(
+                                                                         contentTypes, otherSubprotocols), true,
+                                                                 maxPayloadLength);
+            } else {
+                wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
+                                                                 SubprotocolBuilderUtil.buildSubprotocolString(
+                                                                         contentTypes, otherSubprotocols), true);
+            }
+            handshaker = wsFactory.newHandshaker(req);
+            if (handshaker == null) {
+                WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+                if (log.isDebugEnabled()) {
+                    WebsocketLogUtil.printSpecificLog(log, ctx, "Unsupported websocket version.");
                 }
-            });
+            } else {
+                ChannelFuture future = handshaker.handshake(ctx.channel(), req);
+                future.addListener(new ChannelFutureListener() {
+                    public void operationComplete(ChannelFuture future) throws Exception {
+                        if (future.isSuccess()) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Websocket Handshake is completed successfully with sourceIdentifier: "
+                                                  + ctx.channel().toString() + ", on Thread: "
+                                                  + Thread.currentThread().getName() + ","
+                                                  + Thread.currentThread().getId());
+                            }
+                            handshakeFuture.setSuccess();
+                        }
+                    }
+                });
+            }
+
+            List<Map.Entry<String, String>> httpHeaders = req.headers().entries();
+
+            tenantDomain = MultitenantUtils.getTenantDomainFromUrl(req.getUri());
+            if (tenantDomain.equals(req.getUri())) {
+                tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+            }
+
+            String endpointName = WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
+            if (endpointName == null) {
+                int portWithOffset = port + portOffset;
+                handleException("Endpoint not found for port : " + portWithOffset + " tenant domain : " + tenantDomain);
+            }
+
+            WebsocketSubscriberPathManager.getInstance().addChannelContext(endpointName, subscriberPath.getPath(),
+                                                                           wrappedContext);
+            MessageContext synCtx = getSynapseMessageContext(tenantDomain, ctx);
+            InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
+            defaultContentType = endpoint.getParametersMap().get(
+                    InboundWebsocketConstants.INBOUND_DEFAULT_CONTENT_TYPE);
+            if (endpoint == null) {
+                log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
+                return;
+            }
+
+            for (Map.Entry<String, String> entry : httpHeaders) {
+                synCtx.setProperty(entry.getKey(), entry.getValue());
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(entry.getKey(), entry.getValue());
+            }
+
+            synCtx.setProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                    InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
+            synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                    InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
+                                                                                ctx.channel().hashCode());
+            if (StringUtils.isNotBlank(handshaker.selectedSubprotocol())) {
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                        InboundWebsocketConstants.WEBSOCKET_SUBPROTOCOL, handshaker.selectedSubprotocol());
+                if (log.isDebugEnabled()) {
+                    log.debug("Websocket subprotocol is set to " + handshaker.selectedSubprotocol()
+                                      + " in Connection upgrade on channel: " + ctx.channel().toString()
+                                      + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                      + Thread.currentThread().getId());
+                }
+            }
+            injectForMediation(synCtx, endpoint);
+        } finally {
+            //Release WebsocketFrame
+            ReferenceCountUtil.release(req);
         }
-
-        List<Map.Entry<String, String>> httpHeaders = req.headers().entries();
-
-        tenantDomain = MultitenantUtils.getTenantDomainFromUrl(req.getUri());
-        if (tenantDomain.equals(req.getUri())) {
-            tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        }
-
-        String endpointName =
-                WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-        if (endpointName == null) {
-            int portWithOffset = port + portOffset;
-            handleException("Endpoint not found for port : " + portWithOffset + " tenant domain : " + tenantDomain);
-        }
-
-        WebsocketSubscriberPathManager.getInstance()
-                .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
-        MessageContext synCtx = getSynapseMessageContext(tenantDomain , ctx);
-        InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-        defaultContentType = endpoint.getParametersMap().get(InboundWebsocketConstants.INBOUND_DEFAULT_CONTENT_TYPE);
-        if (endpoint == null) {
-            log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
-            return;
-        }
-
-        for (Map.Entry<String, String> entry : httpHeaders) {
-            synCtx.setProperty(entry.getKey(), entry.getValue());
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(entry.getKey(), entry.getValue());
-        }
-
-        synCtx.setProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(
-                InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(
-                InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
-                ctx.channel().hashCode());
-        if (StringUtils.isNotBlank(handshaker.selectedSubprotocol())) {
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext()
-                    .setProperty(InboundWebsocketConstants.WEBSOCKET_SUBPROTOCOL, handshaker.selectedSubprotocol());
-        }
-        injectForMediation(synCtx, endpoint);
-
     }
 
     private String getWebSocketLocation(FullHttpRequest req) throws URISyntaxException {
@@ -323,10 +353,14 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 }
 
                 if (frame instanceof CloseWebSocketFrame) {
-                    handleClientWebsocketChannelTermination(frame);
-                    if (log.isDebugEnabled()) {
-                        WebsocketLogUtil.printSpecificLog(log, ctx,
-                                "Websocket channel is terminated successfully.");
+                    try {
+                        handleClientWebsocketChannelTermination(frame);
+                        if (log.isDebugEnabled()) {
+                            WebsocketLogUtil.printSpecificLog(log, ctx,
+                                                              "Websocket channel is terminated successfully.");
+                        }
+                    } finally {
+                        ReferenceCountUtil.release(frame);
                     }
                     return;
                 } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
@@ -352,6 +386,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         InputStream in = new AutoCloseInputStream(new ByteBufInputStream((frame.duplicate()).content()));
                         OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                         synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug("BinaryWebSocketFrame being injected to Sequence on channel: "
+                                          + ctx.channel().toString() + ", in the Thread,ID: "
+                                          + Thread.currentThread().getName() + ","
+                                          + Thread.currentThread().getId());
                     }
                     injectForMediation(synCtx, endpoint);
                     return;
@@ -379,6 +419,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                                 ((TextWebSocketFrame) frame).duplicate().text().getBytes()));
                         OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                         synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug(
+                                "TextWebSocketFrame being injected to Sequence on channel: " + ctx.channel().toString()
+                                        + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                        + Thread.currentThread().getId());
                     }
                     injectForMediation(synCtx, endpoint);
                     return;
@@ -425,10 +471,19 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectForMediation(synCtx, endpoint);
                 } else if (frame instanceof PingWebSocketFrame) {
-                    PongWebSocketFrame pongWebSocketFrame = new PongWebSocketFrame(frame.content().retain());
-                    ctx.channel().writeAndFlush(pongWebSocketFrame);
-                    if (log.isDebugEnabled()) {
-                        WebsocketLogUtil.printWebSocketFrame(log, pongWebSocketFrame, ctx, false);
+                    try {
+                        if (log.isDebugEnabled()) {
+                            log.debug("PingWebSocketFrame received on channel: " + ctx.channel().toString()
+                                              + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                              + Thread.currentThread().getId());
+                        }
+                        PongWebSocketFrame pongWebSocketFrame = new PongWebSocketFrame(frame.content().retain());
+                        ctx.channel().writeAndFlush(pongWebSocketFrame);
+                        if (log.isDebugEnabled()) {
+                            WebsocketLogUtil.printWebSocketFrame(log, pongWebSocketFrame, ctx, false);
+                        }
+                    } finally {
+                        ReferenceCountUtil.release(frame);
                     }
                     return;
                 }
