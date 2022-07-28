@@ -18,7 +18,6 @@ package org.wso2.carbon.inbound.endpoint.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.mediation.clustering.ClusteringAgentUtil;
 import org.wso2.carbon.utils.CarbonUtils;
 
 /**
@@ -49,16 +48,6 @@ public class OneTimeTriggerInboundRunner implements Runnable {
         while (!init) {
             if (log.isDebugEnabled()) {
                 log.debug("Waiting for the configuration context to be loaded to run Inbound Endpoint.");
-            }
-            Boolean isSinglNode = ClusteringAgentUtil.isSingleNode();
-            if (isSinglNode != null) {
-                if (!isSinglNode && !CarbonUtils.isWorkerNode()) {
-                    // Given node is the manager in the cluster, and not
-                    // required to run the service
-                    execute = false;
-                    log.info("Inbound Endpoint will not run in manager node. Same will run on worker(s).");
-                }
-                init = true;
             }
             try {
                 Thread.sleep(CLUSTER_CONFIGURATION_CHECK_INTERVAL);

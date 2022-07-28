@@ -35,7 +35,6 @@ import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.wso2.carbon.mediation.clustering.ClusteringServiceUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -761,15 +760,15 @@ public class FilePollingConsumer {
         String strContext = fileObject.getName().getURI();
         boolean rtnValue = false;
         try {
-            if (distributedLock) {
-                if (distributedLockTimeout != null) {
-                    if (!ClusteringServiceUtil.setLock(strContext, distributedLockTimeout)) {
-                        return false;
-                    }
-                } else if (!ClusteringServiceUtil.setLock(strContext)) {
-                    return false;
-                }
-            }
+//            if (distributedLock) {
+//                if (distributedLockTimeout != null) {
+//                    if (!ClusteringServiceUtil.setLock(strContext, distributedLockTimeout)) {
+//                        return false;
+//                    }
+//                } else if (!ClusteringServiceUtil.setLock(strContext)) {
+//                    return false;
+//                }
+//            }
             // When processing a directory list is fetched initially. Therefore
             // there is still a chance of file processed by another process.
             // Need to check the source file before processing.
@@ -793,7 +792,7 @@ public class FilePollingConsumer {
             rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO, fso, true);
         } finally {
             if (distributedLock) {
-                ClusteringServiceUtil.releaseLock(strContext);
+//                ClusteringServiceUtil.releaseLock(strContext);
             }
         }
         return rtnValue;

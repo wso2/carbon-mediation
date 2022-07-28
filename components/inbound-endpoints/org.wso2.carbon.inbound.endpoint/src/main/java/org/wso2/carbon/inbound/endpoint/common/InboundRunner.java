@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
-import org.wso2.carbon.mediation.clustering.ClusteringAgentUtil;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
@@ -74,22 +73,7 @@ public class InboundRunner implements Runnable {
         // Wait for the clustering configuration to be loaded.
         while (!init) {
             log.debug("Waiting for the configuration context to be loaded to run Inbound Endpoint.");
-            Boolean isSingleNode = ClusteringAgentUtil.getClusteringAgent() == null ? true : false;
-            if (!isSingleNode) {
-                Parameter clusteringPattern = ServiceReferenceHolder.getInstance().getConfigurationContextService().
-                        getServerConfigContext().getAxisConfiguration().getClusteringAgent().
-                        getParameter(CLUSTERING_PATTERN);
-                Boolean isWorkerManager = clusteringPattern != null && clusteringPattern.getValue() != null
-                        && clusteringPattern.getValue().toString().equals(CLUSTERING_PATTERN_WORKER_MANAGER);
-                if (!isSingleNode && !CarbonUtils.isWorkerNode() && !runOnManagerOverride && isWorkerManager) {
-                    // Given node is the manager in the cluster, and not
-                    // required to run the service
-                    execute = false;
-                    log.info("Inbound EP will not run in manager node. Same will run on worker(s).");
-                }
-            }
             init = true;
-
             try {
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
