@@ -113,18 +113,18 @@ public class RestApiAdminUnitTest extends TestCase {
         Assert.assertNotNull("Could not find the new resource added from swagger", newResource);
     }
 
-//    public void testGenerateUpdatedSwaggerFromApi() throws IOException, XMLStreamException, APIGenException {
-//
-//        String fileContent = readResourceFile("testAllApiChanged.xml");
-//        OMElement omElement = AXIOMUtil.stringToOM(fileContent);
-//        API newApi = APIFactory.createAPI(omElement);
-//        fileContent = readResourceFile("TestAllApiSwagger.yaml");
-//        String newApiStr = restApiAdmin.generateUpdatedSwaggerFromAPI(fileContent, false, true, newApi);
-//        String expectedResult = readResourceFile("TestAllApiChangedSwagger.json");
-//        JsonElement result = jsonParser.parse(newApiStr);
-//        JsonElement expected = jsonParser.parse(expectedResult);
-//        Assert.assertEquals("Did not received the expected swagger", expected.toString(), result.toString());
-//    }
+    public void testGenerateUpdatedSwaggerFromApi() throws IOException, XMLStreamException, APIGenException {
+
+        String fileContent = readResourceFile("testAllApiChanged.xml");
+        OMElement omElement = AXIOMUtil.stringToOM(fileContent);
+        API newApi = APIFactory.createAPI(omElement);
+        fileContent = readResourceFile("TestAllApiSwagger.yaml");
+        String newApiStr = restApiAdmin.generateUpdatedSwaggerFromAPI(fileContent, false, true, newApi);
+        String expectedResult = readResourceFile("TestAllApiChangedSwagger.json");
+        JsonElement result = jsonParser.parse(newApiStr);
+        JsonElement expected = jsonParser.parse(expectedResult);
+        Assert.assertEquals("Did not received the expected swagger", expected.toString(), result.toString());
+    }
 
     public void testUpdateNameInSwaggerJSON() throws IOException, APIException {
         String fileContent = readResourceFile("ChangeApiSwagger.json");
@@ -152,16 +152,16 @@ public class RestApiAdminUnitTest extends TestCase {
         assertEquals("Resource count mismatch", 3, api.getResources().length);
     }
 
-//    public void testGenerateUpdatedSwaggerFromApiWithRelativeUrl() throws IOException, XMLStreamException,
-//            APIGenException {
-//        String fileContent = readResourceFile("testAllApiChanged.xml");
-//        OMElement omElement = AXIOMUtil.stringToOM(fileContent);
-//        API newApi = APIFactory.createAPI(omElement);
-//        fileContent = readResourceFile("TestAllApiSwaggerRelativeUrl.yaml");
-//        String newApiStr = restApiAdmin.generateUpdatedSwaggerFromAPI(fileContent, false, true, newApi);
-//        String expectedResult = readResourceFile("TestAllApiChangedSwaggerRelativePath.json");
-//        JsonElement result = jsonParser.parse(newApiStr);
-//        JsonElement expected = jsonParser.parse(expectedResult);
-//        Assert.assertEquals("Did not received the expected swagger", expected.toString(), result.toString());
-//    }
+    public void testGenerateUpdatedSwaggerFromApiWithRelativeUrl() throws IOException, XMLStreamException,
+            APIGenException {
+        String fileContent = readResourceFile("testAllApiChanged.xml");
+        OMElement omElement = AXIOMUtil.stringToOM(fileContent);
+        API newApi = APIFactory.createAPI(omElement);
+        fileContent = readResourceFile("TestAllApiSwaggerRelativeUrl.yaml");
+        String newApiStr = restApiAdmin.generateUpdatedSwaggerFromAPI(fileContent, false, true, newApi);
+        String expectedResult = readResourceFile("TestAllApiChangedSwaggerRelativePath.json");
+        JsonElement result = jsonParser.parse(newApiStr);
+        JsonElement expected = jsonParser.parse(expectedResult);
+        Assert.assertEquals("Did not received the expected swagger", expected.toString(), result.toString());
+    }
 }
