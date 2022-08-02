@@ -147,6 +147,16 @@
       "get": {
         "parameters": [
           {
+            "name":"username",
+            "in":"query",
+            "required":false,
+            "style":"form",
+            "explode":true,
+            "schema":{
+              "type":"string"
+            }
+          },
+          {
             "name": "age",
             "in": "query",
             "required": false,
@@ -182,6 +192,16 @@
       },
       "post": {
         "parameters": [
+          {
+            "name":"username",
+            "in":"query",
+            "required":false,
+            "style":"form",
+            "explode":true,
+            "schema":{
+              "type":"string"
+            }
+          },
           {
             "name": "age",
             "in": "query",
