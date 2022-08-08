@@ -21,6 +21,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
+import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEventBasedListener;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
@@ -59,6 +60,9 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
             switch(Protocols.valueOf(protocol)) {
                 case jms:
                     inboundRequestProcessor = new JMSProcessor(params);
+                    break;
+                case file:
+                    inboundRequestProcessor = new VFSProcessor(params);
                     break;
                 case http:
                     inboundRequestProcessor = new InboundHttpListener(params);
