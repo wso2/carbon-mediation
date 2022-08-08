@@ -44,8 +44,6 @@ import org.wso2.carbon.ntask.core.impl.clustered.ClusteredTaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
 
-import com.hazelcast.core.IExecutorService;
-
 public class NTaskTaskManager implements TaskManager, TaskServiceObserver, ServerStartupHandler {
     private final Object lock = new Object();
 
@@ -764,18 +762,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     @Override
     public void sendClusterMessage(Callable<Void> callable) {
-        if (taskManager instanceof ClusteredTaskManager) {
-            try {
-                IExecutorService executorService =
-                                                   ((ClusteredTaskManager) taskManager).getClusterComm()
-                                                                                       .getHazelcast()
-                                                                                       .getExecutorService(NTASK_P2P_COMM_EXECUTOR);
-                executorService.submitToAllMembers(callable);
-            } catch (TaskException e) {
-                logger.error("Can not submit a cluster message.", e);
-            }
-        }
-
+        //removed
     }
 
     /**
