@@ -35,7 +35,6 @@ import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.wso2.carbon.mediation.clustering.ClusteringServiceUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -760,42 +759,28 @@ public class FilePollingConsumer {
     private boolean acquireLock(FileSystemManager fsManager, FileObject fileObject) {
         String strContext = fileObject.getName().getURI();
         boolean rtnValue = false;
+        // When processing a directory list is fetched initially. Therefore
+        // there is still a chance of file processed by another process.
+        // Need to check the source file before processing.
         try {
-            if (distributedLock) {
-                if (distributedLockTimeout != null) {
-                    if (!ClusteringServiceUtil.setLock(strContext, distributedLockTimeout)) {
-                        return false;
-                    }
-                } else if (!ClusteringServiceUtil.setLock(strContext)) {
-                    return false;
-                }
+            String parentURI = fileObject.getParent().getName().getURI();
+            if(parentURI.contains("?")) {
+                String suffix = parentURI.substring(parentURI.indexOf("?"));
+                strContext += suffix;
             }
-            // When processing a directory list is fetched initially. Therefore
-            // there is still a chance of file processed by another process.
-            // Need to check the source file before processing.
-            try {
-                String parentURI = fileObject.getParent().getName().getURI();
-                if(parentURI.contains("?")) {
-                    String suffix = parentURI.substring(parentURI.indexOf("?"));
-                    strContext += suffix;
-                }
-                FileObject sourceFile = fsManager.resolveFile(strContext, fso);
-                if (!sourceFile.exists()) {
-                    return false;
-                }
-            } catch (FileSystemException e) {
+            FileObject sourceFile = fsManager.resolveFile(strContext, fso);
+            if (!sourceFile.exists()) {
                 return false;
-            }         
-            VFSParamDTO vfsParamDTO = new VFSParamDTO();
-            vfsParamDTO.setAutoLockRelease(autoLockRelease);
-            vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
-            vfsParamDTO.setAutoLockReleaseInterval(autoLockReleaseInterval);
-            rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO, fso, true);
-        } finally {
-            if (distributedLock) {
-                ClusteringServiceUtil.releaseLock(strContext);
             }
+        } catch (FileSystemException e) {
+            return false;
         }
+        VFSParamDTO vfsParamDTO = new VFSParamDTO();
+        vfsParamDTO.setAutoLockRelease(autoLockRelease);
+        vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
+        vfsParamDTO.setAutoLockReleaseInterval(autoLockReleaseInterval);
+        rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO, fso, true);
+
         return rtnValue;
     }
 
