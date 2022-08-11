@@ -98,7 +98,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     try {
                         sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
                     } catch (AxisFault e) {
-                        log.error("Error occurred while sending close frames", e);
+                        log.error("Error occurred while handling WebSocket channel termination", e);
                     }
                     return;
                 }
