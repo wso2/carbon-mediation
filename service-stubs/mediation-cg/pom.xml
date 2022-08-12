@@ -93,6 +93,10 @@
             <artifactId>axiom</artifactId>
             <version>${orbit.version.axiom}</version>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.javax.activation</groupId>
+            <artifactId>activation</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

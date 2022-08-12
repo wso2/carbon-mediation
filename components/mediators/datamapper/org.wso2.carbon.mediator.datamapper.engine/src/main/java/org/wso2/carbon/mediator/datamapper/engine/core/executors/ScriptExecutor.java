@@ -16,6 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.executors;
 
+import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
@@ -26,15 +27,16 @@ import org.wso2.carbon.mediator.datamapper.engine.core.models.MapModel;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.StringModel;
 import org.wso2.carbon.mediator.datamapper.engine.output.formatters.MapOutputFormatter;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineUtils;
+import org.wso2.carbon.mediator.datamapper.engine.utils.OpenJDKNashornFactoryWrapper;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.Map;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
 
 /**
  * This class implements script executor for data mapper using java script executor (Rhino or
@@ -44,6 +46,7 @@ public class ScriptExecutor implements Executor {
 
     public static final String PROPERTIES_IDENTIFIER = "properties";
     public static final String INPUT_VARIABLE_IDENTIFIER = "inputVariables";
+    public static final String OPENJDK_NASHORN_CLASSNAME = "org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory";
     private static final Log log = LogFactory.getLog(ScriptExecutor.class);
     private ScriptEngine scriptEngine;
     Bindings bindings;
@@ -54,19 +57,42 @@ public class ScriptExecutor implements Executor {
      * @param scriptExecutorType
      */
     public ScriptExecutor(ScriptExecutorType scriptExecutorType) {
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
         switch (scriptExecutorType) {
             case NASHORN:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
-                bindings = scriptEngine.createBindings();
-                log.debug("Setting Nashorn as Script Engine");
-                break;
+                scriptEngine = scriptEngineManager.getEngineByName(NASHORN_ENGINE_NAME);
+                if (scriptEngine == null) {
+                    try {
+                        // Check whether the openjdk classes are available in the runtime, otherwise throw class not found exception
+                        Class.forName(OPENJDK_NASHORN_CLASSNAME);
+                        // Try getting openjdk nashorn engine from open-jdk-nashorn jar in the lib folder
+                        scriptEngine = OpenJDKNashornFactoryWrapper.getOpenJDKNashornFactory().getScriptEngine();
+                        bindings = scriptEngine.createBindings();
+                        log.debug("Setting OpenJDK Nashorn as Script Engine");
+                        break;
+                    } catch (Exception e) {
+                        log.warn("Could not find Nashorn jar in the lib, switching to rhino js. This may cause performance issue ");
+                        log.debug(e);
+                        scriptEngineManager.registerEngineName(DEFAULT_ENGINE_NAME, new RhinoScriptEngineFactory());
+                        scriptEngine = scriptEngineManager.getEngineByName(DEFAULT_ENGINE_NAME);
+                        bindings = scriptEngine.createBindings();
+                        log.debug("Setting Rhino as Script Engine");
+                    }
+                } else {
+                    scriptEngine = scriptEngineManager.getEngineByName(NASHORN_ENGINE_NAME);
+                    bindings = scriptEngine.createBindings();
+                    log.debug("Setting Nashorn as Script Engine");
+                    break;
+                }
             case RHINO:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+                scriptEngineManager.registerEngineName(DEFAULT_ENGINE_NAME, new RhinoScriptEngineFactory());
+                scriptEngine = scriptEngineManager.getEngineByName(DEFAULT_ENGINE_NAME);
                 bindings = scriptEngine.createBindings();
                 log.debug("Setting Rhino as Script Engine");
                 break;
             default:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+                scriptEngineManager.registerEngineName(DEFAULT_ENGINE_NAME, new RhinoScriptEngineFactory());
+                scriptEngine = scriptEngineManager.getEngineByName(DEFAULT_ENGINE_NAME);
                 bindings = scriptEngine.createBindings();
                 log.debug("Setting default Rhino as Script Engine");
                 break;

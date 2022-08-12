@@ -2535,6 +2535,27 @@
                 <artifactId>org.wso2.transport.http.netty</artifactId>
                 <version>${transport.http.netty}</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.corba</groupId>
+                <artifactId>glassfish-corba-omgapi</artifactId>
+                <version>${glassfish.cobra.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.javax.activation</groupId>
+                <artifactId>javax.activation-api</artifactId>
+                <version>${javax.activation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.nashorn</groupId>
+                <artifactId>nashorn-core</artifactId>
+                <version>${nashorn.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.bsf.wso2</groupId>
+                <artifactId>bsf-all</artifactId>
+                <version>${bsf.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
@@ -2567,7 +2588,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v303</synapse.version>
+        <synapse.version>2.1.7-wso2v306</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.3.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2719,10 +2740,15 @@
         <maven.scr.plugin.version>1.26.0</maven.scr.plugin.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v1</version.org.wso2.orbit.javax.activation>
-        <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
+        <maven.bundle.plugin.version>3.3.0</maven.bundle.plugin.version>
         <saml.common.util.version>1.0.10</saml.common.util.version>
         <opensaml.orbit.version>3.3.1.wso2v4</opensaml.orbit.version>
         <jackson.dataformat.yaml.version>2.10.3</jackson.dataformat.yaml.version>
+        <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <snakeyaml.version>1.25</snakeyaml.version>
+        <glassfish.cobra.version>4.2.1</glassfish.cobra.version>
+        <nashorn.core.version>15.4</nashorn.core.version>
+        <bsf.version>3.0.0.wso2v5</bsf.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.0.20.wso2v1</swagger.parser.orbit.version>
         <transport.http.netty>6.3.35</transport.http.netty>
