@@ -222,6 +222,9 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                                     sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
                         }
                         try {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Terminating the client websocket channel due to server shutdown");
+                            }
                             sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
                         } catch (IOException e) {
                             log.error("Failed while handling client websocket channel termination", e);
