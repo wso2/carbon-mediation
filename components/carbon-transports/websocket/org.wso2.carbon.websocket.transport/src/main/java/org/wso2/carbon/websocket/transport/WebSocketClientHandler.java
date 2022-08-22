@@ -130,11 +130,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         }
         if (evt instanceof ChannelInputShutdownEvent) {
             try {
-                org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
-                synCtx.setProperty(
-                        InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT,
-                        true);
-                getFaultSequence(synCtx, dispatchErrorSequence).mediate(synCtx);
+                invokeFaultSequenceUponServerShutdown();
             } catch (AxisFault axisFault) {
                 log.error("Failed to invoke fault sequence during ChannelInputShutdownEvent", axisFault);
                 throw axisFault;
@@ -193,6 +189,13 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain()).addListener(ChannelFutureListener.CLOSE);
     }
 
+    public void invokeFaultSequenceUponServerShutdown() throws AxisFault {
+        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+        synCtx.setProperty(InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT,
+                true);
+        getFaultSequence(synCtx, dispatchErrorSequence).mediate(synCtx);
+    }
+
     public void handleWebsocketBinaryFrame(WebSocketFrame frame) throws AxisFault {
         org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         synCtx.setProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, true);
@@ -232,6 +235,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                           + Thread.currentThread().getId());
                     }
                     handleTargetWebsocketChannelTermination(frame);
+                    invokeFaultSequenceUponServerShutdown();
                     return;
                 } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
                         ((handshaker.actualSubprotocol() != null) &&
