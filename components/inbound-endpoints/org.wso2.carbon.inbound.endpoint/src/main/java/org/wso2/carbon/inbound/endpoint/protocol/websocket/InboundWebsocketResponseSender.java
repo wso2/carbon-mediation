@@ -212,10 +212,6 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                         InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT);
                 if (Objects.equals(isFaultSequenceInvokedOnChannelInputShutdown, true)) {
                     // Fault sequence was invoked due to a 'ChannelInputShutdownEvent'
-                    if (log.isDebugEnabled()) {
-                        log.debug("Fault sequence was invoked due to a 'ChannelInputShutdownEvent'");
-                    }
-
                     Object shouldCloseClient = msgContext.getProperty(
                             InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_SERVER_TERMINATION);
                     if (shouldCloseClient != null && Boolean.parseBoolean((String) shouldCloseClient)) {

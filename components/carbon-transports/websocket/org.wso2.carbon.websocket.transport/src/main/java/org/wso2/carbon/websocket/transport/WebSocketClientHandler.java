@@ -130,6 +130,9 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         }
         if (evt instanceof ChannelInputShutdownEvent) {
             try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Invoking fault sequence due to a ChannelInputShutdownEvent");
+                }
                 invokeFaultSequenceUponServerShutdown();
             } catch (AxisFault axisFault) {
                 log.error("Failed to invoke fault sequence during ChannelInputShutdownEvent", axisFault);
@@ -235,6 +238,9 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                           + Thread.currentThread().getId());
                     }
                     handleTargetWebsocketChannelTermination(frame);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Invoking fault sequence due to a CloseWebSocketFrame from the server");
+                    }
                     invokeFaultSequenceUponServerShutdown();
                     return;
                 } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
