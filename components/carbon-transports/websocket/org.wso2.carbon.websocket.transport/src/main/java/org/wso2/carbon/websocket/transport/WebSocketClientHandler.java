@@ -23,6 +23,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.socket.ChannelInputShutdownEvent;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
@@ -56,6 +57,7 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.service.ServiceReferenceHolder;
 import org.wso2.carbon.websocket.transport.utils.LogUtil;
@@ -117,6 +119,26 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         if (log.isDebugEnabled()) {
             log.debug("Handshake completed on channel: " + ctx.channel().toString() + ", in the Thread,ID: "
                               + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+        }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("WebSocket user event: " + evt.getClass() + " triggered on context id : " +
+                    ctx.channel().toString());
+        }
+        if (evt instanceof ChannelInputShutdownEvent) {
+            try {
+                org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+                synCtx.setProperty(
+                        InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT,
+                        true);
+                getFaultSequence(synCtx, dispatchErrorSequence).mediate(synCtx);
+            } catch (AxisFault axisFault) {
+                log.error("Failed to invoke fault sequence during ChannelInputShutdownEvent", axisFault);
+                throw axisFault;
+            }
         }
     }
 

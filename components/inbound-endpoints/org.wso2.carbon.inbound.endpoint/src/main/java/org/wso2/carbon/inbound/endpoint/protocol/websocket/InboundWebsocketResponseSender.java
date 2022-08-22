@@ -44,6 +44,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.util.Objects;
 
 public class InboundWebsocketResponseSender implements InboundResponseSender {
 
@@ -207,6 +208,33 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 }
                 handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
             } else {
+                Object isFaultSequenceInvokedOnChannelInputShutdown = msgContext.getProperty(
+                        InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT);
+                if (Objects.equals(isFaultSequenceInvokedOnChannelInputShutdown, true)) {
+                    // Fault sequence was invoked due to a 'ChannelInputShutdownEvent'
+                    if (log.isDebugEnabled()) {
+                        log.debug("Fault sequence was invoked due to a 'ChannelInputShutdownEvent'");
+                    }
+
+                    Object shouldCloseClient = msgContext.getProperty(
+                            InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_SERVER_TERMINATION);
+                    if (shouldCloseClient != null && Boolean.parseBoolean((String) shouldCloseClient)) {
+                        CloseWebSocketFrame closeWebSocketFrame =
+                                new CloseWebSocketFrame(1001, "Websocket server terminated");
+                        if (log.isDebugEnabled()) {
+                            WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
+                                    sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
+                        }
+                        try {
+                            sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
+                        } catch (IOException e) {
+                            log.error("Failed while handling client websocket channel termination", e);
+                        }
+                    }
+
+                    return;
+                }
+
                 try {
                     Object wsCloseFrameStatusCode = msgContext.getProperty(
                             InboundWebsocketConstants.WS_CLOSE_FRAME_STATUS_CODE);

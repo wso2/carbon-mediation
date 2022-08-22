@@ -23,6 +23,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -247,6 +248,7 @@ public class WebsocketConnectionFactory {
                     });
 
             Channel ch = b.connect(uri.getHost(), port).sync().channel();
+            ch.config().setOption(ChannelOption.ALLOW_HALF_CLOSURE, true);
             ch.closeFuture().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture channelFuture) throws Exception {
