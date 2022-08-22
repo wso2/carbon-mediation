@@ -41,7 +41,6 @@ public class InboundRunner implements Runnable {
     private long interval;
 
     private volatile boolean execute = true;
-    private volatile boolean init = false;
     // Following will be used to calculate the sleeping interval
     private long lastRuntime;
     private long currentRuntime;
@@ -70,20 +69,6 @@ public class InboundRunner implements Runnable {
     @Override
     public void run() {
         log.debug("Starting the Inbound Endpoint.");
-        // Wait for the clustering configuration to be loaded.
-        while (!init) {
-            log.debug("Waiting for the configuration context to be loaded to run Inbound Endpoint.");
-            init = true;
-
-            try {
-                Thread.sleep(interval);
-            } catch (InterruptedException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to sleep the inbound thread for interval of : " + interval + "ms.");
-                }
-            }
-        }
-
         log.debug("Configuration context loaded. Running the Inbound Endpoint.");
         // Run the poll cycles
         while (execute) {
