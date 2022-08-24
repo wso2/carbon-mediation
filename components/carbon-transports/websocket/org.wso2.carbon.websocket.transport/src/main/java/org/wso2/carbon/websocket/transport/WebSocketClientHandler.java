@@ -238,10 +238,6 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                           + Thread.currentThread().getId());
                     }
                     handleTargetWebsocketChannelTermination(frame);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Invoking fault sequence due to a CloseWebSocketFrame from the server");
-                    }
-                    invokeFaultSequenceUponServerShutdown();
                     return;
                 } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
                         ((handshaker.actualSubprotocol() != null) &&
