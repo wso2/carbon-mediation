@@ -36,7 +36,11 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Map;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.DEFAULT_ENGINE_NAME;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NASHORN_ENGINE_NAME;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
 
 /**
  * This class implements script executor for data mapper using java script executor (Rhino or
