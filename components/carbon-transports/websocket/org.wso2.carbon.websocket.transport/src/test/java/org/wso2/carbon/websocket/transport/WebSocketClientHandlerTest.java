@@ -110,9 +110,9 @@ public class WebSocketClientHandlerTest {
         webSocketClientHandler.handlerAdded(channelHandlerContext);
 
         webSocketClientHandler.exceptionCaught(channelHandlerContext, cause);
-        Assert.assertEquals(synCtx.getProperty(InboundWebsocketConstants.CORRUPTED_WEB_SOCKET_FRAME_STATUS_CODE),
+        Assert.assertEquals(synCtx.getProperty(InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE),
                 WebSocketCloseStatus.MESSAGE_TOO_BIG.code());
-        Assert.assertEquals(synCtx.getProperty(InboundWebsocketConstants.CORRUPTED_WEB_SOCKET_FRAME_REASON_TEXT),
+        Assert.assertEquals(synCtx.getProperty(InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT),
                 WebSocketCloseStatus.MESSAGE_TOO_BIG.reasonText());
     }
 
