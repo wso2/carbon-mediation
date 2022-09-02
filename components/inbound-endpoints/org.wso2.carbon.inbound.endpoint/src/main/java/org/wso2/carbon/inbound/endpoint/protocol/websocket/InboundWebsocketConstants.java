@@ -82,4 +82,9 @@ public class InboundWebsocketConstants {
     public static final String WEBSOCKET_DISPATCH_IDLETIME = "ws.dispatch.idleTime";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME = "ws.outflow.dispatch.idleTime";
     public static final String CUSTOM_HTTP_SC = "CUSTOM_HTTP_SC";
+
+    public static final String CLOSE_WEBSOCKET_CLIENT_ON_SERVER_TERMINATION =
+            "close.websocket.client.on.server.termination";
+    public static final String FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT =
+            "fault.sequence.invoked.on.websocket.channel.input.shutdown.event";
 }

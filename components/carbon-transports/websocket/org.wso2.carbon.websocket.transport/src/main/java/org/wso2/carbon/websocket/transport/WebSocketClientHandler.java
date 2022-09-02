@@ -23,6 +23,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.socket.ChannelInputShutdownEvent;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
@@ -56,6 +57,7 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.service.ServiceReferenceHolder;
 import org.wso2.carbon.websocket.transport.utils.LogUtil;
@@ -121,6 +123,25 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("WebSocket user event: " + evt.getClass() + " triggered on context id : " +
+                    ctx.channel().toString());
+        }
+        if (evt instanceof ChannelInputShutdownEvent) {
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Invoking fault sequence due to a ChannelInputShutdownEvent");
+                }
+                invokeFaultSequenceUponServerShutdown();
+            } catch (AxisFault axisFault) {
+                log.error("Failed to invoke fault sequence during ChannelInputShutdownEvent", axisFault);
+                throw axisFault;
+            }
+        }
+    }
+
+    @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         if (log.isDebugEnabled()) {
             log.debug("WebSocket client disconnected on context id : " + ctx.channel().toString());
@@ -169,6 +190,13 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                               + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
         }
         handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain()).addListener(ChannelFutureListener.CLOSE);
+    }
+
+    public void invokeFaultSequenceUponServerShutdown() throws AxisFault {
+        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+        synCtx.setProperty(InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT,
+                true);
+        getFaultSequence(synCtx, dispatchErrorSequence).mediate(synCtx);
     }
 
     public void handleWebsocketBinaryFrame(WebSocketFrame frame) throws AxisFault {
