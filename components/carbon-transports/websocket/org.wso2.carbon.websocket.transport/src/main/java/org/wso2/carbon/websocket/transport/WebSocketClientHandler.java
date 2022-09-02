@@ -27,6 +27,7 @@ import io.netty.channel.socket.ChannelInputShutdownEvent;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CorruptedWebSocketFrameException;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -133,7 +134,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                 if (log.isDebugEnabled()) {
                     log.debug("Invoking fault sequence due to a ChannelInputShutdownEvent");
                 }
-                invokeFaultSequenceUponServerShutdown();
+                invokeFaultSequenceUponServerShutdown(null);
             } catch (AxisFault axisFault) {
                 log.error("Failed to invoke fault sequence during ChannelInputShutdownEvent", axisFault);
                 throw axisFault;
@@ -192,11 +193,20 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain()).addListener(ChannelFutureListener.CLOSE);
     }
 
-    public void invokeFaultSequenceUponServerShutdown() throws AxisFault {
-        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+    public void invokeFaultSequenceUponServerShutdown(MessageContext synCtx) throws AxisFault {
+        if (synCtx == null) {
+            synCtx = getSynapseMessageContext(tenantDomain);
+        }
         synCtx.setProperty(InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT,
                 true);
         getFaultSequence(synCtx, dispatchErrorSequence).mediate(synCtx);
+    }
+
+    public void invokeFaultSequenceWhenCorruptedWebSocketFrame(int statusCode, String reasonText) throws AxisFault {
+        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+        synCtx.setProperty(InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE, statusCode);
+        synCtx.setProperty(InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT, reasonText);
+        invokeFaultSequenceUponServerShutdown(synCtx);
     }
 
     public void handleWebsocketBinaryFrame(WebSocketFrame frame) throws AxisFault {
@@ -334,7 +344,12 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws AxisFault {
+        if (cause instanceof CorruptedWebSocketFrameException) {
+            CorruptedWebSocketFrameException corruptedWebSocketFrameException = ((CorruptedWebSocketFrameException) cause);
+            invokeFaultSequenceWhenCorruptedWebSocketFrame(corruptedWebSocketFrameException.closeStatus().code(),
+                    corruptedWebSocketFrameException.closeStatus().reasonText());
+        }
         log.error("Error encountered while processing the response", cause);
         if (!handshakeFuture.isDone()) {
             handshakeFuture.setFailure(cause);

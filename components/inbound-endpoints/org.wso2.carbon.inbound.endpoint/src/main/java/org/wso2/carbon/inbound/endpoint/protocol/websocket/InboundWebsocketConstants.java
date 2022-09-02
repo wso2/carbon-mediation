@@ -87,4 +87,6 @@ public class InboundWebsocketConstants {
             "close.websocket.client.on.server.termination";
     public static final String FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT =
             "fault.sequence.invoked.on.websocket.channel.input.shutdown.event";
+    public static final String WEB_SOCKET_CLOSE_CODE = "websocket.server.close.code";
+    public static final String WEB_SOCKET_REASON_TEXT = "websocket.server.reason.text";
 }

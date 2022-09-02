@@ -215,8 +215,20 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     Object shouldCloseClient = msgContext.getProperty(
                             InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_SERVER_TERMINATION);
                     if (shouldCloseClient != null && Boolean.parseBoolean((String) shouldCloseClient)) {
-                        CloseWebSocketFrame closeWebSocketFrame =
-                                new CloseWebSocketFrame(1001, "Websocket server terminated");
+                        int closeWebSocketFrameStatusCode = 1001;
+                        String closeWebSocketFrameReasonText = "Websocket server terminated";
+                        Object corruptedWebSocketFrameStatusCode = msgContext.getProperty(
+                                InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE);
+                        closeWebSocketFrameStatusCode = (corruptedWebSocketFrameStatusCode == null) ?
+                                closeWebSocketFrameStatusCode :
+                                Integer.parseInt(corruptedWebSocketFrameStatusCode.toString());
+                        Object corruptedWebSocketFrameReasonText = msgContext.getProperty(
+                                InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT);
+                        closeWebSocketFrameReasonText = (corruptedWebSocketFrameReasonText == null) ?
+                                closeWebSocketFrameReasonText :
+                                corruptedWebSocketFrameReasonText.toString();
+                        CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(closeWebSocketFrameStatusCode,
+                                closeWebSocketFrameReasonText);
                         if (log.isDebugEnabled()) {
                             WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
                                     sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
