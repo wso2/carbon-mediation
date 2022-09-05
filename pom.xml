@@ -2502,6 +2502,18 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito2</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.tenant.common</artifactId>
                 <version>${carbon.commons.version}</version>
@@ -2720,6 +2732,7 @@
         <saml.common.util.version>1.0.10</saml.common.util.version>
         <opensaml.orbit.version>3.3.1.wso2v4</opensaml.orbit.version>
         <jackson.dataformat.yaml.version>2.10.3</jackson.dataformat.yaml.version>
+        <powermock.version>2.0.9</powermock.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.0.20.wso2v1</swagger.parser.orbit.version>
         <transport.http.netty>6.3.35</transport.http.netty>
