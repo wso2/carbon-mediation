@@ -18,7 +18,6 @@ package org.wso2.carbon.inbound.endpoint.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.mediation.clustering.ClusteringAgentUtil;
 import org.wso2.carbon.utils.CarbonUtils;
 
 /**
@@ -29,7 +28,6 @@ public class OneTimeTriggerInboundRunner implements Runnable {
 
     private OneTimeTriggerInboundTask task;
     private volatile boolean execute = true;
-    private volatile boolean init = false;
     private String tenantDomain;
     private static final long CLUSTER_CONFIGURATION_CHECK_INTERVAL = 1000;
 
@@ -44,30 +42,6 @@ public class OneTimeTriggerInboundRunner implements Runnable {
     public void run() {
         if (log.isDebugEnabled()) {
             log.debug("Starting the Inbound Endpoint.");
-        }
-        // Wait for the clustering configuration to be loaded.
-        while (!init) {
-            if (log.isDebugEnabled()) {
-                log.debug("Waiting for the configuration context to be loaded to run Inbound Endpoint.");
-            }
-            Boolean isSinglNode = ClusteringAgentUtil.isSingleNode();
-            if (isSinglNode != null) {
-                if (!isSinglNode && !CarbonUtils.isWorkerNode()) {
-                    // Given node is the manager in the cluster, and not
-                    // required to run the service
-                    execute = false;
-                    log.info("Inbound Endpoint will not run in manager node. Same will run on worker(s).");
-                }
-                init = true;
-            }
-            try {
-                Thread.sleep(CLUSTER_CONFIGURATION_CHECK_INTERVAL);
-            } catch (InterruptedException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to sleep the Inbound thread for interval of : " +
-                            CLUSTER_CONFIGURATION_CHECK_INTERVAL + "ms.");
-                }
-            }
         }
 
         if (log.isDebugEnabled()) {

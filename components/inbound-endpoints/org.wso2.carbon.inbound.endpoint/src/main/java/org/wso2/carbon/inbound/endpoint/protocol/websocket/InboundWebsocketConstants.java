@@ -74,10 +74,19 @@ public class InboundWebsocketConstants {
     public static final String WS_CLOSE_FRAME_STATUS_CODE = "websocket.close.frame.status.code";
     public static final String WS_CLOSE_FRAME_REASON_TEXT = "websocket.close.frame.reason.text";
     public static final int WS_CLOSE_DEFAULT_CODE = 1001;
+    public static final int WS_UNAUTHORIZED_CODE = 3000;
 
     public static final String INBOUND_PIPELINE_HANDLER_CLASS = "ws.pipeline.handler.class";
     public static final String CUSTOM_SEQUENCE = "dispatch.custom.sequence";
 
     public static final String WEBSOCKET_DISPATCH_IDLETIME = "ws.dispatch.idleTime";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME = "ws.outflow.dispatch.idleTime";
+    public static final String CUSTOM_HTTP_SC = "CUSTOM_HTTP_SC";
+
+    public static final String CLOSE_WEBSOCKET_CLIENT_ON_SERVER_TERMINATION =
+            "close.websocket.client.on.server.termination";
+    public static final String FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT =
+            "fault.sequence.invoked.on.websocket.channel.input.shutdown.event";
+    public static final String WEB_SOCKET_CLOSE_CODE = "websocket.server.close.code";
+    public static final String WEB_SOCKET_REASON_TEXT = "websocket.server.reason.text";
 }

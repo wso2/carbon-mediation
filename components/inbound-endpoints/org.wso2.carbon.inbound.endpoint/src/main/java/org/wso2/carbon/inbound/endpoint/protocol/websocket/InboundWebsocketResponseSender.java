@@ -21,6 +21,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketCloseStatus;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.util.ReferenceCountUtil;
 import org.apache.axiom.om.OMOutputFormat;
@@ -28,6 +29,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.util.MessageProcessorSelector;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,6 +44,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.util.Objects;
 
 public class InboundWebsocketResponseSender implements InboundResponseSender {
 
@@ -82,6 +85,25 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 }
             } catch (AxisFault fault) {
                 log.error("Error occurred while sending close frames", fault);
+            }
+            if (msgContext.getProperty(InboundWebsocketConstants.CUSTOM_HTTP_SC) != null) {
+                int statusCode = Integer.parseInt(
+                        String.valueOf(msgContext.getProperty(InboundWebsocketConstants.CUSTOM_HTTP_SC)));
+                if (statusCode == HttpStatus.SC_FORBIDDEN) {
+                    CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(
+                            InboundWebsocketConstants.WS_UNAUTHORIZED_CODE, errorMessage);
+                    if (log.isDebugEnabled()) {
+                        WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
+                                                             sourceHandler.getChannelHandlerContext()
+                                                                     .getChannelHandlerContext(), false);
+                    }
+                    try {
+                        sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
+                    } catch (AxisFault e) {
+                        log.error("Error occurred while handling WebSocket channel termination", e);
+                    }
+                    return;
+                }
             }
             Object isTCPTransport = ((Axis2MessageContext) msgContext).getAxis2MessageContext()
                     .getProperty(InboundWebsocketConstants.IS_TCP_TRANSPORT);
@@ -186,6 +208,44 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 }
                 handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
             } else {
+                Object isFaultSequenceInvokedOnChannelInputShutdown = msgContext.getProperty(
+                        InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT);
+                if (Objects.equals(isFaultSequenceInvokedOnChannelInputShutdown, true)) {
+                    // Fault sequence was invoked due to a 'ChannelInputShutdownEvent'
+                    Object shouldCloseClient = msgContext.getProperty(
+                            InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_SERVER_TERMINATION);
+                    if (shouldCloseClient != null && Boolean.parseBoolean((String) shouldCloseClient)) {
+                        int closeWebSocketFrameStatusCode = 1001;
+                        String closeWebSocketFrameReasonText = "Websocket server terminated";
+                        Object corruptedWebSocketFrameStatusCode = msgContext.getProperty(
+                                InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE);
+                        closeWebSocketFrameStatusCode = (corruptedWebSocketFrameStatusCode == null) ?
+                                closeWebSocketFrameStatusCode :
+                                Integer.parseInt(corruptedWebSocketFrameStatusCode.toString());
+                        Object corruptedWebSocketFrameReasonText = msgContext.getProperty(
+                                InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT);
+                        closeWebSocketFrameReasonText = (corruptedWebSocketFrameReasonText == null) ?
+                                closeWebSocketFrameReasonText :
+                                corruptedWebSocketFrameReasonText.toString();
+                        CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(closeWebSocketFrameStatusCode,
+                                closeWebSocketFrameReasonText);
+                        if (log.isDebugEnabled()) {
+                            WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
+                                    sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
+                        }
+                        try {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Terminating the client websocket channel due to server shutdown");
+                            }
+                            sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
+                        } catch (IOException e) {
+                            log.error("Failed while handling client websocket channel termination", e);
+                        }
+                    }
+
+                    return;
+                }
+
                 try {
                     Object wsCloseFrameStatusCode = msgContext.getProperty(
                             InboundWebsocketConstants.WS_CLOSE_FRAME_STATUS_CODE);

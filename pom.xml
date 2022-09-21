@@ -26,7 +26,7 @@
     </parent>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>carbon-mediation</artifactId>
-    <version>4.7.137-SNAPSHOT</version>
+    <version>4.7.141-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -55,7 +55,6 @@
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
                 <module>components/inbound-endpoints</module>
-                <module>components/mediation-clustering</module>
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
                 <module>components/mediation-throttle</module>
@@ -74,7 +73,6 @@
                 <module>features/mediation-ui-features</module>
                 <module>features/mediation-ntask-features</module>
                 <module>features/inbound-endpoints</module>
-                <module>features/mediation-clustering</module>
                 <module>features/application-deployers</module>
                 <module>features/application-mgt</module>
                 <module>features/mediation-throttle-features</module>
@@ -130,6 +128,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <source>1.8</source>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
                 </configuration>
                 <executions>
                     <execution>
@@ -510,6 +509,10 @@
                     <exclusion>
                         <groupId>org.ops4j.pax.logging</groupId>
                         <artifactId>pax-logging-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.wso2.orbit.com.hazelcast</groupId>
+                        <artifactId>hazelcast</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1679,11 +1682,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.mediator</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -2505,6 +2503,18 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito2</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.tenant.common</artifactId>
                 <version>${carbon.commons.version}</version>
@@ -2561,7 +2571,7 @@
     <properties>
         <!-- Carbon mediation version -->
         <carbon.mediation.import.feature.version>${carbon.mediation.version}</carbon.mediation.import.feature.version>
-        <carbon.mediation.version>4.7.137-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.7.141-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.7.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
@@ -2588,7 +2598,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v306</synapse.version>
+        <synapse.version>2.1.7-wso2v310</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.3.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2749,6 +2759,7 @@
         <glassfish.cobra.version>4.2.1</glassfish.cobra.version>
         <nashorn.core.version>15.4</nashorn.core.version>
         <bsf.version>3.0.0.wso2v5</bsf.version>
+        <powermock.version>2.0.9</powermock.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.0.20.wso2v1</swagger.parser.orbit.version>
         <transport.http.netty>6.3.35</transport.http.netty>
