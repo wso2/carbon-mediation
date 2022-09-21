@@ -41,7 +41,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
  */
 public class MapOutputFormatter implements Formatter {
 
-    public static final String RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME = "sun.org.mozilla.javascript.internal.NativeArray";
+    public static final String RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME = "org.mozilla.javascript.NativeArray";
     private OutputMessageBuilder outputMessageBuilder;
     private Schema outputSchema;
 
