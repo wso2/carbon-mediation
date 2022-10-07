@@ -2575,12 +2575,12 @@
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.7.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.6.3</carbon.kernel.version>
+        <carbon.kernel.version>4.7.1</carbon.kernel.version>
         <carbon.kernel.feature.version>${carbon.kernel.version}</carbon.kernel.feature.version>
-        <carbon.kernel.imp.pkg.version>[4.5.3, 4.7.0)</carbon.kernel.imp.pkg.version>
+        <carbon.kernel.imp.pkg.version>[4.5.3, 5.0.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.7.45</carbon.commons.version>
+        <carbon.commons.version>4.9.0-SNAPSHOT</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.7.0, 5.0.0)</carbon.commons.imp.pkg.version>
         <!-- Carbon Deployment version-->
         <carbon.deployment.version>4.9.15</carbon.deployment.version>
