@@ -42,7 +42,6 @@
                 <module>components/carbon-mediation-startup</module>
                 <module>service-stubs/mediation-admin</module>
                 <module>service-stubs/application-mgt</module>
-                <module>service-stubs/mediation-cg</module>
                 <module>components/mediation-registry</module>
                 <module>components/mediation-initializer</module>
                 <module>components/mediation-monitor</module>
@@ -58,7 +57,6 @@
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
                 <module>components/mediation-throttle</module>
-                <module>components/mediation-cg</module>
                 <module>components/org.wso2.carbon.integrator.core</module>
                 <module>features/thirdpartylib-features</module>
                 <module>features/event-sink</module>
@@ -76,7 +74,6 @@
                 <module>features/application-deployers</module>
                 <module>features/application-mgt</module>
                 <module>features/mediation-throttle-features</module>
-                <module>features/mediation-cg-features</module>
                 <module>features/org.wso2.carbon.integrator.server.feature</module>
                 <module>components/mediation-message-processor</module>
                 <module>features/message-processors</module>
@@ -910,16 +907,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.agent.stub</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.stub</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -1058,37 +1045,6 @@
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
                 <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.common</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.agent.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.agent</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>log4j-over-slf4j</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
@@ -1701,30 +1657,6 @@
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <!--10.3 Features -->
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.agent.server.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.agent.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.server.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.application.mgt.synapse.server.feature</artifactId>
@@ -2575,12 +2507,12 @@
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.7.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.6.3</carbon.kernel.version>
+        <carbon.kernel.version>4.8.0-m1</carbon.kernel.version>
         <carbon.kernel.feature.version>${carbon.kernel.version}</carbon.kernel.feature.version>
-        <carbon.kernel.imp.pkg.version>[4.5.3, 4.7.0)</carbon.kernel.imp.pkg.version>
+        <carbon.kernel.imp.pkg.version>[4.5.3, 5.0.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.7.45</carbon.commons.version>
+        <carbon.commons.version>4.9.0</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.7.0, 5.0.0)</carbon.commons.imp.pkg.version>
         <!-- Carbon Deployment version-->
         <carbon.deployment.version>4.9.15</carbon.deployment.version>
