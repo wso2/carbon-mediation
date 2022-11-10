@@ -111,6 +111,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private String defaultContentType;
     private int portOffset;
     private boolean isHealthCheckCall = false;
+    private boolean passThroughControlFrames = false;
     private InboundApiHandler inboundApiHandler = new InboundApiHandler();
     private static final AttributeKey<Map<String, Object>> WSO2_PROPERTIES = AttributeKey.valueOf("WSO2_PROPERTIES");
 
@@ -189,6 +190,14 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         synCtx.setProperty(InboundWebsocketConstants.CONNECTION_TERMINATE, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(
                 InboundWebsocketConstants.CONNECTION_TERMINATE, new Boolean(true));
+        if (ctx.channel().hasAttr(AttributeKey.valueOf(InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE))) {
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                    InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE,
+                    ctx.channel().attr(AttributeKey.valueOf(InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE)).get());
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                    InboundWebsocketConstants.WEBSOCKET_REASON_TEXT,
+                    ctx.channel().attr(AttributeKey.valueOf(InboundWebsocketConstants.WEBSOCKET_REASON_TEXT)).get());
+        }
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                 ctx.channel().hashCode());
         injectForMediation(synCtx, endpoint);
@@ -354,6 +363,31 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
                 if (frame instanceof CloseWebSocketFrame) {
                     try {
+                        if (passThroughControlFrames) {
+                            int statusCode = ((CloseWebSocketFrame) frame).statusCode();
+                            String reasonText = ((CloseWebSocketFrame) frame).reasonText();
+                            if (statusCode != -1) {
+                                ctx.channel().attr(AttributeKey.valueOf(InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE))
+                                        .set(statusCode);
+                            } else {
+                                if (log.isDebugEnabled()) {
+                                    WebsocketLogUtil.printSpecificLog(log, ctx,
+                                                                      "Malformed close frame received from client. No close code found."
+                                                                              + "Using default code : "
+                                                                              + InboundWebsocketConstants.WS_CLOSE_DEFAULT_CODE);
+                                }
+                                ctx.channel().attr(AttributeKey.valueOf(InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE))
+                                        .set(InboundWebsocketConstants.WS_CLOSE_DEFAULT_CODE);
+                            }
+                            if (reasonText != null) {
+                                ctx.channel().attr(
+                                        AttributeKey.valueOf(InboundWebsocketConstants.WEBSOCKET_REASON_TEXT)).set(
+                                        reasonText);
+                            } else {
+                                ctx.channel().attr(
+                                        AttributeKey.valueOf(InboundWebsocketConstants.WEBSOCKET_REASON_TEXT)).set("");
+                            }
+                        }
                         handleClientWebsocketChannelTermination(frame);
                         if (log.isDebugEnabled()) {
                             WebsocketLogUtil.printSpecificLog(log, ctx,
@@ -471,21 +505,51 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectForMediation(synCtx, endpoint);
                 } else if (frame instanceof PingWebSocketFrame) {
-                    try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("PingWebSocketFrame received on channel: " + ctx.channel().toString()
+                                          + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                          + Thread.currentThread().getId());
+                    }
+                    if (passThroughControlFrames) {
+                        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                                InboundWebsocketConstants.WEBSOCKET_PING_FRAME_PRESENT, true);
+
+                        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                                InboundWebsocketConstants.WEBSOCKET_PING_FRAME, frame);
+
+                        injectForMediation(synCtx, endpoint);
+                    } else {
+                        try {
+                            PongWebSocketFrame pongWebSocketFrame = new PongWebSocketFrame(frame.content().retain());
+                            ctx.channel().writeAndFlush(pongWebSocketFrame);
+                            if (log.isDebugEnabled()) {
+                                WebsocketLogUtil.printWebSocketFrame(log, pongWebSocketFrame, ctx, false);
+                            }
+                        } finally {
+                            ReferenceCountUtil.release(frame);
+                        }
+                    }
+                } else if (frame instanceof PongWebSocketFrame) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("PongWebSocketFrame received on channel: " + ctx.channel().toString()
+                                          + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                          + Thread.currentThread().getId());
+                    }
+                    if (passThroughControlFrames) {
+                        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                                InboundWebsocketConstants.WEBSOCKET_PONG_FRAME_PRESENT, true);
+                        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                                InboundWebsocketConstants.WEBSOCKET_PONG_FRAME, frame);
+
+                        injectForMediation(synCtx, endpoint);
+                    } else {
                         if (log.isDebugEnabled()) {
-                            log.debug("PingWebSocketFrame received on channel: " + ctx.channel().toString()
+                            log.debug("Ignoring PongWebSocketFrame received on channel: " + ctx.channel().toString()
                                               + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                                               + Thread.currentThread().getId());
                         }
-                        PongWebSocketFrame pongWebSocketFrame = new PongWebSocketFrame(frame.content().retain());
-                        ctx.channel().writeAndFlush(pongWebSocketFrame);
-                        if (log.isDebugEnabled()) {
-                            WebsocketLogUtil.printWebSocketFrame(log, pongWebSocketFrame, ctx, false);
-                        }
-                    } finally {
                         ReferenceCountUtil.release(frame);
                     }
-                    return;
                 }
 
             } else {
@@ -725,6 +789,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        log.error("Error encountered while processing inbound websocket connection", cause);
         if (!handshakeFuture.isDone()) {
             handshakeFuture.setFailure(cause);
         }
@@ -738,6 +803,14 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
     public void setPortOffset(int portOffset) {
         this.portOffset = portOffset;
+    }
+
+    public void setPassThroughControlFrames(boolean passThroughControlFrames) {
+        this.passThroughControlFrames = passThroughControlFrames;
+    }
+
+    public boolean getPassThroughControlFrames() {
+        return passThroughControlFrames;
     }
 
 }

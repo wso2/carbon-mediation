@@ -38,6 +38,11 @@ public class WebsocketConstants {
     public static final String WEBSOCKET_BINARY_FRAME_PRESENT = "websocket.binary.frame.present";
     public static final String WEBSOCKET_BINARY_FRAME = "websocket.binary.frame";
 
+    public static final String WEBSOCKET_PING_FRAME_PRESENT = "websocket.ping.frame.present";
+    public static final String WEBSOCKET_PING_FRAME = "websocket.ping.frame";
+    public static final String WEBSOCKET_PONG_FRAME_PRESENT = "websocket.pong.frame.present";
+    public static final String WEBSOCKET_PONG_FRAME = "websocket.pong.frame";
+
     public static final String WEBSOCKET_TEXT_FRAME_PRESENT = "websocket.text.frame.present";
     public static final String WEBSOCKET_TEXT_FRAME = "websocket.text.frame";
 
@@ -58,6 +63,12 @@ public class WebsocketConstants {
     public static final String WEBSOCKET_SUBPROTOCOL = "websocket.subprotocol";
 
     public static final String CONNECTION_TERMINATE = "connection.terminate";
+    public static final String WEBSOCKET_CLOSE_CODE = "websocket.close.code";
+
+    public static final String WEBSOCKET_REASON_TEXT = "websocket.reason.text";
+
+    public static final int WS_CLOSE_DEFAULT_CODE = 1001;
+    public static final String WS_CLOSE_DEFAULT_REASON_TEXT = "Websocket server terminated";
 
     public static final int WEBSOCKET_UPSTREAM_ERROR_SC = 1014;
 }

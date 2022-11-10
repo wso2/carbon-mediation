@@ -45,8 +45,17 @@ public class InboundWebsocketConstants {
     public static final String WEBSOCKET_BINARY_FRAME_PRESENT = "websocket.binary.frame.present";
     public static final String WEBSOCKET_BINARY_FRAME = "websocket.binary.frame";
 
+    public static final String WEBSOCKET_PING_FRAME_PRESENT = "websocket.ping.frame.present";
+    public static final String WEBSOCKET_PING_FRAME = "websocket.ping.frame";
+    public static final String WEBSOCKET_PONG_FRAME_PRESENT = "websocket.pong.frame.present";
+    public static final String WEBSOCKET_PONG_FRAME = "websocket.pong.frame";
+
     public static final String WEBSOCKET_TEXT_FRAME_PRESENT = "websocket.text.frame.present";
     public static final String WEBSOCKET_TEXT_FRAME = "websocket.text.frame";
+
+    public static final String WEBSOCKET_CLOSE_CODE = "websocket.close.code";
+    public static final String WEBSOCKET_CLOSE_CLIENT = "websocket.close.client";
+    public static final String WEBSOCKET_REASON_TEXT = "websocket.reason.text";
 
     public static final String WEBSOCKET_CLIENT_SIDE_BROADCAST_LEVEL = "ws.client.side.broadcast.level";
     public static final String WEBSOCKET_USE_PORT_OFFSET = "ws.use.port.offset";
@@ -55,6 +64,7 @@ public class InboundWebsocketConstants {
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
 
     public static final String INBOUND_SUBPROTOCOL_HANDLER_CLASS = "ws.subprotocol.handler.class";
+    public static final String PASS_THROUGH_CONTROL_FRAMES = "ws.pass.through.control.frames";
     public static final String INBOUND_DEFAULT_CONTENT_TYPE = "ws.default.content.type";
     public static final String WEBSOCKET_SUBPROTOCOL = "websocket.subprotocol";
 

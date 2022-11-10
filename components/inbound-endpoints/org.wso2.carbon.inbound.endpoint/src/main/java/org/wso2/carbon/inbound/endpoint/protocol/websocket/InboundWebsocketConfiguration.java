@@ -32,6 +32,7 @@ public class InboundWebsocketConfiguration {
     private final boolean usePortOffset;
     private int inflowIdleTime;
     private int outflowIdleTime;
+    private boolean passThroughControlFrames;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -48,6 +49,7 @@ public class InboundWebsocketConfiguration {
         this.usePortOffset = builder.usePortOffset;
         this.inflowIdleTime = builder.inflowIdleTime;
         this.outflowIdleTime = builder.outflowIdleTime;
+        this.passThroughControlFrames = builder.passThroughControlFrames;
     }
 
     public int getPort() {
@@ -106,6 +108,10 @@ public class InboundWebsocketConfiguration {
         return outflowIdleTime;
     }
 
+    public boolean passThroughControlFrames() {
+        return passThroughControlFrames;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -121,6 +127,7 @@ public class InboundWebsocketConfiguration {
         private boolean usePortOffset = false;
         private int inflowIdleTime;
         private int outflowIdleTime;
+        private boolean passThroughControlFrames = false;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -190,6 +197,12 @@ public class InboundWebsocketConfiguration {
             this.outflowIdleTime = outflowIdleTime;
             return this;
         }
+
+        public InboundWebsocketConfigurationBuilder passThroughControlFrames(boolean passThroughControlFrames) {
+            this.passThroughControlFrames = passThroughControlFrames;
+            return this;
+        }
+
     }
 
 }
