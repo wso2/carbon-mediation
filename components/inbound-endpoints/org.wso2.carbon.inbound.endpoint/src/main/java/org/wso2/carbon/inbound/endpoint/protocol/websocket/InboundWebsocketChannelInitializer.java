@@ -45,6 +45,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private int portOffset;
     private int inflowIdleTime;
     private int outflowIdleTime;
+    private boolean passThroughControlFrames;
 
     public InboundWebsocketChannelInitializer() {
     }
@@ -85,6 +86,10 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         this.outflowIdleTime = outflowIdleTime;
     }
 
+    public void setPassThroughControlFrames(boolean passThroughControlFrames) {
+        this.passThroughControlFrames = passThroughControlFrames;
+    }
+
     @Override
     protected void initChannel(SocketChannel websocketChannel) throws Exception {
 
@@ -102,6 +107,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         sourceHandler.setClientBroadcastLevel(clientBroadcastLevel);
         sourceHandler.setDispatchToCustomSequence(dispatchToCustomSequence);
         sourceHandler.setPortOffset(portOffset);
+        sourceHandler.setPassThroughControlFrames(passThroughControlFrames);
         if (outflowDispatchSequence != null)
             sourceHandler.setOutflowDispatchSequence(outflowDispatchSequence);
         if (outflowErrorSequence != null)

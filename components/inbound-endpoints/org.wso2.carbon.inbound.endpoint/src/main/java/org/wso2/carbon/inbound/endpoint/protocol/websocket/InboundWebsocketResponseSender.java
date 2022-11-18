@@ -20,6 +20,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketCloseStatus;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
@@ -138,15 +140,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                             OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
                             byte[] message = messageFormatter.getBytes(msgCtx, format);
                             frame = new BinaryWebSocketFrame(Unpooled.copiedBuffer(message));
-                            InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                            int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
-                            String subscriberPath = sourceHandler.getSubscriberPath();
-                            WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-                            if (log.isDebugEnabled()) {
-                                WebsocketLogUtil.printWebSocketFrame(log, frame,
-                                        ctx.getChannelHandlerContext(), false);
-                            }
-                            handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                            handleSendBack(frame);
                             return;
                         }
                     } catch (XMLStreamException ex) {
@@ -155,15 +149,37 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                         log.error("Failed for format message to specified output format", ex);
                     }
                 }
-                InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
-                String subscriberPath = sourceHandler.getSubscriberPath();
-                WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+                handleSendBack(frame);
+            } else if (Objects.equals(true,
+                                      msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_PING_FRAME_PRESENT))) {
+
+                PingWebSocketFrame frame = (PingWebSocketFrame)msgContext
+                        .getProperty(InboundWebsocketConstants.WEBSOCKET_PING_FRAME);
+                handleSendBack(frame);
+
+            } else if (Objects.equals(true,
+                                      msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_PONG_FRAME_PRESENT))) {
+
+                PongWebSocketFrame frame = (PongWebSocketFrame) msgContext.getProperty(
+                        InboundWebsocketConstants.WEBSOCKET_PONG_FRAME);
+                handleSendBack(frame);
+            } else if (Objects.equals(true, msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_CLOSE_CLIENT))) {
+
+                int statusCode = (int) msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE);
+                String reasonText = (String) msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_REASON_TEXT);
+                CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(statusCode, reasonText);
                 if (log.isDebugEnabled()) {
-                    WebsocketLogUtil.printWebSocketFrame(log, frame, ctx.getChannelHandlerContext(),
-                            false);
+                    WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
+                                                         sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
                 }
-                handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Terminating the client websocket channel due to server shutdown");
+                    }
+                    sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
+                } catch (IOException e) {
+                    log.error("Failed while handling client websocket channel termination", e);
+                }
             } else if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
                 TextWebSocketFrame frame = (TextWebSocketFrame)
@@ -272,15 +288,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
                     TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext)
                             .getAxis2MessageContext()));
-                    InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                    int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
-                    String subscriberPath = sourceHandler.getSubscriberPath();
-                    WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-                    if (log.isDebugEnabled()) {
-                        WebsocketLogUtil.printWebSocketFrame(log, frame,
-                                sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
-                    }
-                    handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                    handleSendBack(frame);
                 } catch (IOException ex) {
                     log.error("Failed for format message to specified output format", ex);
                 } catch (XMLStreamException e) {
@@ -288,6 +296,17 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 }
             }
         }
+    }
+
+    protected void handleSendBack(WebSocketFrame frame) {
+        InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+        int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
+        String subscriberPath = sourceHandler.getSubscriberPath();
+        WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+        if (log.isDebugEnabled()) {
+            WebsocketLogUtil.printWebSocketFrame(log, frame, ctx.getChannelHandlerContext(), false);
+        }
+        handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
     }
 
     protected void handleSendBack(WebSocketFrame frame,

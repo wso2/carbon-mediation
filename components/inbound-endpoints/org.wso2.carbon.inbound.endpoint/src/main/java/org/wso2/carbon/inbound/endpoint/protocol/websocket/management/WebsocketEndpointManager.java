@@ -143,6 +143,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setPortOffset(PersistenceUtils.getPortOffset(params.getProperties()));
         handler.setInflowIdleTime(config.getInflowIdleTime());
         handler.setOutflowIdleTime(config.getOutflowIdleTime());
+        handler.setPassThroughControlFrames(config.passThroughControlFrames());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -180,6 +181,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setPortOffset(PersistenceUtils.getPortOffset(params.getProperties()));
         handler.setInflowIdleTime(config.getInflowIdleTime());
         handler.setOutflowIdleTime(config.getOutflowIdleTime());
+        handler.setPassThroughControlFrames(config.passThroughControlFrames());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -256,12 +258,14 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                         InboundWebsocketConstants.INBOUND_PIPELINE_HANDLER_CLASS))
                 .dispatchToCustomSequence(params.getProperties().getProperty(
                         InboundWebsocketConstants.CUSTOM_SEQUENCE))
-                .usePortOffset(Boolean.valueOf(params.getProperties().getProperty(
+                .usePortOffset(Boolean.parseBoolean(params.getProperties().getProperty(
                         InboundWebsocketConstants.WEBSOCKET_USE_PORT_OFFSET)))
                 .inflowIdleTime(Integer.parseInt(params.getProperties()
                         .getProperty(InboundWebsocketConstants.WEBSOCKET_DISPATCH_IDLETIME, "0")))
                 .outflowIdleTime(Integer.parseInt(params.getProperties()
                         .getProperty(InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_IDLETIME, "0")))
+                .passThroughControlFrames(Boolean.parseBoolean(
+                        params.getProperties().getProperty(InboundWebsocketConstants.PASS_THROUGH_CONTROL_FRAMES)))
                 .build();
     }
 

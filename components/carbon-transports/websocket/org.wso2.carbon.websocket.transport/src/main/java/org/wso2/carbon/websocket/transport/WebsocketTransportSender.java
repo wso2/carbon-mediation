@@ -21,10 +21,13 @@ package org.wso2.carbon.websocket.transport;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
+import java.util.Objects;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
@@ -75,7 +78,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
     public void sendMessage(MessageContext msgCtx, String targetEPR, OutTransportInfo trpOut)
             throws AxisFault {
-        String sourceIdentier = null;
+        String sourceIdentifier = null;
         boolean handshakePresent = false;
         String responceDispatchSequence = null;
         String responceErrorSequence = null;
@@ -92,13 +95,13 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             responseSender = (InboundResponseSender)
                     msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER);
             if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER) != null) {
-                sourceIdentier = msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER).toString();
+                sourceIdentifier = msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER).toString();
             } else {
-                sourceIdentier = ((ChannelHandlerContext) msgCtx.
+                sourceIdentifier = ((ChannelHandlerContext) msgCtx.
                         getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT)).channel().toString();
             }
         } else {
-            sourceIdentier = WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER;
+            sourceIdentifier = WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER;
         }
 
         if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT) != null
@@ -125,7 +128,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             isConnectionTerminate = true;
         }
         if (log.isDebugEnabled()) {
-            log.debug("sendMessage triggered with sourceChannel: " + sourceIdentier + ", websocket sub protocol: "
+            log.debug("sendMessage triggered with sourceChannel: " + sourceIdentifier + ", websocket sub protocol: "
                               + wsSubProtocol + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                               + Thread.currentThread().getId());
         }
@@ -172,11 +175,11 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         try {
             if (log.isDebugEnabled()) {
                 log.debug("Fetching a Connection from the WS(WSS) Connection Factory with sourceChannel : "
-                                  + sourceIdentier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                  + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                                   + Thread.currentThread().getId());
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR),
-                                                                                       sourceIdentier, handshakePresent,
+                                                                                       sourceIdentifier, handshakePresent,
                                                                                        responceDispatchSequence,
                                                                                        responceErrorSequence,
                                                                                        messageType, wsSubProtocol,
@@ -187,7 +190,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             if (clientHandler == null && isConnectionTerminate) {
                 if (log.isDebugEnabled()) {
                     log.debug("Backend connection does not exist. No need to send close frame to backend "
-                                      + "with sourceChannel : " + sourceIdentier + ", in the Thread,ID: "
+                                      + "with sourceChannel : " + sourceIdentifier + ", in the Thread,ID: "
                                       + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
                 }
                 return;
@@ -223,7 +226,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     if (log.isDebugEnabled()) {
                         log.debug("Sending the passthrough text frame to the WS server on context id: "
                                           + clientHandler.getChannelHandlerContext().channel().toString() + ", "
-                                          + ", sourceIdentifier: " + sourceIdentier + ", in the Thread,ID: "
+                                          + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: "
                                           + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
@@ -235,15 +238,28 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 } finally {
                     ReferenceCountUtil.release(frame);
                 }
+            } else if (Objects.equals(true, msgCtx.getProperty(WebsocketConstants.WEBSOCKET_PING_FRAME_PRESENT))) {
+                WebSocketFrame frame = (PingWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_PING_FRAME);
+                dispatchPingPongFrame(clientHandler, sourceIdentifier, frame, "ping");
+
+            } else if (Objects.equals(true, msgCtx.getProperty(WebsocketConstants.WEBSOCKET_PONG_FRAME_PRESENT))) {
+                WebSocketFrame frame = (PongWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_PONG_FRAME);
+                dispatchPingPongFrame(clientHandler, sourceIdentifier, frame, "pong");
             } else if (isConnectionTerminate) {
+                Channel channel = clientHandler.getChannelHandlerContext().channel();
                 if (log.isDebugEnabled()) {
                     log.debug("Sending CloseWebsocketFrame to WS server on context id: "
                                       + clientHandler.getChannelHandlerContext().channel().toString() + ", "
-                                      + ", sourceIdentifier: " + sourceIdentier + ", in the Thread,ID: "
+                                      + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: "
                                       + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
                 }
-                Channel channel = clientHandler.getChannelHandlerContext().channel();
-                channel.writeAndFlush(new CloseWebSocketFrame());
+                if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CLOSE_CODE) != null) {
+                    int statusCode = (int) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CLOSE_CODE);
+                    String reasonText = (String) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_REASON_TEXT);
+                    channel.writeAndFlush(new CloseWebSocketFrame(statusCode, reasonText));
+                } else {
+                    channel.writeAndFlush(new CloseWebSocketFrame());
+                }
                 channel.close();
             } else {
                 if (!handshakePresent) {
@@ -271,7 +287,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     if (log.isDebugEnabled()) {
                         log.debug("AcknowledgeHandshake to WS server on context id: "
                                           + clientHandler.getChannelHandlerContext().channel().toString() + ", "
-                                          + ", sourceIdentifier: " + sourceIdentier + ", in the Thread,ID: "
+                                          + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: "
                                           + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
                     }
                     clientHandler.acknowledgeHandshake();
@@ -287,6 +303,29 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             log.error("Error writing to the websocket channel", e);
         } catch (XMLStreamException e) {
             handleException("Error while building message", e);
+        }
+    }
+
+    private void dispatchPingPongFrame(WebSocketClientHandler clientHandler, String sourceIdentifier,
+                                       WebSocketFrame frame, String frameType) {
+        try {
+            if (clientHandler.getChannelHandlerContext().channel().isActive()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending the " + frameType + " frame to the WS server on context id: "
+                                      + clientHandler.getChannelHandlerContext().channel().toString() + ", "
+                                      + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: "
+                                      + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                }
+                clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Disregarding the " + frameType + " frame on " + ", sourceIdentifier: " + sourceIdentifier
+                                      + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                      + Thread.currentThread().getId() + " due to the Channel being inactive");
+                }
+            }
+        } finally {
+            ReferenceCountUtil.release(frame);
         }
     }
 

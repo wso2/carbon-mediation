@@ -33,6 +33,7 @@ import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.util.ReferenceCountUtil;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -48,6 +49,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -59,6 +61,7 @@ import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.service.ServiceReferenceHolder;
 import org.wso2.carbon.websocket.transport.utils.LogUtil;
@@ -75,6 +78,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     private ChannelHandlerContext ctx;
     private InboundResponseSender responseSender;
     private String tenantDomain;
+    private boolean passThroughControlFrames;
 
     public void setTenantDomain(String tenantDomain) {
         this.tenantDomain = tenantDomain;
@@ -82,6 +86,8 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     public WebSocketClientHandler(WebSocketClientHandshaker handshaker) {
         this.handshaker = handshaker;
+        passThroughControlFrames =
+                WebsocketEndpointManager.getInstance().getSourceHandler().getPassThroughControlFrames();
     }
 
     public void setDispatchSequence(String dispatchSequence) {
@@ -161,7 +167,6 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                   + Thread.currentThread().getId());
             }
             handshakeFuture.setSuccess();
-            return;
         }
     }
 
@@ -209,6 +214,26 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         invokeFaultSequenceUponServerShutdown(synCtx);
     }
 
+    private void closeClientConnection(CloseWebSocketFrame frame, boolean passThroughControlFrames) throws AxisFault {
+        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+        if (passThroughControlFrames) {
+            synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_CLOSE_CLIENT, true);
+        }
+        if (frame.statusCode() != -1) {
+            synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE, frame.statusCode());
+        } else {
+            synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_CLOSE_CODE,
+                               WebsocketConstants.WS_CLOSE_DEFAULT_CODE);
+        }
+        if (StringUtils.isNotEmpty(frame.reasonText())) {
+            synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_REASON_TEXT, frame.reasonText());
+        } else {
+            synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_REASON_TEXT,
+                               WebsocketConstants.WS_CLOSE_DEFAULT_REASON_TEXT);
+        }
+        injectToSequence(synCtx, dispatchSequence, dispatchErrorSequence);
+    }
+
     public void handleWebsocketBinaryFrame(WebSocketFrame frame) throws AxisFault {
         org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         synCtx.setProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, true);
@@ -248,6 +273,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                           + Thread.currentThread().getId());
                     }
                     handleTargetWebsocketChannelTermination(frame);
+                    closeClientConnection((CloseWebSocketFrame) frame, passThroughControlFrames);
                     return;
                 } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
                         ((handshaker.actualSubprotocol() != null) &&
@@ -262,13 +288,44 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                           + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                                           + Thread.currentThread().getId());
                     }
-                    ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
-                    if (log.isDebugEnabled()) {
-                        log.debug("PongWebSocketFrame sent on channel: " + ctx.channel().toString()
-                                          + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
-                                          + Thread.currentThread().getId());
+                    if (passThroughControlFrames) {
+                        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+                        synCtx.setProperty(WebsocketConstants.WEBSOCKET_PING_FRAME_PRESENT, true);
+                        synCtx.setProperty(WebsocketConstants.WEBSOCKET_PING_FRAME, frame);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Ping frame being injected to sequence on channel: " + ctx.channel().toString()
+                                              + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                              + Thread.currentThread().getId());
+                        }
+                        injectToSequence(synCtx, dispatchSequence, dispatchErrorSequence);
+                    } else {
+                        ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
+                        if (log.isDebugEnabled()) {
+                            log.debug("PongWebSocketFrame sent on channel: " + ctx.channel().toString()
+                                              + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                              + Thread.currentThread().getId());
+                        }
+                        ReferenceCountUtil.release(frame);
                     }
-                    return;
+                } else if (frame instanceof PongWebSocketFrame) {
+                    if (passThroughControlFrames) {
+                        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+                        synCtx.setProperty(WebsocketConstants.WEBSOCKET_PONG_FRAME_PRESENT, true);
+                        synCtx.setProperty(WebsocketConstants.WEBSOCKET_PONG_FRAME, frame);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Pong frame being injected to sequence on channel: " + ctx.channel().toString()
+                                              + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                              + Thread.currentThread().getId());
+                        }
+                        injectToSequence(synCtx, dispatchSequence, dispatchErrorSequence);
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Ignoring PongWebSocketFrame on channel: " + ctx.channel().toString()
+                                              + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                              + Thread.currentThread().getId());
+                        }
+                        ReferenceCountUtil.release(frame);
+                    }
                 } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
                         ((handshaker.actualSubprotocol() != null) &&
                                 !handshaker.actualSubprotocol().contains(WebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {

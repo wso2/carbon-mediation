@@ -47,6 +47,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketSourceHandler;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.websocket.transport.service.ServiceReferenceHolder;
 
@@ -58,7 +60,7 @@ import java.util.HashMap;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ServiceReferenceHolder.class,
-        MessageContextCreatorForAxis2.class, WebSocketClientHandler.class })
+        MessageContextCreatorForAxis2.class, WebSocketClientHandler.class, WebsocketEndpointManager.class })
 public class WebSocketClientHandlerTest {
 
     private static final Log log = LogFactory.getLog(WebSocketClientHandlerTest.class);
@@ -79,6 +81,13 @@ public class WebSocketClientHandlerTest {
         WebsocketConnectionFactory webSocketClientHandshakerFactory;
         webSocketClientHandshaker = WebSocketClientHandshakerFactory.newHandshaker(new URI("ws://localhost:8000"),
                 WebSocketVersion.V13, null, false, httpHeaders);
+        WebsocketEndpointManager websocketEndpointManager = Mockito.mock(WebsocketEndpointManager.class);
+        PowerMockito.mockStatic(WebsocketEndpointManager.class);
+        Mockito.when(WebsocketEndpointManager.getInstance()).thenReturn(websocketEndpointManager);
+        InboundWebsocketSourceHandler inboundWebsocketSourceHandler = Mockito.mock(InboundWebsocketSourceHandler.class);
+        inboundWebsocketSourceHandler.setPassThroughControlFrames(false);
+        Mockito.when(WebsocketEndpointManager.getInstance().getSourceHandler()).thenReturn(
+                inboundWebsocketSourceHandler);
         webSocketClientHandler = new WebSocketClientHandler(webSocketClientHandshaker);
         webSocketClientHandler.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
