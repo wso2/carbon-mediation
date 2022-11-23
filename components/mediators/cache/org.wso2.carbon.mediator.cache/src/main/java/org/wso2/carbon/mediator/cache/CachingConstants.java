@@ -129,4 +129,5 @@ public class CachingConstants {
     public static final String PERMANENTLY_EXCLUDED_HEADERS_STRING = "permanently-excluded-headers";
     public static final String EXCLUDED_HEADERS_PROPERTY = "headers-to-exclude";
     public static final String INCLUDED_HEADERS_PROPERTY = "headers-to-include";
+    public static final String PROPERTY_SEPARATOR = ";";
 }
