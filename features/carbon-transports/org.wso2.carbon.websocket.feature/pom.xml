@@ -80,6 +80,10 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-tcnative-boringssl-static</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-unix-common</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -116,6 +120,7 @@
                                 <bundleDef>io.netty:netty-tcnative-classes:compatible:${netty.tcnative.version}</bundleDef>
                                 <bundleDef>io.netty:netty-handler-proxy:compatible:${netty.version}</bundleDef>
                                 <bundleDef>io.netty:netty-codec-socks:compatible:${netty.version}</bundleDef>
+                                <bundleDef>io.netty:netty-transport-native-unix-common:compatible:${netty.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <!--<importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>-->
