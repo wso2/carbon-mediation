@@ -44,6 +44,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundResponseSender;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.utils.SSLUtil;
 
 import javax.net.ssl.SSLException;
@@ -85,7 +86,8 @@ public class WebsocketConnectionFactory {
         }
     }
 
-    public WebSocketClientHandler getChannelHandler(final URI uri,
+    public WebSocketClientHandler getChannelHandler(final String tenantDomain,
+                                                    final URI uri,
                                                     final String sourceIdentifier,
                                                     final boolean handshakePresent,
                                                     final String dispatchSequence,
@@ -110,7 +112,7 @@ public class WebsocketConnectionFactory {
                         log.debug("Caching new connection with sourceIdentifier " + sourceIdentifier + " in the Thread,"
                                           + "ID: " + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
                     }
-                    channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
+                    channelHandler = cacheNewConnection(tenantDomain, uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
                                                         contentType, wsSubprotocol, headers, inboundResponseSender,
                                                         responseDispatchSequence, responseErrorSequence);
                 }
@@ -127,7 +129,8 @@ public class WebsocketConnectionFactory {
         return host.concat(String.valueOf(port)).concat(subscriberPath);
     }
 
-    public WebSocketClientHandler cacheNewConnection(final URI uri,
+    public WebSocketClientHandler cacheNewConnection(final String tenantDomain,
+                                                     final URI uri,
                                                      final String sourceIdentifier,
                                                      String dispatchSequence,
                                                      String dispatchErrorSequence,
@@ -228,6 +231,13 @@ public class WebsocketConnectionFactory {
                         deriveSubprotocol(wsSubprotocol, contentType),
                         false, defaultHttpHeaders));
             }
+
+            if (tenantDomain != null) {
+                handler.setTenantDomain(tenantDomain);
+            } else {
+                handler.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            }
+
             if (!(WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER).equals(sourceIdentifier)) {
                 handler.registerWebsocketResponseSender(inboundResponseSender);
                 handler.setDispatchSequence(responseDispatchSequence);

@@ -132,6 +132,10 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                               + wsSubProtocol + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                               + Thread.currentThread().getId());
         }
+        String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
+        if (tenantDomain == null) {
+            tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
 
         /*
         * Get all the message property names and check whether the properties with the websocket custom header
@@ -178,7 +182,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                   + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                                   + Thread.currentThread().getId());
             }
-            WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR),
+            WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(tenantDomain,
+                                                                                       new URI(targetEPR),
                                                                                        sourceIdentifier, handshakePresent,
                                                                                        responceDispatchSequence,
                                                                                        responceErrorSequence,
@@ -194,12 +199,6 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                       + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
                 }
                 return;
-            }
-            String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
-            if (tenantDomain != null) {
-                clientHandler.setTenantDomain(tenantDomain);
-            } else {
-                clientHandler.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
             }
 
             if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT) != null
