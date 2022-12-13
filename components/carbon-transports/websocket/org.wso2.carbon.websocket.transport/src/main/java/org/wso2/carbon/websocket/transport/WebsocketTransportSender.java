@@ -27,6 +27,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.AttributeKey;
 import java.util.Objects;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
@@ -64,6 +65,7 @@ import javax.xml.stream.XMLStreamException;
 public class WebsocketTransportSender extends AbstractTransportSender {
 
     private WebsocketConnectionFactory connectionFactory;
+    private final String API_PROPERTIES = "API_PROPERTIES";
 
     private static final Log log = LogFactory.getLog(WebsocketTransportSender.class);
 
@@ -79,6 +81,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
     public void sendMessage(MessageContext msgCtx, String targetEPR, OutTransportInfo trpOut)
             throws AxisFault {
         String sourceIdentifier = null;
+        String correlationId = null;
         boolean handshakePresent = false;
         String responceDispatchSequence = null;
         String responceErrorSequence = null;
@@ -86,6 +89,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         String wsSubProtocol = null;
         boolean isConnectionTerminate = false;
         Map<String, Object> customHeaders = new HashMap<>();
+        Map<String, Object> apiProperties = new HashMap<>();
 
         if (log.isDebugEnabled()) {
             log.debug("Endpoint url: " + targetEPR);
@@ -119,6 +123,18 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
         if (msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE) != null) {
             messageType = (String) msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE);
+        }
+
+        if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CORRELATION_ID) != null) {
+            correlationId = (String) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CORRELATION_ID);
+        } else {
+            correlationId = sourceIdentifier;
+        }
+
+        if (((ChannelHandlerContext) (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT))).channel()
+                .attr(AttributeKey.valueOf(API_PROPERTIES)).get() != null) {
+            apiProperties = (Map<String, Object>) ((ChannelHandlerContext) (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT))).channel()
+                    .attr(AttributeKey.valueOf(API_PROPERTIES)).get();
         }
 
         if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SUBPROTOCOL) != null) {
@@ -191,7 +207,9 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                                                                        isConnectionTerminate,
                                                                                        customHeaders, responseSender,
                                                                                        responceDispatchSequence,
-                                                                                       responceErrorSequence);
+                                                                                       responceErrorSequence,
+                                                                                       correlationId,
+                                                                                       apiProperties);
             if (clientHandler == null && isConnectionTerminate) {
                 if (log.isDebugEnabled()) {
                     log.debug("Backend connection does not exist. No need to send close frame to backend "

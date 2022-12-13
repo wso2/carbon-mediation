@@ -98,7 +98,9 @@ public class WebsocketConnectionFactory {
                                                     final Map<String, Object> headers,
                                                     final InboundResponseSender inboundResponseSender,
                                                     final String responseDispatchSequence,
-                                                    final String responseErrorSequence) throws InterruptedException {
+                                                    final String responseErrorSequence,
+                                                    final String correlationId,
+                                                    final Map<String, Object> apiProperties) throws InterruptedException {
         WebSocketClientHandler channelHandler = getChannelHandlerFromPool(sourceIdentifier,
                                                                           getClientHandlerIdentifier(uri));
         if (channelHandler == null) {
@@ -114,7 +116,8 @@ public class WebsocketConnectionFactory {
                     }
                     channelHandler = cacheNewConnection(tenantDomain, uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
                                                         contentType, wsSubprotocol, headers, inboundResponseSender,
-                                                        responseDispatchSequence, responseErrorSequence);
+                                                        responseDispatchSequence, responseErrorSequence,
+                                                        correlationId, apiProperties);
                 }
             }
         }
@@ -139,7 +142,9 @@ public class WebsocketConnectionFactory {
                                                      Map<String, Object> headers,
                                                      InboundResponseSender inboundResponseSender,
                                                      String responseDispatchSequence,
-                                                     String responseErrorSequence) {
+                                                     String responseErrorSequence,
+                                                     String correlationId,
+                                                     Map<String, Object> apiProperties) {
         if (log.isDebugEnabled()) {
             log.debug("Creating a Connection for the specified WS endpoint.");
         }
@@ -231,7 +236,8 @@ public class WebsocketConnectionFactory {
                         deriveSubprotocol(wsSubprotocol, contentType),
                         false, defaultHttpHeaders));
             }
-
+            handler.setCorrelationId(correlationId);
+            handler.setApiProperties(apiProperties);
             if (tenantDomain != null) {
                 handler.setTenantDomain(tenantDomain);
             } else {
