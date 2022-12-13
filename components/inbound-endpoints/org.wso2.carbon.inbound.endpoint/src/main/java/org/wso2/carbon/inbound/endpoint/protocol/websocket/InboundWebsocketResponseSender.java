@@ -224,34 +224,38 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 }
                 handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
             } else {
-                Object isFaultSequenceInvokedOnChannelInputShutdown = msgContext.getProperty(
-                        InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CHANNEL_INPUT_SHUTDOWN_EVENT);
-                if (Objects.equals(isFaultSequenceInvokedOnChannelInputShutdown, true)) {
-                    // Fault sequence was invoked due to a 'ChannelInputShutdownEvent'
+                Object isFaultSequenceInvokedOnClientHandlerError = msgContext.getProperty(
+                        InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CLIENT_HANDLER_ERROR);
+                if (Objects.equals(isFaultSequenceInvokedOnClientHandlerError, true)) {
+                    /*
+                     * Fault sequence was invoked due to an error happened in
+                     * org.wso2.carbon.websocket.transport.WebSocketClientHandler
+                     */
                     Object shouldCloseClient = msgContext.getProperty(
-                            InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_SERVER_TERMINATION);
+                            InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_CLIENT_HANDLER_ERROR);
                     if (shouldCloseClient != null && Boolean.parseBoolean((String) shouldCloseClient)) {
-                        int closeWebSocketFrameStatusCode = 1001;
-                        String closeWebSocketFrameReasonText = "Websocket server terminated";
-                        Object corruptedWebSocketFrameStatusCode = msgContext.getProperty(
-                                InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE);
-                        closeWebSocketFrameStatusCode = (corruptedWebSocketFrameStatusCode == null) ?
-                                closeWebSocketFrameStatusCode :
-                                Integer.parseInt(corruptedWebSocketFrameStatusCode.toString());
-                        Object corruptedWebSocketFrameReasonText = msgContext.getProperty(
-                                InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT);
-                        closeWebSocketFrameReasonText = (corruptedWebSocketFrameReasonText == null) ?
-                                closeWebSocketFrameReasonText :
-                                corruptedWebSocketFrameReasonText.toString();
-                        CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(closeWebSocketFrameStatusCode,
-                                closeWebSocketFrameReasonText);
+                        Object msgContextStatusCode =
+                                msgContext.getProperty(InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE);
+                        int statusCode;
+                        if (msgContextStatusCode != null) {
+                            statusCode = (int) msgContextStatusCode;
+                        } else {
+                            statusCode = InboundWebsocketConstants.WS_CLOSE_DEFAULT_CODE;
+                        }
+                        String reasonText =
+                                (String) (msgContext.getProperty(InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT));
+                        if (reasonText == null) {
+                            reasonText = InboundWebsocketConstants.WS_UNEXPECTED_CONNECTION_CLOSURE_TEXT;
+                        }
+
+                        CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(statusCode, reasonText);
                         if (log.isDebugEnabled()) {
                             WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
                                     sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
                         }
                         try {
                             if (log.isDebugEnabled()) {
-                                log.debug("Terminating the client websocket channel due to server shutdown");
+                                log.debug("Terminating the client websocket channel due to WebSocketClientHandler error");
                             }
                             sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
                         } catch (IOException e) {
