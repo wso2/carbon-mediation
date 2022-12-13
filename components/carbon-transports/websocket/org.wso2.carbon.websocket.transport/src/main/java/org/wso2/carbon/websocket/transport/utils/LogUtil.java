@@ -74,9 +74,9 @@ public class LogUtil {
      * @param isInbound true if the frame is inbound, false if it is outbound
      */
     public static void printWebSocketFrame(Log log, WebSocketFrame frame, ChannelHandlerContext ctx,
-                                           String customMsg, boolean isInbound) {
+                                           String customMsg, boolean isInbound, String correlationID) {
         String channelContextId = resolveContextId(ctx);
-        printWebSocketFrame(log, frame, channelContextId, customMsg, isInbound);
+        printWebSocketFrame(log, frame, channelContextId, customMsg, isInbound, correlationID);
     }
 
     /**
@@ -88,9 +88,9 @@ public class LogUtil {
      * @param isInbound true if the frame is inbound, false if it is outbound
      */
     public static void printWebSocketFrame(Log log, WebSocketFrame frame, ChannelHandlerContext ctx,
-                                           boolean isInbound) {
+                                           boolean isInbound, String correlationID) {
         String channelContextId = resolveContextId(ctx);
-        printWebSocketFrame(log, frame, channelContextId, null, isInbound);
+        printWebSocketFrame(log, frame, channelContextId, null, isInbound, correlationID);
     }
 
     /**
@@ -104,7 +104,7 @@ public class LogUtil {
      * @param isInbound        true if the frame is inbound, false if it is outbound
      */
     private static void printWebSocketFrame(Log log, WebSocketFrame frame, String channelContextId,
-                                            String customMsg, boolean isInbound) {
+                                            String customMsg, boolean isInbound, String correlationID) {
 
         String logStatement = getDirectionString(isInbound) + channelContextId;
         if (frame instanceof PingWebSocketFrame) {
@@ -117,6 +117,11 @@ public class LogUtil {
             logStatement += " Binary frame";
         } else if (frame instanceof TextWebSocketFrame) {
             logStatement += " " + ((TextWebSocketFrame) frame).text();
+            if (isInbound) {
+                logStatement = correlationID + " -- Websocket API request [inbound] " + logStatement;
+            } else {
+                logStatement = correlationID + " -- Websocket API request [outbound] " + logStatement;
+            }
         }
 
         //specifically for logging close websocket frames with error status

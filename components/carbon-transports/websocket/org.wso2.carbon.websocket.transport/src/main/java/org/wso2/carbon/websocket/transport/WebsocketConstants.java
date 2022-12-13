@@ -30,6 +30,7 @@ public class WebsocketConstants {
     public static final String WEBSOCKET_SOURCE_CHANNEL_IDENTIFIER = "websocket.source.channel.identifier";
     public static final String WEBSOCKET_CORRELATION_ID = "websocket.correlation.id";
     public static final String API_PROPERTIES = "API_PROPERTIES";
+    public static final String API_CONTEXT = "api.ut.context";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
     public static final String CONTENT_TYPE = "websocket.accept.contenType";

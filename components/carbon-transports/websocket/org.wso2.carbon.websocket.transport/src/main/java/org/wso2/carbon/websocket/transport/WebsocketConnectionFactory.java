@@ -111,8 +111,10 @@ public class WebsocketConnectionFactory {
                         return null;
                     }
                     if (log.isDebugEnabled()) {
-                        log.debug("Caching new connection with sourceIdentifier " + sourceIdentifier + " in the Thread,"
-                                          + "ID: " + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                        log.debug(correlationId + " -- Caching new connection with sourceIdentifier " + sourceIdentifier
+                                + " in the Thread," + "ID: " + Thread.currentThread().getName() + "," + Thread
+                                .currentThread().getId() + " API context: " + apiProperties
+                                .get(WebsocketConstants.API_CONTEXT));
                     }
                     channelHandler = cacheNewConnection(tenantDomain, uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
                                                         contentType, wsSubprotocol, headers, inboundResponseSender,
@@ -146,7 +148,8 @@ public class WebsocketConnectionFactory {
                                                      String correlationId,
                                                      Map<String, Object> apiProperties) {
         if (log.isDebugEnabled()) {
-            log.debug("Creating a Connection for the specified WS endpoint.");
+            log.debug(correlationId + " -- Creating a Connection for the specified WS endpoint." + " API context: "
+                    + apiProperties.get(WebsocketConstants.API_CONTEXT));
         }
         final WebSocketClientHandler handler;
 
@@ -335,6 +338,15 @@ public class WebsocketConnectionFactory {
         if (handlerMap == null) {
             return null;
         } else {
+            if (log.isDebugEnabled()) {
+                if (handlerMap.get(clientIdentifier) != null) {
+                    log.debug(handlerMap.get(clientIdentifier).getCorrelationId()
+                            + " -- Fetched channel for on sourceIdentifier: " + sourceIdentifier
+                            + ", clientIdentifier: " + clientIdentifier + ", in the Thread,ID: " + Thread
+                            .currentThread().getName() + "," + Thread.currentThread().getId() + "API Context"
+                            + handlerMap.get(clientIdentifier).getApiProperties().get(WebsocketConstants.API_CONTEXT));
+                }
+            }
             return handlerMap.get(clientIdentifier);
         }
     }

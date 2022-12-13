@@ -275,7 +275,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
         try {
             if (log.isDebugEnabled()) {
-                LogUtil.printWebSocketFrame(log, frame, ctx, true);
+                LogUtil.printWebSocketFrame(log, frame, ctx, true, correlationId);
             }
             if (handshaker.isHandshakeComplete()) {
 

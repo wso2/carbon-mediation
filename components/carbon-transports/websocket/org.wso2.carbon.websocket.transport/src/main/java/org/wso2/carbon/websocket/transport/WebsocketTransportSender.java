@@ -144,9 +144,10 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             isConnectionTerminate = true;
         }
         if (log.isDebugEnabled()) {
-            log.debug("sendMessage triggered with sourceChannel: " + sourceIdentifier + ", websocket sub protocol: "
-                              + wsSubProtocol + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
-                              + Thread.currentThread().getId());
+            log.debug(correlationId + " -- sendMessage triggered with sourceChannel: " + sourceIdentifier
+                    + ", websocket sub protocol: " + wsSubProtocol + ", in the Thread,ID: " + Thread.currentThread()
+                    .getName() + "," + Thread.currentThread().getId() + ", URL: " + targetEPR + " API context: "
+                    + apiProperties.get(WebsocketConstants.API_CONTEXT));
         }
         String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
         if (tenantDomain == null) {
@@ -183,7 +184,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 if (headerSplits.length > 1) {
                     customHeaders.put(headerSplits[1], value);
                     if (log.isDebugEnabled()) {
-                        log.debug("Adding Custom Header " + headerSplits[1] + ":" + value);
+                        log.debug(correlationId + " -- Adding Custom Header " + headerSplits[1] + ":" + value);
                     }
                 } else {
                     log.warn("A header identified with having only the websocket custom-header prefix"
@@ -194,9 +195,11 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Fetching a Connection from the WS(WSS) Connection Factory with sourceChannel : "
-                                  + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
-                                  + Thread.currentThread().getId());
+                log.debug(correlationId
+                        + " -- Fetching a Connection from the WS(WSS) Connection Factory with sourceChannel : "
+                        + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + "," + Thread
+                        .currentThread().getId() + ", URL: " + targetEPR + " API context: " + apiProperties
+                        .get(WebsocketConstants.API_CONTEXT));
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(tenantDomain,
                                                                                        new URI(targetEPR),
@@ -212,9 +215,11 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                                                                        apiProperties);
             if (clientHandler == null && isConnectionTerminate) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Backend connection does not exist. No need to send close frame to backend "
-                                      + "with sourceChannel : " + sourceIdentifier + ", in the Thread,ID: "
-                                      + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                    log.debug(
+                            correlationId + " -- Backend connection does not exist. No need to send close frame to backend "
+                                    + "with sourceChannel : " + sourceIdentifier + ", in the Thread,ID: " + Thread
+                                    .currentThread().getName() + "," + Thread.currentThread().getId() + ", URL: "
+                                    + targetEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                 }
                 return;
             }
@@ -224,13 +229,14 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 WebSocketFrame frame = (BinaryWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME);
                 try {
                     if (log.isDebugEnabled()) {
-                        log.debug("Sending the binary frame to the WS server on context id : "
+                        log.debug(correlationId + " -- Sending the binary frame to the WS server on context id : "
                                           + clientHandler.getChannelHandlerContext().channel().toString());
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                         clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
                         if (log.isDebugEnabled()) {
-                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false,
+                                    correlationId);
                         }
                     }
                 } finally {
@@ -241,15 +247,17 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 WebSocketFrame frame = (TextWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME);
                 try {
                     if (log.isDebugEnabled()) {
-                        log.debug("Sending the passthrough text frame to the WS server on context id: "
-                                          + clientHandler.getChannelHandlerContext().channel().toString() + ", "
-                                          + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: "
-                                          + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                        log.debug(correlationId + " -- Sending the passthrough text frame to the WS server on context id: "
+                                + clientHandler.getChannelHandlerContext().channel().toString() + ", "
+                                + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: " + Thread
+                                .currentThread().getName() + "," + Thread.currentThread().getId() + ", URL: "
+                                + targetEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                         clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
                         if (log.isDebugEnabled()) {
-                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false,
+                                    correlationId);
                         }
                     }
                 } finally {
@@ -265,10 +273,11 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             } else if (isConnectionTerminate) {
                 Channel channel = clientHandler.getChannelHandlerContext().channel();
                 if (log.isDebugEnabled()) {
-                    log.debug("Sending CloseWebsocketFrame to WS server on context id: "
-                                      + clientHandler.getChannelHandlerContext().channel().toString() + ", "
-                                      + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: "
-                                      + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                    log.debug(correlationId + " -- Sending CloseWebsocketFrame to WS server on context id: " + clientHandler
+                            .getChannelHandlerContext().channel().toString() + ", " + ", sourceIdentifier: "
+                            + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + "," + Thread
+                            .currentThread().getId() + ", URL: " + targetEPR + " API context: " + apiProperties
+                            .get(WebsocketConstants.API_CONTEXT));
                 }
                 if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CLOSE_CODE) != null) {
                     int statusCode = (int) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CLOSE_CODE);
@@ -291,21 +300,24 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     final String msg = sw.toString();
                     WebSocketFrame frame = new TextWebSocketFrame(msg);
                     if (log.isDebugEnabled()) {
-                        log.debug("Sending the text frame to the WS server on context id : "
-                                + clientHandler.getChannelHandlerContext().channel().toString());
+                        log.debug(correlationId + " -- Sending the text frame to the WS server on context id : "
+                                + clientHandler.getChannelHandlerContext().channel().toString() + ", URL: " + targetEPR
+                                + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                         clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
                         if (log.isDebugEnabled()) {
-                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false);
+                            LogUtil.printWebSocketFrame(log, frame, clientHandler.getChannelHandlerContext(), false,
+                                    correlationId);
                         }
                     }
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("AcknowledgeHandshake to WS server on context id: "
-                                          + clientHandler.getChannelHandlerContext().channel().toString() + ", "
-                                          + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: "
-                                          + Thread.currentThread().getName() + "," + Thread.currentThread().getId());
+                        log.debug(correlationId + " -- AcknowledgeHandshake to WS server on context id: " + clientHandler
+                                .getChannelHandlerContext().channel().toString() + ", " + ", sourceIdentifier: "
+                                + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                                + Thread.currentThread().getId() + ", URL: " + targetEPR + " API context: "
+                                + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     clientHandler.acknowledgeHandshake();
                 }
