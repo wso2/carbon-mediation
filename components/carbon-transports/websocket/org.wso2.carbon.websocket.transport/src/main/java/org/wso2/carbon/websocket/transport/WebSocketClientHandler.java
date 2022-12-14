@@ -68,6 +68,8 @@ import org.wso2.carbon.websocket.transport.utils.LogUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
     private final WebSocketClientHandshaker handshaker;
@@ -79,6 +81,24 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     private InboundResponseSender responseSender;
     private String tenantDomain;
     private boolean passThroughControlFrames;
+    private String correlationId;
+    private Map<String, Object> apiProperties = new HashMap<>();
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    public Map<String, Object> getApiProperties() {
+        return apiProperties;
+    }
+
+    public void setApiProperties(Map<String, Object> apiProperties) {
+        this.apiProperties = apiProperties;
+    }
 
     public void setTenantDomain(String tenantDomain) {
         this.tenantDomain = tenantDomain;
@@ -255,7 +275,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
         try {
             if (log.isDebugEnabled()) {
-                LogUtil.printWebSocketFrame(log, frame, ctx, true);
+                LogUtil.printWebSocketFrame(log, frame, ctx, true, correlationId);
             }
             if (handshaker.isHandshakeComplete()) {
 
@@ -416,6 +436,8 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
             synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
         }
+        synCtx.setProperty(WebsocketConstants.WEBSOCKET_CORRELATION_ID, correlationId);
+        synCtx.setProperty(WebsocketConstants.API_PROPERTIES, apiProperties);
         synCtx.setProperty(WebsocketConstants.WEBSOCKET_SUBSCRIBER_PATH, handshaker.uri().toString());
         return synCtx;
     }

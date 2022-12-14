@@ -46,6 +46,10 @@ public class InboundWebsocketChannelContext {
         return channelIdentifier;
     }
 
+    public String getChannelIdLongText() {
+        return ctx.channel().id().asLongText();
+    }
+
     public void addCloseListener(final ChannelHandlerContext targetCtx) {
         ChannelFuture closeFuture = ctx.channel().closeFuture();
         closeFuture.addListener(new ChannelFutureListener() {

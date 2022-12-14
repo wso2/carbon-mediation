@@ -118,6 +118,11 @@ public class WebsocketLogUtil {
             logStatement += " Binary frame";
         } else if (frame instanceof TextWebSocketFrame) {
             logStatement += " " + ((TextWebSocketFrame) frame).text();
+            if (isInbound) {
+                logStatement = "Websocket API request [inbound] " + logStatement;
+            } else {
+                logStatement = "Websocket API request [outbound] " + logStatement;
+            }
         }
 
         //specifically for logging close websocket frames with error status
