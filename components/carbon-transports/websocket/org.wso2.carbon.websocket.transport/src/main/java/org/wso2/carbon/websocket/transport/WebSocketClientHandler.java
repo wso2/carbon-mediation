@@ -318,7 +318,6 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                               + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                                               + Thread.currentThread().getId());
                         }
-                        ReferenceCountUtil.release(frame);
                     }
                 } else if (frame instanceof PongWebSocketFrame) {
                     if (passThroughControlFrames) {
@@ -337,7 +336,6 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                                               + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                                               + Thread.currentThread().getId());
                         }
-                        ReferenceCountUtil.release(frame);
                     }
                 } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
                         ((handshaker.actualSubprotocol() != null) &&
