@@ -2667,7 +2667,7 @@
         <esotericsoftware.kryo.version>3.0.3</esotericsoftware.kryo.version>
         <org.objenesis.version>2.1</org.objenesis.version>
         <esotericsoftware.minlog.version>1.3.0</esotericsoftware.minlog.version>
-        <orbit.version.snakeyaml>1.16.0.wso2v1</orbit.version.snakeyaml>
+        <orbit.version.snakeyaml>1.33.0.wso2v1</orbit.version.snakeyaml>
         <orbit.snakeyaml.import.version.range>[1.16.0.wso2v1, 2.0.0)</orbit.snakeyaml.import.version.range>
         <!-- OWASP encoder versions -->
         <owasp.encoder.wso2.version>1.2.0.wso2v1</owasp.encoder.wso2.version>
@@ -2692,7 +2692,7 @@
         <opensaml.orbit.version>3.3.1.wso2v4</opensaml.orbit.version>
         <jackson.dataformat.yaml.version>2.10.3</jackson.dataformat.yaml.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
-        <snakeyaml.version>1.25</snakeyaml.version>
+        <snakeyaml.version>1.33</snakeyaml.version>
         <glassfish.cobra.version>4.2.1</glassfish.cobra.version>
         <nashorn.core.version>15.4</nashorn.core.version>
         <bsf.version>3.0.0.wso2v5</bsf.version>
