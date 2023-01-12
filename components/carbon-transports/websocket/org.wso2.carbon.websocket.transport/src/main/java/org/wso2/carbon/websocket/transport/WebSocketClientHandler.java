@@ -476,6 +476,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     private void injectToSequence(org.apache.synapse.MessageContext synCtx,
                                   String dispatchSequence, String dispatchErrorSequence) {
         SequenceMediator injectingSequence = null;
+        synCtx.setResponse(true);
         if (dispatchSequence != null) {
             injectingSequence = (SequenceMediator) synCtx.getSequence(dispatchSequence);
         }
