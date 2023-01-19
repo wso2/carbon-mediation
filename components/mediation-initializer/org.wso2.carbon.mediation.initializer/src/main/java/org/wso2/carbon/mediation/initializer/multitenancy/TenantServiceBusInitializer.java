@@ -191,6 +191,15 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                     ConfigurationHolder.getInstance().getBundleContext().registerService(
                         SynapseConfigurationService.class.getName(), synCfgSvc, null);
 
+            try {
+                if (confRegistration != null) {
+                    confRegistration.getReference(); //check if service registered properly
+                }
+            } catch (Exception eConf) {
+                handleFatal("Error during synapse configuration service registration for tenant " + tenantDomain, eConf);
+                return;
+            }
+
             // Older SynapseConfiguration references created for a particular tenant are not getting cleaned.
             // Hence, there can be an OOM issue when there are multiple accumulated SynapseConfiguration instances.
             // To overcome the OOM issue, here, the localRegistry map in the older instance, which can bear the biggest
@@ -213,6 +222,18 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                         SynapseEnvironmentService.class.getName(), synEnvSvc, null);
             synapseEnvironment.registerSynapseHandler(new SynapseExternalPropertyConfigurator());
 
+            try {
+                if (envRegistration != null) {
+                    envRegistration.getReference(); //check if service registered properly
+                }
+            } catch (Exception eEnv) {
+                if (confRegistration != null) {
+                    ConfigurationHolder.getInstance().getBundleContext().ungetService(confRegistration.getReference());
+                    confRegistration.unregister();
+                }
+                handleFatal("Error during synapse environment service registration for tenant " + tenantDomain, eEnv);
+                return;
+            }
             //props = new Properties();
             SynapseRegistrationsService synRegistrationsSvc
                     = new SynapseRegistrationsServiceImpl(
@@ -221,6 +242,23 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                     ConfigurationHolder.getInstance().getBundleContext().registerService(
                     SynapseRegistrationsService.class.getName(),
                     synRegistrationsSvc, null);
+            try {
+                if (synapseRegistration != null) {
+                    synapseRegistration.getReference(); //check if service registered properly
+                }
+                ConfigurationHolder.getInstance().addSynapseRegistration(tenantId, synapseRegistration);
+            } catch (Exception e) {
+                if (confRegistration != null) {
+                    ConfigurationHolder.getInstance().getBundleContext().ungetService(confRegistration.getReference());
+                    confRegistration.unregister();
+                }
+                if (envRegistration != null) {
+                    ConfigurationHolder.getInstance().getBundleContext().ungetService(envRegistration.getReference());
+                    envRegistration.unregister();
+                }
+                handleFatal("Error during synapse registration for tenant " + tenantDomain, e);
+                return;
+            }
 
             //creating secure-vault specific location
             if (!isRepoExists(registry)) {
@@ -244,7 +282,6 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                configurationContext.setProperty("mediation.event.broker", eventBroker);
             }
 
-            ConfigurationHolder.getInstance().addSynapseRegistration(tenantId, synapseRegistration);
             registerInboundDeployer(axisConfig, contextInfo.getSynapseEnvironment());
         } catch (Exception e) {
             handleFatal("Couldn't initialize the ESB for tenant:" + tenantDomain, e);
