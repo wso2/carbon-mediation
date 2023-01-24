@@ -364,7 +364,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         // we will close the client connection and notify with close frame
         InboundWebsocketSourceHandler sourceHandler = ((InboundWebsocketResponseSender) responseSender).getSourceHandler();
         CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(WebsocketConstants.WEBSOCKET_UPSTREAM_ERROR_SC,
-                e.getMessage());
+                "Error connecting with the backend");
         try {
             sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
         } catch (AxisFault fault) {
