@@ -26,6 +26,8 @@ public class Configuration {
     private Integer maxIdleConnections;
     private Integer minIdleConnections;
     private Long maxWaitTime;
+    private long poolConnectionAgedTimeout = 0;
+    private boolean isAgedTimeoutEnabled = false;
     private Long minEvictionTime;
     private Long evictionCheckInterval;
     private String exhaustedAction;
@@ -153,5 +155,22 @@ public class Configuration {
     public void setSoftMinEvictableIdleTimeMillis(Long softMinEvictableIdleTimeMillis) {
 
         this.softMinEvictableIdleTimeMillis = softMinEvictableIdleTimeMillis;
+    }
+
+
+    public long getPoolConnectionAgedTimeout() {
+        return poolConnectionAgedTimeout;
+    }
+
+    public void setPoolConnectionAgedTimeout(long poolConnectionAgedTimeout) {
+        this.poolConnectionAgedTimeout = poolConnectionAgedTimeout;
+    }
+
+    public boolean isAgedTimeoutEnabled() {
+        return isAgedTimeoutEnabled;
+    }
+
+    public void setAgedTimeoutEnabled(boolean agedTimeoutEnabled) {
+        isAgedTimeoutEnabled = agedTimeoutEnabled;
     }
 }
