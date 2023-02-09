@@ -24,9 +24,11 @@ import org.wso2.carbon.connector.core.pool.Configuration;
 import org.wso2.carbon.connector.core.pool.ConnectionFactory;
 import org.wso2.carbon.connector.core.pool.ConnectionPool;
 
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.String.format;
 
@@ -40,6 +42,10 @@ public class ConnectionHandler {
     // Stores connections/connection pools against connection code name
     // defined as <connector_name>:<connection_name>
     private final Map<String, Object> connectionMap;
+    private ConnectionFactory connectionFactory = null;
+    private Configuration configuration = null;
+
+    private ReentrantLock lock = new ReentrantLock();
 
     static {
         handler = new ConnectionHandler();
@@ -71,7 +77,9 @@ public class ConnectionHandler {
     public void createConnection(String connector, String connectionName, ConnectionFactory factory,
                                  Configuration configuration) {
 
-        ConnectionPool pool = new ConnectionPool(factory, configuration);
+        this.connectionFactory = factory;
+        this.configuration = configuration;
+        ConnectionPool pool = new ConnectionPool(connectionFactory, configuration);
         connectionMap.putIfAbsent(getCode(connector, connectionName), pool);
     }
 
@@ -102,7 +110,14 @@ public class ConnectionHandler {
         Object connectionObj = connectionMap.get(connectorCode);
         if (connectionObj != null) {
             if (connectionObj instanceof ConnectionPool) {
-                connection = (Connection) ((ConnectionPool) connectionObj).borrowObject();
+                if (((ConnectionPool) connectionObj).isAgedTimeoutEnabled()) {
+                    closeAgedConnectionPoolGracefully(connectorCode);
+                    if (!connectionMap.containsKey(connectorCode)) {
+                        ConnectionPool pool = new ConnectionPool(connectionFactory, configuration);
+                        connectionMap.putIfAbsent(connectorCode, pool);
+                    }
+                }
+                connection = (Connection) ((ConnectionPool) connectionMap.get(connectorCode)).borrowObject();
             } else if (connectionObj instanceof Connection) {
                 connection = (Connection) connectionObj;
             }
@@ -111,6 +126,28 @@ public class ConnectionHandler {
                     "Connection %s for %s connector does not exist.", connectionName, connector));
         }
         return connection;
+    }
+
+    /**
+     * Closes the connection.
+     *
+     * @param connectorCode String Object
+     */
+    private void closeAgedConnectionPoolGracefully(String connectorCode) {
+        Instant current = Instant.now();
+        if (((ConnectionPool)connectionMap.get(connectorCode)).isPoolExpired(current)) {
+            lock.lock();
+            try {
+                if (connectionMap.get(connectorCode) != null && ((ConnectionPool)connectionMap.get(connectorCode)).isPoolExpired(current)) {
+                    ((ConnectionPool)connectionMap.get(connectorCode)).close();
+                    connectionMap.remove(connectorCode);
+                }
+            } catch (ConnectException e) {
+                log.error("Failed to close connection pool. ", e);
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 
     /**
@@ -203,6 +240,24 @@ public class ConnectionHandler {
     private String getCode(String connector, String connectionName) {
 
         return format("%s:%s", connector, connectionName);
+    }
+
+    /**
+     * Retrieves whether the connection pool or not
+     *
+     * @param connector      Name of the connector
+     * @param connectionName Name of the connection
+     * @return the connection pool status
+     */
+    public boolean getStatusOfConnection(String connector, String connectionName) {
+        String connectorCode = getCode(connector, connectionName);
+        Object connectionObj = connectionMap.get(connectorCode);
+        if (connectionObj != null) {
+            if (connectionObj instanceof ConnectionPool) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

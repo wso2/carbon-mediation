@@ -22,6 +22,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.wso2.carbon.connector.core.ConnectException;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import static java.lang.String.format;
 
 /**
@@ -30,6 +33,10 @@ import static java.lang.String.format;
 public class ConnectionPool extends GenericObjectPool {
 
     private static final Log log = LogFactory.getLog(ConnectionPool.class);
+    private Long poolConnectionAgedTimeout;
+    private Instant strat;
+
+    private boolean isAgedTimeoutEnabled = false;
 
     public ConnectionPool(ConnectionFactory factory, Configuration configuration) {
 
@@ -71,6 +78,13 @@ public class ConnectionPool extends GenericObjectPool {
         if (configuration.getSoftMinEvictableIdleTimeMillis() != null) {
             this.setSoftMinEvictableIdleTimeMillis(configuration.getSoftMinEvictableIdleTimeMillis());
         }
+        if (configuration.getPoolConnectionAgedTimeout() != 0) {
+            //If the Aged Timeout value is set enabled pool expiration (gracefully closing)
+            this.setAgedTimeoutEnabled(true);
+            //Set start timestamp of pool
+            this.setStrat(Instant.now());
+            this.setPoolConnectionAgedTimeout(configuration.getPoolConnectionAgedTimeout());
+        }
     }
 
     /**
@@ -98,6 +112,27 @@ public class ConnectionPool extends GenericObjectPool {
                 break;
         }
         return action;
+    }
+
+
+    public Long getPoolConnectionAgedTimeout() {
+        return poolConnectionAgedTimeout;
+    }
+
+    public void setPoolConnectionAgedTimeout(long poolConnectionAgedTimeout) {
+        this.poolConnectionAgedTimeout = poolConnectionAgedTimeout;
+    }
+
+    public boolean isAgedTimeoutEnabled() {
+        return isAgedTimeoutEnabled;
+    }
+
+    public void setAgedTimeoutEnabled(boolean agedTimeoutEnabled) {
+        isAgedTimeoutEnabled = agedTimeoutEnabled;
+    }
+    public boolean isPoolExpired (Instant current) {
+        long gap = ChronoUnit.MILLIS.between(strat, current);
+        return gap >= getPoolConnectionAgedTimeout();
     }
 
     @Override
@@ -130,5 +165,13 @@ public class ConnectionPool extends GenericObjectPool {
         } catch (Exception e) {
             throw new ConnectException(e, "Error occurred while closing the connections.");
         }
+    }
+
+    public Instant getStrat() {
+        return strat;
+    }
+
+    public void setStrat(Instant strat) {
+        this.strat = strat;
     }
 }
