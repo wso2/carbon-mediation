@@ -31,7 +31,7 @@
         <esb.version>5.0.0</esb.version>
         <emma.version>2.1.5320</emma.version>
         <carbon.integration.framework>4.0.0</carbon.integration.framework>
-        <org.testng.version>6.1.1</org.testng.version>
+        <org.testng.version>7.7.0</org.testng.version>
         <integration.base.version>1.0.1</integration.base.version>
     </properties>
     <dependencies>
