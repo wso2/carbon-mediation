@@ -82,7 +82,7 @@ public class RegistrySecretRepository implements SecretRepository {
 		String decryptedText = new String(decyptProvider.decrypt(propertyValue.trim().getBytes()));
 
 		if (log.isDebugEnabled()) {
-			log.info("evaluation completed succesfully " + decryptedText);
+			log.debug("evaluation completed succesfully " + decryptedText);
 		}
 		return decryptedText;
 
