@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -99,7 +100,10 @@ public class WebsocketSubscriberPathManager {
 
     public List<InboundWebsocketChannelContext> getSubscriberPathChannelContextList(String inboundName,
                                                                                     String subscriberPath) {
-        return inboundSubscriberPathMap.get(inboundName).get(subscriberPath);
+        if (inboundSubscriberPathMap.get(inboundName) != null) {
+            return inboundSubscriberPathMap.get(inboundName).get(subscriberPath);
+        }
+        return Collections.emptyList();
     }
 
     public void broadcastOnSubscriberPath(WebSocketFrame frame,
@@ -107,9 +111,11 @@ public class WebsocketSubscriberPathManager {
                                           String subscriberPath) {
         List<InboundWebsocketChannelContext> contextList =
                 getSubscriberPathChannelContextList(inboundName, subscriberPath);
-        for (InboundWebsocketChannelContext context : contextList) {
-            WebSocketFrame duplicatedFrame = frame.duplicate();
-            context.writeToChannel(duplicatedFrame.retain());
+        if (contextList != null) {
+            for (InboundWebsocketChannelContext context : contextList) {
+                WebSocketFrame duplicatedFrame = frame.duplicate();
+                context.writeToChannel(duplicatedFrame.retain());
+            }
         }
     }
 
