@@ -38,7 +38,7 @@ import java.security.cert.CertificateException;
 
 public class SSLHandlerFactory {
 
-    private static final String protocol = "TLS";
+    private static final String protocol = "TLSv1.2";
     private final SSLContext serverContext;
     private boolean needClientAuth;
     private String[] cipherSuites;
