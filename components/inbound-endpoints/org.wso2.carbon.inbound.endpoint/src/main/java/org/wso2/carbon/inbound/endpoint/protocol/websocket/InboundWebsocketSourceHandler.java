@@ -352,6 +352,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                         ctx.channel().hashCode());
 
+                if (StringUtils.isNotBlank(handshaker.selectedSubprotocol())) {
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                            .setProperty(InboundWebsocketConstants.WEBSOCKET_SUBPROTOCOL,
+                                    handshaker.selectedSubprotocol());
+                }
+
                 if (endpoint == null) {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
