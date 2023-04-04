@@ -854,8 +854,6 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     API api = APIFactory.createAPI(apiElement, properties);
 
                     try {
-						getSynapseConfiguration().addAPI(api.getName(), api);
-
 						//addParameterObserver(api.getName());
 
 						if (log.isDebugEnabled()) {
@@ -881,6 +879,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 							}
 						}
                         api.init(getSynapseEnvironment());
+                        getSynapseConfiguration().addAPI(api.getName(), api);
 						persistApi(api);
 
 					} catch (Exception e) {
