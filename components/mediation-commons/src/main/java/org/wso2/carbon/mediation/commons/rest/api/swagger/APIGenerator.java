@@ -101,7 +101,7 @@ public class APIGenerator {
                 // url can be relative the place where the swagger is hosted.
                 apiContext = serversString;
             }
-            if (apiContext.equals("/")) {
+            if (apiContext.isEmpty() || "/".equals(apiContext)) {
                 apiContext = SwaggerConstants.DEFAULT_CONTEXT;
             }
             //cleanup context : remove ending '/'
