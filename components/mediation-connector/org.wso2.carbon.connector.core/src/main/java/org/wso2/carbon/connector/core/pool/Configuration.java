@@ -27,6 +27,7 @@ public class Configuration {
     private Integer minIdleConnections;
     private Long maxWaitTime;
     private long poolConnectionAgedTimeout = 0;
+    private int retryCount = 5;
     private boolean isAgedTimeoutEnabled = false;
     private Long minEvictionTime;
     private Long evictionCheckInterval;
@@ -172,5 +173,13 @@ public class Configuration {
 
     public void setAgedTimeoutEnabled(boolean agedTimeoutEnabled) {
         isAgedTimeoutEnabled = agedTimeoutEnabled;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
     }
 }
