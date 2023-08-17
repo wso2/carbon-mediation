@@ -101,8 +101,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private int port;
     private boolean dispatchToCustomSequence;
     private InboundWebsocketResponseSender responseSender;
-    private static ArrayList<String> contentTypes = new ArrayList<>();
-    private static ArrayList<String> otherSubprotocols = new ArrayList<>();
+    private ArrayList<String> contentTypes = new ArrayList<>();
+    private ArrayList<String> otherSubprotocols = new ArrayList<>();
     private int clientBroadcastLevel;
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
@@ -115,18 +115,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private InboundApiHandler inboundApiHandler = new InboundApiHandler();
     private static final AttributeKey<Map<String, Object>> WSO2_PROPERTIES = AttributeKey.valueOf("WSO2_PROPERTIES");
 
-    static {
+    public InboundWebsocketSourceHandler() throws Exception {
         contentTypes.add("application/xml");
         contentTypes.add("application/json");
         contentTypes.add("text/xml");
-    }
-
-    static {
         otherSubprotocols.add("graphql-ws");
         otherSubprotocols.add("graphql-transport-ws");
-    }
-
-    public InboundWebsocketSourceHandler() throws Exception {
     }
 
     public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers) {
@@ -178,13 +172,17 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         if (isHealthCheckCall) {
             return;
         }
+        if (handshaker == null) {
+            //Handshake has not occurred for this channel. Hence, we can ignore the rest
+            return;
+        }
         String endpointName = WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
         if (endpointName == null) {
             int portWithOffset = port + portOffset;
             handleException("Endpoint not found for port : " + portWithOffset + " tenant domain : " + tenantDomain);
         }
         WebsocketSubscriberPathManager.getInstance()
-                .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
+                .removeChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain , ctx);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
         synCtx.setProperty(InboundWebsocketConstants.CONNECTION_TERMINATE, new Boolean(true));

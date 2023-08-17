@@ -75,8 +75,32 @@ public class WebsocketSubscriberPathManager {
                                      InboundWebsocketChannelContext ctx) {
         ConcurrentHashMap<String, List<InboundWebsocketChannelContext>> subscriberPathMap =
                 inboundSubscriberPathMap.get(inboundName);
+        if (subscriberPathMap == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("SubscriberPathMap does not exist for Inbound : " + inboundName
+                        + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                        + Thread.currentThread().getId());
+            }
+            return;
+        }
         List<InboundWebsocketChannelContext> listContext = subscriberPathMap.get(subscriberPath);
+        if (listContext == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("ListContext does not exist for SubscriberPath : " + subscriberPath
+                        + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                        + Thread.currentThread().getId());
+            }
+            return;
+        }
         for (Object context : listContext.toArray()) {
+            if (context == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("ListContext has null contents : " + listContext.toArray().toString()
+                            + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
+                            + Thread.currentThread().getId());
+                }
+                continue;
+            }
             if (((InboundWebsocketChannelContext) context).getChannelIdentifier()
                     .equals(ctx.getChannelIdentifier())) {
                 if (log.isDebugEnabled()) {
