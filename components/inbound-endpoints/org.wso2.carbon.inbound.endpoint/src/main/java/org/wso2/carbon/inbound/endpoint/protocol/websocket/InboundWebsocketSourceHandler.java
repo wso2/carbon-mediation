@@ -178,13 +178,17 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         if (isHealthCheckCall) {
             return;
         }
+        if (handshaker == null) {
+            //Handshake has not occurred for this channel. Hence, we can ignore the rest
+            return;
+        }
         String endpointName = WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
         if (endpointName == null) {
             int portWithOffset = port + portOffset;
             handleException("Endpoint not found for port : " + portWithOffset + " tenant domain : " + tenantDomain);
         }
         WebsocketSubscriberPathManager.getInstance()
-                .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
+                .removeChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain , ctx);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
         synCtx.setProperty(InboundWebsocketConstants.CONNECTION_TERMINATE, new Boolean(true));
