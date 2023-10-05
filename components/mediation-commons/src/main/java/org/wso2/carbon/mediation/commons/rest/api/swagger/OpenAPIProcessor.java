@@ -338,28 +338,27 @@ public class OpenAPIProcessor {
      */
     private void addDefaultRequestBody(Operation operation, Map.Entry methodEntry) {
         if (operation.getRequestBody() == null) {
-            RequestBody requestBody = new RequestBody();
-            requestBody.description("Sample Payload");
-            requestBody.setRequired(false);
-
-            MediaType mediaType = new MediaType();
-            Schema bodySchema = new Schema();
-            bodySchema.setType("object");
-
-            Map<String, Schema> inputProperties = new HashMap<>();
-            ObjectSchema objectSchema = new ObjectSchema();
-
-            bodySchema.setProperties(inputProperties);
-            inputProperties.put("payload", objectSchema);
-            mediaType.setSchema(bodySchema);
-            Content content = new Content();
-            content.addMediaType("application/json", mediaType);
-            requestBody.setContent(content);
-
             switch ((String) methodEntry.getKey()) {
                 case OPERATION_HTTP_POST:
                 case OPERATION_HTTP_PUT:
                 case OPERATION_HTTP_PATCH:
+                    RequestBody requestBody = new RequestBody();
+                    requestBody.description("Sample Payload");
+                    requestBody.setRequired(false);
+
+                    MediaType mediaType = new MediaType();
+                    Schema bodySchema = new Schema();
+                    bodySchema.setType("object");
+
+                    Map<String, Schema> inputProperties = new HashMap<>();
+                    ObjectSchema objectSchema = new ObjectSchema();
+
+                    bodySchema.setProperties(inputProperties);
+                    inputProperties.put("payload", objectSchema);
+                    mediaType.setSchema(bodySchema);
+                    Content content = new Content();
+                    content.addMediaType("application/json", mediaType);
+                    requestBody.setContent(content);
                     operation.setRequestBody(requestBody);
                     break;
             }
