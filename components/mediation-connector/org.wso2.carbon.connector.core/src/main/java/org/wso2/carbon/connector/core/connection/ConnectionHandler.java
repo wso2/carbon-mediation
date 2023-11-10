@@ -19,29 +19,38 @@ package org.wso2.carbon.connector.core.connection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.wso2.carbon.connector.core.ConnectException;
 import org.wso2.carbon.connector.core.pool.Configuration;
 import org.wso2.carbon.connector.core.pool.ConnectionFactory;
 import org.wso2.carbon.connector.core.pool.ConnectionPool;
+import org.wso2.carbon.connector.core.util.ConnectorUtils;
+import org.wso2.carbon.connector.core.util.Constants;
 
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
 /**
  * Handles the connections
  */
-public class ConnectionHandler {
+public class ConnectionHandler implements LocalEntryUndeployCallBack {
 
     private static final Log log = LogFactory.getLog(ConnectionHandler.class);
     private static final ConnectionHandler handler;
     // Stores connections/connection pools against connection code name
     // defined as <connector_name>:<connection_name>
     private final Map<String, Object> connectionMap;
+    private final Map<String, String> connectionLocalEntryMap;
+    private final ConcurrentHashMap<String, LocalEntryUndeployObserver> observerMap = new ConcurrentHashMap();
+    private SynapseConfiguration synapseConfiguration = null;
     private ConnectionFactory connectionFactory = null;
     private Configuration configuration = null;
 
@@ -52,8 +61,8 @@ public class ConnectionHandler {
     }
 
     private ConnectionHandler() {
-
         this.connectionMap = new ConcurrentHashMap<>();
+        this.connectionLocalEntryMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -67,6 +76,75 @@ public class ConnectionHandler {
     }
 
     /**
+     * Initialize local entry connection mapping
+     *
+     * @param connector      Name of the connector
+     * @param connectionName Name of the connection
+     * @param messageContext Message Context
+     */
+    public void initializeLocalEntryConnectionMapping(String connector, String connectionName,
+                                                      MessageContext messageContext) {
+        String localEntryName = (String) ConnectorUtils.
+                lookupTemplateParamater(messageContext, Constants.INIT_CONFIG_KEY);
+        String uniqueConnectionName = getCode(connector, connectionName);
+        if (localEntryName != null && !connectionLocalEntryMap.containsKey(uniqueConnectionName)) {
+            connectionLocalEntryMap.put(uniqueConnectionName, localEntryName);
+            if (!observerMap.containsKey(localEntryName)) {
+                LocalEntryUndeployObserver localEntryUndeployObserver = new LocalEntryUndeployObserver(localEntryName);
+                localEntryUndeployObserver.setCallback(this); // Set the callback reference
+                SynapseConfiguration synapseConfig = messageContext.getEnvironment().getSynapseConfiguration();
+                observerMap.put(localEntryName, localEntryUndeployObserver);
+                synapseConfig.registerObserver(localEntryUndeployObserver);
+                this.synapseConfiguration = synapseConfig;
+            }
+        }
+    }
+
+    @Override
+    public void onLocalEntryUndeploy(String localEntryKey) {
+        if (localEntryKey != null && connectionLocalEntryMap.containsValue(localEntryKey)) {
+            removeLocalEntryConnections(localEntryKey);
+            connectionLocalEntryMap.values().removeIf(value -> value.equals(localEntryKey));
+            LocalEntryUndeployObserver localEntryUndeployObserver = this.observerMap.remove(localEntryKey);
+            if (synapseConfiguration != null) {
+                this.synapseConfiguration.unregisterObserver(localEntryUndeployObserver);
+            }
+        }
+    }
+
+    /**
+     * Creates a new connection pool and stores the connection
+     *
+     * @param connector      Name of the connector
+     * @param connectionName Name of the connection
+     * @param factory        Connection Factory that defines how to create connections
+     * @param configuration  Configurations for the connection pool
+     * @param messageContext Message Context
+     */
+    public void createConnection(String connector, String connectionName, ConnectionFactory factory,
+                                 Configuration configuration, MessageContext messageContext) {
+        initializeLocalEntryConnectionMapping(connector, connectionName, messageContext);
+        this.connectionFactory = factory;
+        this.configuration = configuration;
+        ConnectionPool pool = new ConnectionPool(connectionFactory, configuration);
+        connectionMap.putIfAbsent(getCode(connector, connectionName), pool);
+    }
+
+    /**
+     * Stores a new single connection
+     *
+     * @param connector      Name of the connector
+     * @param connectionName Name of the connection
+     * @param connection     Connection to be stored
+     * @param messageContext Message Context
+     */
+    public void createConnection(String connector, String connectionName, Connection connection
+            , MessageContext messageContext) {
+        initializeLocalEntryConnectionMapping(connector, connectionName, messageContext);
+        connectionMap.putIfAbsent(getCode(connector, connectionName), connection);
+    }
+
+    /**
      * Creates a new connection pool and stores the connection
      *
      * @param connector      Name of the connector
@@ -76,7 +154,6 @@ public class ConnectionHandler {
      */
     public void createConnection(String connector, String connectionName, ConnectionFactory factory,
                                  Configuration configuration) {
-
         this.connectionFactory = factory;
         this.configuration = configuration;
         ConnectionPool pool = new ConnectionPool(connectionFactory, configuration);
@@ -91,7 +168,6 @@ public class ConnectionHandler {
      * @param connection     Connection to be stored
      */
     public void createConnection(String connector, String connectionName, Connection connection) {
-
         connectionMap.putIfAbsent(getCode(connector, connectionName), connection);
     }
 
@@ -197,6 +273,26 @@ public class ConnectionHandler {
     }
 
     /**
+     * remove local entry and associate connections from local entry store and connection map
+     * @param localEntryName
+     */
+    public void removeLocalEntryConnections(String localEntryName) {
+        Set<String> keysToRemove = connectionLocalEntryMap.entrySet().stream()
+                .filter(entry -> localEntryName.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        // Now close each connection and remove the entry from the connectionMap
+        keysToRemove.forEach(key -> {
+            Object connection = connectionMap.get(key);
+            if (connection != null) {
+                closeConnection(connection);
+                connectionMap.remove(key);
+            }
+        });
+    }
+
+    /**
      * Check if a connection exists for the connector by the same connection name
      *
      * @param connector      Name of the connector
@@ -226,6 +322,27 @@ public class ConnectionHandler {
                 ((Connection) connectionObj).close();
             } catch (ConnectException e) {
                 log.error("Failed to close connection " + conName, e);
+            }
+        }
+    }
+
+    /**
+     * Closes the connection.
+     *
+     * @param connectionObj Connection Object
+     */
+    private void closeConnection(Object connectionObj) {
+        if (connectionObj instanceof ConnectionPool) {
+            try {
+                ((ConnectionPool) connectionObj).close();
+            } catch (ConnectException e) {
+                log.error("Failed to close connection pool. ", e);
+            }
+        } else if (connectionObj instanceof Connection) {
+            try {
+                ((Connection) connectionObj).close();
+            } catch (ConnectException e) {
+                log.error("Failed to close connection ", e);
             }
         }
     }

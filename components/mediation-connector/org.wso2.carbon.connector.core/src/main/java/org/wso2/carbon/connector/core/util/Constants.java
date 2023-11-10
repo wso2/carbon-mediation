@@ -29,4 +29,5 @@ public class Constants {
     public static final String MAX_EVICTION_TIME = "minEvictionTime";
     public static final String EVICTION_CHECK_INTERVAL = "evictionCheckInterval";
     public static final String EXHAUSTED_ACTION = "exhaustedAction";
+    public static final String INIT_CONFIG_KEY = "INIT_CONFIG_KEY";
 }
