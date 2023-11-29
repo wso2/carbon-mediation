@@ -37,6 +37,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
@@ -47,7 +48,9 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.utils.SSLUtil;
 
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLParameters;
 import javax.xml.namespace.QName;
 import java.net.URI;
 import java.util.Map;
@@ -259,8 +262,19 @@ public class WebsocketConnectionFactory {
                         protected void initChannel(SocketChannel ch) {
                             ChannelPipeline p = ch.pipeline();
                             if (sslCtx != null) {
-                                p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
-                            }
+                                SslHandler sslHandler = sslCtx.newHandler(ch.alloc(), host, port);
+                                Parameter wsEnableHostnameVerification = transportOut
+                                        .getParameter(WebsocketConstants.WEBSOCKET_HOSTNAME_VERIFICATION_CONFIG);
+                                if (wsEnableHostnameVerification != null
+                                        && wsEnableHostnameVerification.getValue() != null
+                                        && !wsEnableHostnameVerification.getValue().toString().isEmpty()
+                                        && Boolean.parseBoolean(wsEnableHostnameVerification.getValue().toString())) {
+                                    SSLEngine sslEngine = sslHandler.engine();
+                                    SSLParameters sslParams = sslEngine.getSSLParameters();
+                                    sslParams.setEndpointIdentificationAlgorithm("HTTPS");
+                                    sslEngine.setSSLParameters(sslParams);
+                                }
+                                p.addLast(sslHandler);                            }
                             p.addLast(new HttpClientCodec(), new HttpObjectAggregator(8192),
                                     new WebSocketFrameAggregator(Integer.MAX_VALUE), handler);
                         }
