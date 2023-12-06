@@ -155,6 +155,23 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         }
 
         /*
+        * Preserve the specified headers from the original request by adding to the customHeaders map.
+        * Headers present in this map won't be set at Netty level.
+        */
+        Parameter preserveWebSocketHeadersParameter = msgCtx.getTransportOut()
+                .getParameter(WebsocketConstants.WEBSOCKET_HEADERS_PRESERVE_CONFIG);
+        if (preserveWebSocketHeadersParameter != null && preserveWebSocketHeadersParameter.getValue() != null &&
+                !preserveWebSocketHeadersParameter.getValue().toString().isEmpty()) {
+            String preservableHeaders = preserveWebSocketHeadersParameter.getValue().toString();
+            for (String header : preservableHeaders.split(",")) {
+                Object headerValue = msgCtx.getProperty(header);
+                if (headerValue != null) {
+                    customHeaders.put(header, headerValue);
+                }
+            }
+        }
+
+        /*
         * Get all the message property names and check whether the properties with the websocket custom header
         * prefix are exist in the property map.
         *
