@@ -165,6 +165,13 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             String preservableHeaders = preserveWebSocketHeadersParameter.getValue().toString();
             for (String header : preservableHeaders.split(",")) {
                 Object headerValue = msgCtx.getProperty(header);
+                Iterator<String> headerNames = msgCtx.getPropertyNames();
+                while (headerValue == null && headerNames.hasNext()) {
+                    String headerName = headerNames.next();
+                    if (headerName.equalsIgnoreCase(header)) {
+                        headerValue = msgCtx.getProperty(headerName);
+                    }
+                }
                 if (headerValue != null) {
                     customHeaders.put(header, headerValue);
                 }
