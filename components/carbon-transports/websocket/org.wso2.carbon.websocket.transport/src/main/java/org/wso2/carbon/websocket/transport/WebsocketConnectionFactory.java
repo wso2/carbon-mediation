@@ -235,12 +235,12 @@ public class WebsocketConnectionFactory {
                 handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
                         WebSocketVersion.V13,
                         deriveSubprotocol(wsSubprotocol, contentType),
-                        false, defaultHttpHeaders, maxLength));
+                        false, defaultHttpHeaders, maxLength, true, false, -1L, false, false));
             } else {
                 handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
                         WebSocketVersion.V13,
                         deriveSubprotocol(wsSubprotocol, contentType),
-                        false, defaultHttpHeaders));
+                        false, defaultHttpHeaders, 65536, true, false, -1L, false, false));
             }
             handler.setCorrelationId(correlationId);
             handler.setApiProperties(apiProperties);
