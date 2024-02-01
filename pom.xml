@@ -2378,7 +2378,7 @@
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
-                <version>${orbit.version.snakeyaml}</version>
+                <version>${version.snakeyaml}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
@@ -2667,8 +2667,8 @@
         <esotericsoftware.kryo.version>3.0.3</esotericsoftware.kryo.version>
         <org.objenesis.version>2.1</org.objenesis.version>
         <esotericsoftware.minlog.version>1.3.0</esotericsoftware.minlog.version>
-        <orbit.version.snakeyaml>2.0</orbit.version.snakeyaml>
-        <orbit.snakeyaml.import.version.range>[2.0, 3.0.0)</orbit.snakeyaml.import.version.range>
+        <version.snakeyaml>2.2</version.snakeyaml>
+        <snakeyaml.import.version.range>[2.0, 3.0.0)</snakeyaml.import.version.range>
         <!-- OWASP encoder versions -->
         <owasp.encoder.wso2.version>1.2.0.wso2v1</owasp.encoder.wso2.version>
         <owasp.encoder.wso2.imp.pkg.version>[1.2.0,1.3.0)</owasp.encoder.wso2.imp.pkg.version>
