@@ -2698,7 +2698,7 @@
         <powermock.version>2.0.9</powermock.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.1.18.wso2v1</swagger.parser.orbit.version>
-        <transport.http.netty>6.3.35</transport.http.netty>
+        <transport.http.netty>6.3.50</transport.http.netty>
     </properties>
     <pluginRepositories>
         <pluginRepository>
