@@ -94,21 +94,6 @@
             </exclusions>
            <type>mar</type>
         </dependency>
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.woden</groupId>
-                    <artifactId>woden-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>log4j-over-slf4j</artifactId>
-                </exclusion>
-            </exclusions>
-            <type>mar</type>
-        </dependency>
     </dependencies>
 
 </project>

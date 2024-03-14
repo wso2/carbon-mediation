@@ -26,15 +26,6 @@
         <dependencySet>            
             <outputDirectory>lib</outputDirectory>
         </dependencySet>
-
-        <dependencySet>
-            <outputDirectory>samples/client_repo/modules</outputDirectory>
-            <includes>
-                <include>org.apache.axis2:addressing:mar</include>
-                <include>org.apache.rampart:rampart:mar</include>
-                <include>org.apache.sandesha2:sandesha2:mar</include>
-            </includes>            
-        </dependencySet>
     </dependencySets>
     <files>
         <file>
