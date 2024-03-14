@@ -31,7 +31,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Mediator;
 import org.apache.synapse.ServerConfigurationInformation;
 import org.apache.synapse.ServerConfigurationInformationFactory;
 import org.apache.synapse.ServerContextInformation;
@@ -57,8 +56,6 @@ import org.apache.synapse.task.TaskConstants;
 import org.apache.synapse.task.TaskDescriptionRepository;
 import org.apache.synapse.task.TaskManager;
 import org.apache.synapse.task.TaskScheduler;
-import org.apache.synapse.util.AXIOMUtils;
-import org.jetbrains.annotations.Nullable;
 import org.osgi.framework.ServiceRegistration;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -70,7 +67,6 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusInitializer;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
-import org.wso2.carbon.mediation.initializer.handler.SynapseExternalPropertyConfigurator;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationServiceImpl;
@@ -85,12 +81,10 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.ServerConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -220,7 +214,6 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             ServiceRegistration envRegistration =
                     ConfigurationHolder.getInstance().getBundleContext().registerService(
                         SynapseEnvironmentService.class.getName(), synEnvSvc, null);
-            synapseEnvironment.registerSynapseHandler(new SynapseExternalPropertyConfigurator());
 
             try {
                 if (envRegistration != null) {

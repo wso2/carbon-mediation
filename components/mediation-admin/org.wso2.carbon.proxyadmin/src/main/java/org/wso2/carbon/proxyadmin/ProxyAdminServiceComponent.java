@@ -32,12 +32,10 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
-import org.wso2.carbon.proxyadmin.observer.ProxyObserver;
 import org.wso2.carbon.proxyadmin.observer.ProxyServiceParameterObserver;
 import org.wso2.carbon.proxyadmin.service.ProxyDeployerService;
 import org.wso2.carbon.proxyadmin.service.ProxyDeployerServiceImpl;
 import org.wso2.carbon.proxyadmin.util.ConfigHolder;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.service.mgt.ServiceAdmin;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
@@ -86,14 +84,6 @@ public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContex
             if (synEnvService != null) {
                 AxisConfiguration axisConf = synEnvService.getConfigurationContext().getAxisConfiguration();
                 try {
-                    if (!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
-                        ProxyObserver proxyObserver = new ProxyObserver(synEnvService, ConfigHolder.getInstance()
-                                .getRegistryService().getConfigSystemRegistry());
-                        ConfigHolder.getInstance().addProxyObserver(MultitenantConstants.SUPER_TENANT_ID,
-                                proxyObserver);
-                        axisConf.addObservers(proxyObserver);
-                        proxyObserver.setSynapseEnvironmentService(synEnvService);
-                    }
                     registerDeployer(synEnvService.getConfigurationContext().getAxisConfiguration(), synEnvService
                             .getSynapseEnvironment());
                     bindProxyParameterObserver(axisConf);
@@ -179,24 +169,12 @@ public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContex
             int tenantId = synapseEnvironmentService.getTenantId();
             AxisConfiguration axisConfiguration = synapseEnvironmentService.getConfigurationContext()
                     .getAxisConfiguration();
-            ProxyObserver observer;
             if (!alreadyCreated) {
                 try {
                     registerDeployer(synapseEnvironmentService.getConfigurationContext().getAxisConfiguration(),
                             synapseEnvironmentService.getSynapseEnvironment());
-                    observer = new ProxyObserver(synapseEnvironmentService, ConfigHolder.getInstance()
-                            .getRegistryService().getConfigSystemRegistry(tenantId));
-                    axisConfiguration.addObservers(observer);
-                    ConfigHolder.getInstance().addProxyObserver(tenantId, observer);
                 } catch (ProxyAdminException e) {
                     log.error("Error while initializing the proxy admin.", e);
-                } catch (RegistryException e) {
-                    log.error("Error while initializing the proxy admin.", e);
-                }
-            } else {
-                observer = ConfigHolder.getInstance().getProxyObsever(tenantId);
-                if (observer != null) {
-                    observer.setSynapseEnvironmentService(synapseEnvironmentService);
                 }
             }
         }
@@ -303,12 +281,7 @@ public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContex
                     SynapseEnvironmentService synEnvService = ConfigHolder.getInstance().getSynapseEnvironmentService
                             (tenantId);
                     if (synEnvService != null) {
-                        ProxyObserver proxyObserver = new ProxyObserver(synEnvService, ConfigHolder.getInstance()
-                                .getRegistryService().getConfigSystemRegistry(tenantId));
-                        ConfigHolder.getInstance().addProxyObserver(tenantId, proxyObserver);
-                        axisConfig.addObservers(proxyObserver);
                         registerDeployer(axisConfig, synEnvService.getSynapseEnvironment());
-                        proxyObserver.setSynapseEnvironmentService(synEnvService);
                     }
                 } else {
                     log.error("Error while initialzing AxisConfiguration", null);

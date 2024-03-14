@@ -19,7 +19,6 @@ package org.wso2.carbon.proxyadmin.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.proxyadmin.ProxyAdminException;
-import org.wso2.carbon.proxyadmin.observer.ProxyObserver;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 
@@ -32,8 +31,6 @@ public class ConfigHolder {
     private static final Log log = LogFactory.getLog(ConfigHolder.class);
 
     private RegistryService registryService;
-
-    private Map<Integer, ProxyObserver> proxyObservers = new HashMap<Integer, ProxyObserver>();
 
     private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
             new HashMap<Integer, SynapseEnvironmentService>();
@@ -64,18 +61,6 @@ public class ConfigHolder {
         }
     }
 
-    public ProxyObserver getProxyObsever(int id) {
-        return proxyObservers.get(id);
-    }
-
-    public void addProxyObserver(int id, ProxyObserver observer) {
-        proxyObservers.put(id, observer);
-    }
-
-    public void removeProxyObserver(int id) {
-        proxyObservers.remove(id);
-    }
-
     public SynapseEnvironmentService getSynapseEnvironmentService(int id) {
         return synapseEnvironmentServices.get(id);
     }
@@ -93,8 +78,5 @@ public class ConfigHolder {
         return synapseEnvironmentServices;
     }
 
-    public Map<Integer, ProxyObserver> getProxyObservers() {
-        return proxyObservers;
-    }
 }
 
