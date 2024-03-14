@@ -19,7 +19,7 @@
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.7.199</version>
+        <version>4.7.200-SNAPSHOT</version>
         <artifactId>scheduled-tasks-feature</artifactId>
     </parent>
 
