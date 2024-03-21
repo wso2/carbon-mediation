@@ -1075,7 +1075,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             assertNameNotEmpty(endpointName);
             log.debug("Check Endpoint Existence : " + endpointName + " in the configuration");
-            return getSynapseConfiguration().getLocalRegistry().containsKey(endpointName.trim());
+            return getSynapseConfiguration().getLocalRegistry().get(endpointName.trim()) instanceof Endpoint;
         } catch (SynapseException syne) {
             handleFault("Unable to check existence ", syne);
         } finally {
