@@ -2504,7 +2504,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>4.0.0-wso2v99</synapse.version>
+        <synapse.version>4.0.0-wso2v101</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.4.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2604,8 +2604,8 @@
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <json.smart.version>2.5.0</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
-        <netty.version>4.1.104.Final</netty.version>
-        <netty.tcnative.version>2.0.47.Final</netty.tcnative.version>
+        <netty.version>4.1.108.Final</netty.version>
+        <netty.tcnative.version>2.0.65.Final</netty.tcnative.version>
         <javax.activation.version>0.0</javax.activation.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
