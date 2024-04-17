@@ -15,6 +15,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.API;
 import org.apache.synapse.api.Resource;
 import org.apache.synapse.api.dispatch.DispatcherHelper;
@@ -883,15 +884,21 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 						persistApi(api);
 
 					} catch (Exception e) {
+                        String errMsg = "Error trying to add the API to the ESB "
+                                + "configuration : " + api.getName();
                         api.destroy();
-						getSynapseConfiguration().removeAPI(api.getName());
-						try{
-							if (getAxisConfig().getService(api.getName()) != null) {
-								getAxisConfig().removeService(api.getName());
-							}
-						} catch (Exception ignore) {}
-						handleException(log, "Error trying to add the API to the ESB " +
-								"configuration : " + api.getName(), e);
+                        try{
+                            getSynapseConfiguration().removeAPI(api.getName());
+                            if (getAxisConfig().getService(api.getName()) != null) {
+                                getAxisConfig().removeService(api.getName());
+                            }
+                        } catch (SynapseException synapseException) {
+                            // log previous exception and rethrow Synapse Exception
+                            log.error(errMsg, e);
+                            throw synapseException;
+                        }
+                        catch (Exception ignore) {}
+                        handleException(log, errMsg, e);
 					}
 				}
 			} else {
