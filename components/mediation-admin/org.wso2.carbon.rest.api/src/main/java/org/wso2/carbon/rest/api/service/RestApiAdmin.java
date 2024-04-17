@@ -887,7 +887,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                         String errMsg = "Error trying to add the API to the ESB "
                                 + "configuration : " + api.getName();
                         api.destroy();
-                        try{
+                        try {
                             getSynapseConfiguration().removeAPI(api.getName());
                             if (getAxisConfig().getService(api.getName()) != null) {
                                 getAxisConfig().removeService(api.getName());
