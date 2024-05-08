@@ -30,5 +30,12 @@ public class Constants {
     public static final String INTERNAL_APIS_FILE = "internal-apis.xml";
     public static final String PREFIX_TO_ENABLE_INTERNAL_APIS = "enable";
     public static final String WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH = "ws.transport.max.frame.payload.length";
-
+    public static final String WEBSOCKET_TRANSPORT_MAX_HTTP_CODEC_INIT_LENGTH
+            = "ws.transport.max.http.codec.init.length";
+    public static final String WEBSOCKET_TRANSPORT_MAX_HTTP_CODEC_HEADER_SIZE
+            = "ws.transport.max.http.codec.header.size";
+    public static final String WEBSOCKET_TRANSPORT_MAX_HTTP_CODEC_CHUNK_SIZE
+            = "ws.transport.max.http.codec.chunk.size";
+    public static final String WEBSOCKET_TRANSPORT_MAX_HTTP_AGGREGATOR_CONTENT_LENGTH
+            = "ws.transport.max.http.aggregator.content.length";
 }

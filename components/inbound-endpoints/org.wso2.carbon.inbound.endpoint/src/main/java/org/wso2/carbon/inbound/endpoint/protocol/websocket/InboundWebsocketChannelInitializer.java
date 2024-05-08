@@ -25,8 +25,10 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.inbound.endpoint.internal.http.api.Constants;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.SSLHandlerFactory;
 
@@ -99,8 +101,16 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         }
 
         ChannelPipeline p = websocketChannel.pipeline();
-        p.addLast("codec", new HttpServerCodec());
-        p.addLast("aggregator", new HttpObjectAggregator(65536));
+        int maxInitLength = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                Constants.WEBSOCKET_TRANSPORT_MAX_HTTP_CODEC_INIT_LENGTH, "4096"));
+        int maxHeaderSize = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                Constants.WEBSOCKET_TRANSPORT_MAX_HTTP_CODEC_HEADER_SIZE, "8192"));
+        int maxChunkSize = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                Constants.WEBSOCKET_TRANSPORT_MAX_HTTP_CODEC_CHUNK_SIZE, "8192"));
+        int maxContentLength = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
+                Constants.WEBSOCKET_TRANSPORT_MAX_HTTP_AGGREGATOR_CONTENT_LENGTH, "65536"));
+        p.addLast("codec", new HttpServerCodec(maxInitLength, maxHeaderSize, maxChunkSize));
+        p.addLast("aggregator", new HttpObjectAggregator(maxContentLength));
         p.addLast("frameAggregator", new WebSocketFrameAggregator(Integer.MAX_VALUE));
         p.addLast("idleStateHandler", new IdleStateHandler(inflowIdleTime, outflowIdleTime, 0));
         InboundWebsocketSourceHandler sourceHandler = new InboundWebsocketSourceHandler();
