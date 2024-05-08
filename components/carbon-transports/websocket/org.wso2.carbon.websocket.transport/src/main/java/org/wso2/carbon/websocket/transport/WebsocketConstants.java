@@ -56,6 +56,10 @@ public class WebsocketConstants {
     public static final String TRUST_STORE_PASSWORD = "ws.trust.store.Password";
     public static final String TRUST_STORE_CONFIG_ELEMENT = "ws.trust.store";
     public static final String WEBSOCKET_MAX_FRAME_PAYLOAD_LENGTH = "wsMaxFrameLength";
+    public static final String WEBSOCKET_MAX_HTTP_CODEC_INIT_LENGTH = "wsMaxHttpCodecInitLength";
+    public static final String WEBSOCKET_MAX_HTTP_CODEC_HEADER_SIZE = "wsMaxHttpCodecHeaderSize";
+    public static final String WEBSOCKET_MAX_HTTP_CODEC_CHUNK_SIZE = "wsMaxHttpCodecChunkSize";
+    public static final String WEBSOCKET_MAX_HTTP_AGGREGATOR_CONTENT_LENGTH = "wsMaxHttpAggregateContentLength";
 
     public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
     public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";

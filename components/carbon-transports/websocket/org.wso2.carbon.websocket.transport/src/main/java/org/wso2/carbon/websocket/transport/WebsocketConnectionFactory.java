@@ -255,6 +255,14 @@ public class WebsocketConnectionFactory {
                 handler.setDispatchSequence(responseDispatchSequence);
                 handler.setDispatchErrorSequence(responseErrorSequence);
             }
+            int maxInitLength = getMaxValueOrDefault(
+                    transportOut.getParameter(WebsocketConstants.WEBSOCKET_MAX_HTTP_CODEC_INIT_LENGTH), 4096);
+            int maxHeaderSize = getMaxValueOrDefault(
+                    transportOut.getParameter(WebsocketConstants.WEBSOCKET_MAX_HTTP_CODEC_HEADER_SIZE), 8192);
+            int maxChunkSize = getMaxValueOrDefault(
+                    transportOut.getParameter(WebsocketConstants.WEBSOCKET_MAX_HTTP_CODEC_CHUNK_SIZE), 8192);
+            int maxContentLength = getMaxValueOrDefault(
+                    transportOut.getParameter(WebsocketConstants.WEBSOCKET_MAX_HTTP_AGGREGATOR_CONTENT_LENGTH), 8192);
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
@@ -275,7 +283,8 @@ public class WebsocketConnectionFactory {
                                     sslEngine.setSSLParameters(sslParams);
                                 }
                                 p.addLast(sslHandler);                            }
-                            p.addLast(new HttpClientCodec(), new HttpObjectAggregator(8192),
+                            p.addLast(new HttpClientCodec(maxInitLength, maxHeaderSize, maxChunkSize),
+                                    new HttpObjectAggregator(maxContentLength),
                                     new WebSocketFrameAggregator(Integer.MAX_VALUE), handler);
                         }
                     });
@@ -381,5 +390,11 @@ public class WebsocketConnectionFactory {
         }
     }
 
+    private int getMaxValueOrDefault(Parameter parameter, int defaultValue) {
 
+        if (parameter != null) {
+            return Integer.parseInt(parameter.getParameterElement().getText());
+        }
+        return defaultValue;
+    }
 }
