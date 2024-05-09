@@ -53,7 +53,7 @@ public class SSLUtil {
                 KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
                 keyStore.load(new FileInputStream(keyStoreLocation), keyStorePwd.toCharArray());
                 KeyManagerFactory keyManagerFactory =
-                        KeyManagerFactory.getInstance(KEY_MANAGER_TYPE);
+                        KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 keyManagerFactory.init(keyStore, keyStorePwd.toCharArray());
                 serverSSLCtx = SSLContext.getInstance(PROTOCOL);
                 serverSSLCtx.init(keyManagerFactory.getKeyManagers(), null, null);
@@ -85,7 +85,7 @@ public class SSLUtil {
                 trustStore.load(new FileInputStream(trustStoreLocation),
                         trustStorePwd.toCharArray());
                 TrustManagerFactory trustManagerFactory =
-                        TrustManagerFactory.getInstance(TRUST_MANAGER_TYPE);
+                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);
                 clientSSLCtx = SSLContext.getInstance(PROTOCOL);
                 clientSSLCtx.init(null, trustManagerFactory.getTrustManagers(), null);
@@ -116,7 +116,7 @@ public class SSLUtil {
                 KeyStore trustStore = KeyStore.getInstance(TRUST_STORE_TYPE);
                 trustStore.load(new FileInputStream(trustStoreLocation),
                         trustStorePwd.toCharArray());
-                trustManagerFactory = TrustManagerFactory.getInstance(TRUST_MANAGER_TYPE);
+                trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);
                 // clientSSLCtx = SSLContext.getInstance(PROTOCOL);
                 // clientSSLCtx.init(null,
