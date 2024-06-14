@@ -27,6 +27,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.models.MapModel;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.StringModel;
 import org.wso2.carbon.mediator.datamapper.engine.output.formatters.MapOutputFormatter;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineUtils;
 import org.wso2.carbon.mediator.datamapper.engine.utils.OpenJDKNashornFactoryWrapper;
 
@@ -88,6 +89,20 @@ public class ScriptExecutor implements Executor {
                     log.debug("Setting Nashorn as Script Engine");
                     break;
                 }
+            case GRAALJS:
+                try {
+                    scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.GRAALJS_ENGINE_NAME);
+                    bindings = scriptEngine.createBindings();
+                    log.debug("Setting Graal.js as Script Engine");
+                } catch (Exception e) {
+                    log.warn("Could not find Graal.js jar in the lib, switching to rhino js. This may cause performance issue ");
+                    log.debug(e);
+                    scriptEngineManager.registerEngineName(DEFAULT_ENGINE_NAME, new RhinoScriptEngineFactory());
+                    scriptEngine = scriptEngineManager.getEngineByName(DEFAULT_ENGINE_NAME);
+                    bindings = scriptEngine.createBindings();
+                    log.debug("Setting Rhino as Script Engine");
+                }
+                break;
             case RHINO:
                 scriptEngineManager.registerEngineName(DEFAULT_ENGINE_NAME, new RhinoScriptEngineFactory());
                 scriptEngine = scriptEngineManager.getEngineByName(DEFAULT_ENGINE_NAME);

@@ -28,7 +28,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 public class ScriptExecutorFactory {
 
     private static ScriptExecutorPool executorPool = null;
-    private static ScriptExecutorType scriptExecutorType = ScriptExecutorType.NASHORN;
+    private static ScriptExecutorType scriptExecutorType = ScriptExecutorType.GRAALJS;
     private static final Log log = LogFactory.getLog(ScriptExecutorFactory.class);
 
     /**

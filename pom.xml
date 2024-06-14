@@ -2472,6 +2472,36 @@
                 <artifactId>bsf-all</artifactId>
                 <version>${bsf.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.graalvm.sdk</groupId>
+                <artifactId>graal-sdk</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.js</groupId>
+                <artifactId>js-scriptengine</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.js</groupId>
+                <artifactId>js</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.truffle</groupId>
+                <artifactId>truffle-api</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graalvm.regex</groupId>
+                <artifactId>regex</artifactId>
+                <version>${graalvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ibm.icu</groupId>
+                <artifactId>icu4j</artifactId>
+                <version>${icu.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
@@ -2665,6 +2695,8 @@
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.1.18.wso2v1</swagger.parser.orbit.version>
         <transport.http.netty>6.3.50</transport.http.netty>
+        <graalvm.version>23.0.4</graalvm.version>
+        <icu.version>72.1</icu.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
