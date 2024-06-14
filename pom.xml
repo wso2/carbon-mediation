@@ -46,6 +46,7 @@
                 <module>components/mediation-initializer</module>
                 <module>components/mediation-monitor</module>
                 <module>components/mediation-config-admin</module>
+                <module>components/mediation-diagnostics</module>
                 <module>components/business-adaptors</module>
                 <module>components/mediation-admin</module>
                 <module>components/mediation-connector</module>
@@ -2472,6 +2473,11 @@
                 <artifactId>bsf-all</artifactId>
                 <version>${bsf.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.runtime.diagnostics</groupId>
+                <artifactId>runtime-diagnostics-tool</artifactId>
+                <version>${runtime.diagnostics.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
@@ -2665,6 +2671,7 @@
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.1.18.wso2v1</swagger.parser.orbit.version>
         <transport.http.netty>6.3.50</transport.http.netty>
+        <runtime.diagnostics.version>1.1.0</runtime.diagnostics.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
