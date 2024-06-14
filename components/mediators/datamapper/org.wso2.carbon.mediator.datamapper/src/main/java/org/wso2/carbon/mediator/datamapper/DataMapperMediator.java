@@ -755,6 +755,6 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         if (javaVersion.startsWith("1.7") || javaVersion.startsWith("1.6")) {
             return new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
         }
-        return new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
+        return new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.GRAALJS_ENGINE_NAME);
     }
 }
