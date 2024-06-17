@@ -26,7 +26,9 @@ import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEve
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineUtils;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -121,6 +123,9 @@ public class MapOutputFormatter implements Formatter {
                     throw new WriterException(e.getMessage(),e);
                 }
             }
+            if (value instanceof AbstractList) {
+                value = convertListToMap((AbstractList)value);
+            }
             if (value instanceof Map) {
                 // key value is a type of object or an array
                 if (arrayType) {
@@ -164,6 +169,14 @@ public class MapOutputFormatter implements Formatter {
         if (arrayType) {
             sendArrayEndEvent();
         }
+    }
+
+    private Map convertListToMap(AbstractList polyglotList) {
+        Map<Object, Object> map = new HashMap<>();
+        for (int i = 0; i < polyglotList.size(); i++) {
+            map.put(i, polyglotList.get(i));
+        }
+        return map;
     }
 
     private void sendPrimitiveEvent(String key, Object value) throws SchemaException, WriterException {
