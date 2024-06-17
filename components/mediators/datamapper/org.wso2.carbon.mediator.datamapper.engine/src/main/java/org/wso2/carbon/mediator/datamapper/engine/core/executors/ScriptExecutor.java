@@ -91,6 +91,8 @@ public class ScriptExecutor implements Executor {
                 }
             case GRAALJS:
                 try {
+                    // Set the system property to disable the warning messages
+                    System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
                     scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.GRAALJS_ENGINE_NAME);
                     bindings = scriptEngine.createBindings();
                     log.debug("Setting Graal.js as Script Engine");
