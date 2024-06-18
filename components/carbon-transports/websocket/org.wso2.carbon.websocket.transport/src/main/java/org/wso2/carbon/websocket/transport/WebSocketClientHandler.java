@@ -223,6 +223,8 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         synCtx.setProperty(InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE, statusCode);
         synCtx.setProperty(InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT, reasonText);
+        synCtx.setProperty(WebsocketConstants.ERROR_CODE, statusCode);
+        synCtx.setProperty(WebsocketConstants.ERROR_MESSAGE, reasonText);
         synCtx.setProperty(InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CLIENT_HANDLER_ERROR, true);
         getFaultSequence(synCtx, dispatchErrorSequence).mediate(synCtx);
     }
