@@ -80,4 +80,6 @@ public class WebsocketConstants {
     public static final String WS_CLOSE_DEFAULT_REASON_TEXT = "Websocket server terminated";
 
     public static final int WEBSOCKET_UPSTREAM_ERROR_SC = 1014;
+    public static final String ERROR_CODE = "ERROR_CODE";
+    public static final String ERROR_MESSAGE = "ERROR_MESSAGE";
 }
