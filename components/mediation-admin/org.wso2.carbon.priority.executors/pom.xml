@@ -51,6 +51,13 @@
                             org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.utils.ConfigurationContextService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService,
+                            osgi.service;objectClass=org.wso2.carbon.registry.core.service.RegistryService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>
