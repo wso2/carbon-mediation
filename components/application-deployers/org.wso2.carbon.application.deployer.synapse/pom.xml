@@ -64,6 +64,9 @@
                             *;resolution:=optional
                         </Import-Package>
                         <WSO2-Application-Deployer>Synapse App Deployer</WSO2-Application-Deployer>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

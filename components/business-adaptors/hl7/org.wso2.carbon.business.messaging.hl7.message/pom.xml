@@ -54,6 +54,9 @@
                             org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional
                         </Import-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.utils.ConfigurationContextService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

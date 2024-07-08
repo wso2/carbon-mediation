@@ -109,6 +109,12 @@
                         <!--<Private-Package>-->
                             <!--org.wso2.carbon.proxyadmin.*-->
                         <!--</Private-Package>-->
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService,
+                            osgi.service;objectClass=org.wso2.carbon.service.mgt.ServiceAdmin,
+                            osgi.service;objectClass=org.wso2.carbon.registry.core.service.RegistryService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

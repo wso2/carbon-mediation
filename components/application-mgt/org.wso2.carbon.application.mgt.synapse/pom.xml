@@ -66,6 +66,11 @@
                             org.wso2.carbon.application.mgt.synapse
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.registry.core.service.RegistryService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService,
+                            osgi.service;objectClass=org.wso2.carbon.application.deployer.service.ApplicationManagerService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>
