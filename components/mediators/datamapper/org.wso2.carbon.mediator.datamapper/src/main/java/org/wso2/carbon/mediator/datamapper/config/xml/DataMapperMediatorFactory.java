@@ -108,14 +108,10 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
 
         if (inputTypeAttribute != null) {
             datamapperMediator.setInputType(inputTypeAttribute.getAttributeValue());
-        } else {
-            handleException("The input DataType is required for the DataMapper mediator");
         }
 
         if (outputTypeAttribute != null) {
             datamapperMediator.setOutputType(outputTypeAttribute.getAttributeValue());
-        } else {
-            handleException("The output DataType is required for the DataMapper mediator");
         }
 
         if (xsltStyleSheetKeyAttribute != null) {
