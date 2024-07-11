@@ -51,6 +51,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.XSLTMappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.XSLTMappingResource;
+import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.xml.sax.SAXException;
@@ -78,7 +79,9 @@ import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorC
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.DEFAULT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.EMPTY_STRING;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.FUNCTION_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.INPUT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.OPERATIONS_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.OUTPUT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.SYNAPSE_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_HEADERS;
@@ -217,12 +220,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @return the input data type
      */
     public String getInputType() {
-        if (inputType != null) {
-            return inputType;
-        } else {
-            log.warn("Input data type not found. Set to default value : " + InputOutputDataType.XML);
-            return InputOutputDataType.XML.toString();
-        }
+        return inputType;
     }
 
     /**
@@ -240,12 +238,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @return the output data type
      */
     public String getOutputType() {
-        if (outputType != null) {
-            return outputType;
-        } else {
-            log.warn("Output data type not found. Set to default value : " + InputOutputDataType.XML);
-            return InputOutputDataType.XML.toString();
-        }
+        return outputType;
     }
 
     /**
@@ -303,6 +296,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     // mapping resources needed to get the final output
                     try {
                         mappingResource = getMappingResource(synCtx, configKey, inSchemaKey, outSchemaKey);
+                        initializeInputOutputType();
                     } catch (IOException e) {
                         handleException("DataMapper mediator mapping resource generation failed", e, synCtx);
                     }
@@ -311,9 +305,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
 
         // Does message conversion and gives the final result
-        transform(synCtx, getInputType(), getOutputType());
+        transform(synCtx);
         //setting output type in the axis2 message context
-        switch (getOutputType()) {
+        switch (outputType) {
         case "JSON":
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "application/json");
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "application/json");
@@ -327,7 +321,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "text/xml");
             break;
         default:
-            throw new SynapseException("Unsupported output data type found : " + getOutputType());
+            throw new SynapseException("Unsupported output data type found : " + outputType);
         }
 
         if (synLog.isTraceOrDebugEnabled()) {
@@ -371,10 +365,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * Does message conversion and gives the output message as the final result
      *
      * @param synCtx      the message synCtx
-     * @param configKey   registry location of the mapping configuration
-     * @param inSchemaKey registry location of the input schema
      */
-    private void transform(MessageContext synCtx, String configKey, String inSchemaKey) {
+    private void transform(MessageContext synCtx) {
         try {
             String outputResult;
             if (usingXSLTMapping) {
@@ -756,5 +748,28 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             return new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
         }
         return new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.GRAALJS_ENGINE_NAME);
+    }
+
+    private void initializeInputOutputType() {
+        if (inputType == null) {
+            Schema inputSchema = mappingResource.getInputSchema();
+            if (inputSchema != null && inputSchema.getSchemaMap() != null &&
+                    inputSchema.getSchemaMap().containsKey(INPUT_TYPE)) {
+                inputType = inputSchema.getSchemaMap().get(INPUT_TYPE).toString();
+            } else {
+                log.error("Input type is not defined in the input schema/synapse configuration");
+                throw new SynapseException("Input type is not defined in the input schema/synapse configuration");
+            }
+        }
+        if (outputType == null) {
+            Schema outputSchema = mappingResource.getOutputSchema();
+            if (outputSchema != null && outputSchema.getSchemaMap() != null &&
+                    outputSchema.getSchemaMap().containsKey(OUTPUT_TYPE)) {
+                outputType = outputSchema.getSchemaMap().get(OUTPUT_TYPE).toString();
+            } else {
+                log.error("Output type is not defined in the output schema/synapse configuration");
+                throw new SynapseException("Output type is not defined in the output schema/synapse configuration");
+            }
+        }
     }
 }

@@ -93,11 +93,17 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
                                     dataMapperElement);
         }
 
-        dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUT_TYPE, nullNS,
-                                                             dataMapperMediator.getInputType()));
+        String inputType = dataMapperMediator.getInputType();
+        if (inputType != null) {
+            dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUT_TYPE, nullNS,
+                                                                 inputType));
+        }
 
-        dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.OUTPUT_TYPE, nullNS,
-                                                             dataMapperMediator.getOutputType()));
+        String outputType = dataMapperMediator.getOutputType();
+        if (outputType != null) {
+            dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.OUTPUT_TYPE, nullNS,
+                                                                 outputType));
+        }
 
         saveTracingState(dataMapperElement, dataMapperMediator);
         serializeComments(dataMapperElement, dataMapperMediator.getCommentsList());
