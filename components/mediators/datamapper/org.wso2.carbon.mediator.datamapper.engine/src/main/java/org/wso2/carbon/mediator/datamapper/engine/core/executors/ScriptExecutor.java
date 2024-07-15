@@ -40,6 +40,7 @@ import java.util.Map;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.DEFAULT_ENGINE_NAME;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INPUT_VARIABLE_IDENTIFIER;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NASHORN_ENGINE_NAME;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
 
@@ -50,7 +51,6 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 public class ScriptExecutor implements Executor {
 
     public static final String PROPERTIES_IDENTIFIER = "properties";
-    public static final String INPUT_VARIABLE_IDENTIFIER = "inputVariables";
     public static final String OPENJDK_NASHORN_CLASSNAME = "org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory";
     private static final Log log = LogFactory.getLog(ScriptExecutor.class);
     private ScriptEngine scriptEngine;
