@@ -149,7 +149,7 @@ public class MappingResource {
             propertiesList.add(match.group(2) + "['" + match.group(3) + "']");
         }
 
-        if (jsFunctionBody.contains(MAP_FUNCTION_NAME)) {
+        if (!jsFunctionBody.contains(fnName) && jsFunctionBody.contains(MAP_FUNCTION_NAME)) {
             fnName = MAP_FUNCTION;
         }
 
