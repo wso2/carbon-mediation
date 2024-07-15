@@ -85,8 +85,8 @@ import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorC
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.SYNAPSE_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_HEADERS;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INPUT_VARIABLE_IDENTIFIER;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
-import static org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutor.INPUT_VARIABLE_IDENTIFIER;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;

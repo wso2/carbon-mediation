@@ -39,6 +39,8 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.JS_STRINGIFY;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.MAP_FUNCTION;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.MAP_FUNCTION_NAME;
 
 public class MappingResource {
 
@@ -145,6 +147,10 @@ public class MappingResource {
 
         while (match.find()) {
             propertiesList.add(match.group(2) + "['" + match.group(3) + "']");
+        }
+
+        if (jsFunctionBody.contains(MAP_FUNCTION_NAME)) {
+            fnName = MAP_FUNCTION;
         }
 
         if (fnName != null) {
