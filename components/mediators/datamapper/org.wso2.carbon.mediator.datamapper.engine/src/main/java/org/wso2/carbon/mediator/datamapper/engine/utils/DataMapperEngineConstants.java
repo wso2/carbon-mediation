@@ -57,7 +57,7 @@ public class DataMapperEngineConstants {
     public static final String FUNCTION_NAME_CONST_2 = "_S_";
     public static final String INPUT_VARIABLE_IDENTIFIER = "inputVariables";
     public static final String MAP_FUNCTION_NAME = "mapFunction";
-    public static final String MAP_FUNCTION = "mapFunction(JSON.parse(" + INPUT_VARIABLE_IDENTIFIER + ")";
+    public static final String MAP_FUNCTION = "mapFunction(JSON.parse(" + INPUT_VARIABLE_IDENTIFIER + "))";
     public static final String NAME_SEPERATOR = "_Separat0r_";
     public static final String ENCODE_CHAR_HYPHEN = "_EnC0DeCHaRHyPh3n_";
     public static final String HYPHEN = "-";
