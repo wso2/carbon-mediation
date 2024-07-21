@@ -103,6 +103,10 @@
                         <Private-Package>
                             org.wso2.carbon.mediation.configadmin.*
                         </Private-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

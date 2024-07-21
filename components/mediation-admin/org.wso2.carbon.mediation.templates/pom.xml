@@ -59,6 +59,14 @@
                             org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.utils.ConfigurationContextService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService,
+                            osgi.service;objectClass=org.wso2.carbon.registry.core.service.RegistryService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

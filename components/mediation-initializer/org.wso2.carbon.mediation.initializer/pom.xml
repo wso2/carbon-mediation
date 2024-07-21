@@ -114,6 +114,19 @@
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.application.deployer.service.ApplicationManagerService,
+                            osgi.service;objectClass=org.wso2.carbon.registry.core.service.RegistryService,
+                            osgi.service;objectClass=org.wso2.carbon.utils.ConfigurationContextService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.registry.services.SynapseRegistryService,
+                            osgi.service;objectClass=org.wso2.carbon.task.services.TaskDescriptionRepositoryService,
+                            osgi.service;objectClass=org.wso2.carbon.task.services.TaskSchedulerService,
+                            osgi.service;objectClass=org.wso2.carbon.securevault.SecretCallbackHandlerService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService,
+                            osgi.service;objectClass=org.wso2.carbon.event.core.EventBroker,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.ntask.internal.NtaskService,
+                            osgi.service;objectClass=org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>
