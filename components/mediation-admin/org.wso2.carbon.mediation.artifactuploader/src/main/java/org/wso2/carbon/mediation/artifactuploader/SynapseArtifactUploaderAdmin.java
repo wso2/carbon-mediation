@@ -20,6 +20,7 @@ import java.io.IOException;
 public class SynapseArtifactUploaderAdmin extends AbstractAdmin {
 
     private static final Log log = LogFactory.getLog(SynapseArtifactUploaderAdmin.class);
+    private static final String XML_EXTENSION = "xml";
 
     public boolean uploadArtifact(String fileName, DataHandler dataHandler) throws AxisFault {
 
@@ -27,7 +28,17 @@ public class SynapseArtifactUploaderAdmin extends AbstractAdmin {
         File tempDir = new File(CarbonUtils.getCarbonHome() + File.separator + "tmp");
         File destinationTempFile = new File(tempDir, fileName);
         FileOutputStream fos = null;
+
+        String fileExtension = SynapseArtifactUploaderUtil.getFileExtension(fileName);
+        if (!XML_EXTENSION.equals(fileExtension)) {
+            throw new AxisFault("Invalid file type: " + fileExtension);
+        }
+
         try {
+            if (!SynapseArtifactUploaderUtil.validateFilePath(destinationTempFile, tempDir)) {
+                throw new AxisFault("Attempt to upload " + destinationTempFile + ". File path is " +
+                        "outside target directory");
+            }
             fos = FileUtils.openOutputStream(destinationTempFile);
             dataHandler.writeTo(fos);
         } catch (IOException e) {
@@ -56,6 +67,17 @@ public class SynapseArtifactUploaderAdmin extends AbstractAdmin {
     }
 
     public boolean removeArtifact(String fileName) throws AxisFault {
+        File destinationFile = new File(getExtensionRepoPath() + File.separator + fileName);
+        File artifactDir = new File(getExtensionRepoPath());
+        try {
+            if (!SynapseArtifactUploaderUtil.validateFilePath(destinationFile, artifactDir)) {
+                throw new AxisFault("Attempt to delete " + destinationFile + ". File path is " +
+                        "outside target directory");
+            }
+        } catch (IOException e) {
+            handleException("File Delete failed", e);
+        }
+
         File artifactFile = new File(getExtensionRepoPath() + File.separator + fileName);
 
         if (artifactFile.exists() && artifactFile.isFile()) {
