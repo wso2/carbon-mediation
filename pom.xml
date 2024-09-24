@@ -2699,7 +2699,7 @@
         <bsf.version>3.0.0.wso2v5</bsf.version>
         <powermock.version>2.0.9</powermock.version>
         <!-- OAS3 Versions -->
-        <swagger.parser.orbit.version>2.1.18.wso2v1</swagger.parser.orbit.version>
+        <swagger.parser.orbit.version>2.1.22.wso2v1</swagger.parser.orbit.version>
         <transport.http.netty>6.3.50</transport.http.netty>
         <graalvm.version>22.3.4</graalvm.version>
         <icu.version>72.1</icu.version>
