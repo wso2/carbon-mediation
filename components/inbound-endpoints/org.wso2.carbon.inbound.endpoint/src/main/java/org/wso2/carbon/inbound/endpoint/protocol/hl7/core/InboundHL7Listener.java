@@ -32,13 +32,30 @@ public class InboundHL7Listener implements InboundRequestProcessor {
 
     private int port;
     private InboundProcessorParams params;
+    private final boolean startInPausedMode;
 
     public InboundHL7Listener(InboundProcessorParams params) {
         this.params = params;
+        startInPausedMode = params.startInPausedMode();
     }
 
     @Override
     public void init() {
+        /*
+         * The activate/deactivate functionality is not currently implemented
+         * for this Inbound Endpoint type.
+         *
+         * Therefore, the following check has been added to immediately return if the "suspend"
+         * attribute is set to true in the inbound endpoint configuration due to the fixes done
+         * in Synapse level - https://github.com/wso2/wso2-synapse/pull/2261.
+         *
+         * Note: This implementation is temporary and should be revisited and improved once
+         * the activate/deactivate capability is implemented.
+         */
+        if (startInPausedMode) {
+            log.info("Inbound endpoint [" + params.getName() + "] is currently suspended.");
+            return;
+        }
         if (!InboundHL7IOReactor.isStarted()) {
             log.info("Starting MLLP Transport Reactor");
             try {
@@ -65,6 +82,24 @@ public class InboundHL7Listener implements InboundRequestProcessor {
     @Override
     public void destroy() {
         HL7EndpointManager.getInstance().closeEndpoint(port);
+    }
+
+    @Override
+    public boolean activate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean deactivate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean isDeactivated() {
+        // Need to properly implement this logic.
+        return false;
     }
 
 }

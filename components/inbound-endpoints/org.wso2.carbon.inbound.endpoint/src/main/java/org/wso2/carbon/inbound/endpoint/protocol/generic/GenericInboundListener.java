@@ -34,6 +34,7 @@ public abstract class GenericInboundListener implements InboundRequestProcessor 
     protected String onErrorSequence;
     protected String name;
     protected InboundProcessorParams params;
+    protected boolean startInPausedMode;
 
 
     public GenericInboundListener(InboundProcessorParams inboundParams) {
@@ -41,6 +42,7 @@ public abstract class GenericInboundListener implements InboundRequestProcessor 
         this.onErrorSequence = inboundParams.getOnErrorSeq();
         this.name = inboundParams.getName();
         this.params = inboundParams;
+        this.startInPausedMode = params.startInPausedMode();
     }
 
     /**
@@ -92,5 +94,23 @@ public abstract class GenericInboundListener implements InboundRequestProcessor 
     protected static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    @Override
+    public boolean activate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean deactivate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean isDeactivated() {
+        // Need to properly implement this logic.
+        return false;
     }
 }
