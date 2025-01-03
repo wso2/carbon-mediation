@@ -38,6 +38,7 @@ public abstract class InboundOneTimeTriggerRequestProcessor implements InboundRe
     protected SynapseEnvironment synapseEnvironment;
     protected String name;
     protected boolean coordination;
+    protected boolean startInPausedMode;
 
     private OneTimeTriggerInboundRunner inboundRunner;
     private Thread runningThread;
@@ -129,5 +130,23 @@ public abstract class InboundOneTimeTriggerRequestProcessor implements InboundRe
                 log.error("Error while stopping the inbound thread.");
             }
         }
+    }
+
+    @Override
+    public boolean activate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean deactivate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean isDeactivated() {
+        // Need to properly implement this logic.
+        return false;
     }
 }
