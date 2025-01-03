@@ -43,4 +43,10 @@ public class JPAConsumer implements MessageConsumer {
     public String getId() {
         return null;
     }
+
+    @Override
+    public boolean reInitialize() {
+
+        return false;
+    }
 }
