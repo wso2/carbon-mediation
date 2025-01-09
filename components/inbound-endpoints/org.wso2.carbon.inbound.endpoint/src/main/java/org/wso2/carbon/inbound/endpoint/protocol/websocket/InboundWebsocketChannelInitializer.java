@@ -23,6 +23,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
+import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.synapse.config.SynapsePropertiesLoader;
@@ -109,6 +110,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
                 Constants.WEBSOCKET_TRANSPORT_MAX_HTTP_CODEC_CHUNK_SIZE, "8192"));
         int maxContentLength = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
                 Constants.WEBSOCKET_TRANSPORT_MAX_HTTP_AGGREGATOR_CONTENT_LENGTH, "65536"));
+        p.addLast(new WebSocketAccessLoggingHandler(LogLevel.DEBUG));
         p.addLast("codec", new HttpServerCodec(maxInitLength, maxHeaderSize, maxChunkSize));
         p.addLast("aggregator", new HttpObjectAggregator(maxContentLength));
         p.addLast("frameAggregator", new WebSocketFrameAggregator(Integer.MAX_VALUE));
