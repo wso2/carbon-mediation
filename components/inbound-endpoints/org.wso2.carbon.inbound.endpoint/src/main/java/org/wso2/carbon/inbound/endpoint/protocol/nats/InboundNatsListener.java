@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.wso2.carbon.inbound.endpoint.protocol.nats;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.nats.management.NatsEndpointManager;
 
 import org.apache.synapse.inbound.InboundProcessorParams;
@@ -24,19 +26,56 @@ import org.apache.synapse.inbound.InboundRequestProcessor;
  */
 public class InboundNatsListener implements InboundRequestProcessor {
 
+    private static final Log LOGGER = LogFactory.getLog(InboundNatsListener.class);
+
     private String name;
     private InboundProcessorParams processorParams;
+    private final boolean startInPausedMode;
 
     public InboundNatsListener(InboundProcessorParams params) {
         processorParams = params;
         name = params.getName();
+        startInPausedMode = params.startInPausedMode();
     }
 
     @Override public void init() {
+        /*
+         * The activate/deactivate functionality is not currently implemented
+         * for this Inbound Endpoint type.
+         *
+         * Therefore, the following check has been added to immediately return if the "suspend"
+         * attribute is set to true in the inbound endpoint configuration due to the fixes done
+         * in Synapse level - https://github.com/wso2/wso2-synapse/pull/2261.
+         *
+         * Note: This implementation is temporary and should be revisited and improved once
+         * the activate/deactivate capability is implemented.
+         */
+        if (startInPausedMode) {
+            LOGGER.info("Inbound endpoint [" + name + "] is currently suspended.");
+            return;
+        }
         NatsEndpointManager.getInstance().startEndpoint(0, name, processorParams);
     }
 
     @Override public void destroy() {
         NatsEndpointManager.getInstance().closeEndpoint(0);
+    }
+
+    @Override
+    public boolean activate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean deactivate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean isDeactivated() {
+        // Need to properly implement this logic.
+        return false;
     }
 }

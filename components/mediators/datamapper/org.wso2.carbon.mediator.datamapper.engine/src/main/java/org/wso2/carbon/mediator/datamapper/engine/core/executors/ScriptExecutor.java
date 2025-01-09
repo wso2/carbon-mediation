@@ -35,6 +35,9 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import java.util.AbstractList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.DEFAULT_ENGINE_NAME;
@@ -150,6 +153,9 @@ public class ScriptExecutor implements Executor {
             } else {
                 result = scriptEngine.eval(jsFunction.getFunctionName(), bindings);
             }
+            if (result instanceof AbstractList) {
+                result = convertListToMap((AbstractList) result);
+            }
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
             } else if (result instanceof String) {
@@ -168,5 +174,13 @@ public class ScriptExecutor implements Executor {
 
     private String getInputVariable(String inputSchemaName) throws ScriptException {
         return "input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_').replace(HYPHEN, ENCODE_CHAR_HYPHEN);
+    }
+
+    private Map convertListToMap(AbstractList polyglotList) {
+        Map<Object, Object> map = new HashMap<>();
+        for (int i = 0; i < polyglotList.size(); i++) {
+            map.put(i, polyglotList.get(i));
+        }
+        return map;
     }
 }

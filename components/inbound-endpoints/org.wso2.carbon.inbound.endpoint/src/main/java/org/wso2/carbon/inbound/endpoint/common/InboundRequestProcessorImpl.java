@@ -61,7 +61,8 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
     private HashMap<Thread, InboundRunner> inboundRunnersThreadsMap = new HashMap<>();
     private static final Log log = LogFactory.getLog(InboundRequestProcessorImpl.class);
     private InboundEndpointsDataStore dataStore;
-    
+    protected boolean startInPausedMode;
+
     protected final static String COMMON_ENDPOINT_POSTFIX = "--SYNAPSE_INBOUND_ENDPOINT";
     
     public InboundRequestProcessorImpl(){
@@ -262,5 +263,23 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
         }
 
         return null;
+    }
+
+    @Override
+    public boolean activate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean deactivate() {
+
+        return false;
+    }
+
+    @Override
+    public boolean isDeactivated() {
+        // Need to properly implement this logic.
+        return false;
     }
 }
