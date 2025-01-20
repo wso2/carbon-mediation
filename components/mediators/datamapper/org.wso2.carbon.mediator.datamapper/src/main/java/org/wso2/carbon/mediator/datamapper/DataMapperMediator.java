@@ -16,6 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper;
 
+import com.google.gson.Gson;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
@@ -24,6 +25,7 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -41,11 +43,14 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.template.TemplateContext;
 import org.apache.synapse.util.AXIOMUtils;
+import org.graalvm.polyglot.Context;
+import org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutor;
+import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptRunner;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.JSFunction;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
@@ -115,6 +120,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private XSLTMappingResource xsltMappingResource = null;
     private XSLTMappingHandler xsltMappingHandler = null;
     private final Object xsltHandlerLock = new Object();
+    private String targetVariableName = null;
+    private String target = null;
+    private static ScriptRunner scriptRunner = null;
 
     /**
      * Returns registry resources as input streams to create the MappingResourceLoader object
@@ -251,6 +259,42 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     }
 
     /**
+     * Get the target variable name
+     *
+     * @return the target variable name
+     */
+    public String getTargetVariableName() {
+        return targetVariableName;
+    }
+
+    /**
+     * Set the target variable name
+     *
+     * @param targetVariableName the target variable name
+     */
+    public void setTargetVariableName(String targetVariableName) {
+        this.targetVariableName = targetVariableName;
+    }
+
+    /**
+     * Get the target
+     *
+     * @return the target
+     */
+    public String getTarget() {
+        return target;
+    }
+
+    /**
+     * Set the target
+     *
+     * @param target the target
+     */
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    /**
      * Set a pre-built mapping resource
      * This method is used by data-mapper test feature in EI-Tooling
      *
@@ -304,24 +348,40 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             }
         }
 
-        // Does message conversion and gives the final result
-        transform(synCtx);
-        //setting output type in the axis2 message context
-        switch (outputType) {
-        case "JSON":
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "application/json");
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "application/json");
-            break;
-        case "XML":
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "application/xml");
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "application/xml");
-            break;
-        case "CSV":
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "text/xml");
-            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "text/xml");
-            break;
-        default:
-            throw new SynapseException("Unsupported output data type found : " + outputType);
+        if (target != null || targetVariableName != null) {
+            // new datamapping behaviour without schema validation is decided based on above attributes
+            try {
+                String input = getInput(synCtx, inputType);
+                String output = transform(synCtx, mappingConfigurationKey.evaluateValue(synCtx), input);
+                if (target != null && target.toLowerCase().equals(DataMapperMediatorConstants.TARGET_BODY)) {
+                    setOutput(synCtx, outputType, output);
+                } else {
+                    handleException("DataMapper mediator : target variable is not supported", synCtx);
+                }
+            } catch (IOException e) {
+                handleException("DataMapper mediator : mapping failed", e, synCtx);
+            }
+        } else {
+            // preserve backward compatibility
+            // Does message conversion and gives the final result
+            transformWithSchemaValidation(synCtx);
+            //setting output type in the axis2 message context
+            switch (outputType) {
+                case "JSON":
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "application/json");
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "application/json");
+                    break;
+                case "XML":
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "application/xml");
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "application/xml");
+                    break;
+                case "CSV":
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "text/xml");
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "text/xml");
+                    break;
+                default:
+                    throw new SynapseException("Unsupported output data type found : " + outputType);
+            }
         }
 
         if (synLog.isTraceOrDebugEnabled()) {
@@ -361,12 +421,91 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
     }
 
+    public String transform(MessageContext synCtx, String configKey, String inputJson) throws IOException {
+
+        if (scriptRunner == null) {
+            String jsCode = getScriptResource(synCtx, configKey);
+            scriptRunner = new ScriptRunner(jsCode);
+        }
+        return scriptRunner.runScript(inputJson, convertVariablesMapToJSON(synCtx));
+    }
+
+    /**
+     * Convert the variables map to a JSON String.
+     *
+     * @param synCtx Message context
+     * @return JSON String
+     */
+    private String convertVariablesMapToJSON(MessageContext synCtx) {
+        return new Gson().toJson(((Axis2MessageContext) synCtx).getVariables());
+    }
+
+    private String getInput(MessageContext context, String inputType) {
+
+        String inputString = null;
+        try {
+            switch (InputOutputDataType.fromString(inputType)) {
+                case XML:
+                case CSV:
+                    inputString = JsonUtil.toJsonString(context.getEnvelope()).toString();
+                    break;
+                case JSON:
+                    org.apache.axis2.context.MessageContext a2mc =
+                            ((Axis2MessageContext) context).getAxis2MessageContext();
+                    if (JsonUtil.hasAJsonPayload(a2mc)) {
+                        try {
+                            inputString = IOUtils.toString(JsonUtil.getJsonPayload(a2mc));
+                        } catch (IOException e) {
+                            handleException("Unable to read input message in Data Mapper mediator. " +
+                                    e.getMessage(), e, context);
+                        }
+                    }
+                    break;
+                default:
+                    inputString = context.getEnvelope().toString();
+            }
+        } catch (OMException e) {
+            handleException("Unable to read input message in Data Mapper mediator. " + e.getMessage(), e,
+                    context);
+        } catch (AxisFault e) {
+            handleException("Unable to convert input message from XML to JSON in Data Mapper mediator. " +
+                    e.getMessage(), e, context);
+        }
+        return inputString;
+    }
+
+    private void setOutput(MessageContext msgCtx, String outputType, String output) {
+
+        org.apache.axis2.context.MessageContext a2mc = ((Axis2MessageContext) msgCtx).getAxis2MessageContext();
+        switch (InputOutputDataType.fromString(outputType)) {
+            case JSON:
+                try {
+                    JsonUtil.getNewJsonPayload(a2mc, output, true, true);
+                } catch (AxisFault e) {
+                    handleException("Unable to add output JSON to Message Context in Data Mapper mediator. " +
+                            e.getMessage(), e, msgCtx);
+                }
+                break;
+            case XML:
+            case CSV:
+            default:
+                try {
+                    JsonUtil.removeJsonPayload(a2mc);
+                    OMElement omXML = JsonUtil.toXml(IOUtils.toInputStream(output), false);
+                    a2mc.getEnvelope().getBody().addChild(omXML.getFirstElement());
+                } catch (AxisFault e) {
+                    handleException("Unable to convert output JSON to XML in Data Mapper mediator. " +
+                            e.getMessage(), e, msgCtx);
+                }
+        }
+    }
+
     /**
      * Does message conversion and gives the output message as the final result
      *
      * @param synCtx      the message synCtx
      */
-    private void transform(MessageContext synCtx) {
+    private void transformWithSchemaValidation(MessageContext synCtx) {
         try {
             String outputResult;
             if (usingXSLTMapping) {
@@ -581,6 +720,15 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             handleException(e.getMessage(), synCtx);
         }
         return null;
+    }
+
+    private String getScriptResource(MessageContext synCtx, String configKey) throws IOException {
+
+        InputStream configFileInputStream = getRegistryResource(synCtx, configKey);
+        if (configFileInputStream == null) {
+            handleException("DataMapper mediator : mapping configuration is null", synCtx);
+        }
+        return IOUtils.toString(configFileInputStream, String.valueOf(StandardCharsets.UTF_8));
     }
 
     /**
