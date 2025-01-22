@@ -2540,14 +2540,14 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>4.0.0-wso2v165</synapse.version>
+        <synapse.version>4.0.0-wso2v185</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.4.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.1.0</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[6.1.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1-wso2v98</orbit.version.axis2>
+        <orbit.version.axis2>1.6.1-wso2v102</orbit.version.axis2>
         <orbit.version.axis2.client>${orbit.version.axis2}</orbit.version.axis2.client>
         <axis2-transports.base.version>${orbit.version.axis2}</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
@@ -2564,7 +2564,7 @@
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>${rampart.version}</rampart.wso2.version>
-        <commons.vfs.version>2.2.0-wso2v17</commons.vfs.version>
+        <commons.vfs.version>2.2.0-wso2v19</commons.vfs.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpasyncclient.version>4.0-beta3</httpasyncclient.version>
         <!--Misc-->
