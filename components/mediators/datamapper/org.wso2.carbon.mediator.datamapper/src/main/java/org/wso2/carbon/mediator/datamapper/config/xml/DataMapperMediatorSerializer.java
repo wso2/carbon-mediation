@@ -105,6 +105,17 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
                                                                  outputType));
         }
 
+        String targetVariableName = dataMapperMediator.getTargetVariableName();
+        if (targetVariableName != null) {
+            dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.TARGET_VARIABLE, nullNS,
+                                                                 targetVariableName));
+        }
+
+        String target = dataMapperMediator.getTarget();
+        if (target != null) {
+            dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.TARGET, nullNS, target));
+        }
+
         saveTracingState(dataMapperElement, dataMapperMediator);
         serializeComments(dataMapperElement, dataMapperMediator.getCommentsList());
         return dataMapperElement;
