@@ -41,6 +41,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.MAP_FUNCTION;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.MAP_FUNCTION_NAME;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OUTPUT_TYPE;
 
 public class MappingResource {
 
@@ -128,9 +129,6 @@ public class MappingResource {
         String fnName =
                 FUNCTION_NAME_CONST_1 + inputRootElement + FUNCTION_NAME_CONST_2 + outputRootElement + BRACKET_OPEN
                         + BRACKET_CLOSE;
-        if (InputOutputDataType.JSON.toString().equals(outputType)) {
-            fnName = JS_STRINGIFY + BRACKET_OPEN + fnName + BRACKET_CLOSE;
-        }
         String configLine;
         StringBuilder configScriptBuilder = new StringBuilder();
         try {
@@ -151,6 +149,15 @@ public class MappingResource {
 
         if (!jsFunctionBody.contains(fnName) && jsFunctionBody.contains(MAP_FUNCTION_NAME)) {
             fnName = MAP_FUNCTION;
+        }
+        if (outputType == null) {
+            if (outputSchema != null && outputSchema.getSchemaMap() != null &&
+                    outputSchema.getSchemaMap().containsKey(OUTPUT_TYPE)) {
+                outputType = outputSchema.getSchemaMap().get(OUTPUT_TYPE).toString();
+            }
+        }
+        if (InputOutputDataType.JSON.toString().equals(outputType)) {
+            fnName = JS_STRINGIFY + BRACKET_OPEN + fnName + BRACKET_CLOSE;
         }
 
         if (fnName != null) {

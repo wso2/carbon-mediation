@@ -69,4 +69,5 @@ public class DataMapperEngineConstants {
     public static final String PROPERTY_SEPERATOR = ",";
     public static final String FIRST_ELEMENT_OF_THE_INPUT = "xmlns:firstElementOfTheInput";
     public static final String XSLT_COMPATIBLE_DEFAULT = "false";
+    public static final String OUTPUT_TYPE = "outputType";
 }
