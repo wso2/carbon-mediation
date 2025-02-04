@@ -49,12 +49,13 @@ public class ConnectionHandler implements LocalEntryUndeployCallBack {
     // defined as <connector_name>:<connection_name>
     private final Map<String, Object> connectionMap;
     private final Map<String, String> connectionLocalEntryMap;
+    private final Map<String, ConnectionFactory> connectionFactoryMap;
+    private final Map<String, Configuration> configurationMap;
     private final ConcurrentHashMap<String, LocalEntryUndeployObserver> observerMap = new ConcurrentHashMap();
     private SynapseConfiguration synapseConfiguration = null;
-    private ConnectionFactory connectionFactory = null;
-    private Configuration configuration = null;
 
     private ReentrantLock lock = new ReentrantLock();
+    private ReentrantLock poolLock = new ReentrantLock();
 
     static {
         handler = new ConnectionHandler();
@@ -63,6 +64,8 @@ public class ConnectionHandler implements LocalEntryUndeployCallBack {
     private ConnectionHandler() {
         this.connectionMap = new ConcurrentHashMap<>();
         this.connectionLocalEntryMap = new ConcurrentHashMap<>();
+        this.connectionFactoryMap = new ConcurrentHashMap<>();
+        this.configurationMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -124,10 +127,25 @@ public class ConnectionHandler implements LocalEntryUndeployCallBack {
     public void createConnection(String connector, String connectionName, ConnectionFactory factory,
                                  Configuration configuration, MessageContext messageContext) {
         initializeLocalEntryConnectionMapping(connector, connectionName, messageContext);
-        this.connectionFactory = factory;
-        this.configuration = configuration;
-        ConnectionPool pool = new ConnectionPool(connectionFactory, configuration);
-        connectionMap.putIfAbsent(getCode(connector, connectionName), pool);
+        configurationMap.putIfAbsent(getCode(connector, connectionName), configuration);
+        connectionFactoryMap.putIfAbsent(getCode(connector, connectionName), factory);
+        String key = getCode(connector, connectionName);
+        ConnectionPool pool = (ConnectionPool) connectionMap.get(key);
+
+        // Double-checked locking for thread safety
+        if (pool == null) {
+            poolLock.lock();
+            try {
+                pool = (ConnectionPool) connectionMap.get(key);  // Second check (inside lock)
+                if (pool == null) {
+                    log.info("Creating connection pool for " + connectionName);
+                    pool = new ConnectionPool(factory, configuration);
+                    connectionMap.putIfAbsent(key, pool);
+                }
+            } finally {
+                poolLock.unlock();  // Always release lock
+            }
+        }
     }
 
     /**
@@ -154,10 +172,25 @@ public class ConnectionHandler implements LocalEntryUndeployCallBack {
      */
     public void createConnection(String connector, String connectionName, ConnectionFactory factory,
                                  Configuration configuration) {
-        this.connectionFactory = factory;
-        this.configuration = configuration;
-        ConnectionPool pool = new ConnectionPool(connectionFactory, configuration);
-        connectionMap.putIfAbsent(getCode(connector, connectionName), pool);
+        configurationMap.putIfAbsent(getCode(connector, connectionName), configuration);
+        connectionFactoryMap.putIfAbsent(getCode(connector, connectionName), factory);
+        String key = getCode(connector, connectionName);
+        ConnectionPool pool = (ConnectionPool) connectionMap.get(key);
+
+        // Double-checked locking for thread safety
+        if (pool == null) {
+            poolLock.lock();
+            try {
+                pool = (ConnectionPool) connectionMap.get(key);  // Second check (inside lock)
+                if (pool == null) {
+                    log.info("Creating connection pool for " + connectionName);
+                    pool = new ConnectionPool(factory, configuration);
+                    connectionMap.putIfAbsent(key, pool);
+                }
+            } finally {
+                poolLock.unlock();  // Always release lock
+            }
+        }
     }
 
     /**
@@ -189,7 +222,8 @@ public class ConnectionHandler implements LocalEntryUndeployCallBack {
                 if (((ConnectionPool) connectionObj).isAgedTimeoutEnabled()) {
                     closeAgedConnectionPoolGracefully(connectorCode);
                     if (!connectionMap.containsKey(connectorCode)) {
-                        ConnectionPool pool = new ConnectionPool(connectionFactory, configuration);
+                        ConnectionPool pool = new ConnectionPool(connectionFactoryMap.get(connectorCode),
+                                configurationMap.get(connectorCode));
                         connectionMap.putIfAbsent(connectorCode, pool);
                     }
                 }
