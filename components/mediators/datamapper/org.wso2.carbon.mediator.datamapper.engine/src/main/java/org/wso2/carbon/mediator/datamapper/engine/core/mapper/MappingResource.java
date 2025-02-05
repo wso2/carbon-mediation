@@ -16,6 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.JacksonJSONSchema;
@@ -150,7 +151,7 @@ public class MappingResource {
         if (!jsFunctionBody.contains(fnName) && jsFunctionBody.contains(MAP_FUNCTION_NAME)) {
             fnName = MAP_FUNCTION;
         }
-        if (outputType == null) {
+        if (StringUtils.isEmpty(outputType)) {
             if (outputSchema != null && outputSchema.getSchemaMap() != null &&
                     outputSchema.getSchemaMap().containsKey(OUTPUT_TYPE)) {
                 outputType = outputSchema.getSchemaMap().get(OUTPUT_TYPE).toString();
