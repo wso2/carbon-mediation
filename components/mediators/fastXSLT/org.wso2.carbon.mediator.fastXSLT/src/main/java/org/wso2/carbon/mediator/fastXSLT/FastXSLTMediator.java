@@ -37,6 +37,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.Entry;
@@ -214,7 +215,10 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
                     fullLenthDone = true;
                 }
 
-                if (!fullLenthDone && Boolean.TRUE.equals(axis2MC.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+                if (!fullLenthDone &&
+                        (Boolean.TRUE.equals(context.getProperty(SynapseConstants.IS_SEQ_CONTENT_AWARE)) ||
+                                Boolean.TRUE
+                                .equals(axis2MC.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED)))) {
                     RelayUtils.buildMessage(axis2MC, false, bufferedStream);
                 } else if (!fullLenthDone) {
                     IOUtils.write(_transformedOutMessage.toByteArray(), msgContextOutStream);
