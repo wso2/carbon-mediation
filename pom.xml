@@ -2540,7 +2540,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>4.0.0-wso2v213</synapse.version>
+        <synapse.version>4.0.0-wso2v214</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.4.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2638,7 +2638,7 @@
         <geronimo-jpa.version>1.1</geronimo-jpa.version>
         <geronimo-jta.version>1.1.1</geronimo-jta.version>
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
-        <json.smart.version>2.5.0</json.smart.version>
+        <json.smart.version>2.5.2</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
         <netty.version>4.1.118.Final</netty.version>
         <netty.tcnative.version>2.0.65.Final</netty.tcnative.version>
