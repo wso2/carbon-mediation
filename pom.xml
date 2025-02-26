@@ -2531,7 +2531,7 @@
         <carbon.registry.version>4.7.24</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.7.0, 5.0.0)</carbon.registry.imp.pkg.version>
         <!-- Analytic Commons version-->
-        <carbon.analytics.common.version>5.3.7</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.3.19</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.2.0, 6.0.0)</carbon.analytics.common.imp.pkg.version>
         <!-- carbon.identity.framework.version-->
         <carbon.identity.framework.version>5.15.17</carbon.identity.framework.version>
@@ -2540,7 +2540,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>4.0.0-wso2v215</synapse.version>
+        <synapse.version>4.0.0-wso2v218</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.4.4</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
