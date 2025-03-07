@@ -23,6 +23,9 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
+import org.apache.synapse.config.xml.ValueFactory;
+import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.mediators.Value;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.transform.Input;
 import org.wso2.carbon.mediator.transform.Output;
@@ -45,7 +48,14 @@ public class SmooksMediatorFactory extends AbstractMediatorFactory {
         OMAttribute configFileAttr = omElement.getAttribute(CONFIG_KEY);
 
         if (configFileAttr != null) {
-            smooks.setConfigKey(configFileAttr.getAttributeValue());
+            // ValueFactory for creating dynamic or static Value
+            ValueFactory keyFactory = new ValueFactory();
+            // create dynamic or static key based on OMElement
+            Value generatedKey = keyFactory.createValue("config-key", omElement);
+
+            smooks.setConfigKey(generatedKey);
+        } else {
+            handleException("Invalid smooks mediator. Configuration key is required.");
         }
         
         OMAttribute persistenceUnitAttr = omElement.getAttribute(PERSISTENCE_UNIT);

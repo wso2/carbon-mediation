@@ -21,6 +21,8 @@ import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.Mediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
+import org.apache.synapse.config.xml.ValueSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.wso2.carbon.mediator.transform.Input;
 import org.wso2.carbon.mediator.transform.Output;
 import org.wso2.carbon.mediator.transform.SmooksMediator;
@@ -33,7 +35,13 @@ public class SmooksMediatorSerializer extends AbstractMediatorSerializer {
         SmooksMediator smooksMediator = (SmooksMediator) mediator;
         OMElement smooks = fac.createOMElement("smooks", synNS);
 
-        smooks.addAttribute(fac.createOMAttribute("config-key", nullNS, smooksMediator.getConfigKey()));
+        if (smooksMediator.getConfigKey() != null) {
+            // Serialize Value using ValueSerializer
+            ValueSerializer keySerializer =  new ValueSerializer();
+            keySerializer.serializeValue(smooksMediator.getConfigKey(), "config-key", smooks);
+        } else {
+            handleException("Invalid smooks mediator. Configuration key is required.");
+        }
         
         if (smooksMediator.getPersistenceUnitName() != null) {
         	smooks.addAttribute(fac.createOMAttribute("persistence-unit", nullNS, smooksMediator.getPersistenceUnitName()));

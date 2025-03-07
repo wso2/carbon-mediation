@@ -37,6 +37,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.Value;
 import org.milyn.Smooks;
 import org.milyn.SmooksException;
 import org.milyn.container.ExecutionContext;
@@ -58,7 +59,7 @@ public class SmooksMediator extends AbstractMediator {
 	/** Smooks engine */
 	private Smooks smooks = null;
 	/** Smooks configuration file */
-	private String configKey = null;
+	private Value configKey = null;
 	/** This lock is used to create the smooks configuration synchronously */
 	private volatile Lock lock = new ReentrantLock();
 
@@ -100,7 +101,7 @@ public class SmooksMediator extends AbstractMediator {
 		// check weather we need to create the smooks configuration
 		lock.lock();
 		try {
-			if (isCreationOrRecreationRequired(synCtx.getConfiguration())) {
+			if (isCreationOrRecreationRequired(synCtx)) {
 				smooks = createSmooksConfig(synCtx);
 			}
 		} finally {
@@ -206,12 +207,12 @@ public class SmooksMediator extends AbstractMediator {
 	 */
 	private Smooks createSmooksConfig(MessageContext synCtx) {
 		SynapseLog log = getLog(synCtx);
-		Object o = synCtx.getEntry(configKey);
-		if (o == null) {
+		String generatedConfigKey = configKey.evaluateValue(synCtx);
+		if (generatedConfigKey == null) {
 			handleException("Cannot find the object for smooks config key: " + configKey);
 		}
 
-		InputStream in = SynapseConfigUtils.getInputStream(o);
+		InputStream in = SynapseConfigUtils.getInputStream(synCtx.getEntry(generatedConfigKey));
 		if (in == null) {
 			handleException("Cannot get the input stream from the config key: " + configKey);
 		}
@@ -234,14 +235,15 @@ public class SmooksMediator extends AbstractMediator {
 		return null;
 	}
 
-	private boolean isCreationOrRecreationRequired(SynapseConfiguration synCfg) {
+	private boolean isCreationOrRecreationRequired(MessageContext synCtx) {
 		// if there are no cachedTemplates we need to create a one
 		if (smooks == null) {
 			// this is a creation case
 			return true;
 		} else {
+			String generatedConfigKey = configKey.evaluateValue(synCtx);
 			// build transformer - if necessary
-			Entry dp = synCfg.getEntryDefinition(configKey);
+			Entry dp = synCtx.getConfiguration().getEntryDefinition(generatedConfigKey);
 			// if the smooks config key refers to a dynamic resource, and if it
 			// has been expired
 			// it is a recreation case
@@ -263,11 +265,11 @@ public class SmooksMediator extends AbstractMediator {
 		throw new SynapseException(msg + " Caused by " + ex.getMessage());
 	}
 
-	public String getConfigKey() {
+	public Value getConfigKey() {
 		return configKey;
 	}
 
-	public void setConfigKey(String configKey) {
+	public void setConfigKey(Value configKey) {
 		this.configKey = configKey;
 	}
 
