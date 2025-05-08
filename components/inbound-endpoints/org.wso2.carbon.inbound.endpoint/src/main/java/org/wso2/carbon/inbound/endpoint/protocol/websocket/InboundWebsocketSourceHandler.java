@@ -86,6 +86,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.SEC_WEBSOCKET_PROTOCOL;
 import static io.netty.handler.codec.http.HttpHeaders.Names.HOST;
 
 
@@ -218,18 +219,26 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             }
 
             WebSocketServerHandshakerFactory wsFactory;
+            boolean enableSubprotocolNegotiation = Boolean.parseBoolean(
+                    SynapsePropertiesLoader.getPropertyValue(
+                            org.wso2.carbon.inbound.endpoint.internal.http.api.Constants.ENABLE_WEBSOCKET_TRANSPORT_SUBPROTOCOL_NEGOTIATE,
+                            "true"));
             int maxPayloadLength = Integer.parseInt(SynapsePropertiesLoader.getPropertyValue(
                     org.wso2.carbon.inbound.endpoint.internal.http.api.Constants.WEBSOCKET_TRANSPORT_MAX_FRAME_PAYLOAD_LENGTH,
                     "0"));
+
+            String subprotocolString;
+            if (enableSubprotocolNegotiation) {
+                subprotocolString = SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols);
+            } else {
+                subprotocolString = req.headers().get(SEC_WEBSOCKET_PROTOCOL);
+            }
+
             if (maxPayloadLength != 0) {
                 wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
-                                                                 SubprotocolBuilderUtil.buildSubprotocolString(
-                                                                         contentTypes, otherSubprotocols), true,
-                                                                 maxPayloadLength);
+                        subprotocolString, true, maxPayloadLength);
             } else {
-                wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
-                                                                 SubprotocolBuilderUtil.buildSubprotocolString(
-                                                                         contentTypes, otherSubprotocols), true);
+                wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), subprotocolString, true);
             }
             handshaker = wsFactory.newHandshaker(req);
             if (handshaker == null) {
