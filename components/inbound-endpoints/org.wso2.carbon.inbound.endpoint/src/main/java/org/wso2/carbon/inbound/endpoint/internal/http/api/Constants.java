@@ -38,4 +38,6 @@ public class Constants {
             = "ws.transport.max.http.codec.chunk.size";
     public static final String WEBSOCKET_TRANSPORT_MAX_HTTP_AGGREGATOR_CONTENT_LENGTH
             = "ws.transport.max.http.aggregator.content.length";
+    public static final String ENABLE_WEBSOCKET_TRANSPORT_SUBPROTOCOL_NEGOTIATE
+            = "ws.transport.subprotocol.negotiate";
 }
