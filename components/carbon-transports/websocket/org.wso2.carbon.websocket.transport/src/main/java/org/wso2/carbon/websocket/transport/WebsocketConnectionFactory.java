@@ -60,12 +60,20 @@ public class WebsocketConnectionFactory {
 
     private static final Log log = LogFactory.getLog(WebsocketConnectionFactory.class);
 
+    private final EventLoopGroup sharedEventLoopGroup;
     private final TransportOutDescription transportOut;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>
             channelHandlerPool = new ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>();
 
     public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
         this.transportOut = transportOut;
+        int sharedEventLoopPoolSize = getMaxValueOrDefault(
+                transportOut.getParameter(WebsocketConstants.WEBSOCKET_SHARED_EVENT_LOOP_POOL_SIZE), -1);
+        if (sharedEventLoopPoolSize > 0) {
+            this.sharedEventLoopGroup = new NioEventLoopGroup(sharedEventLoopPoolSize);
+        } else {
+            this.sharedEventLoopGroup = new NioEventLoopGroup();
+        }
         boolean sslEnabled = WebsocketConstants.WSS.equalsIgnoreCase(transportOut.getName());
         if (sslEnabled) {
             Parameter trustParam = transportOut.getParameter(WebsocketConstants.TRUST_STORE_CONFIG_ELEMENT);
@@ -227,7 +235,7 @@ public class WebsocketConnectionFactory {
                 }
             }
 
-            final EventLoopGroup group = new NioEventLoopGroup();
+            // Initialize handler before Bootstrap configuration
             Parameter maxPayloadParam = transportOut
                     .getParameter(WebsocketConstants.WEBSOCKET_MAX_FRAME_PAYLOAD_LENGTH);
             if (maxPayloadParam != null) {
@@ -264,10 +272,18 @@ public class WebsocketConnectionFactory {
             int maxContentLength = getMaxValueOrDefault(
                     transportOut.getParameter(WebsocketConstants.WEBSOCKET_MAX_HTTP_AGGREGATOR_CONTENT_LENGTH), 8192);
             Bootstrap b = new Bootstrap();
-            b.group(group).channel(NioSocketChannel.class)
+            b.group(sharedEventLoopGroup).channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
+                            if (log.isDebugEnabled()) {
+                                log.debug(correlationId + " -- Using shared NioEventLoopGroup for connection - "
+                                        + "Group: " + sharedEventLoopGroup.toString()
+                                        + ", Source: " + sourceIdentifier
+                                        + ", URI: " + uri
+                                        + ", Thread: " + Thread.currentThread().getName()
+                                        + ", ThreadID: " + Thread.currentThread().getId());
+                            }
                             ChannelPipeline p = ch.pipeline();
                             if (sslCtx != null) {
                                 SslHandler sslHandler = sslCtx.newHandler(ch.alloc(), host, port);
@@ -300,7 +316,6 @@ public class WebsocketConnectionFactory {
                                           + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
                                           + Thread.currentThread().getId());
                     }
-                    group.shutdownGracefully();
                     removeChannelHandler(sourceIdentifier, getClientHandlerIdentifier(uri));
                 }
             });
@@ -396,5 +411,11 @@ public class WebsocketConnectionFactory {
             return Integer.parseInt(parameter.getParameterElement().getText());
         }
         return defaultValue;
+    }
+
+    public void shutdown() {
+        if (sharedEventLoopGroup != null) {
+            sharedEventLoopGroup.shutdownGracefully();
+        }
     }
 }
