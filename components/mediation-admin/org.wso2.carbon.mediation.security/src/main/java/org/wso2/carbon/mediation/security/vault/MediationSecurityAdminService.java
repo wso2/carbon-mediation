@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.security.vault.external.ExternalVaultException;
 import org.wso2.carbon.mediation.security.vault.external.hashicorp.HashiCorpVaultLookupHandlerImpl;
+import org.wso2.securevault.DecryptionProvider;
 
 public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 
@@ -69,9 +70,29 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 
 	}
 
+	/**
+	 * Operation to do the decryption ops by invoking secure vault api
+	 *
+	 * @param cipherText The cipher text to be decrypted
+	 * @return The decrypted plain text
+	 * @throws AxisFault if an error occurs while loading the keystore
+	 */
 	public String doDecrypt(String cipherText) throws AxisFault {
-		// TODO:yet to implement
-		return null;
+		CipherInitializer cipherInitializer = CipherInitializer.getInstance();
+
+		DecryptionProvider decryptionProvider = cipherInitializer.getDecryptionProvider();
+		if (decryptionProvider == null) {
+			log.error("Either Configuration properties can not be loaded or No secret"
+					+ " repositories have been configured please check PRODUCT_HOME/conf/security "
+					+ " refer links related to configure WSO2 Secure vault");
+			handleException(log,
+					"Failed to load security key store information ," +
+							"Configure secret-conf.properties properly by referring to " +
+							"\"Carbon Secure Vault Implementation\" in WSO2 Documentation",
+					null);
+		}
+
+		return new String(decryptionProvider.decrypt(cipherText.trim().getBytes()));
 	}
 
 	private void handleException(Log log, String message, Exception e) throws AxisFault {
