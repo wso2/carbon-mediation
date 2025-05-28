@@ -2595,7 +2595,7 @@
         <pax.logging.api.version>2.1.0-wso2v4</pax.logging.api.version>
         <import.package.version.commons.logging>[1.2.0,2.0.0)</import.package.version.commons.logging>
         <commons-collections.version>3.2.2</commons-collections.version>
-        <commons-beanutils.version>1.8.3</commons-beanutils.version>
+        <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <commons-digester.version>1.8</commons-digester.version>
         <commons-codec.version>1.16.0</commons-codec.version>
         <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
