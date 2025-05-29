@@ -215,7 +215,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
         } catch (Exception e) {
-            log.warn("Cannot get PassThroughSourceConfiguration ", e);
+            log.warn("Cannot get PassThroughSourceConfiguration for endpoint: " + name + ", port: " + port);
             return false;
         }
 
