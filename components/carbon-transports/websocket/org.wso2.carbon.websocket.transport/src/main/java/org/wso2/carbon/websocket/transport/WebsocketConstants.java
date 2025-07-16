@@ -83,4 +83,7 @@ public class WebsocketConstants {
     public static final int WEBSOCKET_UPSTREAM_ERROR_SC = 1014;
     public static final String ERROR_CODE = "ERROR_CODE";
     public static final String ERROR_MESSAGE = "ERROR_MESSAGE";
+
+    public static final String TARGET_ENDPOINT_ADDRESS = "ENDPOINT_ADDRESS";
+    public static final String WSO2_PROPERTIES = "WSO2_PROPERTIES";
 }

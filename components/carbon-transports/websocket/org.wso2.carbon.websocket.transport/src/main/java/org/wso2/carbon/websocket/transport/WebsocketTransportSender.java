@@ -94,6 +94,18 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         if (log.isDebugEnabled()) {
             log.debug("Endpoint url: " + targetEPR);
         }
+
+        // Store the target endpoint address in the channel attributes to make it available throughout the lifecycle of the connection
+        AttributeKey<Map<String, Object>> WSO2_PROPERTIES = AttributeKey.valueOf(WebsocketConstants.WSO2_PROPERTIES);
+        Map<String, Object> propertiesMap = ((ChannelHandlerContext) (msgCtx.getProperty(
+                WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT))).channel().attr(WSO2_PROPERTIES).get();
+        if (propertiesMap == null) {
+            propertiesMap = new HashMap<>();
+        }
+        propertiesMap.put(WebsocketConstants.TARGET_ENDPOINT_ADDRESS, targetEPR);
+        ((ChannelHandlerContext) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT)).channel()
+                .attr(WSO2_PROPERTIES).set(propertiesMap);
+
         InboundResponseSender responseSender = null;
         if (msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER) != null) {
             responseSender = (InboundResponseSender)
