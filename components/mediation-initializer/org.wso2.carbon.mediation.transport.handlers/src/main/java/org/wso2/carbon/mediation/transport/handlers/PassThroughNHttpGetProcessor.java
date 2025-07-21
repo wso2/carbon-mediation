@@ -174,7 +174,7 @@ public class PassThroughNHttpGetProcessor extends AbstractHttpGetRequestProcesso
         // Handle browser request to get favicon while requesting for wsdl
         if (uri.equals(FAVICON_ICO)) {
             response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
-            response.addHeader(HTTPConstants.HEADER_LOCATION, FAVICON_ICO_URL);
+            response.addHeader(HTTPConstants.HEADER_LOCATION, getFaviconUrl());
             SourceContext.updateState(conn, ProtocolState.WSDL_RESPONSE_DONE);
             try {
                 outputStream.flush();

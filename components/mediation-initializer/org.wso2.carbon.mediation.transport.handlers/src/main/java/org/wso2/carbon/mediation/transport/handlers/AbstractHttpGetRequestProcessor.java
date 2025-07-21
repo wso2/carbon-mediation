@@ -55,11 +55,11 @@ public abstract class AbstractHttpGetRequestProcessor {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String TEXT_HTML = "text/html";
     public static final String FAVICON_ICO = "/favicon.ico";
-    public static final String FAVICON_ICO_URL = "http://wso2.org/favicon.ico";
     public static final String LOCALHOST = "localhost";
     public static final String HOST_NAME = "HostName";
     public static final String WSO2_LOADBALANCER_SYS_PROPERTY = "wso2.loadbalancer";
 
+    private String faviconUrl;
     protected Map<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor> getRequestProcessors =
             new LinkedHashMap<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor>();
     protected ConfigurationContext cfgCtx;
@@ -233,6 +233,24 @@ public abstract class AbstractHttpGetRequestProcessor {
             servicePath = "/" + servicePath;
         }
         return servicePath;
+    }
+
+    /**
+     * Returns the favicon URL.
+     *
+     * @return favicon URL
+     */
+    protected String getFaviconUrl() {
+        if (faviconUrl == null) {
+            String hostName = LOCALHOST;
+            ServerConfiguration serverConfig = ServerConfiguration.getInstance();
+            if (serverConfig.getFirstProperty(HOST_NAME) != null) {
+                hostName = serverConfig.getFirstProperty(HOST_NAME);
+            }
+            faviconUrl = "https://" +
+                    hostName + ":" + System.getProperty("carbon.https.port") + "/carbon/admin/images/favicon.ico";
+        }
+        return faviconUrl;
     }
 
     public void handleException(String msg, Exception e) throws AxisFault {
