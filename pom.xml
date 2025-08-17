@@ -2541,19 +2541,19 @@
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
         <synapse.version>4.0.0-wso2v240</synapse.version>
-        <carbon.identity.entitlement.proxy.version>5.4.4</carbon.identity.entitlement.proxy.version>
+        <carbon.identity.entitlement.proxy.version>5.4.8</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.1.0</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[6.1.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1-wso2v102</orbit.version.axis2>
+        <orbit.version.axis2>1.6.1-wso2v105</orbit.version.axis2>
         <orbit.version.axis2.client>${orbit.version.axis2}</orbit.version.axis2.client>
         <axis2-transports.base.version>${orbit.version.axis2}</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>${orbit.version.axis2}</axis2.json.version>
         <!-- Axiom Version -->
-        <axiom.version>1.2.11-wso2v22</axiom.version>
+        <axiom.version>1.2.11-wso2v29</axiom.version>
         <axiom.api.wso2.version>${axiom.version}</axiom.api.wso2.version>
         <orbit.version.axiom>${axiom.version}</orbit.version.axiom>
         <axiom.wso2.version>${axiom.version}</axiom.wso2.version>
