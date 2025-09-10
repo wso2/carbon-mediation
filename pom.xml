@@ -2700,7 +2700,7 @@
         <powermock.version>2.0.9</powermock.version>
         <!-- OAS3 Versions -->
         <swagger.parser.orbit.version>2.1.22.wso2v2</swagger.parser.orbit.version>
-        <transport.http.netty>6.3.53</transport.http.netty>
+        <transport.http.netty>6.3.55</transport.http.netty>
         <graalvm.version>22.3.4</graalvm.version>
         <icu.version>72.1</icu.version>
         <runtime.diagnostics.version>1.1.0</runtime.diagnostics.version>
