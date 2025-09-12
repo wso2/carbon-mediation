@@ -50,6 +50,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketRespo
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketSourceHandler;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.utils.LogUtil;
+import org.wso2.securevault.SecretResolver;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -237,6 +238,11 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                         .currentThread().getId() + ", URL: " + targetEPR + " API context: " + apiProperties
                         .get(WebsocketConstants.API_CONTEXT));
             }
+            ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
+            SecretResolver resolver = null;
+            if (configurationContext != null && configurationContext.getAxisConfiguration() != null) {
+                resolver = configurationContext.getAxisConfiguration().getSecretResolver();
+            }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(tenantDomain,
                                                                                        new URI(targetEPR),
                                                                                        sourceIdentifier, handshakePresent,
@@ -248,7 +254,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                                                                        responceDispatchSequence,
                                                                                        responceErrorSequence,
                                                                                        correlationId,
-                                                                                       apiProperties);
+                                                                                       apiProperties,
+                                                                                       resolver);
             if (clientHandler == null && isConnectionTerminate) {
                 if (log.isDebugEnabled()) {
                     log.debug(
