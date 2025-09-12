@@ -47,6 +47,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.utils.SSLUtil;
+import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
 import org.wso2.securevault.commons.MiscellaneousUtil;
 
@@ -113,7 +114,8 @@ public class WebsocketConnectionFactory {
                                                     final String responseDispatchSequence,
                                                     final String responseErrorSequence,
                                                     final String correlationId,
-                                                    final Map<String, Object> apiProperties) throws InterruptedException {
+                                                    final Map<String, Object> apiProperties,
+                                                    final SecretResolver resolver) throws InterruptedException {
         WebSocketClientHandler channelHandler = getChannelHandlerFromPool(sourceIdentifier,
                                                                           getClientHandlerIdentifier(uri));
         if (channelHandler == null) {
@@ -132,7 +134,7 @@ public class WebsocketConnectionFactory {
                     channelHandler = cacheNewConnection(tenantDomain, uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
                                                         contentType, wsSubprotocol, headers, inboundResponseSender,
                                                         responseDispatchSequence, responseErrorSequence,
-                                                        correlationId, apiProperties);
+                                                        correlationId, apiProperties, resolver);
                 }
             }
         }
@@ -159,7 +161,8 @@ public class WebsocketConnectionFactory {
                                                      String responseDispatchSequence,
                                                      String responseErrorSequence,
                                                      String correlationId,
-                                                     Map<String, Object> apiProperties) {
+                                                     Map<String, Object> apiProperties,
+                                                     SecretResolver resolver) {
         if (log.isDebugEnabled()) {
             log.debug(correlationId + " -- Creating a Connection for the specified WS endpoint." + " API context: "
                     + apiProperties.get(WebsocketConstants.API_CONTEXT));
@@ -205,8 +208,12 @@ public class WebsocketConnectionFactory {
 
                     final String location = trustStoreLocationElem.getText();
                     String storePassword = trustStorePasswordElem.getText();
-                    storePassword = MiscellaneousUtil.resolve(storePassword,
-                            SecretResolverFactory.create(trustParam.getParameterElement(), false));
+                    if (resolver != null) {
+                        storePassword = MiscellaneousUtil.resolve(storePassword, resolver);
+                    } else {
+                        storePassword = MiscellaneousUtil.resolve(storePassword,
+                                SecretResolverFactory.create(trustParam.getParameterElement(), false));
+                    }
                     sslCtx = SslContextBuilder.forClient()
                             .trustManager(SSLUtil.createTrustmanager(location,
                                     storePassword))
