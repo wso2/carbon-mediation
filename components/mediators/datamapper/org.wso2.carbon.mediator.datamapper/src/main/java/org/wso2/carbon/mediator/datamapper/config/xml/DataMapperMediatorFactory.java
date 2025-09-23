@@ -19,7 +19,9 @@ package org.wso2.carbon.mediator.datamapper.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
+import org.apache.synapse.config.xml.FactoryUtils;
 import org.apache.synapse.config.xml.ValueFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.mediators.Value;
@@ -87,6 +89,10 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
         if (configKeyAttribute != null) {
             // Create dynamic or static key based on OMElement
             Value configKeyValue = keyFac.createValue(configKeyAttribute.getLocalName(), element);
+            if (configKeyValue.getKeyValue() != null && !configKeyValue.hasExprTypeKey()){
+                configKeyValue = new Value(FactoryUtils.prependArtifactIdentifierToFileName(
+                        configKeyValue.getKeyValue(), properties));
+            }
             // set key as the Value
             datamapperMediator.setMappingConfigurationKey(configKeyValue);
         } else {
@@ -95,6 +101,10 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
 
         if (inputSchemaKeyAttribute != null) {
             Value inputSchemaKeyValue = keyFac.createValue(inputSchemaKeyAttribute.getLocalName(), element);
+            if (inputSchemaKeyValue.getKeyValue() != null && !inputSchemaKeyValue.hasExprTypeKey()){
+                inputSchemaKeyValue = new Value(FactoryUtils.prependArtifactIdentifierToFileName(
+                        inputSchemaKeyValue.getKeyValue(), properties));
+            }
             datamapperMediator.setInputSchemaKey(inputSchemaKeyValue);
         } else {
             handleException("The attribute inputSchema is required for the DataMapper mediator");
@@ -102,6 +112,10 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
 
         if (outputSchemaKeyAttribute != null) {
             Value outputSchemaKeyValue = keyFac.createValue(outputSchemaKeyAttribute.getLocalName(), element);
+            if (outputSchemaKeyValue.getKeyValue() != null && !outputSchemaKeyValue.hasExprTypeKey()){
+                outputSchemaKeyValue = new Value(FactoryUtils.prependArtifactIdentifierToFileName(
+                        outputSchemaKeyValue.getKeyValue(), properties));
+            }
             datamapperMediator.setOutputSchemaKey(outputSchemaKeyValue);
         } else {
             handleException("The outputSchema attribute is required for the DataMapper mediator");
@@ -118,6 +132,10 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
         if (xsltStyleSheetKeyAttribute != null) {
             Value xsltStyleSheetKeyValue = keyFac.createValue(xsltStyleSheetKeyAttribute
                     .getLocalName(), element);
+            if (xsltStyleSheetKeyValue.getKeyValue() != null && !xsltStyleSheetKeyValue.hasExprTypeKey()){
+                xsltStyleSheetKeyValue = new Value(FactoryUtils.prependArtifactIdentifierToFileName(
+                        xsltStyleSheetKeyValue.getKeyValue(), properties));
+            }
             datamapperMediator.setXsltStyleSheetKey(xsltStyleSheetKeyValue);
         }
 
