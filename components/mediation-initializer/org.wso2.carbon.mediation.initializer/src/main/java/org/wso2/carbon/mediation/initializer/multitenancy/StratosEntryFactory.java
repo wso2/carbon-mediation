@@ -100,6 +100,10 @@ public class StratosEntryFactory implements IEntryFactory,XMLToObjectMapper {
         return null;
     }
 
+    public Object getObjectFromOMNode(OMNode om, Properties properties, String artifactIdentifier) {
+        return getObjectFromOMNode(om, properties);
+    }
+
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
