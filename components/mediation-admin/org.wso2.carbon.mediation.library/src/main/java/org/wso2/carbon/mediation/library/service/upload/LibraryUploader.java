@@ -55,6 +55,9 @@ public class LibraryUploader extends AbstractAdmin {
                 String fileName = libraryFile.getFileName();
                 if (fileName == null || fileName.equals(""))
                     throw new AxisFault("Invalid file name");
+                
+                // Validate file paths
+                validateFilePaths(fileName, carbonAppDir, carbonAppDirTemp);
 
                 if (fileName.endsWith(".zip")) {
                     writeResource(libraryFile.getDataHandler(), carbonAppDirTemp, carbonAppDir,
@@ -68,6 +71,53 @@ public class LibraryUploader extends AbstractAdmin {
             log.error(msg, e);
             throw new AxisFault(msg, e);
         }
+    }
+
+    /**
+     * Validates file paths to ensure they remain within allowed directories.
+     * 
+     * @param fileName the name of the file
+     * @param targetDir the target directory path
+     * @param tempDir the temporary directory path
+     * @throws AxisFault if path validation fails or IOException occurs
+     */
+    private void validateFilePaths(String fileName, String targetDir, String tempDir) throws AxisFault {
+        try {
+            File targetDirFile = new File(targetDir);
+            File tempDirFile = new File(tempDir);
+            File targetFile = new File(targetDirFile, fileName);
+            File tempFile = new File(tempDirFile, fileName);
+
+            String targetDirCanonical = targetDirFile.getCanonicalPath();
+            String tempDirCanonical = tempDirFile.getCanonicalPath();
+            String targetFileCanonical = targetFile.getCanonicalPath();
+            String tempFileCanonical = tempFile.getCanonicalPath();
+
+            // Validate target file path
+            if (!isWithinDirectory(targetFileCanonical, targetDirCanonical)) {
+                throw new AxisFault("File validation failed: Invalid file path: " + fileName);
+            }
+            
+            // Validate temp file path
+            if (!isWithinDirectory(tempFileCanonical, tempDirCanonical)) {
+                throw new AxisFault("File validation failed: Invalid file path: " + fileName);
+            }
+        } catch (IOException e) {
+            String msg = "Error occurred during file path validation for file: " + fileName;
+            log.error(msg, e);
+            throw new AxisFault(msg, e);
+        }
+    }
+
+    /**
+     * Checks if a file path is within the specified base directory.
+     * 
+     * @param filePath the canonical path of the file
+     * @param baseDir the canonical path of the base directory
+     * @return true if the file is within the base directory, false otherwise
+     */
+    private boolean isWithinDirectory(String filePath, String baseDir) {
+        return filePath.startsWith(baseDir + File.separator) || filePath.equals(baseDir);
     }
 
     private void writeResource(DataHandler dataHandler, String tempDestPath, String destPath,
