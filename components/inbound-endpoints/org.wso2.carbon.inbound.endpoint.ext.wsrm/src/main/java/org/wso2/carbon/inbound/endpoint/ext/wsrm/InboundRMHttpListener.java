@@ -148,4 +148,9 @@ public class InboundRMHttpListener extends GenericInboundListener {
         invoker.getExecutorService().shutdown();
         logger.info("CXF-WS-RM Inbound Listener on " + host + ":" + port + " is shutting down");
     }
+
+    @Override
+    public void pause() {
+
+    }
 }

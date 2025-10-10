@@ -97,6 +97,11 @@ public class InboundHttpListener implements InboundRequestProcessor {
         HTTPEndpointManager.getInstance().closeEndpoint(port);
     }
 
+    @Override
+    public void pause() {
+
+    }
+
     protected void handleException(String msg, Exception e) {
 
         log.error(msg, e);

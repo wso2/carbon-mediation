@@ -62,6 +62,11 @@ public class InboundNatsListener implements InboundRequestProcessor {
     }
 
     @Override
+    public void pause() {
+
+    }
+
+    @Override
     public boolean activate() {
 
         return false;
