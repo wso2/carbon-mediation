@@ -74,6 +74,11 @@ public class InboundHttpWebsocketListener implements InboundRequestProcessor {
         HttpWebsocketEndpointManager.getInstance().closeEndpoint(port);
     }
 
+    @Override
+    public void pause() {
+
+    }
+
     protected void handleException(String msg, Exception e) {
 
         LOGGER.error(msg, e);

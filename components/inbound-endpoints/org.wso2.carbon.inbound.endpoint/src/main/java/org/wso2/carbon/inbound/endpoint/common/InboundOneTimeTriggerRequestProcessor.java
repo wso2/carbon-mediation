@@ -149,4 +149,9 @@ public abstract class InboundOneTimeTriggerRequestProcessor implements InboundRe
         // Need to properly implement this logic.
         return false;
     }
+
+    @Override
+    public void pause() {
+
+    }
 }
