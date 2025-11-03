@@ -23,7 +23,6 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketCloseStatus;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.util.ReferenceCountUtil;
 import org.apache.axiom.om.OMOutputFormat;
@@ -135,6 +134,8 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     }
 
                     CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(statusCode, reasonText);
+                    log.info("Closing WebSocket client connection due to handler error with status code: "
+                            + statusCode + " and reason: " + reasonText);
                     if (log.isDebugEnabled()) {
                         WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
                                 sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
@@ -162,6 +163,8 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                                 errorCode = 1001; // 1001 indicates that an endpoint is "going away"
                             }
                             CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(errorCode, errorMessage);
+                            log.info("Closing WebSocket client connection with error code: "
+                                    + errorCode + " and message: " + errorMessage);
                             if (log.isDebugEnabled()) {
                                 String customErrorMessage =
                                         "errorCode:" + errorCode + " error message: " + errorMessage;
