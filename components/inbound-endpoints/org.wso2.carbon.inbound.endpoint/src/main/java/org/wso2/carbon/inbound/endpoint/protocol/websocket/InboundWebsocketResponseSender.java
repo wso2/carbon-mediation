@@ -109,6 +109,75 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
             }
             Object isTCPTransport = ((Axis2MessageContext) msgContext).getAxis2MessageContext()
                     .getProperty(InboundWebsocketConstants.IS_TCP_TRANSPORT);
+            Object shouldCloseClient =
+                    msgContext.getProperty(InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_CLIENT_HANDLER_ERROR);
+            if (shouldCloseClient != null && Boolean.parseBoolean((String) shouldCloseClient)) {
+                Object isFaultSequenceInvokedOnClientHandlerError =
+                        msgContext.getProperty(
+                                InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CLIENT_HANDLER_ERROR);
+                if (Objects.equals(isFaultSequenceInvokedOnClientHandlerError, true)) {
+                    /*
+                     * Fault sequence was invoked due to an error happened in
+                     * org.wso2.carbon.websocket.transport.WebSocketClientHandler
+                     */
+                    Object msgContextStatusCode =
+                            msgContext.getProperty(InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE);
+                    int statusCode;
+                    if (msgContextStatusCode != null) {
+                        statusCode = (int) msgContextStatusCode;
+                    } else {
+                        statusCode = InboundWebsocketConstants.WS_CLOSE_DEFAULT_CODE;
+                    }
+                    String reasonText =
+                            (String) (msgContext.getProperty(InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT));
+                    if (reasonText == null) {
+                        reasonText = InboundWebsocketConstants.WS_UNEXPECTED_CONNECTION_CLOSURE_TEXT;
+                    }
+
+                    CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(statusCode, reasonText);
+                    if (log.isDebugEnabled()) {
+                        WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
+                                sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
+                    }
+                    try {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Terminating the client websocket channel due to WebSocketClientHandler error");
+                        }
+                        sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
+                    } catch (IOException e) {
+                        log.error("Failed while handling client websocket channel termination", e);
+                    }
+                } else {
+                    /*
+                     * For scenarios where fault sequence was hit during inbound synapse mediation.
+                     * Eg: when endpoint is already suspended
+                     */
+                    try {
+                        if (errorMessage != null) {
+                            if (errorCode == null && msgContext.getProperty("ERROR_CODE") != null) {
+                                errorCode = Integer.parseInt(msgContext.getProperty("ERROR_CODE").toString());
+                            }
+                            // WebSocket close codes are between 1000-4999 as per RFC 6455
+                            if (errorCode == null || errorCode.equals(0) || errorCode > 4999) {
+                                errorCode = 1001; // 1001 indicates that an endpoint is "going away"
+                            }
+                            CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(errorCode, errorMessage);
+                            if (log.isDebugEnabled()) {
+                                String customErrorMessage =
+                                        "errorCode:" + errorCode + " error message: " + errorMessage;
+                                WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
+                                        sourceHandler.getChannelHandlerContext().getChannelHandlerContext(),
+                                        customErrorMessage, false);
+                            }
+                            sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
+                        }
+                    } catch (AxisFault fault) {
+                        log.error("Error occurred while sending close frames", fault);
+                    }
+                }
+                return;
+            }
+
             if (msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT).equals(true)) {
                 return;
@@ -224,48 +293,6 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 }
                 handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
             } else {
-                Object isFaultSequenceInvokedOnClientHandlerError = msgContext.getProperty(
-                        InboundWebsocketConstants.FAULT_SEQUENCE_INVOKED_ON_WEBSOCKET_CLIENT_HANDLER_ERROR);
-                if (Objects.equals(isFaultSequenceInvokedOnClientHandlerError, true)) {
-                    /*
-                     * Fault sequence was invoked due to an error happened in
-                     * org.wso2.carbon.websocket.transport.WebSocketClientHandler
-                     */
-                    Object shouldCloseClient = msgContext.getProperty(
-                            InboundWebsocketConstants.CLOSE_WEBSOCKET_CLIENT_ON_CLIENT_HANDLER_ERROR);
-                    if (shouldCloseClient != null && Boolean.parseBoolean((String) shouldCloseClient)) {
-                        Object msgContextStatusCode =
-                                msgContext.getProperty(InboundWebsocketConstants.WEB_SOCKET_CLOSE_CODE);
-                        int statusCode;
-                        if (msgContextStatusCode != null) {
-                            statusCode = (int) msgContextStatusCode;
-                        } else {
-                            statusCode = InboundWebsocketConstants.WS_CLOSE_DEFAULT_CODE;
-                        }
-                        String reasonText =
-                                (String) (msgContext.getProperty(InboundWebsocketConstants.WEB_SOCKET_REASON_TEXT));
-                        if (reasonText == null) {
-                            reasonText = InboundWebsocketConstants.WS_UNEXPECTED_CONNECTION_CLOSURE_TEXT;
-                        }
-
-                        CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(statusCode, reasonText);
-                        if (log.isDebugEnabled()) {
-                            WebsocketLogUtil.printWebSocketFrame(log, closeWebSocketFrame,
-                                    sourceHandler.getChannelHandlerContext().getChannelHandlerContext(), false);
-                        }
-                        try {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Terminating the client websocket channel due to WebSocketClientHandler error");
-                            }
-                            sourceHandler.handleClientWebsocketChannelTermination(closeWebSocketFrame);
-                        } catch (IOException e) {
-                            log.error("Failed while handling client websocket channel termination", e);
-                        }
-                    }
-
-                    return;
-                }
-
                 try {
                     Object wsCloseFrameStatusCode = msgContext.getProperty(
                             InboundWebsocketConstants.WS_CLOSE_FRAME_STATUS_CODE);
