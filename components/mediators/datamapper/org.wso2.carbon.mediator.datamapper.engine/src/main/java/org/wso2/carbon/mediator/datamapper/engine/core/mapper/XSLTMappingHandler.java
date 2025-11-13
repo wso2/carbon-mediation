@@ -20,6 +20,7 @@ import net.sf.saxon.TransformerFactoryImpl;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -34,7 +35,7 @@ import java.util.Map;
  */
 public class XSLTMappingHandler {
 
-    private Transformer transformer;
+    private final Templates templates;
 
     /**
      * @param xsltMappingResource xslt mapping resource
@@ -43,7 +44,7 @@ public class XSLTMappingHandler {
     public XSLTMappingHandler(XSLTMappingResource xsltMappingResource) throws TransformerException {
         Source xsltSource = new StreamSource(xsltMappingResource.getInputStream());
         TransformerFactory transFact = new TransformerFactoryImpl();
-        transformer = transFact.newTransformer(xsltSource);
+        templates = transFact.newTemplates(xsltSource);
     }
 
     /**
@@ -57,7 +58,8 @@ public class XSLTMappingHandler {
     public String doMap(Map<String, Object> properties, InputStream inputXML) throws
                                                                               TransformerException {
 
-        setParameters(properties);
+        Transformer transformer = templates.newTransformer();
+        setParameters(transformer, properties);
         Source xmlSource = new StreamSource(inputXML);
         StringWriter sw = new StringWriter();
         Result result = new javax.xml.transform.stream.StreamResult(sw);
@@ -69,9 +71,10 @@ public class XSLTMappingHandler {
     /**
      * Set runtime properties as parameters in the transformer
      *
+     * @param transformer Transformer object
      * @param properties Map of properties with values
      */
-    private void setParameters(Map<String, Object> properties) {
+    private void setParameters(Transformer transformer, Map<String, Object> properties) {
         transformer.clearParameters();
         for (Map.Entry<String, Object> property : properties.entrySet()) {
             transformer.setParameter(property.getKey(), property.getValue());
