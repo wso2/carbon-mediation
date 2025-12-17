@@ -251,6 +251,10 @@
                         <groupId>org.ops4j.pax.logging</groupId>
                         <artifactId>pax-logging-api</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.dataformat</groupId>
+                        <artifactId>jackson-dataformat-yaml</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
