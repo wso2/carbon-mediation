@@ -93,6 +93,10 @@
                             org.osgi.service.component.*;version="${imp.package.version.osgi.services}",
                             *;resolution:=optional
                         </Import-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService,
+                        </Provide-Capability>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

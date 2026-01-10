@@ -53,6 +53,9 @@
                         </Export-Package>
                         <Import-Package>
                         </Import-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService
+                        </Provide-Capability>
                         <DynamicImport-Package>*
                         </DynamicImport-Package> <!-- TODO: remove this after adding all imports-->
                     </instructions>

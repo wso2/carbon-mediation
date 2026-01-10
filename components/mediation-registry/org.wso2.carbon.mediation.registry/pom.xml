@@ -64,6 +64,9 @@
                             org.apache.commons.logging; version="${import.package.version.commons.logging}",
                             *;resolution:=optional
                         </Import-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.mediation.registry.services.SynapseRegistryService
+                        </Provide-Capability>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
