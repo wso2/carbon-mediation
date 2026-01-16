@@ -251,10 +251,6 @@
                         <groupId>org.ops4j.pax.logging</groupId>
                         <artifactId>pax-logging-api</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.dataformat</groupId>
-                        <artifactId>jackson-dataformat-yaml</artifactId>
-                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -2511,6 +2507,11 @@
                 <groupId>org.wso2.runtime.diagnostics</groupId>
                 <artifactId>runtime-diagnostics-tool</artifactId>
                 <version>${runtime.diagnostics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${fasterxml.jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
