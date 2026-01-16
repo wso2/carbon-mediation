@@ -72,6 +72,10 @@
             <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
