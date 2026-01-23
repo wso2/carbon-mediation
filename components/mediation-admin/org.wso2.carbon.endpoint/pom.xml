@@ -61,6 +61,9 @@
                             org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.endpoint.service.EndpointAdmin,
+                        </Provide-Capability>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

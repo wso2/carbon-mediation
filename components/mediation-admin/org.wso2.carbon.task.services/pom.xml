@@ -83,6 +83,11 @@
                             org.apache.synapse.task.*,
                             *;resolution:=optional
                         </Import-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.task.services.TaskDescriptionRepositoryService,
+                            osgi.service;objectClass=org.wso2.carbon.task.services.TaskSchedulerService,
+                            osgi.service;objectClass=org.wso2.carbon.task.services.JobMetaDataProviderService,
+                        </Provide-Capability>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>

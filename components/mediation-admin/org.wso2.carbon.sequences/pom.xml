@@ -59,6 +59,9 @@
                             org.wso2.carbon.sequences.common.factory,
                             org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                         </Import-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.sequences.services.SequenceAdmin
+                        </Provide-Capability>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
