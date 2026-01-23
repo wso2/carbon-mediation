@@ -53,9 +53,6 @@
                             org.osgi.framework,
                             org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                         </Import-Package>
-                        <Provide-Capability>
-                            osgi.service;objectClass=org.wso2.carbon.mediator.service.MediatorService
-                        </Provide-Capability>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
