@@ -26,7 +26,7 @@
     </parent>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>carbon-mediation</artifactId>
-    <version>4.7.270-SNAPSHOT</version>
+    <version>4.8.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -2518,7 +2518,7 @@
     <properties>
         <!-- Carbon mediation version -->
         <carbon.mediation.import.feature.version>${carbon.mediation.version}</carbon.mediation.import.feature.version>
-        <carbon.mediation.version>4.7.270-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.8.0-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.7.0, 5.0.0)</carbon.mediation.imp.pkg.version>
         <!-- Carbon kernel version-->
@@ -2545,7 +2545,7 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>4.0.0-wso2v281</synapse.version>
+        <synapse.version>4.1.0-wso2v2</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.4.9</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2585,7 +2585,7 @@
         <commons.net.wso2.version>3.4.wso2v1</commons.net.wso2.version>
         <jcifs.wso2.version>1.3.17.wso2v1</jcifs.wso2.version>
         <orbit.version.json>3.0.0.wso2v4</orbit.version.json>
-        <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
+        <imp.pkg.version.javax.servlet>[3.1.0, 4.0.0)</imp.pkg.version.javax.servlet>
         <org.milyn.wso2.version>1.5.1.wso2v5</org.milyn.wso2.version>
         <javax.persistence.version>1.0</javax.persistence.version>
         <org.slf4j.verison>1.7.21</org.slf4j.verison>
@@ -2680,8 +2680,8 @@
         <owasp.encoder.wso2.version>1.2.0.wso2v1</owasp.encoder.wso2.version>
         <owasp.encoder.wso2.imp.pkg.version>[1.2.0,1.3.0)</owasp.encoder.wso2.imp.pkg.version>
         <maven.surefire.plugin.version>2.12.4</maven.surefire.plugin.version>
-        <maven.jacoco.plugin.version>0.8.2</maven.jacoco.plugin.version>
-        <jacoco.agent.version>0.8.2</jacoco.agent.version>
+        <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
+        <jacoco.agent.version>0.8.11</jacoco.agent.version>
         <activemq.version>5.2.0</activemq.version>
         <activemq.broker.version>5.15.2</activemq.broker.version>
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v3</version.org.wso2.orbit.javax.activation>

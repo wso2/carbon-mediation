@@ -18,9 +18,9 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer</artifactId>
-        <version>4.7.270-SNAPSHOT</version>
+        <version>4.8.0-SNAPSHOT</version>
     </parent>
-    <version>4.7.270-SNAPSHOT</version>
+    <version>4.8.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
     <packaging>bundle</packaging>
@@ -114,6 +114,11 @@
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Provide-Capability>
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService,
+                            osgi.service;objectClass=org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService,
+                        </Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>
