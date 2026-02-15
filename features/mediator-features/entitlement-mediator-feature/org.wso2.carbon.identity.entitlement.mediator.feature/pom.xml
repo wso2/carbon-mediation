@@ -51,7 +51,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
+            <artifactId>opensaml-jdk21</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.saml.common</groupId>
@@ -86,7 +86,7 @@
                                 <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.authenticator.stub</bundleDef>
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.opensaml:opensaml</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.opensaml:opensaml-jdk21</bundleDef>
                                 <bundleDef>org.wso2.carbon.identity.saml.common:org.wso2.carbon.identity.saml.common.util</bundleDef>
                             </bundles>
                             <importFeatures>
