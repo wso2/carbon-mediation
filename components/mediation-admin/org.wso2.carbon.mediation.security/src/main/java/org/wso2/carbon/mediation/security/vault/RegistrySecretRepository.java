@@ -98,9 +98,6 @@ public class RegistrySecretRepository implements SecretRepository {
 					decryptionProvider.decrypt(propertyValue.trim().getBytes(StandardCharsets.UTF_8)));
 		}
 
-		if (log.isDebugEnabled()) {
-			log.debug("evaluation completed successfully " + decryptedText);
-		}
 		return decryptedText;
 
 	}

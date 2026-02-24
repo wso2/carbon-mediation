@@ -57,9 +57,20 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 		try {
 			boolean isGCMMode = cipherInitializer.getAlgorithm().equals(SecureVaultConstants.AES_GCM_NO_PADDING);
 			Cipher cipher;
+			byte[] iv = null;
 
 			if (isGCMMode) {
-				cipher = cipherInitializer.getGCMEncryptionProvider();
+				CipherInitializer.CipherWithIV cipherWithIV = cipherInitializer.getGCMEncryptionProvider();
+				if (cipherWithIV == null) {
+					log.error("Failed to get GCM encryption provider");
+					handleException(log,
+							"Failed to initialize GCM encryption provider. " +
+									"Configure secret-conf.properties properly by referring to " +
+									"\"Carbon Secure Vault Implementation\" in WSO2 Documentation",
+							null);
+				}
+				cipher = cipherWithIV.getCipher();
+				iv = cipherWithIV.getIv();
 			} else {
 				cipher = cipherInitializer.getEncryptionProvider();
 			}
@@ -78,8 +89,7 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 			String base64EncodedCipherText = new String(Base64.encodeBase64(encryptedPassword), StandardCharsets.UTF_8);
 
 			if (isGCMMode) {
-				return SecureVaultUtil.createSelfContainedCiphertextWithGCMMode(base64EncodedCipherText,
-						cipherInitializer.getIv());
+				return SecureVaultUtil.createSelfContainedCiphertextWithGCMMode(base64EncodedCipherText, iv);
 			} else {
 				return base64EncodedCipherText;
 			}

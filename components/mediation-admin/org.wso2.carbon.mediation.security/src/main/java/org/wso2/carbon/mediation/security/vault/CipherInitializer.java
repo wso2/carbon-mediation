@@ -109,6 +109,27 @@ public class CipherInitializer {
 
 	}
 
+	/**
+	 * Wrapper class to atomically pair a Cipher with its corresponding IV.
+	 */
+	public static class CipherWithIV {
+		private final Cipher cipher;
+		private final byte[] iv;
+
+		public CipherWithIV(Cipher cipher, byte[] iv) {
+			this.cipher = cipher;
+			this.iv = iv != null ? iv.clone() : null;
+		}
+
+		public Cipher getCipher() {
+			return cipher;
+		}
+
+		public byte[] getIv() {
+			return iv != null ? iv.clone() : null;
+		}
+	}
+
 	public static CipherInitializer getInstance() {
 	   	return cipherInitializer;
 	}
@@ -173,11 +194,12 @@ public class CipherInitializer {
 					SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
 			String encryptionKey = createEncryptionKey(secretInformation);
 			if (encryptionKey == null || encryptionKey.isEmpty()) {
-				log.debug("Encryption key is mandatory in order to initialize secret manager.");
+				log.error("Encryption key is mandatory in order to initialize secret manager.");
 				return false;
 			}
 			encryptionKeyWrapper = new EncryptionKeyWrapper();
 			encryptionKeyWrapper.init(secretInformation, encryptionKey);
+            log.debug("Encryption key wrapper initialized successfully for symmetric encryption.");
 		} else {
 			// Create a KeyStore Information for private key entry KeyStore
 			IdentityKeyStoreInformation identityInformation =
@@ -388,9 +410,10 @@ public class CipherInitializer {
 							SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
 					String encryptionKey = createEncryptionKey(secretInformation);
 					if (encryptionKey == null || encryptionKey.isEmpty()) {
-						log.debug("Encryption key is mandatory in order to initialize cipher.");
+						log.error("Encryption key is mandatory in order to initialize cipher.");
 						return;
 					}
+					this.encryptionKeyWrapper = new EncryptionKeyWrapper();
 					this.encryptionKeyWrapper.init(secretInformation, encryptionKey);
 				}
 				this.algorithm = algorithm;
@@ -592,11 +615,11 @@ public class CipherInitializer {
 	 * This method should be called for each GCM encryption operation to ensure
 	 * that a unique key-IV combination is used, which is required for GCM security.
 	 *
-	 * @return A Cipher instance initialized with a new IV for GCM encryption
+	 * @return A CipherWithIV instance containing both the Cipher and its corresponding IV
 	 */
-	public synchronized Cipher getGCMEncryptionProvider() {
+	public synchronized CipherWithIV getGCMEncryptionProvider() {
 		if (!SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
-			return encryptionProvider;
+			return new CipherWithIV(encryptionProvider, this.iv);
 		}
 
 		if (this.encryptionKeyWrapper == null) {
@@ -616,7 +639,7 @@ public class CipherInitializer {
 			gcmCipher.init(Cipher.ENCRYPT_MODE, key,
 				new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, gcmIv));
 			
-			return gcmCipher;
+			return new CipherWithIV(gcmCipher, gcmIv);
 		} catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException |
 				NoSuchPaddingException e) {
 			handleException("Error creating GCM cipher ", e);

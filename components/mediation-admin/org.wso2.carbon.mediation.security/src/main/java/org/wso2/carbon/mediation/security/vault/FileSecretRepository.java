@@ -68,6 +68,11 @@ public class FileSecretRepository implements SecretRepository {
     public String getSecret(String alias) {
         // Read from file
         String secretRawValue = getPlainTextSecret(alias);
+        if (secretRawValue == null) {
+            LOG.error("Secret file content is null or empty for alias: " + alias);
+            return null;
+        }
+        
         CipherInitializer cipherInitializer = CipherInitializer.getInstance();
         DecryptionProvider decryptionProvider = cipherInitializer.getDecryptionProvider();
 

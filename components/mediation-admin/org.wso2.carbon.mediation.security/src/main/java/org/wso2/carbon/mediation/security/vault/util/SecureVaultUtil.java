@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Properties;
 
@@ -65,7 +66,7 @@ public class SecureVaultUtil {
 	public static JsonObject getJsonObject(String encryptedText) {
 
 		try {
-			String jsonString = new String(Base64Utils.decode(encryptedText));
+			String jsonString = new String(Base64Utils.decode(encryptedText), StandardCharsets.UTF_8);
 			return JsonParser.parseString(jsonString).getAsJsonObject();
 		} catch (JsonSyntaxException e) {
 			throw new SecureVaultException("Invalid encrypted text: JSON parsing failed.", log);
