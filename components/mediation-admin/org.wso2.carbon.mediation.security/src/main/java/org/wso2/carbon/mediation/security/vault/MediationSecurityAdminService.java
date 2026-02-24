@@ -21,7 +21,10 @@ package org.wso2.carbon.mediation.security.vault;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.spec.GCMParameterSpec;
 
+import com.google.gson.JsonObject;
+import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -29,7 +32,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.security.vault.external.ExternalVaultException;
 import org.wso2.carbon.mediation.security.vault.external.hashicorp.HashiCorpVaultLookupHandlerImpl;
+import org.wso2.carbon.mediation.security.vault.util.SecureVaultUtil;
 import org.wso2.securevault.DecryptionProvider;
+
+import java.nio.charset.StandardCharsets;
 
 public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 
@@ -39,17 +45,25 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 
 	/**
 	 * Operation to do the encryption ops by invoking secure vault api
-	 * 
-	 * @param plainTextPass
-	 * @return
-	 * @throws AxisFault
+	 *
+	 * @param plainTextPass Plain text password to encrypt
+	 * @return Encrypted password
+	 * @throws AxisFault if an error occurs while encrypting the plain text
 	 */
 	public String doEncrypt(String plainTextPass) throws AxisFault {
-		CipherInitializer ciperInitializer = CipherInitializer.getInstance();
-		byte[] plainTextPassByte = plainTextPass.getBytes();
+		CipherInitializer cipherInitializer = CipherInitializer.getInstance();
+		byte[] plainTextPassByte = plainTextPass.getBytes(StandardCharsets.UTF_8);
 
 		try {
-			Cipher cipher = ciperInitializer.getEncryptionProvider();
+			boolean isGCMMode = cipherInitializer.getAlgorithm().equals(SecureVaultConstants.AES_GCM_NO_PADDING);
+			Cipher cipher;
+
+			if (isGCMMode) {
+				cipher = cipherInitializer.getGCMEncryptionProvider();
+			} else {
+				cipher = cipherInitializer.getEncryptionProvider();
+			}
+
 			if (cipher == null) {
                 log.error("Either Configuration properties can not be loaded or No secret"
                           + " repositories have been configured please check PRODUCT_HOME/conf/security "
@@ -61,12 +75,19 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
                                 null);
             }
 			byte[] encryptedPassword = cipher.doFinal(plainTextPassByte);
-            return new String(Base64.encodeBase64(encryptedPassword));
+			String base64EncodedCipherText = new String(Base64.encodeBase64(encryptedPassword), StandardCharsets.UTF_8);
+
+			if (isGCMMode) {
+				return SecureVaultUtil.createSelfContainedCiphertextWithGCMMode(base64EncodedCipherText,
+						cipherInitializer.getIv());
+			} else {
+				return base64EncodedCipherText;
+			}
 		} catch (IllegalBlockSizeException | BadPaddingException e) {
 			handleException(log, "Error encrypting password ", e);
 		}
 
-        return null;
+		return null;
 
 	}
 
@@ -91,8 +112,16 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 							"\"Carbon Secure Vault Implementation\" in WSO2 Documentation",
 					null);
 		}
-
-		return new String(decryptionProvider.decrypt(cipherText.trim().getBytes()));
+		if (cipherInitializer.getAlgorithm().equals((SecureVaultConstants.AES_GCM_NO_PADDING))) {
+			JsonObject jsonObject = SecureVaultUtil.getJsonObject(cipherText.trim());
+			byte[] cipherTextBytes = SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.CIPHER_TEXT)
+					.getBytes(StandardCharsets.UTF_8);
+			byte[] iv = Base64Utils.decode(SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.IV));
+			return new String(decryptionProvider.decrypt(cipherTextBytes,
+					new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv)));
+		} else {
+			return new String(decryptionProvider.decrypt(cipherText.trim().getBytes(StandardCharsets.UTF_8)));
+		}
 	}
 
 	private void handleException(Log log, String message, Exception e) throws AxisFault {

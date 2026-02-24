@@ -18,12 +18,16 @@
 
 package org.wso2.carbon.mediation.security.vault;
 
+import com.google.gson.JsonObject;
+import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.wso2.carbon.mediation.security.vault.util.SecureVaultUtil;
 import org.wso2.securevault.DecryptionProvider;
 import org.wso2.securevault.secret.SecretRepository;
 
+import javax.crypto.spec.GCMParameterSpec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +35,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 /**
@@ -63,14 +68,23 @@ public class FileSecretRepository implements SecretRepository {
     public String getSecret(String alias) {
         // Read from file
         String secretRawValue = getPlainTextSecret(alias);
-        DecryptionProvider decyptProvider = CipherInitializer.getInstance().getDecryptionProvider();
+        CipherInitializer cipherInitializer = CipherInitializer.getInstance();
+        DecryptionProvider decryptionProvider = cipherInitializer.getDecryptionProvider();
 
-        if (decyptProvider == null) {
-            // This cannot happen unless someone mess with OSGI references
+        if (decryptionProvider == null) {
             LOG.error("Can not proceed decryption due to the secret repository initialization error");
             return null;
         }
-        return new String(decyptProvider.decrypt(secretRawValue.trim().getBytes()));
+        if (cipherInitializer.getAlgorithm().equals((SecureVaultConstants.AES_GCM_NO_PADDING))) {
+            JsonObject jsonObject = SecureVaultUtil.getJsonObject(secretRawValue.trim());
+            byte[] cipherTextBytes = SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.CIPHER_TEXT)
+                    .getBytes(StandardCharsets.UTF_8);
+            byte[] iv = Base64Utils.decode(SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.IV));
+            return new String(decryptionProvider.decrypt(cipherTextBytes,
+                    new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv)));
+        } else {
+            return new String(decryptionProvider.decrypt(secretRawValue.trim().getBytes(StandardCharsets.UTF_8)));
+        }
     }
 
     /**

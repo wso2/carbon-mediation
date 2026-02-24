@@ -18,15 +18,21 @@
  */
 package org.wso2.carbon.mediation.security.vault;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+import com.google.gson.JsonObject;
+import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.registry.Registry;
+import org.wso2.carbon.mediation.security.vault.util.SecureVaultUtil;
 import org.wso2.securevault.DecryptionProvider;
 import org.wso2.securevault.secret.SecretRepository;
+
+import javax.crypto.spec.GCMParameterSpec;
 
 /**
  * Holds all secrets in a file
@@ -72,17 +78,28 @@ public class RegistrySecretRepository implements SecretRepository {
 				}
 			}
 		}
-		DecryptionProvider decyptProvider = CipherInitializer.getInstance().getDecryptionProvider();
+		CipherInitializer cipherInitializer = CipherInitializer.getInstance();
+		DecryptionProvider decryptionProvider = cipherInitializer.getDecryptionProvider();
 
-		if (decyptProvider == null) {
-			log.error("Can not proceed decyption due to the secret repository intialization error");
+		if (decryptionProvider == null) {
+			log.error("Can not proceed decryption due to the secret repository initialization error");
 			return null;
 		}
-
-		String decryptedText = new String(decyptProvider.decrypt(propertyValue.trim().getBytes()));
+		String decryptedText;
+		if (cipherInitializer.getAlgorithm().equals((SecureVaultConstants.AES_GCM_NO_PADDING))) {
+			JsonObject jsonObject = SecureVaultUtil.getJsonObject(propertyValue.trim());
+			byte[] cipherTextBytes = SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.CIPHER_TEXT)
+					.getBytes(StandardCharsets.UTF_8);
+			byte[] iv = Base64Utils.decode(SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.IV));
+			decryptedText = new String(decryptionProvider.decrypt(cipherTextBytes,
+					new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv)));
+		} else {
+			decryptedText = new String(
+					decryptionProvider.decrypt(propertyValue.trim().getBytes(StandardCharsets.UTF_8)));
+		}
 
 		if (log.isDebugEnabled()) {
-			log.debug("evaluation completed succesfully " + decryptedText);
+			log.debug("evaluation completed successfully " + decryptedText);
 		}
 		return decryptedText;
 
