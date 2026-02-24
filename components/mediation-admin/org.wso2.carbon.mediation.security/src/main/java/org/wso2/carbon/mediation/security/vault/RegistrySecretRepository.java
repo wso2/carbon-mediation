@@ -78,6 +78,12 @@ public class RegistrySecretRepository implements SecretRepository {
 				}
 			}
 		}
+
+		if (propertyValue == null || propertyValue.trim().isEmpty()) {
+			log.error("No encrypted value found for alias: " + alias);
+			return alias;
+		}
+
 		CipherInitializer cipherInitializer = CipherInitializer.getInstance();
 		DecryptionProvider decryptionProvider = cipherInitializer.getDecryptionProvider();
 

@@ -410,8 +410,7 @@ public class CipherInitializer {
 							SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
 					String encryptionKey = createEncryptionKey(secretInformation);
 					if (encryptionKey == null || encryptionKey.isEmpty()) {
-						log.error("Encryption key is mandatory in order to initialize cipher.");
-						return;
+						handleException("Encryption key is mandatory in order to initialize cipher.");
 					}
 					this.encryptionKeyWrapper = new EncryptionKeyWrapper();
 					this.encryptionKeyWrapper.init(secretInformation, encryptionKey);
@@ -562,11 +561,11 @@ public class CipherInitializer {
 	
 	
 	protected static void handleException(String msg, Exception e) {
-		//throw new CipherToolException(msg, e);
+		throw new RuntimeException(msg, e);
 	}
 
 	protected static void handleException(String msg) {
-		//throw new CipherToolException(msg);
+		throw new RuntimeException(msg);
 	}
 
 
@@ -629,7 +628,6 @@ public class CipherInitializer {
 		
 		try {
 			byte[] gcmIv = getInitializationVector();
-			this.iv = gcmIv;
 
 			byte[] keyBytes = this.encryptionKeyWrapper.getSecretKeyBytes();
 			String baseAlgorithm = algorithm.split("/")[0];
