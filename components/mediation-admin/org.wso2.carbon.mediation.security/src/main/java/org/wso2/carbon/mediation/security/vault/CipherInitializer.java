@@ -422,7 +422,6 @@ public class CipherInitializer {
 				cipher = Cipher.getInstance(algorithm);
 				if (SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
 					byte[] iv = getInitializationVector();
-					this.iv = iv;
 					cipher.init(Cipher.ENCRYPT_MODE, key,
 							new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv));
 				} else {
@@ -603,6 +602,10 @@ public class CipherInitializer {
 	}
 
 	public Cipher getEncryptionProvider() {
+		if (SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
+			throw new IllegalStateException(
+					"Use getGCMEncryptionProvider() for AES-GCM to ensure a unique IV per operation.");
+		}
 		return encryptionProvider;
 	}
 
