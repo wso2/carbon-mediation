@@ -93,12 +93,17 @@ public class RegistrySecretRepository implements SecretRepository {
 		}
 		String decryptedText;
 		if (cipherInitializer.getAlgorithm().equals((SecureVaultConstants.AES_GCM_NO_PADDING))) {
-			JsonObject jsonObject = SecureVaultUtil.getJsonObject(propertyValue.trim());
-			byte[] cipherTextBytes = SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.CIPHER_TEXT)
-					.getBytes(StandardCharsets.UTF_8);
-			byte[] iv = Base64Utils.decode(SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.IV));
-			decryptedText = new String(decryptionProvider.decrypt(cipherTextBytes,
-					new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv)));
+			try {
+				JsonObject jsonObject = SecureVaultUtil.getJsonObject(propertyValue.trim());
+				byte[] cipherTextBytes = SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.CIPHER_TEXT)
+						.getBytes(StandardCharsets.UTF_8);
+				byte[] iv = Base64Utils.decode(SecureVaultUtil.getValueFromJson(jsonObject, SecureVaultConstants.IV));
+				decryptedText = new String(decryptionProvider.decrypt(cipherTextBytes,
+						new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv)));
+			} catch (Exception e) {
+				log.error("Failed to decrypt GCM encrypted value for alias: " + alias, e);
+				return null;
+			}
 		} else {
 			decryptedText = new String(
 					decryptionProvider.decrypt(propertyValue.trim().getBytes(StandardCharsets.UTF_8)));

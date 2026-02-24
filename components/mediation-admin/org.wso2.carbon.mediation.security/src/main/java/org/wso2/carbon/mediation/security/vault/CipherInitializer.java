@@ -484,16 +484,21 @@ public class CipherInitializer {
 	private String getCipherTransformation(Properties properties) {
 		String cipherTransformation = System.getProperty(CIPHER_TRANSFORMATION_SYSTEM_PROPERTY);
 
+		String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
+				SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
+		boolean symmetricEncryptionEnabled = SecureVaultConstants.SYMMETRIC.equals(
+				secretRepositoryEncryptionMode) || SecureVaultConstants.KEY_BASED_SYMMETRIC_ENCRYPTION.equals(
+				secretRepositoryEncryptionMode);
+
 		if (cipherTransformation == null) {
-			String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
-					SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
-			boolean symmetricEncryptionEnabled = SecureVaultConstants.SYMMETRIC.equals(
-					secretRepositoryEncryptionMode) || SecureVaultConstants.KEY_BASED_SYMMETRIC_ENCRYPTION.equals(
-					secretRepositoryEncryptionMode);
 			if (symmetricEncryptionEnabled) {
 				return SecureVaultConstants.AES_GCM_NO_PADDING;
 			}
 			cipherTransformation = SecureVaultConstants.RSA;
+		}
+
+		if (symmetricEncryptionEnabled) {
+			return cipherTransformation;
 		}
 
 		return MiscellaneousUtil.getProperty(properties, CIPHER_TRANSFORMATION_SECRET_CONF_PROPERTY,
@@ -618,7 +623,8 @@ public class CipherInitializer {
 	 */
 	public synchronized CipherWithIV getGCMEncryptionProvider() {
 		if (!SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
-			return new CipherWithIV(encryptionProvider, this.iv);
+			throw new IllegalStateException(
+					"GCM encryption is only used for AES-GCM algorithm, but algorithm is: " + algorithm);
 		}
 
 		if (this.encryptionKeyWrapper == null) {
