@@ -2545,20 +2545,20 @@
         <carbon.rule.version>4.5.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.5.0, 4.6.0)</carbon.rule.imp.pkg.version>
         <!-- Synapse Version -->
-        <synapse.version>4.1.0-wso2v19</synapse.version>
+        <synapse.version>4.1.0-wso2v23</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.4.9</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.2.0, 6.0.0)
         </carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.1.0</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[6.1.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1-wso2v114</orbit.version.axis2>
+        <orbit.version.axis2>1.6.1-wso2v120</orbit.version.axis2>
         <orbit.version.axis2.client>${orbit.version.axis2}</orbit.version.axis2.client>
         <axis2-transports.base.version>${orbit.version.axis2}</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>${orbit.version.axis2}</axis2.json.version>
         <!-- Axiom Version -->
-        <axiom.version>1.2.11-wso2v30</axiom.version>
+        <axiom.version>1.2.11-wso2v34</axiom.version>
         <axiom.api.wso2.version>${axiom.version}</axiom.api.wso2.version>
         <orbit.version.axiom>${axiom.version}</orbit.version.axiom>
         <axiom.wso2.version>${axiom.version}</axiom.wso2.version>
@@ -2645,7 +2645,7 @@
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <json.smart.version>2.6.0</json.smart.version>
         <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
-        <netty.version>4.1.131.Final</netty.version>
+        <netty.version>4.2.9.Final</netty.version>
         <netty.tcnative.version>2.0.65.Final</netty.tcnative.version>
         <javax.activation.version>0.0</javax.activation.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
@@ -2658,7 +2658,7 @@
         <project.scm.id>wso2-scm-server</project.scm.id>
         <fge.json.schema.validator.version>2.2.6.wso2v10</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
-        <joda-time.version>2.9.4.wso2v1</joda-time.version>
+        <joda-time.version>2.14.0.wso2v1</joda-time.version>
         <google.guava.version>33.0.0-jre</google.guava.version>
         <!-- publishEvent mediator versions -->
         <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
@@ -2696,7 +2696,7 @@
         <version.org.wso2.orbit.javax.activation>1.1.1.wso2v1</version.org.wso2.orbit.javax.activation>
         <maven.bundle.plugin.version>3.3.0</maven.bundle.plugin.version>
         <saml.common.util.version>1.3.1</saml.common.util.version>
-        <opensaml.orbit.version>3.3.1.wso2v118</opensaml.orbit.version>
+        <opensaml.orbit.version>3.3.1.wso2v120</opensaml.orbit.version>
         <jackson.dataformat.yaml.version>2.17.2</jackson.dataformat.yaml.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
         <glassfish.cobra.version>4.2.1</glassfish.cobra.version>
