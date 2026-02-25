@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.mediation.security.vault;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.security.vault.util.SecureVaultUtil;
@@ -26,29 +27,38 @@ import org.wso2.securevault.CipherFactory;
 import org.wso2.securevault.CipherOperationMode;
 import org.wso2.securevault.DecryptionProvider;
 import org.wso2.securevault.EncodingType;
+import org.wso2.securevault.SymmetricCipher;
 import org.wso2.securevault.commons.MiscellaneousUtil;
 import org.wso2.securevault.definition.CipherInformation;
 import org.wso2.securevault.definition.IdentityKeyStoreInformation;
 import org.wso2.securevault.definition.KeyStoreInformationFactory;
 import org.wso2.securevault.definition.TrustKeyStoreInformation;
+import org.wso2.securevault.encryption.EncryptionKeyWrapper;
 import org.wso2.securevault.keystore.IdentityKeyStoreWrapper;
 import org.wso2.securevault.keystore.KeyStoreWrapper;
 import org.wso2.securevault.keystore.TrustKeyStoreWrapper;
+import org.wso2.securevault.secret.SecretInformation;
+import org.wso2.securevault.secret.SecretInformationFactory;
 import org.wso2.securevault.secret.SecretRepository;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
+import java.security.SecureRandom;
 import java.util.Properties;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class CipherInitializer {
 	private static Log log = LogFactory.getLog(CipherInitializer.class);
@@ -57,7 +67,6 @@ public class CipherInitializer {
 	private static final String KEY_STORE = "keyStore";
 	private static final String DOT = ".";
 	private static final String ALGORITHM = "algorithm";
-	private static final String DEFAULT_ALGORITHM = "RSA";
 	private static final String TRUSTED = "trusted";
 	private static final String CIPHER_TRANSFORMATION_SECRET_CONF_PROPERTY = "keystore.identity.CipherTransformation";
 	private static final String CIPHER_TRANSFORMATION_SYSTEM_PROPERTY = "org.wso2.CipherTransformation";
@@ -71,9 +80,15 @@ public class CipherInitializer {
 
 	private TrustKeyStoreWrapper trustKeyStoreWrapper;
 
+	private EncryptionKeyWrapper encryptionKeyWrapper;
+
 	private DecryptionProvider decryptionProvider = null;
 
 	private Cipher encryptionProvider = null;
+
+	private String algorithm = SecureVaultConstants.RSA;
+
+	private byte[] iv;
 	
 	Object cipherLockObj = new Object();
 
@@ -92,6 +107,27 @@ public class CipherInitializer {
 			}
 		}
 
+	}
+
+	/**
+	 * Wrapper class to atomically pair a Cipher with its corresponding IV.
+	 */
+	public static class CipherWithIV {
+		private final Cipher cipher;
+		private final byte[] iv;
+
+		public CipherWithIV(Cipher cipher, byte[] iv) {
+			this.cipher = cipher;
+			this.iv = iv != null ? iv.clone() : null;
+		}
+
+		public Cipher getCipher() {
+			return cipher;
+		}
+
+		public byte[] getIv() {
+			return iv != null ? iv.clone() : null;
+		}
 	}
 
 	public static CipherInitializer getInstance() {
@@ -147,41 +183,58 @@ public class CipherInitializer {
 			return false;
 		}
 
-		// Create a KeyStore Information for private key entry KeyStore
-		IdentityKeyStoreInformation identityInformation =
-		                                                  KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
+		String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
+				SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
+		boolean keyBasedSymmetricEncryption = isKeyBasedSymmetricEncryption(secretRepositoryEncryptionMode);
 
-		// Create a KeyStore Information for trusted certificate KeyStore
-		TrustKeyStoreInformation trustInformation =
-		                                            KeyStoreInformationFactory.createTrustKeyStoreInformation(properties);
+		if (keyBasedSymmetricEncryption) {
+			log.debug("Symmetric key encryption is configured. Hence skipping the initialization of keystores.");
+			SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(properties,
+					SecureVaultConstants.KEY_BASED_SECRET_PROVIDER + DOT,
+					SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
+			String encryptionKey = createEncryptionKey(secretInformation);
+			if (encryptionKey == null || encryptionKey.isEmpty()) {
+				log.error("Encryption key is mandatory in order to initialize secret manager.");
+				return false;
+			}
+			encryptionKeyWrapper = new EncryptionKeyWrapper();
+			encryptionKeyWrapper.init(secretInformation, encryptionKey);
+            log.debug("Encryption key wrapper initialized successfully for symmetric encryption.");
+		} else {
+			// Create a KeyStore Information for private key entry KeyStore
+			IdentityKeyStoreInformation identityInformation =
+					KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
 
-		String identityKeyPass = null;
-		String identityStorePass = null;
-		String trustStorePass = null;
-		if (identityInformation != null) {
-			identityKeyPass = identityInformation.getKeyPasswordProvider().getResolvedSecret();
-			identityStorePass =
-			                    identityInformation.getKeyStorePasswordProvider()
-			                                       .getResolvedSecret();
-		}
+			// Create a KeyStore Information for trusted certificate KeyStore
+			TrustKeyStoreInformation trustInformation =
+					KeyStoreInformationFactory.createTrustKeyStoreInformation(properties);
 
-		if (trustInformation != null) {
-			trustStorePass = trustInformation.getKeyStorePasswordProvider().getResolvedSecret();
-		}
+			String identityKeyPass = null;
+			String identityStorePass = null;
+			String trustStorePass = null;
+			if (identityInformation != null) {
+				identityKeyPass = identityInformation.getKeyPasswordProvider().getResolvedSecret();
+				identityStorePass = identityInformation.getKeyStorePasswordProvider().getResolvedSecret();
+			}
 
-		if (!validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
+			if (trustInformation != null) {
+				trustStorePass = trustInformation.getKeyStorePasswordProvider().getResolvedSecret();
+			}
 
-			log.error("Either Identity or Trust keystore password is mandatory"
-			          + " in order to initialized secret manager.");
-			return false;
-		}
+			if (!validatePasswords(identityStorePass, identityKeyPass, trustStorePass)) {
 
-		identityKeyStoreWrapper = new IdentityKeyStoreWrapper();
-		identityKeyStoreWrapper.init(identityInformation, identityKeyPass);
+				log.error("Either Identity or Trust keystore password is mandatory"
+								+ " in order to initialized secret manager.");
+				return false;
+			}
 
-		trustKeyStoreWrapper = new TrustKeyStoreWrapper();
-		if (trustInformation != null) {
-			trustKeyStoreWrapper.init(trustInformation);
+			identityKeyStoreWrapper = new IdentityKeyStoreWrapper();
+			identityKeyStoreWrapper.init(identityInformation, identityKeyPass);
+
+			trustKeyStoreWrapper = new TrustKeyStoreWrapper();
+			if (trustInformation != null) {
+				trustKeyStoreWrapper.init(trustInformation);
+			}
 		}
 
 		SecretRepository currentParent = null;
@@ -262,16 +315,68 @@ public class CipherInitializer {
 			keyStoreWrapper = identityKeyStoreWrapper;
 		}
 
+		this.algorithm = algorithm;
 		CipherInformation cipherInformation = new CipherInformation();
 		cipherInformation.setAlgorithm(algorithm);
 		cipherInformation.setCipherOperationMode(CipherOperationMode.DECRYPT);
 		cipherInformation.setInType(EncodingType.BASE64); // TODO
-		decryptionProvider = CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
-
+		String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
+				SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
+		boolean keyBasedSymmetricEncryption = isKeyBasedSymmetricEncryption(secretRepositoryEncryptionMode);
+		if (keyBasedSymmetricEncryption) {
+			cipherInformation.setType(SecureVaultConstants.SYMMETRIC);
+			cipherInformation.setKeyBasedSymmetricEncryption(true);
+			decryptionProvider = new SymmetricCipher(cipherInformation, encryptionKeyWrapper);
+		} else {
+			decryptionProvider = CipherFactory.createCipher(cipherInformation, keyStoreWrapper);
+		}
 	}
 
+	/**
+	 * Checks whether symmetric encryption is configured using the provided encryption mode.
+	 */
+	public boolean isKeyBasedSymmetricEncryption(String secretRepositoryEncryptionMode) {
 
-	
+		if (secretRepositoryEncryptionMode == null) {
+			log.debug("Symmetric key encryption is not configured.");
+			return false;
+		}
+		if (secretRepositoryEncryptionMode.equals(SecureVaultConstants.KEY_BASED_SYMMETRIC_ENCRYPTION)) {
+			log.debug("Input key based symmetric encryption is configured.");
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Create the encryption key.
+	 *
+	 * @param secretInformation Encryption Information for symmetric key encryption.
+	 * @return encryptionKey.
+	 */
+	private String createEncryptionKey(SecretInformation secretInformation) {
+
+		String encryptionKey = null;
+
+		if (secretInformation != null) {
+			encryptionKey = secretInformation.getResolvedSecret();
+		}
+		return encryptionKey;
+	}
+
+	/**
+	 * Generates a new initialization vector (IV) for GCM encryption.
+	 *
+	 * @return the generated IV as a byte array
+	 */
+	private byte[] getInitializationVector() {
+
+		byte[] iv = new byte[SecureVaultConstants.GCM_IV_LENGTH];
+		SecureRandom secureRandom = new SecureRandom();
+		secureRandom.nextBytes(iv);
+		return iv;
+	}
+
 	/**
 	 * Initializing the encryption key store which uses to encrypt the given
 	 * plain text
@@ -290,38 +395,78 @@ public class CipherInitializer {
 		String provider = null;
 		Cipher cipher = null;
 
-		keyStoreFile = properties.getProperty("keystore.identity.location");
+		String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
+				SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
+		boolean keyBasedSymmetricEncryption = isKeyBasedSymmetricEncryption(secretRepositoryEncryptionMode);
+		if (keyBasedSymmetricEncryption) {
+			try {
+				String cipherTransformation = System.getProperty(CIPHER_TRANSFORMATION_SYSTEM_PROPERTY);
+				String algorithm = StringUtils.isNotBlank(cipherTransformation) ?
+						cipherTransformation :
+						SecureVaultConstants.AES_GCM_NO_PADDING;
+				if (this.encryptionKeyWrapper == null) {
+					SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(properties,
+							SecureVaultConstants.KEY_BASED_SECRET_PROVIDER + DOT,
+							SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
+					String encryptionKey = createEncryptionKey(secretInformation);
+					if (encryptionKey == null || encryptionKey.isEmpty()) {
+						handleException("Encryption key is mandatory in order to initialize cipher.");
+					}
+					this.encryptionKeyWrapper = new EncryptionKeyWrapper();
+					this.encryptionKeyWrapper.init(secretInformation, encryptionKey);
+				}
+				this.algorithm = algorithm;
+				byte[] keyBytes = this.encryptionKeyWrapper.getSecretKeyBytes();
+				String baseAlgorithm = algorithm.split("/")[0];
+				Key key = new SecretKeySpec(keyBytes, baseAlgorithm);
+				cipher = Cipher.getInstance(algorithm);
+				if (SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
+					byte[] iv = getInitializationVector();
+					cipher.init(Cipher.ENCRYPT_MODE, key,
+							new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv));
+				} else {
+					cipher.init(Cipher.ENCRYPT_MODE, key);
+				}
+			} catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException |
+					NoSuchPaddingException e) {
+				handleException("Error initializing Cipher ", e);
+			}
+		} else {
 
-		File keyStore = new File(keyStoreFile);
+			keyStoreFile = properties.getProperty("keystore.identity.location");
 
-		if (!keyStore.exists()) {
-			handleException("Primary Key Store Can not be found at Default location");
-		}
-		
-		keyType =  properties.getProperty("keystore.identity.type"); 
-		aliasName = properties.getProperty("keystore.identity.alias"); ;
-	
-		// Create a KeyStore Information for private key entry KeyStore
-		IdentityKeyStoreInformation identityInformation = KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
+			File keyStore = new File(keyStoreFile);
 
-		password = identityInformation.getKeyStorePasswordProvider().getResolvedSecret();
+			if (!keyStore.exists()) {
+				handleException("Primary Key Store Can not be found at Default location");
+			}
 
-		try {
-			KeyStore primaryKeyStore = getKeyStore(keyStoreFile, password, keyType, provider);
-			java.security.cert.Certificate certs = primaryKeyStore.getCertificate(aliasName);
+			keyType = properties.getProperty("keystore.identity.type");
+			aliasName = properties.getProperty("keystore.identity.alias");
 
-			String algorithm = getCipherTransformation(properties);
+			// Create a KeyStore Information for private key entry KeyStore
+			IdentityKeyStoreInformation identityInformation =
+					KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
 
-			cipher = Cipher.getInstance(algorithm);
-			cipher.init(Cipher.ENCRYPT_MODE, certs);
-		} catch (InvalidKeyException e) {
-			handleException("Error initializing Cipher ", e);
-		} catch (NoSuchAlgorithmException e) {
-			handleException("Error initializing Cipher ", e);
-		} catch (KeyStoreException e) {
-			handleException("Error initializing Cipher ", e);
-		} catch (NoSuchPaddingException e) {
-			handleException("Error initializing Cipher ", e);
+			password = identityInformation.getKeyStorePasswordProvider().getResolvedSecret();
+
+			try {
+				KeyStore primaryKeyStore = getKeyStore(keyStoreFile, password, keyType, provider);
+				java.security.cert.Certificate certs = primaryKeyStore.getCertificate(aliasName);
+
+				String algorithm = getCipherTransformation(properties);
+
+				cipher = Cipher.getInstance(algorithm);
+				cipher.init(Cipher.ENCRYPT_MODE, certs);
+			} catch (InvalidKeyException e) {
+				handleException("Error initializing Cipher ", e);
+			} catch (NoSuchAlgorithmException e) {
+				handleException("Error initializing Cipher ", e);
+			} catch (KeyStoreException e) {
+				handleException("Error initializing Cipher ", e);
+			} catch (NoSuchPaddingException e) {
+				handleException("Error initializing Cipher ", e);
+			}
 		}
 		encryptionProvider = cipher;
 	}
@@ -329,7 +474,7 @@ public class CipherInitializer {
 	/**
 	 * Get the Cipher Transformation to be used by the Cipher. We have the option of configuring this globally as a
 	 * System Property '-Dorg.wso2.CipherTransformation', which can be overridden at the 'secret-conf.properties' level
-	 * by specifying the property 'keystore.identity.CipherTransformation'. If neither are configured the default 'RSA'
+	 * by specifying the property 'keystore.identity.CipherTransformation'. If neither are configured the default
 	 * will be used
 	 *
 	 * @param properties Properties from the 'secret-conf.properties' file
@@ -338,8 +483,21 @@ public class CipherInitializer {
 	private String getCipherTransformation(Properties properties) {
 		String cipherTransformation = System.getProperty(CIPHER_TRANSFORMATION_SYSTEM_PROPERTY);
 
+		String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
+				SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
+		boolean symmetricEncryptionEnabled = SecureVaultConstants.SYMMETRIC.equals(
+				secretRepositoryEncryptionMode) || SecureVaultConstants.KEY_BASED_SYMMETRIC_ENCRYPTION.equals(
+				secretRepositoryEncryptionMode);
+
 		if (cipherTransformation == null) {
-			cipherTransformation = DEFAULT_ALGORITHM;
+			if (symmetricEncryptionEnabled) {
+				return SecureVaultConstants.AES_GCM_NO_PADDING;
+			}
+			cipherTransformation = SecureVaultConstants.RSA;
+		}
+
+		if (symmetricEncryptionEnabled) {
+			return cipherTransformation;
 		}
 
 		return MiscellaneousUtil.getProperty(properties, CIPHER_TRANSFORMATION_SECRET_CONF_PROPERTY,
@@ -407,11 +565,11 @@ public class CipherInitializer {
 	
 	
 	protected static void handleException(String msg, Exception e) {
-		//throw new CipherToolException(msg, e);
+		throw new RuntimeException(msg, e);
 	}
 
 	protected static void handleException(String msg) {
-		//throw new CipherToolException(msg);
+		throw new RuntimeException(msg);
 	}
 
 
@@ -421,6 +579,14 @@ public class CipherInitializer {
 
 	public void setIdentityKeyStoreWrapper(IdentityKeyStoreWrapper identityKeyStoreWrapper) {
 		this.identityKeyStoreWrapper = identityKeyStoreWrapper;
+	}
+
+	public EncryptionKeyWrapper getEncryptionKeyWrapper() {
+		return encryptionKeyWrapper;
+	}
+
+	public void setEncryptionKeyWrapper(EncryptionKeyWrapper encryptionKeyWrapper) {
+		this.encryptionKeyWrapper = encryptionKeyWrapper;
 	}
 
 	public TrustKeyStoreWrapper getTrustKeyStoreWrapper() {
@@ -436,7 +602,55 @@ public class CipherInitializer {
 	}
 
 	public Cipher getEncryptionProvider() {
+		if (SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
+			throw new IllegalStateException(
+					"Use getGCMEncryptionProvider() for AES-GCM to ensure a unique IV per operation.");
+		}
 		return encryptionProvider;
 	}
 
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
+	public byte[] getIv() {
+		return iv;
+	}
+
+	/**
+	 * Gets an encryption provider for GCM mode with a new IV.
+	 * This method should be called for each GCM encryption operation to ensure
+	 * that a unique key-IV combination is used, which is required for GCM security.
+	 *
+	 * @return A CipherWithIV instance containing both the Cipher and its corresponding IV
+	 */
+	public synchronized CipherWithIV getGCMEncryptionProvider() {
+		if (!SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
+			throw new IllegalStateException(
+					"GCM encryption is only used for AES-GCM algorithm, but algorithm is: " + algorithm);
+		}
+
+		if (this.encryptionKeyWrapper == null) {
+			handleException("GCM encryption requires symmetric key encryption to be configured");
+			return null;
+		}
+		
+		try {
+			byte[] gcmIv = getInitializationVector();
+
+			byte[] keyBytes = this.encryptionKeyWrapper.getSecretKeyBytes();
+			String baseAlgorithm = algorithm.split("/")[0];
+			Key key = new SecretKeySpec(keyBytes, baseAlgorithm);
+			
+			Cipher gcmCipher = Cipher.getInstance(algorithm);
+			gcmCipher.init(Cipher.ENCRYPT_MODE, key,
+				new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, gcmIv));
+			
+			return new CipherWithIV(gcmCipher, gcmIv);
+		} catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException |
+				NoSuchPaddingException e) {
+			handleException("Error creating GCM cipher ", e);
+			return null;
+		}
+	}
 }
