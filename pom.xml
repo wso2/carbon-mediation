@@ -2669,7 +2669,7 @@
         <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
         <libthrift.version>0.16.0.wso2v1</libthrift.version>
         <opencsv.version>2.3</opencsv.version>
-        <fasterxml.jackson.version>2.17.2</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.18.6</fasterxml.jackson.version>
         <json.simple.version>1.1.1</json.simple.version>
         <esotericsoftware.kryo.version>3.0.3</esotericsoftware.kryo.version>
         <org.objenesis.version>2.1</org.objenesis.version>
