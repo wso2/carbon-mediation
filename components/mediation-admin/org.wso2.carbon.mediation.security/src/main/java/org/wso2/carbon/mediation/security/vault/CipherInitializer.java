@@ -543,15 +543,8 @@ public class CipherInitializer {
 			}
 			keyStore.load(bufferedInputStream, storePassword.toCharArray());
 			return keyStore;
-		} catch (KeyStoreException e) {
-			handleException("Error loading keyStore from ' " + location + " ' ", e);
-		} catch (IOException e) {
-			handleException("IOError loading keyStore from ' " + location + " ' ", e);
-		} catch (NoSuchAlgorithmException e) {
-			handleException("Error loading keyStore from ' " + location + " ' ", e);
-		} catch (CertificateException e) {
-			handleException("Error loading keyStore from ' " + location + " ' ", e);
-		} catch (NoSuchProviderException e) {
+		} catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException |
+				NoSuchProviderException e) {
 			handleException("Error loading keyStore from ' " + location + " ' ", e);
 		} finally {
 			if (bufferedInputStream != null) {
