@@ -27,6 +27,7 @@ import org.wso2.securevault.CipherFactory;
 import org.wso2.securevault.CipherOperationMode;
 import org.wso2.securevault.DecryptionProvider;
 import org.wso2.securevault.EncodingType;
+import org.wso2.securevault.SecureVaultException;
 import org.wso2.securevault.SymmetricCipher;
 import org.wso2.securevault.commons.MiscellaneousUtil;
 import org.wso2.securevault.definition.CipherInformation;
@@ -554,11 +555,11 @@ public class CipherInitializer {
 	
 	
 	protected static void handleException(String msg, Exception e) {
-		throw new RuntimeException(msg, e);
+		throw new SecureVaultException(msg, e);
 	}
 
 	protected static void handleException(String msg) {
-		throw new RuntimeException(msg);
+		throw new SecureVaultException(msg);
 	}
 
 
