@@ -51,14 +51,13 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 	 * @throws AxisFault if an error occurs while encrypting the plain text
 	 */
 	public String doEncrypt(String plainTextPass) throws AxisFault {
+
 		CipherInitializer cipherInitializer = CipherInitializer.getInstance();
 		byte[] plainTextPassByte = plainTextPass.getBytes(StandardCharsets.UTF_8);
-
 		try {
 			boolean isGCMMode = cipherInitializer.getAlgorithm().equals(SecureVaultConstants.AES_GCM_NO_PADDING);
 			Cipher cipher;
 			byte[] iv = null;
-
 			if (isGCMMode) {
 				CipherInitializer.CipherWithIV cipherWithIV = cipherInitializer.getGCMEncryptionProvider();
 				if (cipherWithIV == null) {
@@ -74,7 +73,6 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 			} else {
 				cipher = cipherInitializer.getEncryptionProvider();
 			}
-
 			if (cipher == null) {
                 log.error("Either Configuration properties can not be loaded or No secret"
                           + " repositories have been configured please check PRODUCT_HOME/conf/security "
@@ -87,7 +85,6 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
             }
 			byte[] encryptedPassword = cipher.doFinal(plainTextPassByte);
 			String base64EncodedCipherText = new String(Base64.encodeBase64(encryptedPassword), StandardCharsets.UTF_8);
-
 			if (isGCMMode) {
 				return SecureVaultUtil.createSelfContainedCiphertextWithGCMMode(base64EncodedCipherText, iv);
 			} else {
@@ -109,8 +106,8 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 	 * @throws AxisFault if an error occurs while loading the keystore
 	 */
 	public String doDecrypt(String cipherText) throws AxisFault {
-		CipherInitializer cipherInitializer = CipherInitializer.getInstance();
 
+		CipherInitializer cipherInitializer = CipherInitializer.getInstance();
 		DecryptionProvider decryptionProvider = cipherInitializer.getDecryptionProvider();
 		if (decryptionProvider == null) {
 			log.error("Either Configuration properties can not be loaded or No secret"

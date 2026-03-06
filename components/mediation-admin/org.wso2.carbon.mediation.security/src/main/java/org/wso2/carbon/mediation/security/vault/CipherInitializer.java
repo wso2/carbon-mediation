@@ -113,6 +113,7 @@ public class CipherInitializer {
 	 * Wrapper class to atomically pair a Cipher with its corresponding IV.
 	 */
 	public static class CipherWithIV {
+
 		private final Cipher cipher;
 		private final byte[] initializationVector;
 
@@ -186,7 +187,6 @@ public class CipherInitializer {
 		String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
 				SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
 		boolean keyBasedSymmetricEncryption = isKeyBasedSymmetricEncryption(secretRepositoryEncryptionMode);
-
 		if (keyBasedSymmetricEncryption) {
 			log.debug("Symmetric key encryption is configured. Hence skipping the initialization of keystores.");
 			SecretInformation secretInformation = SecretInformationFactory.createSecretInformation(properties,
@@ -358,7 +358,6 @@ public class CipherInitializer {
 	private String createEncryptionKey(SecretInformation secretInformation) {
 
 		String encryptionKey = null;
-
 		if (secretInformation != null) {
 			encryptionKey = secretInformation.getResolvedSecret();
 			if (encryptionKey == null) {
@@ -487,25 +486,22 @@ public class CipherInitializer {
 	 * @return Cipher Transformation String
 	 */
 	private String getCipherTransformation(Properties properties) {
-		String cipherTransformation = System.getProperty(CIPHER_TRANSFORMATION_SYSTEM_PROPERTY);
 
+		String cipherTransformation = System.getProperty(CIPHER_TRANSFORMATION_SYSTEM_PROPERTY);
 		String secretRepositoryEncryptionMode = MiscellaneousUtil.getProperty(properties,
 				SecureVaultConstants.SECRET_FILE_ENCRYPTION_MODE, null);
 		boolean symmetricEncryptionEnabled = SecureVaultConstants.SYMMETRIC.equals(
 				secretRepositoryEncryptionMode) || SecureVaultConstants.KEY_BASED_SYMMETRIC_ENCRYPTION.equals(
 				secretRepositoryEncryptionMode);
-
 		if (cipherTransformation == null) {
 			if (symmetricEncryptionEnabled) {
 				return SecureVaultConstants.AES_GCM_NO_PADDING;
 			}
 			cipherTransformation = SecureVaultConstants.RSA;
 		}
-
 		if (symmetricEncryptionEnabled) {
 			return cipherTransformation;
 		}
-
 		return MiscellaneousUtil.getProperty(properties, CIPHER_TRANSFORMATION_SECRET_CONF_PROPERTY,
 				cipherTransformation);
 	}
@@ -631,27 +627,23 @@ public class CipherInitializer {
 	 * @return A CipherWithIV instance containing both the Cipher and its corresponding IV
 	 */
 	public synchronized CipherWithIV getGCMEncryptionProvider() {
+
 		if (!SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
 			throw new IllegalStateException(
 					"GCM encryption is only used for AES-GCM algorithm, but algorithm is: " + algorithm);
 		}
-
 		if (this.encryptionKeyWrapper == null) {
 			handleException("GCM encryption requires symmetric key encryption to be configured");
 			return null;
 		}
-		
 		try {
 			byte[] gcmIv = getRandomInitializationVector();
-
 			byte[] keyBytes = this.encryptionKeyWrapper.getSecretKeyBytes();
 			String baseAlgorithm = algorithm.split("/")[0];
 			Key key = new SecretKeySpec(keyBytes, baseAlgorithm);
-			
 			Cipher gcmCipher = Cipher.getInstance(algorithm);
 			gcmCipher.init(Cipher.ENCRYPT_MODE, key,
 				new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, gcmIv));
-			
 			return new CipherWithIV(gcmCipher, gcmIv);
 		} catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException |
 				NoSuchPaddingException e) {
