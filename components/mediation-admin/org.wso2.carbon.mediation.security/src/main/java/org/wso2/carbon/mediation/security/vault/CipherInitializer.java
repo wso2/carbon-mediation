@@ -463,16 +463,10 @@ public class CipherInitializer {
 
 				cipher = Cipher.getInstance(algorithm);
 				cipher.init(Cipher.ENCRYPT_MODE, certs);
-			} catch (InvalidKeyException e) {
-				handleException("Error initializing Cipher ", e);
-			} catch (NoSuchAlgorithmException e) {
-				handleException("Error initializing Cipher ", e);
-			} catch (KeyStoreException e) {
-				handleException("Error initializing Cipher ", e);
-			} catch (NoSuchPaddingException e) {
+			} catch (InvalidKeyException | NoSuchAlgorithmException | KeyStoreException | NoSuchPaddingException e) {
 				handleException("Error initializing Cipher ", e);
 			}
-		}
+        }
 		encryptionProvider = cipher;
 	}
 
