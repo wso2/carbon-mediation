@@ -48,4 +48,17 @@ public interface SecureVaultConstants {
 
 	public static final String FILE_PROTOCOL_PREFIX = "file:";
 
+	public static final String SYMMETRIC = "symmetric";
+	public static final String RSA = "RSA";
+	public static final String AES_GCM_NO_PADDING = "AES/GCM/NoPadding";
+	public static final String CIPHER_TEXT = "cipherText";
+	public static final String IV = "iv";
+	public static final int GCM_TAG_LENGTH = 128;
+	public static final int GCM_IV_LENGTH = 12;
+
+	public final static String SYMMETRIC_ENCRYPTION_KEY_PROMPT = "Symmetric Encryption Key > ";
+	public final static String KEY_BASED_SECRET_PROVIDER = "key.based";
+	public static final String SECRET_FILE_ENCRYPTION_MODE = "secretRepositories.file.encryptionMode";
+	public static final String KEY_BASED_SYMMETRIC_ENCRYPTION = "key.based.symmetric.encryption";
+
 }
