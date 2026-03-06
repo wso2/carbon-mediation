@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import com.google.gson.JsonObject;
 import org.apache.axiom.util.base64.Base64Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -79,9 +80,9 @@ public class RegistrySecretRepository implements SecretRepository {
 			}
 		}
 
-		if (propertyValue == null || propertyValue.trim().isEmpty()) {
+		if (StringUtils.isBlank(propertyValue)) {
 			log.error("No encrypted value found for alias: " + alias);
-			return alias;
+			return null;
 		}
 
 		CipherInitializer cipherInitializer = CipherInitializer.getInstance();

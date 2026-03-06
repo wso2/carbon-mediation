@@ -88,7 +88,7 @@ public class CipherInitializer {
 
 	private String algorithm = SecureVaultConstants.RSA;
 
-	private byte[] iv;
+	private byte[] initializationVector;
 	
 	Object cipherLockObj = new Object();
 
@@ -114,19 +114,19 @@ public class CipherInitializer {
 	 */
 	public static class CipherWithIV {
 		private final Cipher cipher;
-		private final byte[] iv;
+		private final byte[] initializationVector;
 
 		public CipherWithIV(Cipher cipher, byte[] iv) {
 			this.cipher = cipher;
-			this.iv = iv != null ? iv.clone() : null;
+			this.initializationVector = iv != null ? iv.clone() : null;
 		}
 
 		public Cipher getCipher() {
 			return cipher;
 		}
 
-		public byte[] getIv() {
-			return iv != null ? iv.clone() : null;
+		public byte[] getInitializationVector() {
+			return initializationVector != null ? initializationVector.clone() : null;
 		}
 	}
 
@@ -193,7 +193,7 @@ public class CipherInitializer {
 					SecureVaultConstants.KEY_BASED_SECRET_PROVIDER + DOT,
 					SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
 			String encryptionKey = createEncryptionKey(secretInformation);
-			if (encryptionKey == null || encryptionKey.isEmpty()) {
+			if (StringUtils.isBlank(encryptionKey)) {
 				log.error("Encryption key is mandatory in order to initialize secret manager.");
 				return false;
 			}
@@ -345,6 +345,7 @@ public class CipherInitializer {
 			log.debug("Input key based symmetric encryption is configured.");
 			return true;
 		}
+		log.debug("Input key based symmetric encryption is not configured.");
 		return false;
 	}
 
@@ -360,6 +361,11 @@ public class CipherInitializer {
 
 		if (secretInformation != null) {
 			encryptionKey = secretInformation.getResolvedSecret();
+			if (encryptionKey == null) {
+				log.debug("Encryption key is null: SecretInformation resolved secret returned null.");
+			}
+		} else {
+			log.debug("Encryption key is null: SecretInformation is null.");
 		}
 		return encryptionKey;
 	}
@@ -369,12 +375,12 @@ public class CipherInitializer {
 	 *
 	 * @return the generated IV as a byte array
 	 */
-	private byte[] getInitializationVector() {
+	private byte[] getRandomInitializationVector() {
 
-		byte[] iv = new byte[SecureVaultConstants.GCM_IV_LENGTH];
+		byte[] initializationVector = new byte[SecureVaultConstants.GCM_IV_LENGTH];
 		SecureRandom secureRandom = new SecureRandom();
-		secureRandom.nextBytes(iv);
-		return iv;
+		secureRandom.nextBytes(initializationVector);
+		return initializationVector;
 	}
 
 	/**
@@ -409,7 +415,7 @@ public class CipherInitializer {
 							SecureVaultConstants.KEY_BASED_SECRET_PROVIDER + DOT,
 							SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
 					String encryptionKey = createEncryptionKey(secretInformation);
-					if (encryptionKey == null || encryptionKey.isEmpty()) {
+					if (StringUtils.isBlank(encryptionKey)) {
 						handleException("Encryption key is mandatory in order to initialize cipher.");
 					}
 					this.encryptionKeyWrapper = new EncryptionKeyWrapper();
@@ -421,9 +427,9 @@ public class CipherInitializer {
 				Key key = new SecretKeySpec(keyBytes, baseAlgorithm);
 				cipher = Cipher.getInstance(algorithm);
 				if (SecureVaultConstants.AES_GCM_NO_PADDING.equals(algorithm)) {
-					byte[] iv = getInitializationVector();
+					byte[] initializationVector = getRandomInitializationVector();
 					cipher.init(Cipher.ENCRYPT_MODE, key,
-							new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, iv));
+							new GCMParameterSpec(SecureVaultConstants.GCM_TAG_LENGTH, initializationVector));
 				} else {
 					cipher.init(Cipher.ENCRYPT_MODE, key);
 				}
@@ -613,8 +619,8 @@ public class CipherInitializer {
 		return algorithm;
 	}
 
-	public byte[] getIv() {
-		return iv;
+	public byte[] getInitializationVector() {
+		return initializationVector;
 	}
 
 	/**
@@ -636,7 +642,7 @@ public class CipherInitializer {
 		}
 		
 		try {
-			byte[] gcmIv = getInitializationVector();
+			byte[] gcmIv = getRandomInitializationVector();
 
 			byte[] keyBytes = this.encryptionKeyWrapper.getSecretKeyBytes();
 			String baseAlgorithm = algorithm.split("/")[0];

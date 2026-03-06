@@ -70,7 +70,7 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 							null);
 				}
 				cipher = cipherWithIV.getCipher();
-				iv = cipherWithIV.getIv();
+				iv = cipherWithIV.getInitializationVector();
 			} else {
 				cipher = cipherInitializer.getEncryptionProvider();
 			}
