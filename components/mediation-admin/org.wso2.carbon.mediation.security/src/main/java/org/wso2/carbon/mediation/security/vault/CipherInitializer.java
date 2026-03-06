@@ -416,7 +416,7 @@ public class CipherInitializer {
 							SecureVaultConstants.SYMMETRIC_ENCRYPTION_KEY_PROMPT);
 					String encryptionKey = createEncryptionKey(secretInformation);
 					if (StringUtils.isBlank(encryptionKey)) {
-						handleException("Encryption key is mandatory in order to initialize cipher.");
+						throw new SecureVaultException("Encryption key is mandatory in order to initialize cipher.");
 					}
 					this.encryptionKeyWrapper = new EncryptionKeyWrapper();
 					this.encryptionKeyWrapper.init(secretInformation, encryptionKey);
@@ -435,7 +435,7 @@ public class CipherInitializer {
 				}
 			} catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException |
 					NoSuchPaddingException e) {
-				handleException("Error initializing Cipher ", e);
+				throw new SecureVaultException("Error initializing Cipher ", e);
 			}
 		} else {
 
@@ -555,11 +555,11 @@ public class CipherInitializer {
 	
 	
 	protected static void handleException(String msg, Exception e) {
-		throw new SecureVaultException(msg, e);
+		//throw new CipherToolException(msg, e);
 	}
 
 	protected static void handleException(String msg) {
-		throw new SecureVaultException(msg);
+		//throw new CipherToolException(msg);
 	}
 
 
@@ -621,7 +621,7 @@ public class CipherInitializer {
 					"GCM encryption is only used for AES-GCM algorithm, but algorithm is: " + algorithm);
 		}
 		if (this.encryptionKeyWrapper == null) {
-			handleException("GCM encryption requires symmetric key encryption to be configured");
+			log.error("GCM encryption requires symmetric key encryption to be configured");
 			return null;
 		}
 		try {
@@ -635,8 +635,7 @@ public class CipherInitializer {
 			return new CipherWithIV(gcmCipher, gcmIv);
 		} catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException |
 				NoSuchPaddingException e) {
-			handleException("Error creating GCM cipher ", e);
-			return null;
+			throw new SecureVaultException("Error initializing GCM Cipher ", e);
 		}
 	}
 }
