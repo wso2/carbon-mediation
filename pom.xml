@@ -2558,7 +2558,7 @@
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>${orbit.version.axis2}</axis2.json.version>
         <!-- Axiom Version -->
-        <axiom.version>1.2.11-wso2v34</axiom.version>
+        <axiom.version>1.2.11-wso2v35</axiom.version>
         <axiom.api.wso2.version>${axiom.version}</axiom.api.wso2.version>
         <orbit.version.axiom>${axiom.version}</orbit.version.axiom>
         <axiom.wso2.version>${axiom.version}</axiom.wso2.version>
