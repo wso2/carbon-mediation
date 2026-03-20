@@ -83,11 +83,8 @@
                                 <bundleDef>libthrift.wso2:libthrift</bundleDef>
                                 <bundleDef>org.wso2.carbon.identity.agent.entitlement.mediator:org.wso2.carbon.identity.entitlement.proxy</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.identity.entitlement.mediator</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.authenticator.stub</bundleDef>
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.opensaml:opensaml-jdk21</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity.saml.common:org.wso2.carbon.identity.saml.common.util</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <!--<importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.import.feature.version}</importFeatureDef>-->
