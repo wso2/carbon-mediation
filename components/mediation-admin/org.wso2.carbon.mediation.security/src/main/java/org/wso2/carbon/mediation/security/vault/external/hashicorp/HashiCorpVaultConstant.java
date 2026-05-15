@@ -39,5 +39,7 @@ public class HashiCorpVaultConstant {
     static final String KEY_STORE_PARAMETER = "keyStoreFile";
     static final String KEY_STORE_PASSWORD_PARAMETER = "keyStorePassword";
     static final String HTTPS_PARAMETER = "https";
+    static final String OPEN_TIMEOUT_PARAMETER = "openTimeout";
+    static final String READ_TIMEOUT_PARAMETER = "readTimeout";
     static final long LEAST_TTL_VALUE = -2000L;
 }
