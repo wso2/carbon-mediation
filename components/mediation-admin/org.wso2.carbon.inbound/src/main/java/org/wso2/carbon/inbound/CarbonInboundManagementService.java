@@ -147,7 +147,10 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
     public void addInboundEndpointFromXMLString(String inboundElement) {
         XMLStreamReader reader = null;
         try {
-            reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(inboundElement));
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            reader = xmlInputFactory.createXMLStreamReader(new StringReader(inboundElement));
         } catch (XMLStreamException e) {
             log.error(e.getMessage());
         }
