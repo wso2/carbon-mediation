@@ -67,6 +67,9 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 
 	private String currentAliasPassword;
 
+    private Integer openTimeout = 5;
+    private Integer readTimeout = 10;
+
 	private HashiCorpVaultLookupHandlerImpl() throws ExternalVaultException {
 		try {
 			initialize();
@@ -249,6 +252,20 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 		if (parameters.containsKey(HashiCorpVaultConstant.ROLE_ID_PARAMETER)) {
 			roleId = parameters.get(HashiCorpVaultConstant.ROLE_ID_PARAMETER);
 		}
+
+        if (parameters.containsKey(HashiCorpVaultConstant.OPEN_TIMEOUT_PARAMETER) &&
+                !parameters.get(HashiCorpVaultConstant.OPEN_TIMEOUT_PARAMETER).isEmpty() &&
+                parameters.get(HashiCorpVaultConstant.OPEN_TIMEOUT_PARAMETER)
+                        .matches(HashiCorpVaultConstant.NUMBER_REGEX)) {
+            openTimeout = Integer.parseInt(parameters.get(HashiCorpVaultConstant.OPEN_TIMEOUT_PARAMETER));
+        }
+
+        if (parameters.containsKey(HashiCorpVaultConstant.READ_TIMEOUT_PARAMETER) &&
+                !parameters.get(HashiCorpVaultConstant.READ_TIMEOUT_PARAMETER).isEmpty() &&
+                parameters.get(HashiCorpVaultConstant.READ_TIMEOUT_PARAMETER)
+                        .matches(HashiCorpVaultConstant.NUMBER_REGEX)) {
+            readTimeout = Integer.parseInt(parameters.get(HashiCorpVaultConstant.READ_TIMEOUT_PARAMETER));
+        }
 	}
 
 	/**
@@ -310,6 +327,8 @@ public class HashiCorpVaultLookupHandlerImpl implements ExternalVaultLookupHandl
 		if (vaultNamespace != null) {
 			config = config.nameSpace(vaultNamespace);
 		}
+
+        config.openTimeout(openTimeout).readTimeout(readTimeout);
 
 		return config.build();
 	}
