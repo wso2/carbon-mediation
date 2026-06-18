@@ -35,6 +35,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import io.netty.handler.proxy.HttpProxyHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
@@ -55,6 +56,7 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.xml.namespace.QName;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,6 +69,11 @@ public class WebsocketConnectionFactory {
     private final TransportOutDescription transportOut;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>
             channelHandlerPool = new ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>();
+
+    private String proxyHost;
+    private int proxyPort = -1;
+    private String proxyUsername;
+    private String proxyPassword;
 
     public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
         this.transportOut = transportOut;
@@ -96,6 +103,26 @@ public class WebsocketConnectionFactory {
                 handleWssTrustStoreParameterError("Unable to read parameter(s) "
                         + WebsocketConstants.TRUST_STORE_LOCATION + " and/or "
                         + WebsocketConstants.TRUST_STORE_PASSWORD + " from Transport configurations");
+            }
+        }
+
+        Parameter proxyHostParam = transportOut.getParameter(WebsocketConstants.PROXY_HOST);
+        if (proxyHostParam != null) {
+            this.proxyHost = proxyHostParam.getParameterElement().getText();
+            Parameter proxyPortParam = transportOut.getParameter(WebsocketConstants.PROXY_PORT);
+            if (proxyPortParam != null) {
+                this.proxyPort = Integer.parseInt(proxyPortParam.getParameterElement().getText());
+            }
+            Parameter proxyUsernameParam = transportOut.getParameter(WebsocketConstants.PROXY_USERNAME);
+            if (proxyUsernameParam != null) {
+                this.proxyUsername = proxyUsernameParam.getParameterElement().getText();
+            }
+            Parameter proxyPasswordParam = transportOut.getParameter(WebsocketConstants.PROXY_PASSWORD);
+            if (proxyPasswordParam != null) {
+                this.proxyPassword = proxyPasswordParam.getParameterElement().getText();
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("WebSocket outbound proxy configured: " + this.proxyHost + ":" + this.proxyPort);
             }
         }
     }
@@ -296,6 +323,14 @@ public class WebsocketConnectionFactory {
                                         + ", ThreadID: " + Thread.currentThread().getId());
                             }
                             ChannelPipeline p = ch.pipeline();
+                            if (proxyHost != null && proxyPort > 0) {
+                                InetSocketAddress proxyAddress = new InetSocketAddress(proxyHost, proxyPort);
+                                if (proxyUsername != null && !proxyUsername.isEmpty()) {
+                                    p.addLast(new HttpProxyHandler(proxyAddress, proxyUsername, proxyPassword));
+                                } else {
+                                    p.addLast(new HttpProxyHandler(proxyAddress));
+                                }
+                            }
                             if (sslCtx != null) {
                                 SslHandler sslHandler = sslCtx.newHandler(ch.alloc(), host, port);
                                 Parameter wsEnableHostnameVerification = transportOut
