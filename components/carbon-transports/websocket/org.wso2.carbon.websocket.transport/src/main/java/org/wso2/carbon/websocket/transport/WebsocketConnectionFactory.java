@@ -58,18 +58,57 @@ import javax.net.ssl.SSLParameters;
 import javax.xml.namespace.QName;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebsocketConnectionFactory {
 
     private static final Log log = LogFactory.getLog(WebsocketConnectionFactory.class);
 
+    private static final QName Q_PROFILE        = new QName("profile");
+    private static final QName Q_TARGET_HOSTS   = new QName("targetHosts");
+    private static final QName Q_PROXY_HOST_EL  = new QName("proxyHost");
+    private static final QName Q_PROXY_PORT_EL  = new QName("proxyPort");
+    private static final QName Q_PROXY_USER     = new QName("proxyUserName");
+    private static final QName Q_PROXY_PASS     = new QName("proxyPassword");
+    private static final QName Q_BYPASS         = new QName("bypass");
+
+    private static class WsProxyProfileConfig {
+        final String proxyHost;
+        final int proxyPort;
+        final String proxyUsername;
+        final String proxyPassword;
+        final Set<String> bypass;
+
+        WsProxyProfileConfig(String proxyHost, int proxyPort,
+                             String proxyUsername, String proxyPassword,
+                             Set<String> bypass) {
+            this.proxyHost    = proxyHost;
+            this.proxyPort    = proxyPort;
+            this.proxyUsername = proxyUsername;
+            this.proxyPassword = proxyPassword;
+            this.bypass       = bypass;
+        }
+    }
+
     private final EventLoopGroup sharedEventLoopGroup;
     private final TransportOutDescription transportOut;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>
             channelHandlerPool = new ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>();
 
+    // proxyProfiles path — populated from ws.proxyProfiles parameter
+    private Map<String, WsProxyProfileConfig> proxyProfileMap = new HashMap<>();
+    private final Set<String> knownDirectHosts =
+            Collections.synchronizedSet(new HashSet<>());
+    private final Map<String, WsProxyProfileConfig> knownProxyConfigMap =
+            new ConcurrentHashMap<>();
+
+    // flat proxy path — only used when proxyProfileMap is empty
     private String proxyHost;
     private int proxyPort = -1;
     private String proxyUsername;
@@ -106,6 +145,65 @@ public class WebsocketConnectionFactory {
             }
         }
 
+        loadProxyConfig(transportOut);
+    }
+
+    private void loadProxyConfig(TransportOutDescription transportOut) {
+        Parameter profilesParam = transportOut.getParameter(WebsocketConstants.PROXY_PROFILES);
+        if (profilesParam != null) {
+            OMElement profilesElt = profilesParam.getParameterElement();
+            Iterator<?> profiles = profilesElt.getChildrenWithName(Q_PROFILE);
+            while (profiles.hasNext()) {
+                OMElement profile = (OMElement) profiles.next();
+                OMElement targetHostsElt = profile.getFirstChildWithName(Q_TARGET_HOSTS);
+                if (targetHostsElt == null || targetHostsElt.getText().trim().isEmpty()) {
+                    log.warn("Skipping ws proxy profile: missing or empty <targetHosts>");
+                    continue;
+                }
+                OMElement proxyHostElt = profile.getFirstChildWithName(Q_PROXY_HOST_EL);
+                OMElement proxyPortElt = profile.getFirstChildWithName(Q_PROXY_PORT_EL);
+                if (proxyHostElt == null || proxyPortElt == null) {
+                    log.warn("Skipping ws proxy profile for [" + targetHostsElt.getText()
+                            + "]: missing <proxyHost> or <proxyPort>");
+                    continue;
+                }
+                String pHost = proxyHostElt.getText().trim();
+                int pPort = Integer.parseInt(proxyPortElt.getText().trim());
+                String pUser = null;
+                String pPass = null;
+                OMElement userElt = profile.getFirstChildWithName(Q_PROXY_USER);
+                OMElement passElt = profile.getFirstChildWithName(Q_PROXY_PASS);
+                if (userElt != null) {
+                    pUser = userElt.getText().trim();
+                    pPass = passElt != null ? passElt.getText().trim() : "";
+                }
+                Set<String> bypassSet = new HashSet<>();
+                OMElement bypassElt = profile.getFirstChildWithName(Q_BYPASS);
+                if (bypassElt != null && !bypassElt.getText().trim().isEmpty()) {
+                    for (String b : bypassElt.getText().split(",")) {
+                        bypassSet.add(b.trim());
+                    }
+                }
+                WsProxyProfileConfig config =
+                        new WsProxyProfileConfig(pHost, pPort, pUser, pPass, bypassSet);
+                for (String target : targetHostsElt.getText().split(",")) {
+                    target = target.trim();
+                    if (!proxyProfileMap.containsKey(target)) {
+                        proxyProfileMap.put(target, config);
+                    } else {
+                        log.warn("Duplicate ws proxy profile for targetHost [" + target
+                                + "] — ignoring");
+                    }
+                }
+            }
+            if (!proxyProfileMap.isEmpty()) {
+                log.info(transportOut.getName() + " ws proxy profiles loaded for "
+                        + proxyProfileMap.size() + " targetHost(s)");
+                return;
+            }
+        }
+
+        // No profiles — fall back to flat params
         Parameter proxyHostParam = transportOut.getParameter(WebsocketConstants.PROXY_HOST);
         if (proxyHostParam != null) {
             this.proxyHost = proxyHostParam.getParameterElement().getText();
@@ -122,7 +220,8 @@ public class WebsocketConnectionFactory {
                 this.proxyPassword = proxyPasswordParam.getParameterElement().getText();
             }
             if (log.isDebugEnabled()) {
-                log.debug("WebSocket outbound proxy configured: " + this.proxyHost + ":" + this.proxyPort);
+                log.debug(transportOut.getName()
+                        + " ws flat proxy configured: " + this.proxyHost + ":" + this.proxyPort);
             }
         }
     }
@@ -323,13 +422,9 @@ public class WebsocketConnectionFactory {
                                         + ", ThreadID: " + Thread.currentThread().getId());
                             }
                             ChannelPipeline p = ch.pipeline();
-                            if (proxyHost != null && proxyPort > 0) {
-                                InetSocketAddress proxyAddress = new InetSocketAddress(proxyHost, proxyPort);
-                                if (proxyUsername != null && !proxyUsername.isEmpty()) {
-                                    p.addLast(new HttpProxyHandler(proxyAddress, proxyUsername, proxyPassword));
-                                } else {
-                                    p.addLast(new HttpProxyHandler(proxyAddress));
-                                }
+                            HttpProxyHandler proxyHandler = resolveProxyHandler(host);
+                            if (proxyHandler != null) {
+                                p.addLast(proxyHandler);
                             }
                             if (sslCtx != null) {
                                 SslHandler sslHandler = sslCtx.newHandler(ch.alloc(), host, port);
@@ -377,6 +472,69 @@ public class WebsocketConnectionFactory {
         }
 
         return null;
+    }
+
+    private HttpProxyHandler resolveProxyHandler(String targetHost) {
+        if (!proxyProfileMap.isEmpty()) {
+            WsProxyProfileConfig profile = getProfileForHost(targetHost);
+            if (profile != null) {
+                return buildProxyHandler(profile.proxyHost, profile.proxyPort,
+                        profile.proxyUsername, profile.proxyPassword);
+            }
+            return null;
+        }
+        if (proxyHost != null && proxyPort > 0) {
+            return buildProxyHandler(proxyHost, proxyPort, proxyUsername, proxyPassword);
+        }
+        return null;
+    }
+
+    private WsProxyProfileConfig getProfileForHost(String targetHost) {
+        if (knownProxyConfigMap.containsKey(targetHost)) {
+            return knownProxyConfigMap.get(targetHost);
+        }
+        if (knownDirectHosts.contains(targetHost)) {
+            return null;
+        }
+        boolean defaultProfile = false;
+        for (String key : proxyProfileMap.keySet()) {
+            if ("*".equals(key)) {
+                defaultProfile = true;
+                continue;
+            }
+            if (targetHost.matches(key)) {
+                return resolveWithBypass(targetHost, key);
+            }
+        }
+        if (defaultProfile) {
+            return resolveWithBypass(targetHost, "*");
+        }
+        return null;
+    }
+
+    private WsProxyProfileConfig resolveWithBypass(String targetHost, String key) {
+        WsProxyProfileConfig profile = proxyProfileMap.get(key);
+        for (String bypass : profile.bypass) {
+            if (targetHost.matches(bypass)) {
+                knownDirectHosts.add(targetHost);
+                if (log.isDebugEnabled()) {
+                    log.debug("ws proxy bypass matched: host=" + targetHost
+                            + " bypass=" + bypass);
+                }
+                return null;
+            }
+        }
+        knownProxyConfigMap.put(targetHost, profile);
+        return profile;
+    }
+
+    private HttpProxyHandler buildProxyHandler(String host, int port,
+                                               String username, String password) {
+        InetSocketAddress proxyAddress = new InetSocketAddress(host, port);
+        if (username != null && !username.isEmpty()) {
+            return new HttpProxyHandler(proxyAddress, username, password);
+        }
+        return new HttpProxyHandler(proxyAddress);
     }
 
     private String deriveSubprotocol(String wsSubprotocol, String contentType) {

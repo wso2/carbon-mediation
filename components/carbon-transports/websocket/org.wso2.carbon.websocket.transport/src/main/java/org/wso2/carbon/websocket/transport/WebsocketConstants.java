@@ -91,4 +91,5 @@ public class WebsocketConstants {
     public static final String PROXY_PORT = "ws.proxy.port";
     public static final String PROXY_USERNAME = "ws.proxy.username";
     public static final String PROXY_PASSWORD = "ws.proxy.password";
+    public static final String PROXY_PROFILES = "ws.proxyProfiles";
 }
