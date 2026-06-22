@@ -78,6 +78,10 @@ public class WebsocketConnectionFactory {
     private static final QName Q_PROXY_PASS     = new QName("proxyPassword");
     private static final QName Q_BYPASS         = new QName("bypass");
 
+    /**
+     * Holds the resolved proxy settings for a single ws.proxyProfiles profile entry.
+     * Instances are immutable after construction and shared across threads via the profile maps.
+     */
     private static class WsProxyProfileConfig {
         final String proxyHost;
         final int proxyPort;
@@ -148,6 +152,20 @@ public class WebsocketConnectionFactory {
         loadProxyConfig(transportOut);
     }
 
+    /**
+     * Reads proxy configuration from the transport sender descriptor at startup.
+     * <p>
+     * If a {@code ws.proxyProfiles} parameter is present, each {@code <profile>} child is
+     * parsed into a {@link WsProxyProfileConfig} and stored in {@link #proxyProfileMap} keyed
+     * by each comma-separated targetHost pattern. When at least one profile is loaded the method
+     * returns immediately — flat proxy parameters are ignored entirely.
+     * <p>
+     * If no profiles are defined (or the parameter is absent), the flat parameters
+     * {@code ws.proxy.host}, {@code ws.proxy.port}, {@code ws.proxy.username}, and
+     * {@code ws.proxy.password} are read instead.
+     *
+     * @param transportOut the transport sender descriptor from axis2.xml
+     */
     private void loadProxyConfig(TransportOutDescription transportOut) {
         Parameter profilesParam = transportOut.getParameter(WebsocketConstants.PROXY_PROFILES);
         if (profilesParam != null) {
@@ -474,6 +492,17 @@ public class WebsocketConnectionFactory {
         return null;
     }
 
+    /**
+     * Returns a configured {@link HttpProxyHandler} for the given backend host, or {@code null}
+     * if no proxy applies.
+     * <p>
+     * When proxy profiles are defined, delegates to {@link #getProfileForHost(String)} to select
+     * the matching profile. When only flat proxy parameters were configured, uses those directly.
+     * Returns {@code null} in both cases when no proxy configuration matches the host.
+     *
+     * @param targetHost the backend WebSocket host being connected to (e.g., {@code backend.example.com})
+     * @return a ready-to-use {@link HttpProxyHandler}, or {@code null} for a direct connection
+     */
     private HttpProxyHandler resolveProxyHandler(String targetHost) {
         if (!proxyProfileMap.isEmpty()) {
             WsProxyProfileConfig profile = getProfileForHost(targetHost);
@@ -489,6 +518,23 @@ public class WebsocketConnectionFactory {
         return null;
     }
 
+    /**
+     * Selects the proxy profile for the given target host using the following precedence:
+     * <ol>
+     *   <li>Returns the cached result from {@link #knownProxyConfigMap} if already resolved.</li>
+     *   <li>Returns {@code null} (direct) if the host is already in {@link #knownDirectHosts}.</li>
+     *   <li>Iterates {@link #proxyProfileMap}: matches specific patterns first (Java regex via
+     *       {@link String#matches}), then falls back to the {@code "*"} default profile if present.</li>
+     * </ol>
+     * The bypass check is delegated to {@link #resolveWithBypass(String, String)}, which also
+     * populates the caches so subsequent lookups for the same host return immediately.
+     * <p>
+     * Note: {@code targetHosts} patterns use Java regex syntax, not glob. The wildcard default
+     * profile must be configured as {@code <targetHosts>*</targetHosts>} (literal asterisk).
+     *
+     * @param targetHost the backend WebSocket host to match against configured profiles
+     * @return the matching {@link WsProxyProfileConfig}, or {@code null} if the host should connect directly
+     */
     private WsProxyProfileConfig getProfileForHost(String targetHost) {
         if (knownProxyConfigMap.containsKey(targetHost)) {
             return knownProxyConfigMap.get(targetHost);
@@ -512,6 +558,19 @@ public class WebsocketConnectionFactory {
         return null;
     }
 
+    /**
+     * Checks the bypass list of the matched profile and caches the outcome.
+     * <p>
+     * If any bypass pattern in the profile matches {@code targetHost} (Java regex full-string
+     * match), the host is added to {@link #knownDirectHosts} and {@code null} is returned,
+     * causing the caller to make a direct connection. Otherwise the profile is cached in
+     * {@link #knownProxyConfigMap} and returned so the host is proxied on this and all
+     * subsequent connections.
+     *
+     * @param targetHost the backend WebSocket host that matched the profile keyed by {@code key}
+     * @param key        the key in {@link #proxyProfileMap} whose profile was matched ({@code "*"} for the default)
+     * @return the matched {@link WsProxyProfileConfig} to proxy through, or {@code null} to connect directly
+     */
     private WsProxyProfileConfig resolveWithBypass(String targetHost, String key) {
         WsProxyProfileConfig profile = proxyProfileMap.get(key);
         for (String bypass : profile.bypass) {
@@ -528,6 +587,16 @@ public class WebsocketConnectionFactory {
         return profile;
     }
 
+    /**
+     * Constructs a Netty {@link HttpProxyHandler} for the given proxy coordinates.
+     * Uses the authenticated constructor when credentials are provided, anonymous otherwise.
+     *
+     * @param host     proxy server hostname or IP
+     * @param port     proxy server port
+     * @param username proxy username, or {@code null} for anonymous access
+     * @param password proxy password; ignored when {@code username} is {@code null}
+     * @return a configured {@link HttpProxyHandler} ready to be added to the Netty pipeline
+     */
     private HttpProxyHandler buildProxyHandler(String host, int port,
                                                String username, String password) {
         InetSocketAddress proxyAddress = new InetSocketAddress(host, port);
