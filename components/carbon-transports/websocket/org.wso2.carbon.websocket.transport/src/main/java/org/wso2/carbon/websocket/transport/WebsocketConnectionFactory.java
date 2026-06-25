@@ -61,6 +61,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -108,7 +109,7 @@ public class WebsocketConnectionFactory {
             channelHandlerPool = new ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>();
 
     // proxyProfiles path — populated from ws.proxyProfiles parameter
-    private Map<String, WsProxyProfileConfig> proxyProfileMap = new HashMap<>();
+    private final Map<String, WsProxyProfileConfig> proxyProfileMap = new LinkedHashMap<>();
     private final Set<String> knownDirectHosts =
             Collections.synchronizedSet(new HashSet<>());
     private final Map<String, WsProxyProfileConfig> knownProxyConfigMap =
@@ -162,60 +163,71 @@ public class WebsocketConnectionFactory {
         if (profilesParam == null) {
             return;
         }
-        OMElement profilesElt = profilesParam.getParameterElement();
-        SecretResolver secretResolver = SecretResolverFactory.create(profilesElt, false);
-        Iterator<?> profiles = profilesElt.getChildrenWithName(Q_PROFILE);
+        OMElement profilesElement = profilesParam.getParameterElement();
+        SecretResolver secretResolver = SecretResolverFactory.create(profilesElement, false);
+        Iterator<?> profiles = profilesElement.getChildrenWithName(Q_PROFILE);
         while (profiles.hasNext()) {
             OMElement profile = (OMElement) profiles.next();
-            OMElement targetHostsElt = profile.getFirstChildWithName(Q_TARGET_HOSTS);
-            if (targetHostsElt == null || targetHostsElt.getText().trim().isEmpty()) {
+            OMElement targetHostsElement = profile.getFirstChildWithName(Q_TARGET_HOSTS);
+            if (targetHostsElement == null || targetHostsElement.getText().trim().isEmpty()) {
                 log.warn("Skipping ws proxy profile: missing or empty <targetHosts>");
                 continue;
             }
-            OMElement proxyHostElt = profile.getFirstChildWithName(Q_PROXY_HOST);
-            OMElement proxyPortElt = profile.getFirstChildWithName(Q_PROXY_PORT);
-            if (proxyHostElt == null || proxyPortElt == null) {
-                log.warn("Skipping ws proxy profile for [" + targetHostsElt.getText()
+            OMElement proxyHostElement = profile.getFirstChildWithName(Q_PROXY_HOST);
+            OMElement proxyPortElement = profile.getFirstChildWithName(Q_PROXY_PORT);
+            if (proxyHostElement == null || proxyPortElement == null) {
+                log.warn("Skipping ws proxy profile for [" + targetHostsElement.getText()
                         + "]: missing <proxyHost> or <proxyPort>");
                 continue;
             }
-            String proxyHost = proxyHostElt.getText().trim();
+            String proxyHost = proxyHostElement.getText().trim();
+            if (proxyHost.isEmpty()) {
+                log.warn("Skipping ws proxy profile for [" + targetHostsElement.getText()
+                        + "]: empty <proxyHost>");
+                continue;
+            }
             int proxyPort;
+            String proxyPortText = proxyPortElement.getText().trim();
             try {
-                proxyPort = Integer.parseInt(proxyPortElt.getText().trim());
+                proxyPort = Integer.parseInt(proxyPortText);
             } catch (NumberFormatException e) {
-                log.warn("Skipping ws proxy profile for [" + targetHostsElt.getText()
-                        + "]: invalid <proxyPort> value '" + proxyPortElt.getText().trim() + "'");
+                log.warn("Skipping ws proxy profile for [" + targetHostsElement.getText()
+                        + "]: invalid <proxyPort> value '" + proxyPortText + "'");
+                continue;
+            }
+            if (proxyPort < 1 || proxyPort > 65535) {
+                log.warn("Skipping ws proxy profile for [" + targetHostsElement.getText()
+                        + "]: invalid <proxyPort> value '" + proxyPortText + "'");
                 continue;
             }
             String proxyUsername = null;
             String proxyPassword = null;
-            OMElement usernameElt = profile.getFirstChildWithName(Q_PROXY_USERNAME);
-            OMElement passwordElt = profile.getFirstChildWithName(Q_PROXY_PASSWORD);
-            if (usernameElt != null) {
-                proxyUsername = usernameElt.getText().trim();
-                proxyPassword = passwordElt != null
-                        ? MiscellaneousUtil.resolve(passwordElt.getText().trim(), secretResolver)
+            OMElement usernameElement = profile.getFirstChildWithName(Q_PROXY_USERNAME);
+            OMElement passwordElement = profile.getFirstChildWithName(Q_PROXY_PASSWORD);
+            if (usernameElement != null) {
+                proxyUsername = usernameElement.getText().trim();
+                proxyPassword = passwordElement != null
+                        ? MiscellaneousUtil.resolve(passwordElement.getText().trim(), secretResolver)
                         : "";
             }
             Set<String> bypassSet = new HashSet<>();
-            OMElement bypassElt = profile.getFirstChildWithName(Q_BYPASS);
-            if (bypassElt != null && !bypassElt.getText().trim().isEmpty()) {
-                for (String rawEntry : bypassElt.getText().split(",")) {
+            OMElement bypassElement = profile.getFirstChildWithName(Q_BYPASS);
+            if (bypassElement != null && !bypassElement.getText().trim().isEmpty()) {
+                for (String rawEntry : bypassElement.getText().split(",")) {
                     String bypassPattern = rawEntry.trim();
                     try {
                         Pattern.compile(bypassPattern);
                         bypassSet.add(bypassPattern);
                     } catch (PatternSyntaxException e) {
                         log.warn("Skipping invalid bypass regex '" + bypassPattern
-                                + "' in ws proxy profile for [" + targetHostsElt.getText()
+                                + "' in ws proxy profile for [" + targetHostsElement.getText()
                                 + "]: " + e.getMessage());
                     }
                 }
             }
             WsProxyProfileConfig profileConfig =
                     new WsProxyProfileConfig(proxyHost, proxyPort, proxyUsername, proxyPassword, bypassSet);
-            for (String targetHostPattern : targetHostsElt.getText().split(",")) {
+            for (String targetHostPattern : targetHostsElement.getText().split(",")) {
                 targetHostPattern = targetHostPattern.trim();
                 if (!"*".equals(targetHostPattern)) {
                     try {
