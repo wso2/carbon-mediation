@@ -112,12 +112,6 @@ public class WebsocketConnectionFactory {
     private final Map<String, WsProxyProfileConfig> knownProxyConfigMap =
             new ConcurrentHashMap<>();
 
-    // flat proxy path — only used when proxyProfileMap is empty
-    private String proxyHost;
-    private int proxyPort = -1;
-    private String proxyUsername;
-    private String proxyPassword;
-
     public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
         this.transportOut = transportOut;
         int sharedEventLoopPoolSize = getMaxValueOrDefault(
@@ -153,94 +147,67 @@ public class WebsocketConnectionFactory {
     }
 
     /**
-     * Reads proxy configuration from the transport sender descriptor at startup.
+     * Reads proxy profile configuration from the transport sender descriptor at startup.
      * <p>
      * If a {@code ws.proxyProfiles} parameter is present, each {@code <profile>} child is
      * parsed into a {@link WsProxyProfileConfig} and stored in {@link #proxyProfileMap} keyed
-     * by each comma-separated targetHost pattern. When at least one profile is loaded the method
-     * returns immediately — flat proxy parameters are ignored entirely.
-     * <p>
-     * If no profiles are defined (or the parameter is absent), the flat parameters
-     * {@code ws.proxy.host}, {@code ws.proxy.port}, {@code ws.proxy.username}, and
-     * {@code ws.proxy.password} are read instead.
+     * by each comma-separated targetHost pattern.
      *
      * @param transportOut the transport sender descriptor from axis2.xml
      */
     private void loadProxyConfig(TransportOutDescription transportOut) {
         Parameter profilesParam = transportOut.getParameter(WebsocketConstants.PROXY_PROFILES);
-        if (profilesParam != null) {
-            OMElement profilesElt = profilesParam.getParameterElement();
-            Iterator<?> profiles = profilesElt.getChildrenWithName(Q_PROFILE);
-            while (profiles.hasNext()) {
-                OMElement profile = (OMElement) profiles.next();
-                OMElement targetHostsElt = profile.getFirstChildWithName(Q_TARGET_HOSTS);
-                if (targetHostsElt == null || targetHostsElt.getText().trim().isEmpty()) {
-                    log.warn("Skipping ws proxy profile: missing or empty <targetHosts>");
-                    continue;
-                }
-                OMElement proxyHostElt = profile.getFirstChildWithName(Q_PROXY_HOST_EL);
-                OMElement proxyPortElt = profile.getFirstChildWithName(Q_PROXY_PORT_EL);
-                if (proxyHostElt == null || proxyPortElt == null) {
-                    log.warn("Skipping ws proxy profile for [" + targetHostsElt.getText()
-                            + "]: missing <proxyHost> or <proxyPort>");
-                    continue;
-                }
-                String pHost = proxyHostElt.getText().trim();
-                int pPort = Integer.parseInt(proxyPortElt.getText().trim());
-                String pUser = null;
-                String pPass = null;
-                OMElement userElt = profile.getFirstChildWithName(Q_PROXY_USER);
-                OMElement passElt = profile.getFirstChildWithName(Q_PROXY_PASS);
-                if (userElt != null) {
-                    pUser = userElt.getText().trim();
-                    pPass = passElt != null ? passElt.getText().trim() : "";
-                }
-                Set<String> bypassSet = new HashSet<>();
-                OMElement bypassElt = profile.getFirstChildWithName(Q_BYPASS);
-                if (bypassElt != null && !bypassElt.getText().trim().isEmpty()) {
-                    for (String b : bypassElt.getText().split(",")) {
-                        bypassSet.add(b.trim());
-                    }
-                }
-                WsProxyProfileConfig config =
-                        new WsProxyProfileConfig(pHost, pPort, pUser, pPass, bypassSet);
-                for (String target : targetHostsElt.getText().split(",")) {
-                    target = target.trim();
-                    if (!proxyProfileMap.containsKey(target)) {
-                        proxyProfileMap.put(target, config);
-                    } else {
-                        log.warn("Duplicate ws proxy profile for targetHost [" + target
-                                + "] — ignoring");
-                    }
+        if (profilesParam == null) {
+            return;
+        }
+        OMElement profilesElt = profilesParam.getParameterElement();
+        Iterator<?> profiles = profilesElt.getChildrenWithName(Q_PROFILE);
+        while (profiles.hasNext()) {
+            OMElement profile = (OMElement) profiles.next();
+            OMElement targetHostsElt = profile.getFirstChildWithName(Q_TARGET_HOSTS);
+            if (targetHostsElt == null || targetHostsElt.getText().trim().isEmpty()) {
+                log.warn("Skipping ws proxy profile: missing or empty <targetHosts>");
+                continue;
+            }
+            OMElement proxyHostElt = profile.getFirstChildWithName(Q_PROXY_HOST_EL);
+            OMElement proxyPortElt = profile.getFirstChildWithName(Q_PROXY_PORT_EL);
+            if (proxyHostElt == null || proxyPortElt == null) {
+                log.warn("Skipping ws proxy profile for [" + targetHostsElt.getText()
+                        + "]: missing <proxyHost> or <proxyPort>");
+                continue;
+            }
+            String pHost = proxyHostElt.getText().trim();
+            int pPort = Integer.parseInt(proxyPortElt.getText().trim());
+            String pUser = null;
+            String pPass = null;
+            OMElement userElt = profile.getFirstChildWithName(Q_PROXY_USER);
+            OMElement passElt = profile.getFirstChildWithName(Q_PROXY_PASS);
+            if (userElt != null) {
+                pUser = userElt.getText().trim();
+                pPass = passElt != null ? passElt.getText().trim() : "";
+            }
+            Set<String> bypassSet = new HashSet<>();
+            OMElement bypassElt = profile.getFirstChildWithName(Q_BYPASS);
+            if (bypassElt != null && !bypassElt.getText().trim().isEmpty()) {
+                for (String b : bypassElt.getText().split(",")) {
+                    bypassSet.add(b.trim());
                 }
             }
-            if (!proxyProfileMap.isEmpty()) {
-                log.info(transportOut.getName() + " ws proxy profiles loaded for "
-                        + proxyProfileMap.size() + " targetHost(s)");
-                return;
+            WsProxyProfileConfig config =
+                    new WsProxyProfileConfig(pHost, pPort, pUser, pPass, bypassSet);
+            for (String target : targetHostsElt.getText().split(",")) {
+                target = target.trim();
+                if (!proxyProfileMap.containsKey(target)) {
+                    proxyProfileMap.put(target, config);
+                } else {
+                    log.warn("Duplicate ws proxy profile for targetHost [" + target
+                            + "] — ignoring");
+                }
             }
         }
-
-        // No profiles — fall back to flat params
-        Parameter proxyHostParam = transportOut.getParameter(WebsocketConstants.PROXY_HOST);
-        if (proxyHostParam != null) {
-            this.proxyHost = proxyHostParam.getParameterElement().getText();
-            Parameter proxyPortParam = transportOut.getParameter(WebsocketConstants.PROXY_PORT);
-            if (proxyPortParam != null) {
-                this.proxyPort = Integer.parseInt(proxyPortParam.getParameterElement().getText());
-            }
-            Parameter proxyUsernameParam = transportOut.getParameter(WebsocketConstants.PROXY_USERNAME);
-            if (proxyUsernameParam != null) {
-                this.proxyUsername = proxyUsernameParam.getParameterElement().getText();
-            }
-            Parameter proxyPasswordParam = transportOut.getParameter(WebsocketConstants.PROXY_PASSWORD);
-            if (proxyPasswordParam != null) {
-                this.proxyPassword = proxyPasswordParam.getParameterElement().getText();
-            }
-            if (log.isDebugEnabled()) {
-                log.debug(transportOut.getName()
-                        + " ws flat proxy configured: " + this.proxyHost + ":" + this.proxyPort);
-            }
+        if (!proxyProfileMap.isEmpty()) {
+            log.info(transportOut.getName() + " ws proxy profiles loaded for "
+                    + proxyProfileMap.size() + " targetHost(s)");
         }
     }
 
@@ -496,9 +463,8 @@ public class WebsocketConnectionFactory {
      * Returns a configured {@link HttpProxyHandler} for the given backend host, or {@code null}
      * if no proxy applies.
      * <p>
-     * When proxy profiles are defined, delegates to {@link #getProfileForHost(String)} to select
-     * the matching profile. When only flat proxy parameters were configured, uses those directly.
-     * Returns {@code null} in both cases when no proxy configuration matches the host.
+     * Delegates to {@link #getProfileForHost(String)} to select the matching profile from
+     * {@link #proxyProfileMap}. Returns {@code null} when no profile matches.
      *
      * @param targetHost the backend WebSocket host being connected to (e.g., {@code backend.example.com})
      * @return a ready-to-use {@link HttpProxyHandler}, or {@code null} for a direct connection
@@ -510,10 +476,6 @@ public class WebsocketConnectionFactory {
                 return buildProxyHandler(profile.proxyHost, profile.proxyPort,
                         profile.proxyUsername, profile.proxyPassword);
             }
-            return null;
-        }
-        if (proxyHost != null && proxyPort > 0) {
-            return buildProxyHandler(proxyHost, proxyPort, proxyUsername, proxyPassword);
         }
         return null;
     }

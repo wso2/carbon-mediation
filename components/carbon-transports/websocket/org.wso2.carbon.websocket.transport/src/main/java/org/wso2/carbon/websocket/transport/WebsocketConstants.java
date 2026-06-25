@@ -87,9 +87,5 @@ public class WebsocketConstants {
     public static final String TARGET_ENDPOINT_ADDRESS = "ENDPOINT_ADDRESS";
     public static final String WSO2_PROPERTIES = "WSO2_PROPERTIES";
 
-    public static final String PROXY_HOST = "ws.proxy.host";
-    public static final String PROXY_PORT = "ws.proxy.port";
-    public static final String PROXY_USERNAME = "ws.proxy.username";
-    public static final String PROXY_PASSWORD = "ws.proxy.password";
     public static final String PROXY_PROFILES = "ws.proxyProfiles";
 }
