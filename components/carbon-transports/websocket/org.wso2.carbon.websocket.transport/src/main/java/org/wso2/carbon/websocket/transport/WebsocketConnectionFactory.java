@@ -71,14 +71,6 @@ public class WebsocketConnectionFactory {
 
     private final WsProxyProfileRegistry proxyRegistry;
 
-    /**
-     * Creates a new factory. Proxy passwords are stored as raw text during startup and
-     * resolved via SecureVault at connection time using the {@link SecretResolver} threaded
-     * through from {@link #getChannelHandler}.
-     *
-     * @param transportOut the WS/WSS transport-sender descriptor from axis2.xml
-     * @throws AxisFault if the WSS trust-store parameters are missing or malformed
-     */
     public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
         this.transportOut = transportOut;
         int sharedEventLoopPoolSize = getMaxValueOrDefault(
