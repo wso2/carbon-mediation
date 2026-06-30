@@ -102,6 +102,8 @@ public class WebsocketConnectionFactory {
             }
         }
 
+        // Build the proxy registry only when proxy profiles are configured.
+        // A null registry causes resolveProxyHandler to return null immediately (direct connection).
         Parameter profilesParam = transportOut.getParameter(WebsocketConstants.PROXY_PROFILES);
         if (profilesParam != null) {
             this.proxyRegistry = new WsProxyProfileRegistry(profilesParam.getParameterElement());
@@ -306,6 +308,11 @@ public class WebsocketConnectionFactory {
                                         + ", ThreadID: " + Thread.currentThread().getId());
                             }
                             ChannelPipeline p = ch.pipeline();
+                            // Proxy handler must be the first handler in the pipeline so it
+                            // intercepts the TCP connect and sends the HTTP CONNECT request before
+                            // the SSL or HTTP codec layers are involved. HttpProxyHandler removes
+                            // itself from the pipeline once the CONNECT tunnel is established;
+                            // subsequent WS frames flow through the tunnel without proxy overhead.
                             HttpProxyHandler proxyHandler = resolveProxyHandler(host, resolver);
                             if (proxyHandler != null) {
                                 p.addLast(proxyHandler);

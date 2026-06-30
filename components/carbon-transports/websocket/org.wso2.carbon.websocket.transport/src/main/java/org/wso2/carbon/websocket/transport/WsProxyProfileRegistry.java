@@ -86,7 +86,11 @@ class WsProxyProfileRegistry {
         }
     }
 
+    // LinkedHashMap preserves insertion order so specific targetHost patterns are evaluated
+    // before the catch-all "*" entry during host matching in getProfileForHost.
     private final Map<String, WsProxyProfileConfig> proxyProfileMap = new LinkedHashMap<>();
+    // Per-hostname result caches populated on first lookup. Bounded by the number of
+    // distinct backend hostnames (infrastructure-level), not by request volume.
     private final Set<String> knownDirectHosts =
             Collections.synchronizedSet(new HashSet<>());
     private final Map<String, WsProxyProfileConfig> knownProxyConfigMap =
@@ -171,6 +175,9 @@ class WsProxyProfileRegistry {
             OMElement passwordElement = profile.getFirstChildWithName(Q_PROXY_PASSWORD);
             if (usernameElement != null) {
                 proxyUsername = usernameElement.getText().trim();
+                // Store the raw password without resolving. The SecretResolver may not be
+                // fully initialized during transport startup; resolution happens at connection
+                // time in buildProxyHandler via MiscellaneousUtil.resolve.
                 proxyPassword = passwordElement != null
                         ? passwordElement.getText().trim()
                         : "";
@@ -181,6 +188,8 @@ class WsProxyProfileRegistry {
                 for (String rawEntry : bypassElement.getText().split(",")) {
                     String bypassPattern = rawEntry.trim();
                     try {
+                        // Validate the regex at parse time so configuration errors are caught
+                        // on startup rather than silently ignored at request time.
                         Pattern.compile(bypassPattern);
                         bypassSet.add(bypassPattern);
                     } catch (PatternSyntaxException e) {
@@ -194,6 +203,8 @@ class WsProxyProfileRegistry {
                     new WsProxyProfileConfig(proxyHost, proxyPort, proxyUsername, proxyPassword, bypassSet);
             for (String targetHostPattern : targetHostsElement.getText().split(",")) {
                 targetHostPattern = targetHostPattern.trim();
+                // "*" is a literal catch-all sentinel, not a regex. It is stored as-is and
+                // matched explicitly at the end of getProfileForHost after all specific patterns fail.
                 if (!"*".equals(targetHostPattern)) {
                     try {
                         Pattern.compile(targetHostPattern);
@@ -234,6 +245,7 @@ class WsProxyProfileRegistry {
      * @return the matching {@link WsProxyProfileConfig}, or {@code null} if the host should connect directly
      */
     private WsProxyProfileConfig getProfileForHost(String targetHost) {
+        // Fast path: return the cached result for hosts already seen.
         if (knownProxyConfigMap.containsKey(targetHost)) {
             return knownProxyConfigMap.get(targetHost);
         }
@@ -242,10 +254,13 @@ class WsProxyProfileRegistry {
         }
         boolean hasCatchAllProfile = false;
         for (String profileKey : proxyProfileMap.keySet()) {
+            // Defer the catch-all "*" so that specific patterns are evaluated first,
+            // ensuring a more-specific profile takes precedence over the default.
             if ("*".equals(profileKey)) {
                 hasCatchAllProfile = true;
                 continue;
             }
+            // String.matches() anchors both ends implicitly, matching the full hostname.
             if (targetHost.matches(profileKey)) {
                 return resolveWithBypass(targetHost, profileKey);
             }
@@ -279,6 +294,7 @@ class WsProxyProfileRegistry {
                 return null;
             }
         }
+        // Cache the proxied result so subsequent lookups for this host return immediately.
         knownProxyConfigMap.put(targetHost, matchedProfile);
         return matchedProfile;
     }
@@ -301,6 +317,7 @@ class WsProxyProfileRegistry {
                                                SecretResolver resolver) {
         InetSocketAddress proxyAddress = new InetSocketAddress(host, port);
         if (username != null && !username.isEmpty()) {
+            // Resolve at connection time; handles both plain-text and $secret{alias} tokens.
             String password = MiscellaneousUtil.resolve(rawPassword, resolver);
             return new HttpProxyHandler(proxyAddress, username, password);
         }
