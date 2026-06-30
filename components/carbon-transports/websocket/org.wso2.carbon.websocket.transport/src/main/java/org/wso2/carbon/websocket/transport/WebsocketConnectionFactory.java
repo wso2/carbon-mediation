@@ -49,7 +49,6 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.websocket.transport.utils.SSLUtil;
 import org.wso2.securevault.SecretResolver;
-import org.wso2.securevault.SecretResolverFactory;
 import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import javax.net.ssl.SSLEngine;
@@ -71,7 +70,39 @@ public class WebsocketConnectionFactory {
 
     private final WsProxyProfileRegistry proxyRegistry;
 
+    /**
+     * Creates a new factory using a fallback {@link SecretResolver} derived from the
+     * {@code ws.proxyProfiles} parameter element. Proxy passwords protected with
+     * {@code $secret{alias}} will only be resolved if the element carries the SecureVault
+     * namespace; prefer {@link #WebsocketConnectionFactory(TransportOutDescription, SecretResolver)}
+     * when an initialized resolver is available (e.g. from
+     * {@code AxisConfiguration.getSecretResolver()}).
+     *
+     * @param transportOut the WS/WSS transport-sender descriptor from axis2.xml
+     * @throws AxisFault if the WSS trust-store parameters are missing or malformed
+     */
     public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
+        this(transportOut, null);
+    }
+
+    /**
+     * Creates a new factory with an explicitly supplied {@link SecretResolver}.
+     *
+     * <p>Pass the globally initialized resolver (obtained from
+     * {@code ConfigurationContext.getAxisConfiguration().getSecretResolver()}) so that
+     * proxy passwords stored as {@code $secret{alias}} in axis2.xml are decrypted at
+     * startup rather than transmitted as literal strings. When {@code secretResolver} is
+     * {@code null} the constructor falls back to deriving a resolver from the
+     * {@code ws.proxyProfiles} parameter element (same behaviour as the single-argument
+     * constructor).
+     *
+     * @param transportOut   the WS/WSS transport-sender descriptor from axis2.xml
+     * @param secretResolver an initialized SecureVault resolver, or {@code null} to use
+     *                       the element-scoped fallback
+     * @throws AxisFault if the WSS trust-store parameters are missing or malformed
+     */
+    public WebsocketConnectionFactory(TransportOutDescription transportOut,
+                                      SecretResolver secretResolver) throws AxisFault {
         this.transportOut = transportOut;
         int sharedEventLoopPoolSize = getMaxValueOrDefault(
                 transportOut.getParameter(WebsocketConstants.WEBSOCKET_SHARED_EVENT_LOOP_POOL_SIZE), -1);
@@ -105,8 +136,10 @@ public class WebsocketConnectionFactory {
         Parameter profilesParam = transportOut.getParameter(WebsocketConstants.PROXY_PROFILES);
         if (profilesParam != null) {
             OMElement profilesElement = profilesParam.getParameterElement();
-            SecretResolver secretResolver = SecretResolverFactory.create(profilesElement, false);
-            this.proxyRegistry = new WsProxyProfileRegistry(profilesElement, secretResolver);
+            SecretResolver resolverToUse = secretResolver != null
+                    ? secretResolver
+                    : SecretResolverFactory.create(profilesElement, false);
+            this.proxyRegistry = new WsProxyProfileRegistry(profilesElement, resolverToUse);
         } else {
             this.proxyRegistry = null;
         }
