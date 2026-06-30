@@ -393,6 +393,14 @@ public class WebsocketConnectionFactory {
         return null;
     }
 
+    /**
+     * Returns a configured {@link HttpProxyHandler} for the given backend host by delegating
+     * to {@link WsProxyProfileRegistry#resolveProxyHandler(String)}, or {@code null} if no
+     * proxy profiles are configured or the host should connect directly.
+     *
+     * @param targetHost the backend WebSocket host to match against configured proxy profiles
+     * @return a ready-to-use {@link HttpProxyHandler}, or {@code null} for a direct connection
+     */
     private HttpProxyHandler resolveProxyHandler(String targetHost) {
         if (proxyRegistry == null) {
             return null;

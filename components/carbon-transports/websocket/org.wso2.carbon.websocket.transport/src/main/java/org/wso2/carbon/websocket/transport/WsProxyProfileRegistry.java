@@ -68,6 +68,13 @@ class WsProxyProfileRegistry {
         final String proxyPassword;
         final Set<String> bypass;
 
+        /**
+         * @param proxyHost     proxy server hostname or IP
+         * @param proxyPort     proxy server port (1–65535)
+         * @param proxyUsername proxy username, or {@code null} for anonymous access
+         * @param proxyPassword proxy password; ignored when {@code proxyUsername} is {@code null}
+         * @param bypass        set of regex patterns for hosts that bypass this proxy
+         */
         WsProxyProfileConfig(String proxyHost, int proxyPort,
                              String proxyUsername, String proxyPassword,
                              Set<String> bypass) {
@@ -112,6 +119,16 @@ class WsProxyProfileRegistry {
         return null;
     }
 
+    /**
+     * Parses all {@code <profile>} children of {@code profilesElement} and populates
+     * {@link #proxyProfileMap}. Each target-host pattern from {@code <targetHosts>} becomes
+     * a key mapping to its resolved {@link WsProxyProfileConfig}. Proxy passwords referencing
+     * SecureVault aliases are resolved via {@code secretResolver}. Invalid or incomplete
+     * profiles are skipped with a warning log.
+     *
+     * @param profilesElement the {@code ws.proxyProfiles} parameter element from axis2.xml
+     * @param secretResolver  resolver for SecureVault aliases in proxy passwords; may be {@code null}
+     */
     private void parseProfiles(OMElement profilesElement, SecretResolver secretResolver) {
         Iterator<?> profiles = profilesElement.getChildrenWithName(Q_PROFILE);
         while (profiles.hasNext()) {
