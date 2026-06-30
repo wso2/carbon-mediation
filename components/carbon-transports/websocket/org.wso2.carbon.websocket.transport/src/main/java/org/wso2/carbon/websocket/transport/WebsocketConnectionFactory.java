@@ -72,38 +72,14 @@ public class WebsocketConnectionFactory {
     private final WsProxyProfileRegistry proxyRegistry;
 
     /**
-     * Creates a new factory using a fallback {@link SecretResolver} derived from the
-     * {@code ws.proxyProfiles} parameter element. Proxy passwords protected with
-     * {@code $secret{alias}} will only be resolved if the element carries the SecureVault
-     * namespace; prefer {@link #WebsocketConnectionFactory(TransportOutDescription, SecretResolver)}
-     * when an initialized resolver is available (e.g. from
-     * {@code AxisConfiguration.getSecretResolver()}).
+     * Creates a new factory. Proxy passwords are stored as raw text during startup and
+     * resolved via SecureVault at connection time using the {@link SecretResolver} threaded
+     * through from {@link #getChannelHandler}.
      *
      * @param transportOut the WS/WSS transport-sender descriptor from axis2.xml
      * @throws AxisFault if the WSS trust-store parameters are missing or malformed
      */
     public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
-        this(transportOut, null);
-    }
-
-    /**
-     * Creates a new factory with an explicitly supplied {@link SecretResolver}.
-     *
-     * <p>Pass the globally initialized resolver (obtained from
-     * {@code ConfigurationContext.getAxisConfiguration().getSecretResolver()}) so that
-     * proxy passwords stored as {@code $secret{alias}} in axis2.xml are decrypted at
-     * startup rather than transmitted as literal strings. When {@code secretResolver} is
-     * {@code null} the constructor falls back to deriving a resolver from the
-     * {@code ws.proxyProfiles} parameter element (same behaviour as the single-argument
-     * constructor).
-     *
-     * @param transportOut   the WS/WSS transport-sender descriptor from axis2.xml
-     * @param secretResolver an initialized SecureVault resolver, or {@code null} to use
-     *                       the element-scoped fallback
-     * @throws AxisFault if the WSS trust-store parameters are missing or malformed
-     */
-    public WebsocketConnectionFactory(TransportOutDescription transportOut,
-                                      SecretResolver secretResolver) throws AxisFault {
         this.transportOut = transportOut;
         int sharedEventLoopPoolSize = getMaxValueOrDefault(
                 transportOut.getParameter(WebsocketConstants.WEBSOCKET_SHARED_EVENT_LOOP_POOL_SIZE), -1);
@@ -136,11 +112,7 @@ public class WebsocketConnectionFactory {
 
         Parameter profilesParam = transportOut.getParameter(WebsocketConstants.PROXY_PROFILES);
         if (profilesParam != null) {
-            OMElement profilesElement = profilesParam.getParameterElement();
-            SecretResolver resolverToUse = secretResolver != null
-                    ? secretResolver
-                    : SecretResolverFactory.create(profilesElement, false);
-            this.proxyRegistry = new WsProxyProfileRegistry(profilesElement, resolverToUse);
+            this.proxyRegistry = new WsProxyProfileRegistry(profilesParam.getParameterElement());
         } else {
             this.proxyRegistry = null;
         }
@@ -342,7 +314,7 @@ public class WebsocketConnectionFactory {
                                         + ", ThreadID: " + Thread.currentThread().getId());
                             }
                             ChannelPipeline p = ch.pipeline();
-                            HttpProxyHandler proxyHandler = resolveProxyHandler(host);
+                            HttpProxyHandler proxyHandler = resolveProxyHandler(host, resolver);
                             if (proxyHandler != null) {
                                 p.addLast(proxyHandler);
                             }
@@ -396,17 +368,18 @@ public class WebsocketConnectionFactory {
 
     /**
      * Returns a configured {@link HttpProxyHandler} for the given backend host by delegating
-     * to {@link WsProxyProfileRegistry#resolveProxyHandler(String)}, or {@code null} if no
-     * proxy profiles are configured or the host should connect directly.
+     * to {@link WsProxyProfileRegistry#resolveProxyHandler(String, SecretResolver)}, or
+     * {@code null} if no proxy profiles are configured or the host should connect directly.
      *
      * @param targetHost the backend WebSocket host to match against configured proxy profiles
+     * @param resolver   SecureVault resolver used to decrypt proxy passwords; may be {@code null}
      * @return a ready-to-use {@link HttpProxyHandler}, or {@code null} for a direct connection
      */
-    private HttpProxyHandler resolveProxyHandler(String targetHost) {
+    private HttpProxyHandler resolveProxyHandler(String targetHost, SecretResolver resolver) {
         if (proxyRegistry == null) {
             return null;
         }
-        return proxyRegistry.resolveProxyHandler(targetHost);
+        return proxyRegistry.resolveProxyHandler(targetHost, resolver);
     }
 
     private String deriveSubprotocol(String wsSubprotocol, String contentType) {

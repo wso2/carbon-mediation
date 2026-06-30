@@ -76,9 +76,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             log.debug("Initializing WS Connection Factory.");
         }
         super.init(cfgCtx, transportOut);
-        SecretResolver secretResolver = cfgCtx.getAxisConfiguration() != null
-                ? cfgCtx.getAxisConfiguration().getSecretResolver() : null;
-        connectionFactory = new WebsocketConnectionFactory(transportOut, secretResolver);
+        connectionFactory = new WebsocketConnectionFactory(transportOut);
     }
 
     public void sendMessage(MessageContext msgCtx, String targetEPR, OutTransportInfo trpOut)

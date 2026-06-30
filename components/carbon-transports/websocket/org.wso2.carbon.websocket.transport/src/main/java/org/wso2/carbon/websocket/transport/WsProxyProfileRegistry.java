@@ -95,26 +95,27 @@ class WsProxyProfileRegistry {
     /**
      * Parses all {@code <profile>} children of {@code profilesElement} into
      * {@link #proxyProfileMap}. Invalid or incomplete profiles are skipped with a warning.
+     * Proxy passwords are stored as raw text and resolved via SecureVault at connection time.
      *
      * @param profilesElement the {@code ws.proxyProfiles} parameter element from axis2.xml
-     * @param secretResolver  resolver for SecureVault aliases in proxy passwords; may be {@code null}
      */
-    WsProxyProfileRegistry(OMElement profilesElement, SecretResolver secretResolver) {
-        parseProfiles(profilesElement, secretResolver);
+    WsProxyProfileRegistry(OMElement profilesElement) {
+        parseProfiles(profilesElement);
     }
 
     /**
      * Returns a configured {@link HttpProxyHandler} for the given backend host, or {@code null}
-     * for a direct connection.
+     * for a direct connection. The proxy password is resolved at call time via {@code resolver}.
      *
      * @param targetHost the backend WebSocket host (e.g., {@code backend.example.com})
+     * @param resolver   SecureVault resolver used to decrypt proxy passwords; may be {@code null}
      * @return a ready-to-use {@link HttpProxyHandler}, or {@code null} for a direct connection
      */
-    HttpProxyHandler resolveProxyHandler(String targetHost) {
+    HttpProxyHandler resolveProxyHandler(String targetHost, SecretResolver resolver) {
         WsProxyProfileConfig matchedProfile = getProfileForHost(targetHost);
         if (matchedProfile != null) {
             return buildProxyHandler(matchedProfile.proxyHost, matchedProfile.proxyPort,
-                    matchedProfile.proxyUsername, matchedProfile.proxyPassword);
+                    matchedProfile.proxyUsername, matchedProfile.proxyPassword, resolver);
         }
         return null;
     }
@@ -122,14 +123,13 @@ class WsProxyProfileRegistry {
     /**
      * Parses all {@code <profile>} children of {@code profilesElement} and populates
      * {@link #proxyProfileMap}. Each target-host pattern from {@code <targetHosts>} becomes
-     * a key mapping to its resolved {@link WsProxyProfileConfig}. Proxy passwords referencing
-     * SecureVault aliases are resolved via {@code secretResolver}. Invalid or incomplete
+     * a key mapping to its resolved {@link WsProxyProfileConfig}. Proxy passwords are stored
+     * as raw text and resolved via SecureVault at connection time. Invalid or incomplete
      * profiles are skipped with a warning log.
      *
      * @param profilesElement the {@code ws.proxyProfiles} parameter element from axis2.xml
-     * @param secretResolver  resolver for SecureVault aliases in proxy passwords; may be {@code null}
      */
-    private void parseProfiles(OMElement profilesElement, SecretResolver secretResolver) {
+    private void parseProfiles(OMElement profilesElement) {
         Iterator<?> profiles = profilesElement.getChildrenWithName(Q_PROFILE);
         while (profiles.hasNext()) {
             OMElement profile = (OMElement) profiles.next();
@@ -172,7 +172,7 @@ class WsProxyProfileRegistry {
             if (usernameElement != null) {
                 proxyUsername = usernameElement.getText().trim();
                 proxyPassword = passwordElement != null
-                        ? MiscellaneousUtil.resolve(passwordElement.getText().trim(), secretResolver)
+                        ? passwordElement.getText().trim()
                         : "";
             }
             Set<String> bypassSet = new HashSet<>();
@@ -286,17 +286,22 @@ class WsProxyProfileRegistry {
     /**
      * Constructs a Netty {@link HttpProxyHandler} for the given proxy coordinates.
      * Uses the authenticated constructor when credentials are provided, anonymous otherwise.
+     * The raw proxy password is resolved via {@code resolver} before use.
      *
-     * @param host     proxy server hostname or IP
-     * @param port     proxy server port
-     * @param username proxy username, or {@code null} for anonymous access
-     * @param password proxy password; ignored when {@code username} is {@code null}
+     * @param host        proxy server hostname or IP
+     * @param port        proxy server port
+     * @param username    proxy username, or {@code null} for anonymous access
+     * @param rawPassword raw proxy password (may be a SecureVault {@code $secret{alias}});
+     *                    ignored when {@code username} is {@code null}
+     * @param resolver    SecureVault resolver used to decrypt the proxy password; may be {@code null}
      * @return a configured {@link HttpProxyHandler} ready to be added to the Netty pipeline
      */
     private HttpProxyHandler buildProxyHandler(String host, int port,
-                                               String username, String password) {
+                                               String username, String rawPassword,
+                                               SecretResolver resolver) {
         InetSocketAddress proxyAddress = new InetSocketAddress(host, port);
         if (username != null && !username.isEmpty()) {
+            String password = MiscellaneousUtil.resolve(rawPassword, resolver);
             return new HttpProxyHandler(proxyAddress, username, password);
         }
         return new HttpProxyHandler(proxyAddress);
