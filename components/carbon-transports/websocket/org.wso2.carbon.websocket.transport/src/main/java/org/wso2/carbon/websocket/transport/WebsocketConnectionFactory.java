@@ -35,6 +35,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import io.netty.handler.proxy.HttpProxyHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
@@ -68,6 +69,8 @@ public class WebsocketConnectionFactory {
     private ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>
             channelHandlerPool = new ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>();
 
+    private final WsProxyProfileRegistry proxyRegistry;
+
     public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
         this.transportOut = transportOut;
         int sharedEventLoopPoolSize = getMaxValueOrDefault(
@@ -97,6 +100,15 @@ public class WebsocketConnectionFactory {
                         + WebsocketConstants.TRUST_STORE_LOCATION + " and/or "
                         + WebsocketConstants.TRUST_STORE_PASSWORD + " from Transport configurations");
             }
+        }
+
+        // Build the proxy registry only when proxy profiles are configured.
+        // A null registry causes resolveProxyHandler to return null immediately (direct connection).
+        Parameter profilesParam = transportOut.getParameter(WebsocketConstants.PROXY_PROFILES);
+        if (profilesParam != null) {
+            this.proxyRegistry = new WsProxyProfileRegistry(profilesParam.getParameterElement());
+        } else {
+            this.proxyRegistry = null;
         }
     }
 
@@ -296,6 +308,15 @@ public class WebsocketConnectionFactory {
                                         + ", ThreadID: " + Thread.currentThread().getId());
                             }
                             ChannelPipeline p = ch.pipeline();
+                            // Proxy handler must be the first handler in the pipeline so it
+                            // intercepts the TCP connect and sends the HTTP CONNECT request before
+                            // the SSL or HTTP codec layers are involved. HttpProxyHandler removes
+                            // itself from the pipeline once the CONNECT tunnel is established;
+                            // subsequent WS frames flow through the tunnel without proxy overhead.
+                            HttpProxyHandler proxyHandler = resolveProxyHandler(host, resolver);
+                            if (proxyHandler != null) {
+                                p.addLast(proxyHandler);
+                            }
                             if (sslCtx != null) {
                                 SslHandler sslHandler = sslCtx.newHandler(ch.alloc(), host, port);
                                 Parameter wsEnableHostnameVerification = transportOut
@@ -342,6 +363,22 @@ public class WebsocketConnectionFactory {
         }
 
         return null;
+    }
+
+    /**
+     * Returns a configured {@link HttpProxyHandler} for the given backend host by delegating
+     * to {@link WsProxyProfileRegistry#resolveProxyHandler(String, SecretResolver)}, or
+     * {@code null} if no proxy profiles are configured or the host should connect directly.
+     *
+     * @param targetHost the backend WebSocket host to match against configured proxy profiles
+     * @param resolver   SecureVault resolver used to decrypt proxy passwords; may be {@code null}
+     * @return a ready-to-use {@link HttpProxyHandler}, or {@code null} for a direct connection
+     */
+    private HttpProxyHandler resolveProxyHandler(String targetHost, SecretResolver resolver) {
+        if (proxyRegistry == null) {
+            return null;
+        }
+        return proxyRegistry.resolveProxyHandler(targetHost, resolver);
     }
 
     private String deriveSubprotocol(String wsSubprotocol, String contentType) {
