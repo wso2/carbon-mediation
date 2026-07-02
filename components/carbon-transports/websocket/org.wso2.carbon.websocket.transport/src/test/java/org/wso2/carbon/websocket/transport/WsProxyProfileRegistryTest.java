@@ -22,12 +22,15 @@ import io.netty.handler.proxy.HttpProxyHandler;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.junit.Test;
+import org.wso2.securevault.SecretResolver;
 
 import java.net.InetSocketAddress;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WsProxyProfileRegistry}.
@@ -46,7 +49,7 @@ public class WsProxyProfileRegistryTest {
 
     private static WsProxyProfileRegistry buildRegistry(String xml) throws Exception {
         OMElement element = AXIOMUtil.stringToOM(xml);
-        return new WsProxyProfileRegistry(element, null);
+        return new WsProxyProfileRegistry(element);
     }
 
     @SuppressWarnings("unchecked")
@@ -61,7 +64,7 @@ public class WsProxyProfileRegistryTest {
     @Test
     public void testEmptyProfiles_returnsNull() throws Exception {
         WsProxyProfileRegistry reg = buildRegistry("<ws.proxyProfiles/>");
-        assertNull(reg.resolveProxyHandler("any.host.com"));
+        assertNull(reg.resolveProxyHandler("any.host.com", null));
     }
 
     @Test
@@ -74,7 +77,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com");
+        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com", null);
         assertNotNull(handler);
         assertEquals("proxy.corp.com", proxyAddress(handler).getHostString());
         assertEquals(3128, proxyAddress(handler).getPort());
@@ -93,7 +96,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPassword>proxypass</proxyPassword>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com");
+        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com", null);
         assertNotNull(handler);
         assertEquals("proxy.corp.com", proxyAddress(handler).getHostString());
         assertEquals(3128, proxyAddress(handler).getPort());
@@ -112,7 +115,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("other.host.com"));
+        assertNull(reg.resolveProxyHandler("other.host.com", null));
     }
 
     // -----------------------------------------------------------------------
@@ -129,8 +132,8 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNotNull(reg.resolveProxyHandler("any.random.host.com"));
-        assertNotNull(reg.resolveProxyHandler("another.host"));
+        assertNotNull(reg.resolveProxyHandler("any.random.host.com", null));
+        assertNotNull(reg.resolveProxyHandler("another.host", null));
     }
 
     @Test
@@ -148,12 +151,12 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>8080</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        HttpProxyHandler specialHandler = reg.resolveProxyHandler("special.host.com");
+        HttpProxyHandler specialHandler = reg.resolveProxyHandler("special.host.com", null);
         assertNotNull(specialHandler);
         assertEquals("special.proxy", proxyAddress(specialHandler).getHostString());
         assertEquals(8080, proxyAddress(specialHandler).getPort());
 
-        HttpProxyHandler defaultHandler = reg.resolveProxyHandler("other.host.com");
+        HttpProxyHandler defaultHandler = reg.resolveProxyHandler("other.host.com", null);
         assertNotNull(defaultHandler);
         assertEquals("default.proxy", proxyAddress(defaultHandler).getHostString());
     }
@@ -174,7 +177,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>8080</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        HttpProxyHandler handler = reg.resolveProxyHandler("internal.corp.com");
+        HttpProxyHandler handler = reg.resolveProxyHandler("internal.corp.com", null);
         assertNotNull(handler);
         assertEquals("first.proxy", proxyAddress(handler).getHostString());
     }
@@ -189,9 +192,9 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNotNull(reg.resolveProxyHandler("host1.com"));
-        assertNotNull(reg.resolveProxyHandler("host2.com"));
-        assertNull(reg.resolveProxyHandler("host3.com"));
+        assertNotNull(reg.resolveProxyHandler("host1.com", null));
+        assertNotNull(reg.resolveProxyHandler("host2.com", null));
+        assertNull(reg.resolveProxyHandler("host3.com", null));
     }
 
     // -----------------------------------------------------------------------
@@ -209,8 +212,8 @@ public class WsProxyProfileRegistryTest {
                 "    <bypass>direct\\.example\\.com</bypass>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("direct.example.com"));
-        assertNotNull(reg.resolveProxyHandler("proxied.example.com"));
+        assertNull(reg.resolveProxyHandler("direct.example.com", null));
+        assertNotNull(reg.resolveProxyHandler("proxied.example.com", null));
     }
 
     @Test
@@ -224,8 +227,8 @@ public class WsProxyProfileRegistryTest {
                 "    <bypass>local\\.internal</bypass>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("local.internal"));
-        assertNotNull(reg.resolveProxyHandler("external.host.com"));
+        assertNull(reg.resolveProxyHandler("local.internal", null));
+        assertNotNull(reg.resolveProxyHandler("external.host.com", null));
     }
 
     // -----------------------------------------------------------------------
@@ -242,8 +245,8 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        HttpProxyHandler first = reg.resolveProxyHandler("backend.example.com");
-        HttpProxyHandler second = reg.resolveProxyHandler("backend.example.com");
+        HttpProxyHandler first = reg.resolveProxyHandler("backend.example.com", null);
+        HttpProxyHandler second = reg.resolveProxyHandler("backend.example.com", null);
         assertNotNull(first);
         assertNotNull(second);
         assertEquals(proxyAddress(first).getHostString(), proxyAddress(second).getHostString());
@@ -261,8 +264,8 @@ public class WsProxyProfileRegistryTest {
                 "    <bypass>direct\\.example\\.com</bypass>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("direct.example.com"));
-        assertNull(reg.resolveProxyHandler("direct.example.com")); // served from cache
+        assertNull(reg.resolveProxyHandler("direct.example.com", null));
+        assertNull(reg.resolveProxyHandler("direct.example.com", null)); // served from cache
     }
 
     // -----------------------------------------------------------------------
@@ -278,7 +281,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("any.host.com"));
+        assertNull(reg.resolveProxyHandler("any.host.com", null));
     }
 
     @Test
@@ -291,7 +294,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("any.host.com"));
+        assertNull(reg.resolveProxyHandler("any.host.com", null));
     }
 
     @Test
@@ -303,7 +306,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("backend.example.com"));
+        assertNull(reg.resolveProxyHandler("backend.example.com", null));
     }
 
     @Test
@@ -315,7 +318,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyHost>proxy.corp.com</proxyHost>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("backend.example.com"));
+        assertNull(reg.resolveProxyHandler("backend.example.com", null));
     }
 
     @Test
@@ -328,7 +331,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("backend.example.com"));
+        assertNull(reg.resolveProxyHandler("backend.example.com", null));
     }
 
     // -----------------------------------------------------------------------
@@ -345,7 +348,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>notaport</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("backend.example.com"));
+        assertNull(reg.resolveProxyHandler("backend.example.com", null));
     }
 
     @Test
@@ -358,7 +361,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>0</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("backend.example.com"));
+        assertNull(reg.resolveProxyHandler("backend.example.com", null));
     }
 
     @Test
@@ -371,7 +374,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>-1</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("backend.example.com"));
+        assertNull(reg.resolveProxyHandler("backend.example.com", null));
     }
 
     @Test
@@ -384,7 +387,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>65536</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("backend.example.com"));
+        assertNull(reg.resolveProxyHandler("backend.example.com", null));
     }
 
     @Test
@@ -397,8 +400,8 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>1</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNotNull(reg1.resolveProxyHandler("host1.com"));
-        assertEquals(1, proxyAddress(reg1.resolveProxyHandler("host1.com")).getPort());
+        assertNotNull(reg1.resolveProxyHandler("host1.com", null));
+        assertEquals(1, proxyAddress(reg1.resolveProxyHandler("host1.com", null)).getPort());
 
         WsProxyProfileRegistry reg2 = buildRegistry(
                 "<ws.proxyProfiles>" +
@@ -408,8 +411,8 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>65535</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNotNull(reg2.resolveProxyHandler("host2.com"));
-        assertEquals(65535, proxyAddress(reg2.resolveProxyHandler("host2.com")).getPort());
+        assertNotNull(reg2.resolveProxyHandler("host2.com", null));
+        assertEquals(65535, proxyAddress(reg2.resolveProxyHandler("host2.com", null)).getPort());
     }
 
     // -----------------------------------------------------------------------
@@ -427,7 +430,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>3128</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNotNull(reg.resolveProxyHandler("valid.host.com"));
+        assertNotNull(reg.resolveProxyHandler("valid.host.com", null));
     }
 
     @Test
@@ -442,8 +445,8 @@ public class WsProxyProfileRegistryTest {
                 "    <bypass>[invalid,direct\\.example\\.com</bypass>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        assertNull(reg.resolveProxyHandler("direct.example.com"));
-        assertNotNull(reg.resolveProxyHandler("other.example.com"));
+        assertNull(reg.resolveProxyHandler("direct.example.com", null));
+        assertNotNull(reg.resolveProxyHandler("other.example.com", null));
     }
 
     // -----------------------------------------------------------------------
@@ -465,7 +468,7 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyPort>9999</proxyPort>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com");
+        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com", null);
         assertNotNull(handler);
         assertEquals("first.proxy", proxyAddress(handler).getHostString());
     }
@@ -486,10 +489,41 @@ public class WsProxyProfileRegistryTest {
                 "    <proxyUserName>user</proxyUserName>" +
                 "  </profile>" +
                 "</ws.proxyProfiles>");
-        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com");
+        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com", null);
         assertNotNull(handler);
         assertEquals("basic", handler.authScheme());
         assertEquals("user", handler.username());
         assertEquals("", handler.password());
+    }
+
+    // -----------------------------------------------------------------------
+    // SecureVault resolution
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void testSecureVaultPassword_resolvedAtCallTime() throws Exception {
+        // Password is stored as $secret{proxy_password} at parse time and resolved
+        // to the plaintext value only when resolveProxyHandler is called with a live resolver.
+        SecretResolver mockResolver = mock(SecretResolver.class);
+        when(mockResolver.isInitialized()).thenReturn(true);
+        when(mockResolver.isTokenProtected("proxy_password")).thenReturn(true);
+        when(mockResolver.resolve("proxy_password")).thenReturn("secretpass");
+
+        WsProxyProfileRegistry reg = buildRegistry(
+                "<ws.proxyProfiles>" +
+                "  <profile>" +
+                "    <targetHosts>backend\\.example\\.com</targetHosts>" +
+                "    <proxyHost>proxy.corp.com</proxyHost>" +
+                "    <proxyPort>3128</proxyPort>" +
+                "    <proxyUserName>proxyuser</proxyUserName>" +
+                "    <proxyPassword>$secret{proxy_password}</proxyPassword>" +
+                "  </profile>" +
+                "</ws.proxyProfiles>");
+
+        HttpProxyHandler handler = reg.resolveProxyHandler("backend.example.com", mockResolver);
+        assertNotNull(handler);
+        assertEquals("basic", handler.authScheme());
+        assertEquals("proxyuser", handler.username());
+        assertEquals("secretpass", handler.password());
     }
 }
