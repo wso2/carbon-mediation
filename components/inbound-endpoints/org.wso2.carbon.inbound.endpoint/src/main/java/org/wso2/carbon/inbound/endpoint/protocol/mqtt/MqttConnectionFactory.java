@@ -356,14 +356,18 @@ public class MqttConnectionFactory {
 
         char[] keyPassphrase = keyStorePassword.toCharArray();
         KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-        keyStore.load(new FileInputStream(keyStoreLocation), keyPassphrase);
+        try (FileInputStream keyStoreStream = new FileInputStream(keyStoreLocation)) {
+            keyStore.load(keyStoreStream, keyPassphrase);
+        }
 
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(keyStore, keyPassphrase);
 
         char[] trustPassphrase = trustStorePassword.toCharArray();
         KeyStore trustStore = KeyStore.getInstance(trustStoreType);
-        trustStore.load(new FileInputStream(trustStoreLocation), trustPassphrase);
+        try (FileInputStream trustStoreStream = new FileInputStream(trustStoreLocation)) {
+            trustStore.load(trustStoreStream, trustPassphrase);
+        }
 
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(trustStore);
