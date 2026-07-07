@@ -90,15 +90,19 @@ public class JMSReplySender implements InboundResponseSender {
             log.error("Error sending JMS response", e);
         } finally {
             try {
-                producer.close();
+                if (producer != null) {
+                    producer.close();
+                }
             } catch (Exception e) {
                 log.debug("ERROR: Unable to close the producer");
             }
             try {
-                session.close();
+                if (session != null) {
+                    session.close();
+                }
             } catch (Exception e) {
                 log.debug("ERROR: Unable to close the session");
-            }            
+            }
         }
     }
 
