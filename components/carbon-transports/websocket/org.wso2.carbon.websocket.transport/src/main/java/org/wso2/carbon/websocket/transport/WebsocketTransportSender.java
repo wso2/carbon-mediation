@@ -31,6 +31,7 @@ import io.netty.util.AttributeKey;
 import java.util.Objects;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
@@ -119,6 +120,15 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             }
         } else {
             sourceIdentifier = WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER;
+        }
+
+        // The backend url is fixed at deployment time, so the caller's query string is merged in here.
+        // Backend connections are pooled per source channel and the query is constant for the lifetime of
+        // a channel, so a merged query cannot cross callers. The universal identifier is a shared pool and
+        // is therefore skipped.
+        if (!WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER.equals(sourceIdentifier)
+                && isForwardInboundQueryParamsEnabled(msgCtx)) {
+            targetEPR = mergeInboundQueryParams(targetEPR, msgCtx);
         }
 
         if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT) != null
@@ -399,6 +409,102 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         } finally {
             ReferenceCountUtil.release(frame);
         }
+    }
+
+    /**
+     * Checks whether forwarding of inbound query parameters is enabled on this transport sender. Disabled
+     * unless "ws.forward.query.params" is explicitly set to true.
+     *
+     * @param msgCtx axis2 message context of the outgoing message
+     * @return true if the caller's query string should be merged into the backend url
+     */
+    private boolean isForwardInboundQueryParamsEnabled(MessageContext msgCtx) {
+
+        if (msgCtx.getTransportOut() == null) {
+            return false;
+        }
+        Parameter forwardQueryParams =
+                msgCtx.getTransportOut().getParameter(WebsocketConstants.WEBSOCKET_FORWARD_QUERY_PARAMS_CONFIG);
+        return forwardQueryParams != null && forwardQueryParams.getValue() != null
+                && Boolean.parseBoolean(forwardQueryParams.getValue().toString().trim());
+    }
+
+    /**
+     * Merges the query string of the inbound request into the backend url. The backend url is built at
+     * deployment time from the endpoint url and the topic mapping, so it never carries the caller's query.
+     * Pairs are appended verbatim, without decoding, so encoded values reach the backend exactly as the
+     * caller sent them. A name already present on the backend url keeps its configured value.
+     *
+     * The merged url is discarded if it does not parse, because the query is caller controlled and
+     * java.net.URI rejects characters that a caller can send.
+     *
+     * @param targetEPR backend url resolved from the endpoint definition
+     * @param msgCtx    axis2 message context carrying the inbound request url
+     * @return backend url with the caller's query merged in, or targetEPR unchanged
+     */
+    protected String mergeInboundQueryParams(String targetEPR, MessageContext msgCtx) {
+
+        Object inboundUrl = msgCtx.getProperty(Constants.Configuration.TRANSPORT_IN_URL);
+        if (targetEPR == null || inboundUrl == null) {
+            return targetEPR;
+        }
+        String inbound = inboundUrl.toString();
+        int queryStart = inbound.indexOf('?');
+        if (queryStart < 0) {
+            return targetEPR;
+        }
+
+        StringBuilder toAppend = new StringBuilder();
+        for (String pair : inbound.substring(queryStart + 1).split("&")) {
+            int equals = pair.indexOf('=');
+            String name = equals < 0 ? pair : pair.substring(0, equals);
+            if (!name.isEmpty() && !containsQueryParam(targetEPR, name)) {
+                toAppend.append(toAppend.length() == 0 ? "" : "&").append(pair);
+            }
+        }
+        if (toAppend.length() == 0) {
+            return targetEPR;
+        }
+
+        String separator = targetEPR.indexOf('?') < 0 ? "?"
+                : targetEPR.endsWith("?") || targetEPR.endsWith("&") ? "" : "&";
+        String merged = targetEPR + separator + toAppend;
+        try {
+            new URI(merged);
+        } catch (URISyntaxException e) {
+            log.warn("Inbound query parameters were not merged into the backend url because the result is not a "
+                             + "valid URI. Falling back to the configured endpoint url. Reason: " + e.getReason()
+                             + " at index " + e.getIndex());
+            return targetEPR;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Merged inbound query parameters into the backend url. Before: " + targetEPR
+                              + ", after: " + merged);
+        }
+        return merged;
+    }
+
+    /**
+     * Checks whether the backend url already defines a query parameter with the given name.
+     *
+     * @param targetEPR backend url resolved from the endpoint definition
+     * @param name      query parameter name taken from the inbound request
+     * @return true if targetEPR already carries that parameter
+     */
+    private boolean containsQueryParam(String targetEPR, String name) {
+
+        int queryStart = targetEPR.indexOf('?');
+        if (queryStart < 0) {
+            return false;
+        }
+        for (String pair : targetEPR.substring(queryStart + 1).split("&")) {
+            int equals = pair.indexOf('=');
+            String existing = equals < 0 ? pair : pair.substring(0, equals);
+            if (existing.equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleClientConnectionError(InboundResponseSender responseSender, Exception e) {
