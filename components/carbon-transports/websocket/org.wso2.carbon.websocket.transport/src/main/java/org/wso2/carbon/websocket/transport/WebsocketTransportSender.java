@@ -96,8 +96,13 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         Map<String, Object> customHeaders = new HashMap<>();
         Map<String, Object> apiProperties = new HashMap<>();
 
+        // logged urls stay query free: the caller's query can carry a credential, and the endpoint's
+        // own query is configuration that does not belong in the logs either
+        String loggedEPR = targetEPR == null || targetEPR.indexOf('?') < 0
+                ? targetEPR : targetEPR.substring(0, targetEPR.indexOf('?'));
+
         if (log.isDebugEnabled()) {
-            log.debug("Endpoint url: " + targetEPR);
+            log.debug("Endpoint url: " + loggedEPR);
         }
 
         // Store the target endpoint address in the channel attributes to make it available throughout the lifecycle of the connection
@@ -173,7 +178,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         if (log.isDebugEnabled()) {
             log.debug(correlationId + " -- sendMessage triggered with sourceChannel: " + sourceIdentifier
                     + ", websocket sub protocol: " + wsSubProtocol + ", in the Thread,ID: " + Thread.currentThread()
-                    .getName() + "," + Thread.currentThread().getId() + ", URL: " + targetEPR + " API context: "
+                    .getName() + "," + Thread.currentThread().getId() + ", URL: " + loggedEPR + " API context: "
                     + apiProperties.get(WebsocketConstants.API_CONTEXT));
         }
         String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
@@ -249,7 +254,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 log.debug(correlationId
                         + " -- Fetching a Connection from the WS(WSS) Connection Factory with sourceChannel : "
                         + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + "," + Thread
-                        .currentThread().getId() + ", URL: " + targetEPR + " API context: " + apiProperties
+                        .currentThread().getId() + ", URL: " + loggedEPR + " API context: " + apiProperties
                         .get(WebsocketConstants.API_CONTEXT));
             }
             ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
@@ -276,7 +281,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                             correlationId + " -- Backend connection does not exist. No need to send close frame to backend "
                                     + "with sourceChannel : " + sourceIdentifier + ", in the Thread,ID: " + Thread
                                     .currentThread().getName() + "," + Thread.currentThread().getId() + ", URL: "
-                                    + targetEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
+                                    + loggedEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                 }
                 return;
             }
@@ -308,7 +313,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                 + clientHandler.getChannelHandlerContext().channel().toString() + ", "
                                 + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: " + Thread
                                 .currentThread().getName() + "," + Thread.currentThread().getId() + ", URL: "
-                                + targetEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
+                                + loggedEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                         clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
@@ -333,7 +338,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     log.debug(correlationId + " -- Sending CloseWebsocketFrame to WS server on context id: " + clientHandler
                             .getChannelHandlerContext().channel().toString() + ", " + ", sourceIdentifier: "
                             + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + "," + Thread
-                            .currentThread().getId() + ", URL: " + targetEPR + " API context: " + apiProperties
+                            .currentThread().getId() + ", URL: " + loggedEPR + " API context: " + apiProperties
                             .get(WebsocketConstants.API_CONTEXT));
                 }
                 if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CLOSE_CODE) != null) {
@@ -358,7 +363,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     WebSocketFrame frame = new TextWebSocketFrame(msg);
                     if (log.isDebugEnabled()) {
                         log.debug(correlationId + " -- Sending the text frame to the WS server on context id : "
-                                + clientHandler.getChannelHandlerContext().channel().toString() + ", URL: " + targetEPR
+                                + clientHandler.getChannelHandlerContext().channel().toString() + ", URL: " + loggedEPR
                                 + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
@@ -373,7 +378,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                         log.debug(correlationId + " -- AcknowledgeHandshake to WS server on context id: " + clientHandler
                                 .getChannelHandlerContext().channel().toString() + ", " + ", sourceIdentifier: "
                                 + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
-                                + Thread.currentThread().getId() + ", URL: " + targetEPR + " API context: "
+                                + Thread.currentThread().getId() + ", URL: " + loggedEPR + " API context: "
                                 + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     clientHandler.acknowledgeHandshake();
@@ -486,9 +491,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             return targetEPR;
         }
         if (log.isDebugEnabled()) {
-            // names only: the values can carry credentials
-            log.debug("Merged inbound query parameters into the backend url " + targetEPR + ". Parameters: "
-                              + mergedNames);
+            // names only: neither the caller's values nor the configured endpoint query are logged
+            log.debug("Merged inbound query parameters into the backend url. Parameters: " + mergedNames);
         }
         return merged;
     }
