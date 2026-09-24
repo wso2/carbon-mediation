@@ -54,11 +54,14 @@ import org.wso2.carbon.websocket.transport.utils.LogUtil;
 import org.wso2.securevault.SecretResolver;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.ConnectException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -126,9 +129,10 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         // Backend connections are pooled per source channel and the query is constant for the lifetime of
         // a channel, so a merged query cannot cross callers. The universal identifier is a shared pool and
         // is therefore skipped.
+        String effectiveEPR = targetEPR;
         if (!WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER.equals(sourceIdentifier)
                 && isForwardInboundQueryParamsEnabled(msgCtx)) {
-            targetEPR = mergeInboundQueryParams(targetEPR, msgCtx);
+            effectiveEPR = mergeInboundQueryParams(targetEPR, msgCtx);
         }
 
         if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT) != null
@@ -254,7 +258,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 resolver = configurationContext.getAxisConfiguration().getSecretResolver();
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(tenantDomain,
-                                                                                       new URI(targetEPR),
+                                                                                       new URI(effectiveEPR),
                                                                                        sourceIdentifier, handshakePresent,
                                                                                        responceDispatchSequence,
                                                                                        responceErrorSequence,
@@ -455,12 +459,15 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         }
 
         StringBuilder toAppend = new StringBuilder();
-        for (String pair : inbound.substring(queryStart + 1).split("&")) {
+        StringBuilder mergedNames = new StringBuilder();
+        for (String pair : inbound.substring(queryStart + 1).split("[&;]")) {
             int equals = pair.indexOf('=');
-            String name = equals < 0 ? pair : pair.substring(0, equals);
-            if (!name.isEmpty() && !containsQueryParam(targetEPR, name)) {
-                toAppend.append(toAppend.length() == 0 ? "" : "&").append(pair);
+            String name = decodeQueryParamName(equals < 0 ? pair : pair.substring(0, equals));
+            if (name.isEmpty() || containsQueryParam(targetEPR, name)) {
+                continue;
             }
+            toAppend.append(toAppend.length() == 0 ? "" : "&").append(pair);
+            mergedNames.append(mergedNames.length() == 0 ? "" : ", ").append(name);
         }
         if (toAppend.length() == 0) {
             return targetEPR;
@@ -472,16 +479,38 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         try {
             new URI(merged);
         } catch (URISyntaxException e) {
+            // e.getMessage() embeds the offending url, which carries the caller's query
             log.warn("Inbound query parameters were not merged into the backend url because the result is not a "
                              + "valid URI. Falling back to the configured endpoint url. Reason: " + e.getReason()
                              + " at index " + e.getIndex());
             return targetEPR;
         }
         if (log.isDebugEnabled()) {
-            log.debug("Merged inbound query parameters into the backend url. Before: " + targetEPR
-                              + ", after: " + merged);
+            // names only: the values can carry credentials
+            log.debug("Merged inbound query parameters into the backend url " + targetEPR + ". Parameters: "
+                              + mergedNames);
         }
         return merged;
+    }
+
+    /**
+     * Decodes a query parameter name so that encoded forms of the same name compare equal. The inbound
+     * request was matched against decoded names, so comparing raw text here would let an encoded name slip
+     * past the checks that matching performed.
+     *
+     * @param name raw query parameter name as it appears in the url
+     * @return the decoded name, or the raw name when it cannot be decoded
+     */
+    private String decodeQueryParamName(String name) {
+
+        if (name.indexOf('%') < 0 && name.indexOf('+') < 0) {
+            return name;
+        }
+        try {
+            return URLDecoder.decode(name, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            return name;
+        }
     }
 
     /**
@@ -497,9 +526,9 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         if (queryStart < 0) {
             return false;
         }
-        for (String pair : targetEPR.substring(queryStart + 1).split("&")) {
+        for (String pair : targetEPR.substring(queryStart + 1).split("[&;]")) {
             int equals = pair.indexOf('=');
-            String existing = equals < 0 ? pair : pair.substring(0, equals);
+            String existing = decodeQueryParamName(equals < 0 ? pair : pair.substring(0, equals));
             if (existing.equalsIgnoreCase(name)) {
                 return true;
             }

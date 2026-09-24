@@ -133,4 +133,28 @@ public class WebsocketTransportSenderQueryParamTest {
     public void testUnparsableMergeFallsBackOnBraces() {
         Assert.assertEquals(EPR, merge(EPR, "ws://localhost:9099/wsecho/1?p={id}"));
     }
+
+    // Endpoint precedence must not be bypassed by encoding the parameter name differently.
+
+    @Test
+    public void testEncodedNameCannotBypassEndpointPrecedence() {
+        Assert.assertEquals(EPR + "?token=fixed",
+                merge(EPR + "?token=fixed", "ws://localhost:9099/wsecho/1?%74oken=caller"));
+    }
+
+    @Test
+    public void testEncodedEndpointNameStillMatches() {
+        Assert.assertEquals(EPR + "?%74oken=fixed",
+                merge(EPR + "?%74oken=fixed", "ws://localhost:9099/wsecho/1?token=caller"));
+    }
+
+    @Test
+    public void testSemicolonSeparatedInboundPairsBothForwarded() {
+        Assert.assertEquals(EPR + "?a=1&b=2", merge(EPR, "ws://localhost:9099/wsecho/1?a=1;b=2"));
+    }
+
+    @Test
+    public void testPairValuesKeptVerbatimWhenNameDecodes() {
+        Assert.assertEquals(EPR + "?%74oken=a%2Fb", merge(EPR, "ws://localhost:9099/wsecho/1?%74oken=a%2Fb"));
+    }
 }
