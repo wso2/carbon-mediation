@@ -72,6 +72,17 @@ public abstract class GenericEventBasedConsumer {
      * */
     public abstract void destroy();    
 
+    /**
+     * Asks the runtime to call {@link #listen()} again after the consumer tore itself down because of an
+     * unrecoverable failure. WSO2 Micro Integrator, on which event based connectors built against this
+     * module run, listens again on the next task cycle of the inbound endpoint, on the node that runs it.
+     * This runtime does not restart the consumer; it stays down until the inbound endpoint is redeployed.
+     */
+    protected void requestRelisten() {
+        log.warn("Restarting an event based consumer is not supported by this runtime. Consumer [" + name
+                + "] stays down until the inbound endpoint is redeployed.");
+    }
+
     protected boolean injectMessage(String strMessage, String contentType){  
         InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
         return injectMessage(in, contentType);
