@@ -31,6 +31,7 @@ import io.netty.util.AttributeKey;
 import java.util.Objects;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
@@ -53,11 +54,14 @@ import org.wso2.carbon.websocket.transport.utils.LogUtil;
 import org.wso2.securevault.SecretResolver;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.ConnectException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -92,8 +96,13 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         Map<String, Object> customHeaders = new HashMap<>();
         Map<String, Object> apiProperties = new HashMap<>();
 
+        // logged urls stay query free: the caller's query can carry a credential, and the endpoint's
+        // own query is configuration that does not belong in the logs either
+        String loggedEPR = targetEPR == null || targetEPR.indexOf('?') < 0
+                ? targetEPR : targetEPR.substring(0, targetEPR.indexOf('?'));
+
         if (log.isDebugEnabled()) {
-            log.debug("Endpoint url: " + targetEPR);
+            log.debug("Endpoint url: " + loggedEPR);
         }
 
         // Store the target endpoint address in the channel attributes to make it available throughout the lifecycle of the connection
@@ -119,6 +128,16 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             }
         } else {
             sourceIdentifier = WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER;
+        }
+
+        // The backend url is fixed at deployment time, so the caller's query string is merged in here.
+        // Backend connections are pooled per source channel and the query is constant for the lifetime of
+        // a channel, so a merged query cannot cross callers. The universal identifier is a shared pool and
+        // is therefore skipped.
+        String effectiveEPR = targetEPR;
+        if (!WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER.equals(sourceIdentifier)
+                && isForwardInboundQueryParamsEnabled(msgCtx)) {
+            effectiveEPR = mergeInboundQueryParams(targetEPR, msgCtx);
         }
 
         if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT) != null
@@ -159,7 +178,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         if (log.isDebugEnabled()) {
             log.debug(correlationId + " -- sendMessage triggered with sourceChannel: " + sourceIdentifier
                     + ", websocket sub protocol: " + wsSubProtocol + ", in the Thread,ID: " + Thread.currentThread()
-                    .getName() + "," + Thread.currentThread().getId() + ", URL: " + targetEPR + " API context: "
+                    .getName() + "," + Thread.currentThread().getId() + ", URL: " + loggedEPR + " API context: "
                     + apiProperties.get(WebsocketConstants.API_CONTEXT));
         }
         String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
@@ -235,7 +254,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 log.debug(correlationId
                         + " -- Fetching a Connection from the WS(WSS) Connection Factory with sourceChannel : "
                         + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + "," + Thread
-                        .currentThread().getId() + ", URL: " + targetEPR + " API context: " + apiProperties
+                        .currentThread().getId() + ", URL: " + loggedEPR + " API context: " + apiProperties
                         .get(WebsocketConstants.API_CONTEXT));
             }
             ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
@@ -244,7 +263,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 resolver = configurationContext.getAxisConfiguration().getSecretResolver();
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(tenantDomain,
-                                                                                       new URI(targetEPR),
+                                                                                       new URI(effectiveEPR),
                                                                                        sourceIdentifier, handshakePresent,
                                                                                        responceDispatchSequence,
                                                                                        responceErrorSequence,
@@ -262,7 +281,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                             correlationId + " -- Backend connection does not exist. No need to send close frame to backend "
                                     + "with sourceChannel : " + sourceIdentifier + ", in the Thread,ID: " + Thread
                                     .currentThread().getName() + "," + Thread.currentThread().getId() + ", URL: "
-                                    + targetEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
+                                    + loggedEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                 }
                 return;
             }
@@ -294,7 +313,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                 + clientHandler.getChannelHandlerContext().channel().toString() + ", "
                                 + ", sourceIdentifier: " + sourceIdentifier + ", in the Thread,ID: " + Thread
                                 .currentThread().getName() + "," + Thread.currentThread().getId() + ", URL: "
-                                + targetEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
+                                + loggedEPR + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
                         clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
@@ -319,7 +338,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     log.debug(correlationId + " -- Sending CloseWebsocketFrame to WS server on context id: " + clientHandler
                             .getChannelHandlerContext().channel().toString() + ", " + ", sourceIdentifier: "
                             + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + "," + Thread
-                            .currentThread().getId() + ", URL: " + targetEPR + " API context: " + apiProperties
+                            .currentThread().getId() + ", URL: " + loggedEPR + " API context: " + apiProperties
                             .get(WebsocketConstants.API_CONTEXT));
                 }
                 if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_CLOSE_CODE) != null) {
@@ -344,7 +363,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     WebSocketFrame frame = new TextWebSocketFrame(msg);
                     if (log.isDebugEnabled()) {
                         log.debug(correlationId + " -- Sending the text frame to the WS server on context id : "
-                                + clientHandler.getChannelHandlerContext().channel().toString() + ", URL: " + targetEPR
+                                + clientHandler.getChannelHandlerContext().channel().toString() + ", URL: " + loggedEPR
                                 + " API context: " + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
@@ -359,7 +378,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                         log.debug(correlationId + " -- AcknowledgeHandshake to WS server on context id: " + clientHandler
                                 .getChannelHandlerContext().channel().toString() + ", " + ", sourceIdentifier: "
                                 + sourceIdentifier + ", in the Thread,ID: " + Thread.currentThread().getName() + ","
-                                + Thread.currentThread().getId() + ", URL: " + targetEPR + " API context: "
+                                + Thread.currentThread().getId() + ", URL: " + loggedEPR + " API context: "
                                 + apiProperties.get(WebsocketConstants.API_CONTEXT));
                     }
                     clientHandler.acknowledgeHandshake();
@@ -399,6 +418,126 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         } finally {
             ReferenceCountUtil.release(frame);
         }
+    }
+
+    /**
+     * Checks whether forwarding of inbound query parameters is enabled on this transport sender. Disabled
+     * unless "ws.forward.query.params" is explicitly set to true.
+     *
+     * @param msgCtx axis2 message context of the outgoing message
+     * @return true if the caller's query string should be merged into the backend url
+     */
+    private boolean isForwardInboundQueryParamsEnabled(MessageContext msgCtx) {
+
+        if (msgCtx.getTransportOut() == null) {
+            return false;
+        }
+        Parameter forwardQueryParams =
+                msgCtx.getTransportOut().getParameter(WebsocketConstants.WEBSOCKET_FORWARD_QUERY_PARAMS_CONFIG);
+        return forwardQueryParams != null && forwardQueryParams.getValue() != null
+                && Boolean.parseBoolean(forwardQueryParams.getValue().toString().trim());
+    }
+
+    /**
+     * Merges the query string of the inbound request into the backend url. The backend url is built at
+     * deployment time from the endpoint url and the topic mapping, so it never carries the caller's query.
+     * Pairs are appended verbatim, without decoding, so encoded values reach the backend exactly as the
+     * caller sent them. A name already present on the backend url keeps its configured value.
+     *
+     * The merged url is discarded if it does not parse, because the query is caller controlled and
+     * java.net.URI rejects characters that a caller can send.
+     *
+     * @param targetEPR backend url resolved from the endpoint definition
+     * @param msgCtx    axis2 message context carrying the inbound request url
+     * @return backend url with the caller's query merged in, or targetEPR unchanged
+     */
+    protected String mergeInboundQueryParams(String targetEPR, MessageContext msgCtx) {
+
+        Object inboundUrl = msgCtx.getProperty(Constants.Configuration.TRANSPORT_IN_URL);
+        if (targetEPR == null || inboundUrl == null) {
+            return targetEPR;
+        }
+        String inbound = inboundUrl.toString();
+        int queryStart = inbound.indexOf('?');
+        if (queryStart < 0) {
+            return targetEPR;
+        }
+
+        StringBuilder toAppend = new StringBuilder();
+        StringBuilder mergedNames = new StringBuilder();
+        for (String pair : inbound.substring(queryStart + 1).split("[&;]")) {
+            int equals = pair.indexOf('=');
+            String name = decodeQueryParamName(equals < 0 ? pair : pair.substring(0, equals));
+            if (name.isEmpty() || containsQueryParam(targetEPR, name)) {
+                continue;
+            }
+            toAppend.append(toAppend.length() == 0 ? "" : "&").append(pair);
+            mergedNames.append(mergedNames.length() == 0 ? "" : ", ").append(name);
+        }
+        if (toAppend.length() == 0) {
+            return targetEPR;
+        }
+
+        String separator = targetEPR.indexOf('?') < 0 ? "?"
+                : targetEPR.endsWith("?") || targetEPR.endsWith("&") ? "" : "&";
+        String merged = targetEPR + separator + toAppend;
+        try {
+            new URI(merged);
+        } catch (URISyntaxException e) {
+            // e.getMessage() embeds the offending url, which carries the caller's query
+            log.warn("Inbound query parameters were not merged into the backend url because the result is not a "
+                             + "valid URI. Falling back to the configured endpoint url. Reason: " + e.getReason()
+                             + " at index " + e.getIndex());
+            return targetEPR;
+        }
+        if (log.isDebugEnabled()) {
+            // names only: neither the caller's values nor the configured endpoint query are logged
+            log.debug("Merged inbound query parameters into the backend url. Parameters: " + mergedNames);
+        }
+        return merged;
+    }
+
+    /**
+     * Decodes a query parameter name so that encoded forms of the same name compare equal. The inbound
+     * request was matched against decoded names, so comparing raw text here would let an encoded name slip
+     * past the checks that matching performed.
+     *
+     * @param name raw query parameter name as it appears in the url
+     * @return the decoded name, or the raw name when it cannot be decoded
+     */
+    private String decodeQueryParamName(String name) {
+
+        if (name.indexOf('%') < 0 && name.indexOf('+') < 0) {
+            return name;
+        }
+        try {
+            return URLDecoder.decode(name, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            return name;
+        }
+    }
+
+    /**
+     * Checks whether the backend url already defines a query parameter with the given name.
+     *
+     * @param targetEPR backend url resolved from the endpoint definition
+     * @param name      query parameter name taken from the inbound request
+     * @return true if targetEPR already carries that parameter
+     */
+    private boolean containsQueryParam(String targetEPR, String name) {
+
+        int queryStart = targetEPR.indexOf('?');
+        if (queryStart < 0) {
+            return false;
+        }
+        for (String pair : targetEPR.substring(queryStart + 1).split("[&;]")) {
+            int equals = pair.indexOf('=');
+            String existing = decodeQueryParamName(equals < 0 ? pair : pair.substring(0, equals));
+            if (existing.equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleClientConnectionError(InboundResponseSender responseSender, Exception e) {
