@@ -178,14 +178,18 @@ public class RabbitMQConnectionFactory {
                 } else {
                     char[] keyPassphrase = keyStorePassword.toCharArray();
                     KeyStore ks = KeyStore.getInstance(keyStoreType);
-                    ks.load(new FileInputStream(keyStoreLocation), keyPassphrase);
+                    try (FileInputStream keyStoreStream = new FileInputStream(keyStoreLocation)) {
+                        ks.load(keyStoreStream, keyPassphrase);
+                    }
 
                     KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                     kmf.init(ks, keyPassphrase);
 
                     char[] trustPassphrase = trustStorePassword.toCharArray();
                     KeyStore tks = KeyStore.getInstance(trustStoreType);
-                    tks.load(new FileInputStream(trustStoreLocation), trustPassphrase);
+                    try (FileInputStream trustStoreStream = new FileInputStream(trustStoreLocation)) {
+                        tks.load(trustStoreStream, trustPassphrase);
+                    }
 
                     TrustManagerFactory tmf = TrustManagerFactory
                             .getInstance(KeyManagerFactory.getDefaultAlgorithm());
