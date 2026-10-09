@@ -69,6 +69,7 @@ public class WebsocketConstants {
     public static final String WEBSOCKET_CUSTOM_HEADER_CONFIG = "ws.custom.header";
     public static final String WEBSOCKET_HEADERS_PRESERVE_CONFIG = "ws.headers.preserve";
     public static final String WEBSOCKET_HOSTNAME_VERIFICATION_CONFIG = "ws.client.enable.hostname.verification";
+    public static final String WEBSOCKET_FORWARD_QUERY_PARAMS_CONFIG = "ws.forward.query.params";
 
     public static final String WEBSOCKET_SUBPROTOCOL = "websocket.subprotocol";
 

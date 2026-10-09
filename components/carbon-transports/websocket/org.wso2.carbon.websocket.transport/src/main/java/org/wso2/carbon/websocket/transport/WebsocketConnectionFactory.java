@@ -180,6 +180,9 @@ public class WebsocketConnectionFactory {
                     + apiProperties.get(WebsocketConstants.API_CONTEXT));
         }
         final WebSocketClientHandler handler;
+        // logged url stays query free: the caller's query can carry a credential
+        final String loggedUri = uri.getRawQuery() == null ? uri.toString()
+                : uri.toString().substring(0, uri.toString().indexOf('?'));
 
         try {
 
@@ -303,7 +306,7 @@ public class WebsocketConnectionFactory {
                                 log.debug(correlationId + " -- Using shared NioEventLoopGroup for connection - "
                                         + "Group: " + sharedEventLoopGroup.toString()
                                         + ", Source: " + sourceIdentifier
-                                        + ", URI: " + uri
+                                        + ", URI: " + loggedUri
                                         + ", Thread: " + Thread.currentThread().getName()
                                         + ", ThreadID: " + Thread.currentThread().getId());
                             }
