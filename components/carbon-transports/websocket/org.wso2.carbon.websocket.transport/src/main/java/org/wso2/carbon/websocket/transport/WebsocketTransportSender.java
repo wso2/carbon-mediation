@@ -466,8 +466,10 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         StringBuilder toAppend = new StringBuilder();
         StringBuilder mergedNames = new StringBuilder();
         for (String pair : inbound.substring(queryStart + 1).split("[&;]")) {
-            int equals = pair.indexOf('=');
-            String name = decodeQueryParamName(equals < 0 ? pair : pair.substring(0, equals));
+            // QueryStringDecoder skips a leading '=', so "=region=eu" parses as the name region
+            String named = pair.startsWith("=") ? pair.substring(1) : pair;
+            int equals = named.indexOf('=');
+            String name = decodeQueryParamName(equals < 0 ? named : named.substring(0, equals));
             if (name.isEmpty() || containsQueryParam(targetEPR, name)) {
                 continue;
             }

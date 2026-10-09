@@ -157,4 +157,25 @@ public class WebsocketTransportSenderQueryParamTest {
     public void testPairValuesKeptVerbatimWhenNameDecodes() {
         Assert.assertEquals(EPR + "?%74oken=a%2Fb", merge(EPR, "ws://localhost:9099/wsecho/1?%74oken=a%2Fb"));
     }
+
+    @Test
+    public void testLeadingEqualsPairForwardedVerbatim() {
+        Assert.assertEquals(EPR + "?=region=eu", merge(EPR, "ws://localhost:9099/wsecho/1?=region=eu"));
+    }
+
+    @Test
+    public void testLeadingEqualsValuelessPairForwarded() {
+        Assert.assertEquals(EPR + "?=region", merge(EPR, "ws://localhost:9099/wsecho/1?=region"));
+    }
+
+    @Test
+    public void testBareEqualsPairSkipped() {
+        Assert.assertEquals(EPR + "?a=1", merge(EPR, "ws://localhost:9099/wsecho/1?=&a=1"));
+    }
+
+    @Test
+    public void testLeadingEqualsCannotBypassEndpointPrecedence() {
+        Assert.assertEquals(EPR + "?region=fixed",
+                merge(EPR + "?region=fixed", "ws://localhost:9099/wsecho/1?=region=eu"));
+    }
 }
